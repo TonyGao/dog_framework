@@ -1,0 +1,45 @@
+.ef-divider.ef-horizontal {
+  position: relative;
+  clear: both;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  margin: 20px 0;
+  border-bottom: 1px solid rgb(229, 230, 235);
+}
+
+.ef-divider-text {
+  position: absolute;
+  top: 50%;
+  box-sizing: border-box;
+  padding: 0 16px;
+  color: rgb(29, 33, 41);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 2;
+  background: #fff;
+  transform: translateY(-50%);
+}
+
+.ef-divider-text-left {
+  left: 24px;
+}
+
+.ef-divider-text-center {
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ef-divider-text-right {
+  right: 24px;
+}
+
+.ef-divider-vertical {
+  display: inline-block;
+  min-width: 1px;
+  max-width: 1px px;
+  height: 1em;
+  margin: 0 12px;
+  vertical-align: middle;
+  border-left: 1px solid rgb(229,230,235);
+}

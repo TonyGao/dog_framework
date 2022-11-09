@@ -1,0 +1,51 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="ef-layout" style="height: 400px;" demo>
+  <header class="ef-layout-header">Header</header>
+  <main class="ef-layout-content">Content</main>
+  <footer class="ef-layout-footer">Footer</footer>
+</div>
+
+<br>
+
+<div class="ef-layout" style="height: 400px;" demo>
+  <header class="ef-layout-header">Header</header>
+  <section class="ef-layout ef-layout-has-sider">
+    <div class="ef-layout-sider" style="width: 200px">
+      <div class="ef-layout-sider-children">Sider</div>
+    </div>
+    <main class="ef-layout-content">Content</main>
+  </section>
+  <footer class="ef-layout-footer">Footer</footer>
+</div>
+
+<br>
+
+<div class="ef-layout" style="height: 400px;" demo>
+  <header class="ef-layout-header">Header</header>
+  <section class="ef-layout ef-layout-has-sider">
+    <main class="ef-layout-content">Content</main>
+    <div class="ef-layout-sider ef-layout-sider-light" style="width: 200px;">
+      <div class="ef-layout-sider-children">Sider</div>
+    </div>
+  </section>
+  <footer class="ef-layout-footer">Footer</footer>
+</div>
+
+<br>
+
+<div class="ef-layout" style="height: 400px;" demo>
+  <header class="ef-layout-header">Header</header>
+  <section class="ef-layout ef-layout-has-sider">
+    <div class="ef-layout-sider ef-layout-sider-light" style="width: 64px;">
+      <div class="ef-layout-sider-children">Sider</div>
+    </div>
+    <div class="ef-layout-sider ef-layout-sider-light" style="width: 206px;margin-left: 1px;">
+      <div class="ef-layout-sider-children">Sider</div>
+    </div>
+    <main class="ef-layout-content">Content</main>
+  </section>
+  <footer class="ef-layout-footer">Footer</footer>
+</div>
+{% endblock %}
