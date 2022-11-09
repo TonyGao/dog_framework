@@ -1,0 +1,27 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<a href="link" class="ef-link">Normal Link</a>
+<a class="ef-link disabled">Normal Link</a>
+
+<br>
+
+<a href="link" class="ef-link success">Success Link</a>
+<a href="link" class="ef-link success disabled">Success Link</a>
+
+<br>
+
+<a href="link" class="ef-link warning">Warning Link</a>
+<a href="link" class="ef-link warning disabled">Warning Link</a>
+
+<br>
+
+<a href="link" class="ef-link danger">Danger Link</a>
+<a href="link" class="ef-link danger disabled">Danger Link</a>
+
+<br>
+
+<a href="link" class="ef-link icon"><i class="fa-solid fa-link"></i>Link</a>
+<a href="link" class="ef-link disabled icon"><i class="fa-solid fa-link"></i>Link</a>
+
+{% endblock %}

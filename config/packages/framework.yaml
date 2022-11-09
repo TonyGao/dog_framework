@@ -16,6 +16,19 @@ framework:
     #fragments: true
     php_errors:
         log: true
+    assets:
+        version_strategy: 'App\Asset\EfVersioningStrategy'
+        packages:
+            static:
+                version: ~
+            image:
+                base_path: '/img'
+                version: ~
+            ui:
+                base_path: 'sunui/components'
+            admin:
+                base_path: 'sunui/admin'
+            
 
 when@test:
     framework:

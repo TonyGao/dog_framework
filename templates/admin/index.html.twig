@@ -1,0 +1,235 @@
+{% extends "base.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('layout.css', 'admin') }}">
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		$(document).ready(function () {
+      $(".hPerson-avatar-box").on("click", function () {
+        $(".dropdown-menu.hidden").toggle("slow", "swing");
+      });
+
+      $(".scroll-item").on("click", function(event) {
+        $(this).next().toggle("fast");
+      })
+    })
+	</script>
+{% endblock %}
+
+{% block body %}
+	<div id="app">
+		<section class="layout-container">
+			<header class="app-header">
+				<div class="admin-left-logo">
+					<div class="admin-left-logo-container">
+						<div class="admin-logo">
+							<a href="/admin/index">
+								<div class="logo-image" style="background-image: url('{{ asset('logo/logo.png', 'image') }}');"></div>
+							</a>
+						</div>
+					</div>
+				</div>
+				<div class="admin-header-right">
+					<div class="header-helper">
+						<a href="" class="admin-help-link">
+							<div>
+								<span class="universe-icon helper">
+									<i class="fa-regular fa-circle-question"></i>
+								</span>
+							</div>
+						</a>
+					</div>
+					<div class="hSeperater"></div>
+					<span>
+						<div class="module-container">
+							<div class="module-icon-container">
+								<span class="universe-icon">
+									<i class="fa-brands fa-symfony"></i>
+								</span>
+							</div>
+						</div>
+					</span>
+					<span>
+						<div class="hPerson-container">
+							<div class="hPerson-control">
+								<div class="hPerson-avatar-box">
+									<div class="hPerson-avatar">Tony</div>
+									<div class="hPerson-content">
+										<div class="hPerson-name">Tony Gao</div>
+									</div>
+									<div class="hPerson-caret">
+										<i class="fa-solid fa-angle-down"></i>
+									</div>
+								</div>
+							</div>
+							<div class="dropdown-menu hidden">
+								<div class="dropdown-header">
+									<div class="align-items-center">
+										<span>
+											<div class="hPerson-avatar">Tony</div>
+										</span>
+										<div class="hPerson-info-text">
+											<div class="hPerson-info-title">
+												研发工程师 高强
+											</div>
+											<div class="text-content">
+												linuxertony@163.com
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="dropdown-divider" style="margin: 0!important;"></div>
+								<a href="#" class="dropdown-item">
+									<span>Settings</span>
+								</a>
+								<div class="dropdown-divider" style="margin: 0!important;"></div>
+								<div class="dropdown-multilevel">
+									<div class="dropdown-item">
+										<span>Language</span>
+										<i class="fa-solid fa-angle-right"></i>
+									</div>
+									<div class="dropdown-menu">
+										<a href="#" class="dropdown-item">中文</a>
+										<a href="#" class="dropdown-item">English</a>
+									</div>
+								</div>
+								<div class="dropdown-divider" style="margin: 0!important;"></div>
+								<a href="#" class="dropdown-item">
+									<span>退出登录</span>
+								</a>
+							</div>
+						</div>
+					</span>
+				</div>
+			</header>
+			<section class="app-body">
+				<section class="app-side-menu">
+					<aside class="admin-aside-outer">
+						<div class="side-menu-one">
+							<div class="side-menu-two">
+								<div class="universe-icon side-scroll-btn">
+									<i class="fa-solid fa-angles-left"></i>
+								</div>
+								<div class="side-menu-content">
+									<a class="side-home link item-menu-content current" href="/admin/index">
+										<div class="link-icon">
+											<i class="fa-solid fa-house"></i>
+										</div>
+										<div class="link-text">
+											<div class="link-text-content" style="max-width: 83%;">首页</div>
+										</div>
+									</a>
+									<div class="parent-menu">
+										<div class="item-menu-content scroll-item">
+											<div class="link-icon">
+												<i class="fa-solid fa-sitemap"></i>
+											</div>
+											<div class="link-text">
+												<div class="link-text-content" style="max-width: 83%;">组织架构</div>
+												<i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
+											</div>
+										</div>
+										<div class="sub-menu-content" style="display:none">
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">成员与部门</div>
+												</div>
+											</a>
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">角色管理</div>
+												</div>
+											</a>
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">单位管理</div>
+												</div>
+											</a>
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">用户组管理</div>
+												</div>
+											</a>
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">成员字段管理</div>
+												</div>
+											</a>
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">关联组织</div>
+												</div>
+											</a>
+										</div>
+									</div>
+                  									<div class="parent-menu">
+										<div class="item-menu-content scroll-item">
+											<div class="link-icon">
+												<i class="fa-solid fa-sitemap"></i>
+											</div>
+											<div class="link-text">
+												<div class="link-text-content" style="max-width: 83%;">组织架构</div>
+												<i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
+											</div>
+										</div>
+										<div class="sub-menu-content" style="display:none">
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">成员与部门</div>
+												</div>
+											</a>
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">角色管理</div>
+												</div>
+											</a>
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">单位管理</div>
+												</div>
+											</a>
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">用户组管理</div>
+												</div>
+											</a>
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">成员字段管理</div>
+												</div>
+											</a>
+											<a class="item-menu-content" href="#">
+												<div class="link-icon"></div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">关联组织</div>
+												</div>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</aside>
+				</section>
+        <section class="app-content-container">
+        
+        </section>
+			</section>
+		</section>
+	</div>
+{% endblock %}

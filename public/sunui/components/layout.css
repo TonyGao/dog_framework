@@ -1,0 +1,84 @@
+.ef-layout {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+}
+
+.ef-layout-header {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.ef-layout[demo] .ef-layout-header {
+  height: 64px;
+  background-color: rgb(106,161,255);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  font-stretch: condensed;
+  text-align: center;
+}
+
+.ef-layout-content {
+  flex: 1;
+}
+
+.ef-layout[demo] .ef-layout-content {
+  background-color: rgb(22,93,255);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  font-stretch: condensed;
+  text-align: center;
+}
+
+.ef-layout-footer {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.ef-layout[demo] .ef-layout-footer {
+  height: 64px;
+  background-color: rgb(106,161,255);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  font-stretch: condensed;
+  text-align: center;
+}
+
+.ef-layout-has-sider {
+  flex-direction: row;
+}
+
+.ef-layout-sider {
+  width: 206px;
+  background-color: rgb(148,191,255);
+  position: relative;
+  flex: none;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  transition: width .2s cubic-bezier(.34,.69,.1,1);
+}
+
+.ef-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  font-stretch: condensed;
+  text-align: center;
+  height: 100%;
+  overflow: auto;
+}
