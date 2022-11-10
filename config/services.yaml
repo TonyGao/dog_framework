@@ -23,6 +23,9 @@ services:
         arguments:
             - '%kernel.environment%'
             - '%env(APP_VERSION)%'
+    App\Command\EfInitAdminMenuCommand:
+        arguments:
+            - '%app.admin_menu%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

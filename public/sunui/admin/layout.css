@@ -646,6 +646,9 @@ body {
   -webkit-transition: all 0.3s cubic-bezier(0.25, 0.1, 0.05, 1) 70ms;
   -ms-scroll-chaining: none;
   overscroll-behavior: contain;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
 }
 
 .side-menu-one {
@@ -845,4 +848,16 @@ body {
   height: 100%;
   background-color: #ffffff;
   transform-origin: right;
+}
+
+.parent-menu .parent-menu .sub-menu-content .link-text-content {
+  padding-left: 20px;
+}
+
+.parent-menu .parent-menu .parent-menu .sub-menu-content .link-text-content {
+  padding-left: 40px;
+}
+
+.parent-menu .parent-menu .parent-menu .parent-menu .sub-menu-content .link-text-content {
+  padding-left: 60px;
 }
