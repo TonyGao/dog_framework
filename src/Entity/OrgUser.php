@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ORM\Table(name="`user`")
+ * @ORM\Table(name="`org_user`")
  * @UniqueEntity(fields={"username"}, message="There is already an account with this username")
  */
 class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface

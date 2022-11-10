@@ -13,8 +13,18 @@
         $(".dropdown-menu.hidden").toggle("slow", "swing");
       });
 
-      $(".scroll-item").on("click", function(event) {
+      $(".scroll-item").on("click", function (event) {
         $(this).next().toggle("fast");
+				var icon = $(this).find('.link-text i');
+				icon.toggleClass(function() {
+					if (icon.hasClass("fa-chevron-down")) {
+						icon.removeClass("fa-chevron-down");
+						return "fa-chevron-up";
+					} else {
+						icon.removeClass("fa-chevron-up");
+						return "fa-chevron-down";
+					}
+				})
       })
     })
 	</script>
@@ -134,55 +144,147 @@
 											</div>
 										</div>
 										<div class="sub-menu-content" style="display:none">
-											<a class="item-menu-content" href="#">
-												<div class="link-icon"></div>
-												<div class="link-text">
-													<div class="link-text-content" style="max-width: 83%;">成员与部门</div>
+											<div class="parent-menu">
+												<div class="item-menu-content scroll-item">
+													<div class="link-icon"></div>
+													<div class="link-text">
+														<div class="link-text-content" style="max-width: 83%;">二级目录</div>
+														<i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
+													</div>
 												</div>
-											</a>
-											<a class="item-menu-content" href="#">
-												<div class="link-icon"></div>
-												<div class="link-text">
-													<div class="link-text-content" style="max-width: 83%;">角色管理</div>
+												<div class="sub-menu-content" style="display:none">
+													<a class="item-menu-content" href="#">
+														<div class="link-icon"></div>
+														<div class="link-text">
+															<div class="link-text-content" style="max-width: 83%;">成员与部门</div>
+														</div>
+													</a>
+													<a class="item-menu-content" href="#">
+														<div class="link-icon"></div>
+														<div class="link-text">
+															<div class="link-text-content" style="max-width: 83%;">角色管理</div>
+														</div>
+													</a>
+													<div class="parent-menu">
+														<div class="item-menu-content scroll-item">
+															<div class="link-icon"></div>
+															<div class="link-text">
+																<div class="link-text-content" style="max-width: 83%;">三级目录</div>
+																<i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
+															</div>
+														</div>
+														<div class="sub-menu-content" style="display:none">
+															<a class="item-menu-content" href="#">
+																<div class="link-icon"></div>
+																<div class="link-text">
+																	<div class="link-text-content" style="max-width: 83%;">成员与部门</div>
+																</div>
+															</a>
+															<div class="parent-menu">
+																<div class="item-menu-content scroll-item">
+																	<div class="link-icon"></div>
+																	<div class="link-text">
+																		<div class="link-text-content" style="max-width: 83%;">四级目录</div>
+																		<i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
+																	</div>
+																</div>
+																<div class="sub-menu-content" style="display:none">
+																	<a class="item-menu-content" href="#">
+																		<div class="link-icon"></div>
+																		<div class="link-text">
+																			<div class="link-text-content" style="max-width: 83%;">成员与部门</div>
+																		</div>
+																	</a>
+																	<a class="item-menu-content" href="#">
+																		<div class="link-icon"></div>
+																		<div class="link-text">
+																			<div class="link-text-content" style="max-width: 83%;">角色管理</div>
+																		</div>
+																	</a>
+																	<a class="item-menu-content" href="#">
+																		<div class="link-icon"></div>
+																		<div class="link-text">
+																			<div class="link-text-content" style="max-width: 83%;">单位管理</div>
+																		</div>
+																	</a>
+																	<a class="item-menu-content" href="#">
+																		<div class="link-icon"></div>
+																		<div class="link-text">
+																			<div class="link-text-content" style="max-width: 83%;">用户组管理</div>
+																		</div>
+																	</a>
+																	<a class="item-menu-content" href="#">
+																		<div class="link-icon"></div>
+																		<div class="link-text">
+																			<div class="link-text-content" style="max-width: 83%;">成员字段管理</div>
+																		</div>
+																	</a>
+																	<a class="item-menu-content" href="#">
+																		<div class="link-icon"></div>
+																		<div class="link-text">
+																			<div class="link-text-content" style="max-width: 83%;">关联组织</div>
+																		</div>
+																	</a>
+																</div>
+															</div>
+															<a class="item-menu-content" href="#">
+																<div class="link-icon"></div>
+																<div class="link-text">
+																	<div class="link-text-content" style="max-width: 83%;">角色管理</div>
+																</div>
+															</a>
+															<a class="item-menu-content" href="#">
+																<div class="link-icon"></div>
+																<div class="link-text">
+																	<div class="link-text-content" style="max-width: 83%;">单位管理</div>
+																</div>
+															</a>
+															<a class="item-menu-content" href="#">
+																<div class="link-icon"></div>
+																<div class="link-text">
+																	<div class="link-text-content" style="max-width: 83%;">用户组管理</div>
+																</div>
+															</a>
+															<a class="item-menu-content" href="#">
+																<div class="link-icon"></div>
+																<div class="link-text">
+																	<div class="link-text-content" style="max-width: 83%;">成员字段管理</div>
+																</div>
+															</a>
+															<a class="item-menu-content" href="#">
+																<div class="link-icon"></div>
+																<div class="link-text">
+																	<div class="link-text-content" style="max-width: 83%;">关联组织</div>
+																</div>
+															</a>
+														</div>
+													</div>
+													<a class="item-menu-content" href="#">
+														<div class="link-icon"></div>
+														<div class="link-text">
+															<div class="link-text-content" style="max-width: 83%;">单位管理</div>
+														</div>
+													</a>
+													<a class="item-menu-content" href="#">
+														<div class="link-icon"></div>
+														<div class="link-text">
+															<div class="link-text-content" style="max-width: 83%;">用户组管理</div>
+														</div>
+													</a>
+													<a class="item-menu-content" href="#">
+														<div class="link-icon"></div>
+														<div class="link-text">
+															<div class="link-text-content" style="max-width: 83%;">成员字段管理</div>
+														</div>
+													</a>
+													<a class="item-menu-content" href="#">
+														<div class="link-icon"></div>
+														<div class="link-text">
+															<div class="link-text-content" style="max-width: 83%;">关联组织</div>
+														</div>
+													</a>
 												</div>
-											</a>
-											<a class="item-menu-content" href="#">
-												<div class="link-icon"></div>
-												<div class="link-text">
-													<div class="link-text-content" style="max-width: 83%;">单位管理</div>
-												</div>
-											</a>
-											<a class="item-menu-content" href="#">
-												<div class="link-icon"></div>
-												<div class="link-text">
-													<div class="link-text-content" style="max-width: 83%;">用户组管理</div>
-												</div>
-											</a>
-											<a class="item-menu-content" href="#">
-												<div class="link-icon"></div>
-												<div class="link-text">
-													<div class="link-text-content" style="max-width: 83%;">成员字段管理</div>
-												</div>
-											</a>
-											<a class="item-menu-content" href="#">
-												<div class="link-icon"></div>
-												<div class="link-text">
-													<div class="link-text-content" style="max-width: 83%;">关联组织</div>
-												</div>
-											</a>
-										</div>
-									</div>
-                  									<div class="parent-menu">
-										<div class="item-menu-content scroll-item">
-											<div class="link-icon">
-												<i class="fa-solid fa-sitemap"></i>
 											</div>
-											<div class="link-text">
-												<div class="link-text-content" style="max-width: 83%;">组织架构</div>
-												<i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
-											</div>
-										</div>
-										<div class="sub-menu-content" style="display:none">
 											<a class="item-menu-content" href="#">
 												<div class="link-icon"></div>
 												<div class="link-text">
@@ -226,9 +328,7 @@
 						</div>
 					</aside>
 				</section>
-        <section class="app-content-container">
-        
-        </section>
+				<section class="app-content-container"></section>
 			</section>
 		</section>
 	</div>
