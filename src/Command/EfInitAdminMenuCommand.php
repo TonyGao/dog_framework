@@ -68,13 +68,13 @@ class EfInitAdminMenuCommand extends Command
                   ->setUri($uri);
 
                 if ($label !== "root") {
-                    $parentMenu = $this->menuRepo->findOneBy(['label' => $parentMenu]);
-                    $menuEntity->setParent($parentMenu);
+                    $parent = $this->menuRepo->findOneBy(['label' => $parentMenu]);
+                    $menuEntity->setParent($parent);
                 }
 
                 $this->em->persist($menuEntity);
+                $this->em->flush();
             }
-            $this->em->flush();
         }
 
         // 通过命令行增加菜单

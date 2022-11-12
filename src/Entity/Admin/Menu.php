@@ -6,11 +6,12 @@ use App\Entity\CommonTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Tree\Node as GedmoNode;
+use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 
 /**
  * @Gedmo\Tree(type="nested")
  * @ORM\Table(name="admin_menu")
- * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repisitoy\NestedTreeRepository")
+ * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\NestedTreeRepository")
  */
 class Menu implements GedmoNode
 {
