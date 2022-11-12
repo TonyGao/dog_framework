@@ -125,15 +125,56 @@
 									<i class="fa-solid fa-angles-left"></i>
 								</div>
 								<div class="side-menu-content">
-									<a class="side-home link item-menu-content current" href="/admin/index">
+								  {% macro recursiveMenu(mn) %}
+									  {% import _self as self %}
+										{% if mn.__children == [] %}
+											<a class="{{ mn.uri == "/admin/index" ? "side-home" : "" }} link item-menu-content {{ mn.uri == app.request.requestUri ? "current" : "" }}" href="{{ mn.uri }}">
+												<div class="link-icon">
+													<i class="{{ mn.icon }}"></i>
+												</div>
+												<div class="link-text">
+													<div class="link-text-content" style="max-width: 83%;">{{ mn.label }}</div>
+												</div>
+											</a>
+										{% else %}
+										  <div class="parent-menu">
+											  <div class="item-menu-content scroll-item">
+												  <div class="link-icon">
+													  {% if mn.icon %}
+														  <i class="{{ mn.icon }}"></i>
+														{% endif %}
+													</div>
+												  <div class="link-text">
+												    <div class="link-text-content" style="max-width: 83%;">{{ mn.label }}</div>
+												    <i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
+											    </div>
+												</div>
+												<div class="sub-menu-content" style="display:none">
+												  {% for child in mn.__children %}
+													  {{ self.recursiveMenu(child) }}
+													{% endfor %}
+												</div>
+											</div>
+										{% endif %}
+									{% endmacro %}
+
+									{% from _self import recursiveMenu %}
+
+                  {% if menus %}
+										{% for menu in menus %}
+										  {{ recursiveMenu(menu) }}
+										{% endfor %}
+									{% endif %}
+
+									{# <a class="side-home link item-menu-content current" href="/admin/index">
 										<div class="link-icon">
 											<i class="fa-solid fa-house"></i>
 										</div>
 										<div class="link-text">
 											<div class="link-text-content" style="max-width: 83%;">首页</div>
 										</div>
-									</a>
-									<div class="parent-menu">
+									</a> #}
+									{# <div class="parent-menu">
 										<div class="item-menu-content scroll-item">
 											<div class="link-icon">
 												<i class="fa-solid fa-sitemap"></i>
@@ -322,7 +363,8 @@
 												</div>
 											</a>
 										</div>
-									</div>
+									</div> #}
+								
 								</div>
 							</div>
 						</div>

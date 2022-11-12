@@ -646,9 +646,9 @@ body {
   -webkit-transition: all 0.3s cubic-bezier(0.25, 0.1, 0.05, 1) 70ms;
   -ms-scroll-chaining: none;
   overscroll-behavior: contain;
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .side-menu-one {
