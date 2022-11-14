@@ -15,7 +15,8 @@ class AdminController extends AbstractController
   public function index(Request $request, EntityManagerInterface $em): Response
   {
     $repo = $em->getRepository(Menu::class);
-    $menus = $repo->childrenHierarchy()[0]['__children'];
+    $root = $repo->childrenHierarchy();
+    $root !== [] ? $menus = $root[0]['__children'] : $menus = [];
     return $this->render('admin/index.html.twig', [
       'menus' => $menus
     ]);
