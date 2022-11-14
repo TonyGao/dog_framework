@@ -117,60 +117,10 @@
 				</div>
 			</header>
 			<section class="app-body">
-				<section class="app-side-menu">
-					<aside class="admin-aside-outer">
-						<div class="side-menu-one">
-							<div class="side-menu-two">
-								<div class="universe-icon side-scroll-btn">
-									<i class="fa-solid fa-angles-left"></i>
-								</div>
-								<div class="side-menu-content">
-								  {% macro recursiveMenu(mn) %}
-									  {% import _self as self %}
-										{% if mn.__children == [] %}
-											<a class="{{ mn.uri == "/admin/index" ? "side-home" : "" }} link item-menu-content {{ mn.uri == app.request.requestUri ? "current" : "" }}" href="{{ mn.uri }}">
-												<div class="link-icon">
-													<i class="{{ mn.icon }}"></i>
-												</div>
-												<div class="link-text">
-													<div class="link-text-content" style="max-width: 83%;">{{ mn.label }}</div>
-												</div>
-											</a>
-										{% else %}
-										  <div class="parent-menu">
-											  <div class="item-menu-content scroll-item">
-												  <div class="link-icon">
-													  {% if mn.icon %}
-														  <i class="{{ mn.icon }}"></i>
-														{% endif %}
-													</div>
-												  <div class="link-text">
-												    <div class="link-text-content" style="max-width: 83%;">{{ mn.label }}</div>
-												    <i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
-											    </div>
-												</div>
-												<div class="sub-menu-content" style="display:none">
-												  {% for child in mn.__children %}
-													  {{ self.recursiveMenu(child) }}
-													{% endfor %}
-												</div>
-											</div>
-										{% endif %}
-									{% endmacro %}
-
-									{% from _self import recursiveMenu %}
-
-                  {% if menus %}
-										{% for menu in menus %}
-										  {{ recursiveMenu(menu) }}
-										{% endfor %}
-									{% endif %}								
-								</div>
-							</div>
-						</div>
-					</aside>
-				</section>
-				<section class="app-content-container"></section>
+				{% include "admin/static/menu.html.twig" %}
+				<section class="app-content-container">
+        {% block app_content_container %}{% endblock %}
+        </section>
 			</section>
 		</section>
 	</div>

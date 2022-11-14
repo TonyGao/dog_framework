@@ -1,0 +1,141 @@
+.org-sturcture-container ol {
+  list-style: none;
+}
+
+.outside-wrapper {
+  position: absolute;
+  overflow: auto;
+  left: 0px;
+  right: 0;
+  bottom: 0;
+  top: 0px;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: stretch;
+  align-items: stretch;
+  padding-top: 40px;
+}
+
+.inside-wrapper {
+  display: flex;
+  position: relative;
+  margin: 0 auto;
+  transform: scale(1);
+}
+
+.start {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  z-index: 1000;
+  position: inherit;
+}
+
+.start .start-node-wrapper {
+  position: inherit;
+}
+
+.start .start-node-wrapper > h2 {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  height: 34px;
+  width: fit-content;
+  padding: 2px 20px;
+  margin-right: 30px;
+  color: #fefefe;
+  font-size: 14px;
+  background-color: rgb(22, 93, 255);
+  line-height: 30px;
+  border-radius: 16px;
+  z-index: 9999;
+  box-shadow: 2px 3px 5px 0 rgb(39 63 114 / 70%);
+}
+
+.tree {
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+}
+
+.tree h2 {
+  text-align: center;
+  height: 34px;
+  width: fit-content;
+  padding: 2px 20px;
+  color: #fefefe;
+  font-size: 14px;
+  background-color: rgb(22, 93, 255);
+  line-height: 30px;
+  border-radius: 16px;
+  z-index: 9999;
+  box-shadow: 2px 3px 5px 0 rgb(39 63 114 / 70%);
+}
+
+.start-node-wrapper:after {
+  content: "";
+  position: absolute;
+  width: 30px;
+  height: 2px;
+  background: #b8c0c9;
+  top: 18px;
+  right: 0px;
+  z-index: -1;
+}
+
+ .ol-wrapper {
+  list-style: none;
+  border-left: 2px solid #b8c0c9;
+  padding-left: 10px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+ .ol-wrapper > ol > li {
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  flex: 1;
+  padding: 0 5px;
+}
+
+/*
+.ol-wrapper > ol > li > h2:before {
+  content: '';
+  display: inherit;
+  border-left: 2px solid #a2aeba;
+  top: -20px;
+  left: -20px;
+  position: relative;
+  width: 20px;
+}
+
+.ol-wrapper > ol > li:after {
+  content: '';
+  display: inherit;
+  border-top: 2px solid #a2aeba;
+  top: -20px;
+  left: -20px;
+  position: relative;
+  width: 20px;
+}
+
+.ol-wrapper > ol > li:first-child:after {
+  content: '';
+  display: inherit;
+  border-top: 2px solid #a2aeba;
+  border-top-left-radius: 30px;
+  top: -20px;
+  left: -20px;
+  position: relative;
+  width: 20px;
+} */
+
+
+
+

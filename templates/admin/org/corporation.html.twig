@@ -1,0 +1,61 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('corporation.css', 'admin') }}">
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		$(document).ready(function () {})
+	</script>
+{% endblock %}
+
+{% block app_content_container %}
+	<div class="org-sturcture-container">
+		<div class="outside-wrapper">
+			<div class="inside-wrapper">
+				<div class="start">
+					<div class="start-node-wrapper">
+						<h2>天津港集团有限公司</h2>
+					</div>
+          <button class="btn primary mini icon circle" style="position: absolute; right: -15px;">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+				</div>
+				<div class="tree">
+					<div class="start-handler"></div>
+					<div class="ol-wrapper">
+						<ol>
+							<li>
+								<h2>天津港集团物流有限公司</h2>
+							</li>
+							<li>
+								<h2>天津港口医疗健康管理有限公司</h2>
+							</li>
+							<li>
+								<h2>天津港第二集装箱码头有限公司</h2>
+							</li>
+							<li>
+								<h2>天津国恒投资控股有限公司</h2>
+							</li>
+							<li>
+								<h2>天津港宏盛达房地产开发有限公司</h2>
+							</li>
+							<li>
+								<h2>天津市海河产业基金管理有限公司</h2>
+							</li>
+							<li>
+								<h2>津唐国际集装箱码头有限公司</h2>
+							</li>
+							<li>
+								<h2>天银金融租赁股份有限公司</h2>
+							</li>
+						</ol>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
