@@ -34,8 +34,7 @@ class EfInitAdminMenuCommand extends Command
         EntityManagerInterface $em,
         MenuRepository $menuRepo,
         Environment $twig,
-    )
-    {
+    ) {
         parent::__construct();
         $this->em = $em;
         $this->menu = $menuYaml;
@@ -50,7 +49,7 @@ class EfInitAdminMenuCommand extends Command
             ->addArgument('parentName', InputArgument::OPTIONAL, 'Parent Menu Name')
             ->addOption('add', null, InputOption::VALUE_NONE, 'Add menu from command')
             ->addOption('yaml', null, InputOption::VALUE_NONE, 'Init menu from yaml file')
-        ;
+            ->addOption('static', null, InputOption::VALUE_NONE, 'Make a static menu twig file');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
@@ -67,56 +66,58 @@ class EfInitAdminMenuCommand extends Command
         //     $io->note(sprintf('You passed an argument: %s', $arg1));
         // }
 
-        // if ($input->getOption('yaml')) {
-        //     foreach($this->menu as &$menuItem) {
-        //         $label = $menuItem[0];
-        //         $icon = $menuItem[1];
-        //         $uri = $menuItem[2];
-        //         $parentMenu = $menuItem[3];
+        if ($input->getOption('yaml')) {
+            foreach ($this->menu as &$menuItem) {
+                $label = $menuItem[0];
+                $icon = $menuItem[1];
+                $uri = $menuItem[2];
+                $parentMenu = $menuItem[3];
 
-        //         $menuEntity = new Menu();
-        //         $menuEntity->setLabel($label)
-        //           ->setIcon($icon)
-        //           ->setUri($uri);
+                $menuEntity = new Menu();
+                $menuEntity->setLabel($label)
+                    ->setIcon($icon)
+                    ->setUri($uri);
 
-        //         if ($label !== "root") {
-        //             $parent = $this->menuRepo->findOneBy(['label' => $parentMenu]);
-        //             $menuEntity->setParent($parent);
-        //         }
+                if ($label !== "root") {
+                    $parent = $this->menuRepo->findOneBy(['label' => $parentMenu]);
+                    $menuEntity->setParent($parent);
+                }
 
-        //         $this->em->persist($menuEntity);
-        //         $this->em->flush();
-        //     }
-        // }
-
-        // Create a static menu twig file
-        $filesystem = new Filesystem();
-        $menuTwig = 'templates/admin/static/menu.html.twig';
-
-        $repo = $this->em->getRepository(Menu::class);
-        $root = $repo->childrenHierarchy();
-        $root !== [] ? $menus = $root[0]['__children'] : $menus = [];
-        $html = $this->twig->render('admin/dynamic/menu.html.twig', [
-          'menus' => $menus
-        ]);
-
-        if (!$filesystem->exists($menuTwig)) {
-            try {
-                $filesystem->touch($menuTwig);
-            } catch (IOExceptionInterface $exception) {
-                $io->error("An error occurred while creating your directory at ".$exception->getPath());
+                $this->em->persist($menuEntity);
+                $this->em->flush();
             }
         }
 
-        try {
-            $filesystem->dumpFile($menuTwig, $html);
-        } catch (IOExceptionInterface $exception) {
-            $io->error("An error occurred while dumping your file at ".$exception->getPath());
+        if ($input->getOption('static')) {
+            // Create a static menu twig file
+            $filesystem = new Filesystem();
+            $menuTwig = 'templates/admin/static/menu.html.twig';
+
+            $repo = $this->em->getRepository(Menu::class);
+            $root = $repo->childrenHierarchy();
+            $root !== [] ? $menus = $root[0]['__children'] : $menus = [];
+            $html = $this->twig->render('admin/dynamic/menu.html.twig', [
+                'menus' => $menus
+            ]);
+
+            if (!$filesystem->exists($menuTwig)) {
+                try {
+                    $filesystem->touch($menuTwig);
+                } catch (IOExceptionInterface $exception) {
+                    $io->error("An error occurred while creating your directory at " . $exception->getPath());
+                }
+            }
+
+            try {
+                $filesystem->dumpFile($menuTwig, $html);
+            } catch (IOExceptionInterface $exception) {
+                $io->error("An error occurred while dumping your file at " . $exception->getPath());
+            }
         }
 
         // 通过命令行增加菜单
         // if ($input->getOption('add')) {
-        
+
         // }
 
         $io->success('操作菜单成功');
