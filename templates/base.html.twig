@@ -8,6 +8,8 @@
         {% block stylesheets %}
           <link rel="stylesheet" href="{{ asset('/lib/font-awesome/css/all.min.css', 'static') }}">
           <link rel="stylesheet" type="text/css" href="{{ asset('button.css', 'ui') }}">
+          <link rel="stylesheet" type="text/css" href="{{ asset('input.css', 'ui') }}">
+          <link rel="stylesheet" type="text/css" href="{{ asset('textarea.css', 'ui') }}">
           <link rel="stylesheet" type="text/css" href="{{ asset('link.css', 'ui') }}">
           <link rel="stylesheet" type="text/css" href="{{ asset('divider.css', 'ui') }}">
           <link rel="stylesheet" type="text/css" href="{{ asset('grid.css', 'ui') }}">
@@ -16,6 +18,7 @@
 
         {% block javascripts %}
           <script src=" {{ asset('lib/jQuery/jquery-3.6.1.min.js', 'static') }} "></script>
+          <script src=" {{ asset('lib/lodash/lodash.min.js', 'static') }} "></script>
           {# <script src="https://kit.fontawesome.com/ef1baf8144.js" crossorigin="anonymous"></script> #}
           {{ encore_entry_script_tags('app') }}
         {% endblock %}

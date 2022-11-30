@@ -11,7 +11,7 @@ class OptionValueRepository extends ServiceEntityRepository
   private $em;
   public function __construct(ManagerRegistry $registry)
   {
-    parent::__construc($registry, OptionValue::class);
+    parent::__construct($registry, OptionValue::class);
     $this->em = $this->getEntityManager();
   }
 }

@@ -10,7 +10,9 @@ use App\Repository\Platform\EntityPropertyRepository;
 /**
  * 实体属性
  * @ORM\Entity(repositoryClass=EntityPropertyRepository::class)
- * @ORM\Table(name="platform_entity_property")
+ * @ORM\Table(name="platform_entity_property",
+ *     indexes={@ORM\Index(name="entity_property_idx", columns={"token"})}
+ * )
  */
 class EntityProperty
 {
@@ -31,15 +33,21 @@ class EntityProperty
 
     /**
      * 属性令牌
-     * @ORM\Column(type="string", length=40)
+     * @ORM\Column(type="string", length=40, nullable=true)
      */
-    private $token;
+    private $token = null;
 
     /**
      * 是自定义的
      * @ORM\Column(type="boolean")
      */
     private $isCustomized;
+
+    /**
+     * 业务字段，这个布尔值决定了增删改查时是否显示此字段
+     * @ORM\Column(type="boolean")
+     */
+    private $businessField = false;
 
     /**
      * 属性名称
@@ -121,8 +129,12 @@ class EntityProperty
 
     /**
      * 属性所属的实体
-     * @ORM\ManyToOne(targetEntity="Entity", inversedBy="properties", cascade={"persist"})
-     * @ORM\JoinColumn(name="entity_id", referencedColumnName="id")
+     * @ORM\ManyToOne(
+     *     targetEntity="Entity",
+     *     inversedBy="properties",
+     *     cascade={"persist"}
+     * )
+     * ORM\JoinColumn(name="entity_id", referencedColumnName="id", , onDelete="SET NULL")
      */
     private $entity = null;
 
@@ -462,6 +474,26 @@ class EntityProperty
     public function setIsCustomized($isCustomized)
     {
         $this->isCustomized = $isCustomized;
+
+        return $this;
+    }
+
+    /**
+     * Get 业务字段，这个布尔值决定了增删改查时是否显示此字段
+     */
+    public function getBusinessField()
+    {
+        return $this->businessField;
+    }
+
+    /**
+     * Set 业务字段，这个布尔值决定了增删改查时是否显示此字段
+     *
+     * @return  self
+     */
+    public function setBusinessField($businessField)
+    {
+        $this->businessField = $businessField;
 
         return $this;
     }

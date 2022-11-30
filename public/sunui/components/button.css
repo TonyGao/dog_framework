@@ -94,7 +94,6 @@ br {
   cursor: pointer;
   transition: all .1s cubic-bezier(0,0,1,1);
   -webkit-appearance: none;
-  user-select: none;
 }
 
 .btn.medium {

@@ -5,6 +5,7 @@ namespace App\Entity\Platform;
 use App\Entity\CommonTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use App\Repository\Platform\OptionValueRepository;
 
 /**
  * @ORM\Entity(repositoryClass=OptionValueRepository::class)
@@ -26,7 +27,7 @@ class OptionValue
      * @ORM\Column(type="string", length=80)
      */
     private $code;
-    
+
     /**
      * 字符串型的值
      * @ORM\Column(type="string", length=500, nullable=true)
@@ -59,7 +60,7 @@ class OptionValue
 
     /**
      * Get the value of id
-     */ 
+     */
     public function getId()
     {
         return $this->id;
@@ -69,7 +70,7 @@ class OptionValue
      * Set the value of id
      *
      * @return  self
-     */ 
+     */
     public function setId($id)
     {
         $this->id = $id;
@@ -79,7 +80,7 @@ class OptionValue
 
     /**
      * Get 编码
-     */ 
+     */
     public function getCode()
     {
         return $this->code;
@@ -89,7 +90,7 @@ class OptionValue
      * Set 编码
      *
      * @return  self
-     */ 
+     */
     public function setCode($code)
     {
         $this->code = $code;
@@ -99,7 +100,7 @@ class OptionValue
 
     /**
      * Get 字符串型的值
-     */ 
+     */
     public function getStringValue()
     {
         return $this->stringValue;
@@ -109,7 +110,7 @@ class OptionValue
      * Set 字符串型的值
      *
      * @return  self
-     */ 
+     */
     public function setStringValue($stringValue)
     {
         $this->stringValue = $stringValue;
@@ -119,7 +120,7 @@ class OptionValue
 
     /**
      * Get 整型的值
-     */ 
+     */
     public function getIntegerValue()
     {
         return $this->integerValue;
@@ -129,7 +130,7 @@ class OptionValue
      * Set 整型的值
      *
      * @return  self
-     */ 
+     */
     public function setIntegerValue($integerValue)
     {
         $this->integerValue = $integerValue;
@@ -139,7 +140,7 @@ class OptionValue
 
     /**
      * Get 布尔值类型的值
-     */ 
+     */
     public function getBooleanValue()
     {
         return $this->booleanValue;
@@ -149,7 +150,7 @@ class OptionValue
      * Set 布尔值类型的值
      *
      * @return  self
-     */ 
+     */
     public function setBooleanValue($booleanValue)
     {
         $this->booleanValue = $booleanValue;
@@ -159,7 +160,7 @@ class OptionValue
 
     /**
      * Get 小数型的值
-     */ 
+     */
     public function getDecimalValue()
     {
         return $this->decimalValue;
@@ -169,7 +170,7 @@ class OptionValue
      * Set 小数型的值
      *
      * @return  self
-     */ 
+     */
     public function setDecimalValue($decimalValue)
     {
         $this->decimalValue = $decimalValue;
@@ -179,7 +180,7 @@ class OptionValue
 
     /**
      * Get 日期时间类型的值
-     */ 
+     */
     public function getDatetime()
     {
         return $this->datetime;
@@ -189,7 +190,7 @@ class OptionValue
      * Set 日期时间类型的值
      *
      * @return  self
-     */ 
+     */
     public function setDatetime($datetime)
     {
         $this->datetime = $datetime;

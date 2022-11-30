@@ -16,15 +16,16 @@
 	<div class="org-sturcture-container">
 		<div class="outside-wrapper">
 			<div class="inside-wrapper">
+            {% if corporation %}
 				<div class="start">
 					<div class="start-node-wrapper">
 						<h2>天津港集团有限公司</h2>
 					</div>
-          <button class="btn primary mini icon circle" style="position: absolute; right: -15px;">
-            <i class="fa-solid fa-plus"></i>
-          </button>
+                    <button class="btn primary mini icon circle" style="position: absolute; right: -15px;">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
 				</div>
-				<div class="tree">
+                {# <div class="tree">
 					<div class="start-handler"></div>
 					<div class="ol-wrapper">
 						<ol>
@@ -54,7 +55,14 @@
 							</li>
 						</ol>
 					</div>
-				</div>
+				</div> #}
+            {% else %}
+              <div class="warning-content">
+                <div class="warning-title">没有任何数据 T_T</div>
+                <img src="{{ asset('status/no-data.png', 'image') }}" width="587px" height="307px">
+                <button class="btn primary medium round" onclick="location.href='{{ path('org_corporation_edit') }}'"><i class="fa-solid fa-plus"></i>添加集团信息</button>
+              </div>
+            {% endif %}
 			</div>
 		</div>
 	</div>

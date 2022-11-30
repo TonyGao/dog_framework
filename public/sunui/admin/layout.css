@@ -861,3 +861,19 @@ body {
 .parent-menu .parent-menu .parent-menu .parent-menu .sub-menu-content .link-text-content {
   padding-left: 60px;
 }
+
+.warning-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.warning-content .warning-title {
+  width: fit-content;
+  align-self: center;
+  font-size: xx-large;
+}
+
+.warning-content button {
+  width: fit-content;
+  align-self: center;
+}
