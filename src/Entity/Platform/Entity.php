@@ -11,7 +11,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * 实体模型
  * @ORM\Entity(repositoryClass=EntityRepository::class)
- * @ORM\Table(name="platform_entity")
+ * @ORM\Table(name="platform_entity",
+ *     indexes={@ORM\Index(name="entity_idx", columns={"token"})}
+ * )
  */
 class Entity
 {
@@ -43,6 +45,12 @@ class Entity
     private $token;
 
     /**
+     * entity 的命名空间
+     * @ORM\Column(type="string", length=40, nullable=true)
+     */
+    private $fqn = null;
+
+    /**
      * 是自定义的
      * @ORM\Column(type="boolean")
      */
@@ -61,7 +69,12 @@ class Entity
     private $dataTableName;
 
     /**
-     * @ORM\OneToMany(targetEntity="EntityProperty", mappedBy="entity")
+     * @ORM\OneToMany(
+     *     targetEntity="EntityProperty",
+     *     mappedBy="entity",
+     *     orphanRemoval=true,
+     *     cascade={"persist"}
+     * )
      */
     private $properties;
 
@@ -223,6 +236,26 @@ class Entity
     public function setIsCustomized($isCustomized)
     {
         $this->isCustomized = $isCustomized;
+
+        return $this;
+    }
+
+    /**
+     * Get entity 的命名空间
+     */
+    public function getFqn()
+    {
+        return $this->fqn;
+    }
+
+    /**
+     * Set entity 的命名空间
+     *
+     * @return  self
+     */
+    public function setFqn($fqn)
+    {
+        $this->fqn = $fqn;
 
         return $this;
     }

@@ -1,0 +1,109 @@
+.ef-textarea-wrapper {
+  display: inline-flex;
+  box-sizing: border-box;
+  color: rgb(29,33,41);
+  font-size: 14px;
+  background-color: #fff;
+  border: 1px solid #a7a7a7;
+  border-radius: 2px;
+  cursor: text;
+  transition: color .1s cubic-bezier(0,0,1,1),border-color .1s cubic-bezier(0,0,1,1),background-color .1s cubic-bezier(0,0,1,1);
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  padding-right: 0;
+  padding-left: 0;
+  overflow: hidden;
+}
+
+.ef-textarea-wrapper:hover {
+  border-color: rgb(22, 93, 255);
+}
+
+.ef-textarea-wrapper:focus-within,
+.ef-textarea-wrapper.ef-input-focus {
+  background-color: #fff;
+  border-color: rgb(22 93 255 / 62%);
+  box-shadow: 0 0 0 0 rgb(190, 218, 255);
+  outline: 3px solid rgb(22 93 255 / 23%);
+}
+
+textarea {
+  font-family: inherit;
+  margin: 0;
+}
+
+.ef-textarea {
+  width: 100%;
+  color: inherit;
+  background: none;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  cursor: inherit;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  display: block;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 32px;
+  padding: 4px 12px;
+  font-size: 14px;
+  line-height: 1.5715;
+  vertical-align: top;
+  resize: vertical;
+}
+
+.ef-textarea-wrapper.ef-textarea-disabled {
+  color: rgb(201,205,212);
+  background-color: rgb(242,243,245);
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
+.ef-textarea[disabled] {
+  -webkit-text-fill-color: rgb(201,205,212);
+}
+
+.ef-textarea-wrapper .ef-textarea-clear-btn {
+  align-self: center;
+  color: rgb(78,89,105);
+  font-size: 16px;
+  visibility: hidden;
+  cursor: pointer;
+}
+
+.ef-textarea-wrapper .ef-textarea-clear-btn {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+}
+
+.ef-textarea-wrapper:hover .ef-textarea-clear-btn {
+  display: block;
+}
+
+.ef-textarea-wrapper:hover .ef-textarea-clear-btn {
+  visibility: visible;
+}
+
+.ef-textarea-wrapper.ef-textarea-error {
+  background-color: rgb(255,236,232);
+  border-color: transparent;
+}
+
+.ef-textarea-wrapper.ef-textarea-error:hover {
+  background-color: rgb(253,205,197);
+  border-color: transparent;
+}
+
+textarea {
+  overflow-x:hidden;
+  overflow-y:hidden;
+}
+
+textarea:hover {
+  overflow-x:auto;
+  overflow-y:auto;
+}

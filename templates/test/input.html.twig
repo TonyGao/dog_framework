@@ -1,0 +1,154 @@
+{% extends "base.html.twig" %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script>
+    $(document).ready(function() {
+        let xmark = `
+          <span class="ef-icon-hover ef-input-icon-hover ef-input-clear-btn">
+            <i class="fa-regular fa-circle-xmark"></i>
+          </span>
+        `;
+        /**
+         * flag 用来标记是否为中文输入完毕
+         */
+        let flag = true;
+        $("input[type='text']").on('compositionstart', function() {
+          flag = false;
+        })
+
+        $("input[type='text']").on('compositionend', function() {
+          flag = true;
+        })
+        let clearable = true;
+        $("input[type='text']").on('input', _.debounce(function() {
+            if (flag) {
+                // 判断是否需要显示限制字数长度
+                let isLimited = $(this).attr('show-word-limit') !== undefined && $(this).attr('show-word-limit') !== false;
+                let limitString;
+                let maxLength;
+                let limitNum;
+                let textLength = $(this).val().length;
+                if (isLimited) {
+                    limitString = $(this).parent().find('.ef-input-word-limit').html().split('/');
+                    $(this).parent().find('.ef-input-word-limit').html(textLength + '/' + limitString[1]);
+                }
+
+                // 如果 input 包含 max-length="{length:10,errorOnly:true}"
+                // 将 length 更新到 .ef-input-word-limit 上
+                if ($(this).attr('max-length')) {
+                  eval('maxLength='+$(this).attr('max-length'));
+                  maxLength.length ? limitNum = maxLength.length : limitNum = null;
+                  if (maxLength.errorOnly && limitNum) {
+                    $(this).parent().find('.ef-input-word-limit').html(textLength + '/' + limitNum);
+                    // 如果输入的字符长度超过了限制长度，向父级span添加ef-input-error类
+                    let hasError = $(this).parent().hasClass('ef-input-error');
+                    if (textLength > limitNum) {
+                      if (!hasError) {
+                        $(this).parent().addClass('ef-input-error');
+                      }
+                    } else if (hasError) {
+                      $(this).parent().removeClass('ef-input-error');
+                    }
+                  }
+                }
+
+                clearable = $(this).attr('clearable') == 'true' ? true : false;
+                if ($(this).val().length > 0 && clearable) {
+                    clearable = false;
+                    $(this).attr('clearable', 'false');
+                    $(this).after(xmark);
+                    $(".ef-input-clear-btn").on("click", function() {
+                        if (isLimited) {
+                            $(this).parent().find('.ef-input-word-limit').html('0/' + limitString[1]);
+                            $(this).parent().removeClass('ef-input-error');
+                        }
+                        $(this).prev().val("");
+                        $(this).prev().attr('clearable', 'true');
+                        clearable = true;
+                        $(this).remove();
+                    })
+                };
+
+                if ($(this).val().length == 0 && !clearable) {
+                    clearable = true;
+                    $(this).attr('clearable', 'true');
+                    $(this).next().remove();
+                }
+            }
+        }, 100))
+    })
+  </script>
+{% endblock %}
+
+{% block body %}
+	<span class="ef-input-wrapper" style="width: 320px;">
+      <input class="ef-input ef-input-size-medium" type="text" clearable="true" placeholder="Please enter something">
+    </span>
+    <br>
+    <span class="ef-input-wrapper ef-input-disabled" style="width: 320px;">
+      <input class="ef-input ef-input-size-medium" type="text" clearable="true" placeholder="Please enter something" disabled>
+    </span>
+    <br>
+    <span class="ef-input-wrapper ef-input-error" style="width: 320px;">
+      <input aria-invalid="true" class="ef-input ef-input-size-medium" clearable="true" type="text" placeholder="Error status">
+    </span>
+    <br>
+    <span class="ef-input-wrapper" style="width: 320px;">
+      <input class="ef-input ef-input-size-mini" type="text" clearable="true" placeholder="Please enter something">
+    </span>
+    <br>
+    <span class="ef-input-wrapper" style="width: 320px;">
+      <input class="ef-input ef-input-size-small" type="text" clearable="true" placeholder="Please enter something">
+    </span>
+    <br>
+    <span class="ef-input-wrapper" style="width: 320px;">
+      <input class="ef-input ef-input-size-large" type="text" clearable="true" placeholder="Please enter something">
+    </span>
+    <br>
+    <span class="ef-input-wrapper" style="width: 320px;">
+      <span class="ef-input-prefix">
+        <i class="fa-regular fa-user"></i>
+      </span>
+      <input class="ef-input ef-input-size-medium" type="text" clearable="true" placeholder="Please enter something">
+    </span>
+    <br>
+    <span class="ef-input-wrapper" style="width: 320px;">
+      <input class="ef-input ef-input-size-medium" type="text" clearable="true" placeholder="Please enter something">
+      <span class="ef-input-suffix">
+        <i class="fa-brands fa-java"></i>
+      </span>
+    </span>
+    <br>
+    <span class="ef-input-outer ef-input-outer-size-medium" style="width: 320px;">
+      <span class="ef-input-prepend"> +86 </span>
+      <span class="ef-input-wrapper">
+        <input class="ef-input ef-input-size-medium" type="text" clearable="true" placeholder="Please enter something">
+      </span>
+    </span>
+    <br>
+    <span class="ef-input-outer ef-input-outer-size-medium" style="width: 320px;">
+      <span class="ef-input-wrapper">
+        <input class="ef-input ef-input-size-medium" type="text" clearable="true" placeholder="Please enter something">
+      </span>
+      <span class="ef-input-append"> RMB </span>
+    </span>
+    <br>
+    <span class="ef-input-wrapper" style="width: 320px;">
+      <input class="ef-input ef-input-size-medium" type="text" clearable="true" maxlength="10" show-word-limit placeholder="Please enter something">
+      <span class="ef-input-suffix">
+        <span class="ef-input-word-limit">0/10</span>
+      </span>
+    </span>
+    <br>
+    <span class="ef-input-wrapper" style="width: 320px;">
+      <input class="ef-input ef-input-size-medium" type="text" clearable="true" max-length="{length:10,errorOnly:true}" show-word-limit placeholder="Please enter something">
+      <span class="ef-input-suffix">
+        <span class="ef-input-word-limit">0/10</span>
+      </span>
+    </span>
+    <br>
+	<input type="text" maxlength="180">
+    <br>
+	<input type="text" required="required" maxlength="180">
+{% endblock %}

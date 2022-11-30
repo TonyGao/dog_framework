@@ -1,0 +1,218 @@
+input {
+  overflow: visible;
+}
+
+.ef-input-wrapper {
+  display: inline-flex;
+  box-sizing: border-box;
+  width: 100%;
+  padding-right: 12px;
+  padding-left: 12px;
+  color: var(--color-text-1);
+  font-size: 14px;
+  background-color: #fff;
+  border: 1px solid #a7a7a7;
+  border-radius: 2px;
+  cursor: text;
+  transition: color 0.1s cubic-bezier(0, 0, 1, 1),
+    border-color 0.1s cubic-bezier(0, 0, 1, 1),
+    background-color 0.1s cubic-bezier(0, 0, 1, 1);
+}
+
+.ef-input-wrapper:hover {
+  border-color: rgb(22, 93, 255);
+}
+
+.ef-input-wrapper:focus-within,
+.ef-input-wrapper.ef-input-focus {
+  background-color: #fff;
+  border-color: rgb(22 93 255 / 62%);
+  box-shadow: 0 0 0 0 rgb(190, 218, 255);
+  outline: 3px solid rgb(22 93 255 / 23%);
+}
+
+.ef-input-wrapper .ef-input.ef-input-size-medium {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  font-size: 14px;
+  line-height: 1.5715;
+}
+
+.ef-input-wrapper .ef-input {
+  width: 100%;
+  padding-right: 0;
+  padding-left: 0;
+  color: inherit;
+  line-height: 1.5715;
+  background: none;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  cursor: inherit;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.ef-input-wrapper:hover .ef-input-clear-btn {
+  visibility: visible;
+}
+
+.ef-input-wrapper .ef-input-clear-btn {
+  align-self: center;
+  color: rgb(78, 89, 105);
+  font-size: 16px;
+  visibility: hidden;
+  cursor: pointer;
+}
+
+.ef-icon-hover {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  line-height: 12px;
+}
+
+.ef-icon-hover:before {
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+  border-radius: var(--border-radius-circle);
+  transition: background-color 0.1s cubic-bezier(0, 0, 1, 1);
+  content: "";
+}
+
+.ef-input-wrapper .ef-input-clear-btn>svg {
+  position: relative;
+  transition: color .1s cubic-bezier(0,0,1,1);
+}
+
+.ef-input-wrapper.ef-input-disabled {
+  color: rgb(201,205,212);
+  background-color: rgb(242,243,245);
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
+.ef-input-wrapper.ef-input-error {
+  background-color: rgb(255,236,232);
+  border-color: transparent;
+}
+
+.ef-input-wrapper.ef-input-error:hover {
+  background-color: rgb(253,205,197);
+  border-color: transparent;
+}
+
+.ef-input-wrapper.ef-input-error:focus-within, .ef-input-wrapper.ef-input-error.ef-input-wrapper-focus {
+  background-color: #fff;
+  border-color: rgb(245,63,63);
+  box-shadow: 0 0 0 0 rgb(253,205,197);
+  outline: transparent;
+}
+
+.ef-input-wrapper .ef-input.ef-input-size-mini {
+  padding-top: 1px;
+  padding-bottom: 1px;
+  font-size: 12px;
+  line-height: 1.667;
+}
+
+.ef-input-wrapper .ef-input.ef-input-size-small {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  font-size: 14px;
+  line-height: 1.5715;
+}
+
+.ef-input-wrapper .ef-input.ef-input-size-large {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-size: 14px;
+  line-height: 1.5715;
+}
+
+.ef-input-wrapper .ef-input-prefix {
+  padding-right: 12px;
+  color: rgb(78,89,105);
+}
+
+.ef-input-wrapper .ef-input-prefix, .ef-input-wrapper .ef-input-suffix {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.ef-input-wrapper .ef-input-prefix>i, .ef-input-wrapper .ef-input-suffix>i {
+  font-size: 14px;
+}
+
+.ef-input-wrapper .ef-input-suffix {
+  padding-left: 12px;
+  color: rgb(78,89,105);
+}
+
+.ef-input-wrapper .ef-input-prefix, .ef-input-wrapper .ef-input-suffix {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.ef-input-wrapper .ef-input-prefix>i, .ef-input-wrapper .ef-input-suffix>i {
+  font-size: 14px;
+}
+
+.ef-input-outer {
+  display: inline-flex;
+  width: 100%;
+}
+
+.ef-input-outer>:first-child {
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+.ef-input-outer>:last-child {
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.ef-input-prepend {
+  border-right: 1px solid rgb(229,230,235);
+}
+
+.ef-input-prepend, .ef-input-append {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 12px;
+  color: rgb(29,33,41);
+  white-space: nowrap;
+  background-color: rgb(242,243,245);
+  border: 1px solid transparent;
+}
+
+.ef-input-prepend {
+  font-size: 14px;
+}
+
+.ef-input-append {
+  font-size: 14px;
+}
+
+.ef-input-suffix {
+  font-size: 14px;
+}
+
+.ef-input-word-limit {
+  font-size: 12px;
+}

@@ -1,0 +1,23 @@
+{% extends "admin/layout.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('corporation.css', 'admin') }}">
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		$(document).ready(function () {})
+	</script>
+{% endblock %}
+
+{% block app_content_container %}
+	<div class="org-sturcture-container">
+		<div class="outside-wrapper">
+			<div class="inside-wrapper">
+              {{ form(form) }}
+			</div>
+		</div>
+	</div>
+{% endblock %}

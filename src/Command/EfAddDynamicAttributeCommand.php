@@ -48,7 +48,7 @@ class EfAddDynamicAttributeCommand extends Command
             $class->addProperty('englishName')
             ->setPrivate()
             ->addComment('英文名称')
-            ->addComment('@ORM\Column(type="string, lenght=180")');
+            ->addComment('@ORM\Column(type="string", length=180)');
 
             if (!$filesystem->exists($entity)) {
                 $io->error("不存在此模型");

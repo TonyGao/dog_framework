@@ -28,7 +28,7 @@ trait CommonTrait
 
     /**
      * Pre persist event listener
-     * 
+     *
      * @ORM\PrePersist
      */
     public function beforeSave()
@@ -39,7 +39,7 @@ trait CommonTrait
 
     /**
      * Pre update event listener
-     * 
+     *
      * @ORM\PreUpdate
      */
     public function beforeUpdate()

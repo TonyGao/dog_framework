@@ -8,8 +8,8 @@
 				<div class="side-menu-content">
 					{% macro recursiveMenu(mn) %}
 						{% import _self as self %}
+                        {% set uri = mn.uri %}
 						{% if mn.__children == [] %}
-              {% set uri = mn.uri %}
 							<a class="{{ mn.uri == "/admin/index" ? "side-home" : "" }} link item-menu-content {{"{{'"}}{{uri|trim}}{{"'== app.request.requestUri ? 'current' : '' }}"}}" href="{{ mn.uri }}">
 								<div class="link-icon">
 									<i class="{{ mn.icon }}"></i>
@@ -31,7 +31,7 @@
 										<i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
 									</div>
 								</div>
-								<div class="sub-menu-content" style="display:none">
+								<div class="sub-menu-content" style="{{"{{'"}}{{uri|trim}}{{"'== app.request.requestUri ? 'display: none;' : '' }}"}}">
 									{% for child in mn.__children %}
 										{{ self.recursiveMenu(child) }}
 									{% endfor %}
