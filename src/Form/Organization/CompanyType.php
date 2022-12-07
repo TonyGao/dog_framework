@@ -1,16 +1,19 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\Organization;
 
-use App\Entity\Organization\Corporation;
+use App\Lib\Str;
+use App\Entity\Organization\Company;
 use App\Entity\Platform\Entity;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
-class CorporationType extends AbstractType
+class CompanyType extends AbstractType
 {
     public $em;
     public function __construct(EntityManagerInterface $em)
@@ -20,22 +23,24 @@ class CorporationType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $reflectionClass = new \ReflectionClass(Corporation::class);
+        $reflectionClass = new \ReflectionClass(Company::class);
         $repo = $this->em->getRepository(Entity::class);
         $en = $repo->findOneBy([
             'fqn' => $reflectionClass->name,
         ]);
         $fields = $en->getProperties();
         foreach ($fields as $field) {
-            $builder->add($field->getFieldName());
+            $classType = Str::convertFormType($field->getType());
+            $builder->add($field->getFieldName(), $classType, [
+                'label' => $field->getComment()
+            ]);
         }
-        $builder->add('save', SubmitType::class, ['label' => 'Create Task']);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Corporation::class,
+            'data_class' => Company::class,
         ]);
     }
 }

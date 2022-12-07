@@ -12,10 +12,10 @@
   display: flex;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: nowrap;
   -webkit-box-pack: justify;
-  justify-content: space-between;
+  justify-content: center;
   -webkit-box-align: stretch;
   align-items: stretch;
   padding-top: 40px;
@@ -26,6 +26,7 @@
   position: relative;
   margin: 0 auto;
   transform: scale(1);
+  margin-bottom: 60px;
 }
 
 .start {
@@ -102,6 +103,11 @@
   box-sizing: border-box;
   flex: 1;
   padding: 0 5px;
+}
+
+.button-group {
+  display: flex;
+  margin: 0 auto;
 }
 
 /*

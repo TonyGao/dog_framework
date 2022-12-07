@@ -8,19 +8,25 @@
         {% block stylesheets %}
           <link rel="stylesheet" href="{{ asset('/lib/font-awesome/css/all.min.css', 'static') }}">
           <link rel="stylesheet" type="text/css" href="{{ asset('button.css', 'ui') }}">
+          <link rel="stylesheet" type="text/css" href="{{ asset('input-number.css', 'ui') }}">
           <link rel="stylesheet" type="text/css" href="{{ asset('input.css', 'ui') }}">
           <link rel="stylesheet" type="text/css" href="{{ asset('textarea.css', 'ui') }}">
           <link rel="stylesheet" type="text/css" href="{{ asset('link.css', 'ui') }}">
           <link rel="stylesheet" type="text/css" href="{{ asset('divider.css', 'ui') }}">
           <link rel="stylesheet" type="text/css" href="{{ asset('grid.css', 'ui') }}">
           <link rel="stylesheet" type="text/css" href="{{ asset('layout.css', 'ui') }}">
+          <link rel="stylesheet" type="text/css" href="{{ asset('form.css', 'ui') }}">
         {% endblock %}
 
         {% block javascripts %}
           <script src=" {{ asset('lib/jQuery/jquery-3.6.1.min.js', 'static') }} "></script>
           <script src=" {{ asset('lib/lodash/lodash.min.js', 'static') }} "></script>
+          <script src=" {{ asset('input.js', 'ui') }} "></script>
+          <script src=" {{ asset('textarea.js', 'ui') }} "></script>
           {# <script src="https://kit.fontawesome.com/ef1baf8144.js" crossorigin="anonymous"></script> #}
           {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+        {% block css %}
         {% endblock %}
     </head>
     <body>

@@ -216,3 +216,11 @@ input {
 .ef-input-word-limit {
   font-size: 12px;
 }
+
+.ef-underline-input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  border-bottom: 1px solid #a7a7a7;
+  font-size: 14px;
+}

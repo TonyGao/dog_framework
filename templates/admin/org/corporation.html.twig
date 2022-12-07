@@ -8,62 +8,118 @@
 {% block javascripts %}
 	{{ parent() }}
 	<script>
-		$(document).ready(function () {})
+		$().ready(function () {
+      $(".corporation-node").hover(function() {
+        $(".node-edit", this).show();
+      }, function() {
+        $(".node-edit", this).hide();
+      });
+
+      let isadded = false;
+      $("#add-company").on("click", function() {
+        if (isadded == false) {
+          $(".added-company").show();
+        }
+        isadded = true;
+        $(".company").append('<li class="deleteable"><h2><span class="ef-underline-input input-company" contenteditable></span><span class="delete-icon"><i class="fa-solid fa-circle-minus"></i><span></li>');
+        $(".delete-icon:last").on("click", function() {
+          $(this).parents('li').remove();
+        })
+      })
+
+      // 批量创建公司名称
+      $("#save-company").on("click", function() {
+        let arr = [];
+        $(".ef-underline-input.input-company").each(function(val) {
+          arr.push($(this).text());
+        })
+
+        let payload = {
+          company: arr
+        }
+
+        $.ajax({
+          url: "/api/admin/org/company/batchcreate",
+          method: "POST",
+          dataType: "json",
+          data: JSON.stringify(payload),
+          success: function(data) {
+            location.reload();
+          }
+        })
+      })
+    })
 	</script>
+{% endblock %}
+
+{% block css %}
+  <style>
+    .btn.mini.node-edit {
+      display: initial;
+      background-color: white;
+      color: rgb(22,93,255);
+      border-radius: 10px;
+      margin-left: 10px;
+      font-size: 1em;
+    }
+
+    .ef-underline-input.input-company {
+      border-bottom: 1px solid #fefefe;
+      font-weight: bold;
+      color: #fefefe;
+      min-width: 200px;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .deleteable .delete-icon:hover {
+      cursor: pointer;
+    }
+  </style>
 {% endblock %}
 
 {% block app_content_container %}
 	<div class="org-sturcture-container">
 		<div class="outside-wrapper">
 			<div class="inside-wrapper">
-            {% if corporation %}
+      {% if corporation %}
 				<div class="start">
 					<div class="start-node-wrapper">
-						<h2>天津港集团有限公司</h2>
+						<h2 class="corporation-node">
+              {{ corporation.name }}
+              <a class="btn primary mini node-edit" href="{{ path('org_corporation_edit') }}" style="display: none;">编辑</a>
+            </h2>
 					</div>
-                    <button class="btn primary mini icon circle" style="position: absolute; right: -15px;">
-                        <i class="fa-solid fa-plus"></i>
-                    </button>
+            <button class="btn primary mini icon circle" id="add-company" style="position: absolute; right: -15px;">
+              <i class="fa-solid fa-plus"></i>
+            </button>
 				</div>
-                {# <div class="tree">
-					<div class="start-handler"></div>
-					<div class="ol-wrapper">
-						<ol>
-							<li>
-								<h2>天津港集团物流有限公司</h2>
-							</li>
-							<li>
-								<h2>天津港口医疗健康管理有限公司</h2>
-							</li>
-							<li>
-								<h2>天津港第二集装箱码头有限公司</h2>
-							</li>
-							<li>
-								<h2>天津国恒投资控股有限公司</h2>
-							</li>
-							<li>
-								<h2>天津港宏盛达房地产开发有限公司</h2>
-							</li>
-							<li>
-								<h2>天津市海河产业基金管理有限公司</h2>
-							</li>
-							<li>
-								<h2>津唐国际集装箱码头有限公司</h2>
-							</li>
-							<li>
-								<h2>天银金融租赁股份有限公司</h2>
-							</li>
-						</ol>
-					</div>
-				</div> #}
-            {% else %}
-              <div class="warning-content">
-                <div class="warning-title">没有任何数据 T_T</div>
-                <img src="{{ asset('status/no-data.png', 'image') }}" width="587px" height="307px">
-                <button class="btn primary medium round" onclick="location.href='{{ path('org_corporation_edit') }}'"><i class="fa-solid fa-plus"></i>添加集团信息</button>
-              </div>
-            {% endif %}
+        <div class="tree">
+          <div class="start-handler"></div>
+          <div class="ol-wrapper">
+            <ol class="company">
+              {% for company in companies %}
+                <li>
+                  <h2>
+                    {{ company.name }}
+                    <a class="btn primary mini node-edit" href="{{ path('org_company_edit', {id: company.id}) }}" style="display: none;">编辑</a>
+                  </h2>
+                </li>
+              {% endfor %}
+            </ol>
+          </div>
+        </div>
+      {% else %}
+          <div class="warning-content">
+              <div class="warning-title">没有任何数据 T_T</div>
+              <img src="{{ asset('status/no-data.png', 'image') }}" width="587px" height="307px">
+              <button class="btn primary medium round" onclick="location.href='{{ path('org_corporation_edit') }}'"><i class="fa-solid fa-plus"></i>添加集团信息</button>
+          </div>
+      {% endif %}
 			</div>
+      <span class="button-group added-company" style="display: none">
+        <button class="btn primary medium round" id="save-company">保存</button>
+      </span>
 		</div>
 	</div>
 {% endblock %}

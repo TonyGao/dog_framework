@@ -58,7 +58,7 @@ class Corporation
 
 	/**
 	 * 描述
-	 * @ORM\Column(type="text")
+	 * @ORM\Column(type="text", nullable=true)
 	 * @Ef(
      *     group="corporation_base_info",
      *     isBF=true
