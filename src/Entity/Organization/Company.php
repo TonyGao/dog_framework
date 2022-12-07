@@ -9,13 +9,13 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Tree\Node as GedmoNode;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Repository\Organization\CompanyRepository;
 
 /**
  * 公司, 分组: 公司基本信息, 公司关联信息, 公司管理信息, 公司说明信息
  * @Gedmo\Tree(type="nested")
- * @ORM\Table(name="organization_company")
- * @ORM\Entity(repositoryClass=CompanyPropertyRepository::class)
- * @ORM\Table(name="organization_company")
+ * @ORM\Table(name="org_company")
+ * @ORM\Entity(repositoryClass=CompanyRepository::class)
  * isBusinessEntity
  */
 class Company implements GedmoNode
@@ -61,7 +61,7 @@ class Company implements GedmoNode
 
 	/**
 	 * 描述
-	 * @ORM\Column(type="text")
+	 * @ORM\Column(type="text", nullable=true)
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
@@ -71,7 +71,7 @@ class Company implements GedmoNode
 
     /**
      * 排序号
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
@@ -81,7 +81,7 @@ class Company implements GedmoNode
 
     /**
      * 重复排序号处理: 插入、重复
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="string", nullable=true)
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
@@ -97,11 +97,11 @@ class Company implements GedmoNode
      *     isBF=true
      * )
      */
-    private $state;
+    private $state = true;
 
     /**
      * 独立登录页
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
@@ -346,6 +346,26 @@ class Company implements GedmoNode
     public function setLoginIndependent($loginIndependent)
     {
         $this->loginIndependent = $loginIndependent;
+
+        return $this;
+    }
+
+    /**
+     * Get 上级公司
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * Set 上级公司
+     *
+     * @return  self
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
 
         return $this;
     }

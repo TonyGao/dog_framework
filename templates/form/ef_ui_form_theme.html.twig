@@ -1,0 +1,96 @@
+{% use 'form_div_layout.html.twig' %}
+
+{% block form_start -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' ef-form ef-form-layout-horizontal ef-form-size-medium ef-form-auto-label-width')|trim}) %}
+    {{- parent() -}}
+{%- endblock form_start %}
+
+{# Widgets #}
+
+{%- block form_widget_simple -%}
+    {%- set type = type|default('text') -%}
+    {%- if type == 'range' or type == 'color' -%}
+        {# Attribute "required" is not supported #}
+        {%- set required = false -%}
+    {%- endif -%}
+    {%- if type == 'text' -%}
+    <span class="ef-input-wrapper" style="width: 320px;">
+      <input class="ef-input ef-input-size-medium" clearable="true" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    </span>
+    {%- else -%}
+      <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    {%- endif -%}
+{%- endblock form_widget_simple -%}
+
+{%- block textarea_widget -%}
+  <div class="ef-textarea-wrapper">
+    <textarea {{ block('widget_attributes') }} class="ef-textarea resizeable" min-rows="3" max-rows="10" clearable="true" placeholder="Please enter something">{{ value }}</textarea>
+  </div>
+{%- endblock textarea_widget -%}
+
+{%- block submit_widget -%}
+    <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+      <div class="ef-col ef-col-5 ef-form-item-label-col">
+        <label class="ef-form-item-label"></label>
+      </div>
+      <div class="ef-col ef-col-19 ef-form-item-wrapper-col">
+        <div class="ef-form-item-content-wrapper">
+          <div class="ef-form-item-content ef-form-item-content-flex">
+            <div class="ef-space ef-space-horizontal ef-space-align-center">
+              {%- set type = type|default('submit') -%}
+              {{ block('button_widget') }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{%- endblock submit_widget -%}
+
+{% block button_widget -%}
+  <div class="ef-space-item">
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' btn primary medium')|trim}) %}
+    {{- parent() -}}
+  </div>
+{%- endblock %}
+
+{# Labels #}
+
+{% block form_label -%}
+  {%- set label_attr = label_attr|merge({ class: label_attr.class|default(label_class|default('ef-form-item-label')) }) -%}
+  {{- parent() -}}
+{%- endblock form_label %}
+
+{# Rows #}
+
+{% block form_row -%}
+  <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+    <div class="ef-col ef-col-5 ef-form-item-label-col">
+      {{- form_label(form) -}}
+    </div>
+    <div class="ef-col ef-col-19 ef-form-item-wrapper-col">
+      <div class="ef-form-item-content-wrapper">
+        <div class="ef-form-item-content ef-form-item-content-flex">
+          {{- form_widget(form) -}}
+        </div>
+      </div>
+    </div>
+    {{- form_errors(form) -}}
+  </div>
+{%- endblock form_row %}
+
+{% block button_row -%}
+    {{- form_widget(form) -}}
+{%- endblock button_row %}
+
+{# Errors #}
+
+{% block form_errors -%}
+    {% if errors|length > 0 -%}
+        <div class="ui pointing red label">
+            <i class="warning sign icon"></i>
+            {%- for error in errors -%}
+                 {{ error.message }}
+            {%- endfor -%}
+        </div>
+    {%- endif %}
+{%- endblock form_errors %}

@@ -1,0 +1,119 @@
+.ef-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.ef-form-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.ef-row {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.ef-row-align-start {
+  align-items: flex-start;
+}
+
+.ef-row-justify-start {
+  justify-content: flex-start;
+}
+
+.ef-form-item-label-col {
+  padding-right: 16px;
+}
+
+.ef-form-item-label-col {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  line-height: 32px;
+  white-space: nowrap;
+}
+
+.ef-col {
+  box-sizing: border-box;
+}
+
+.ef-col-5 {
+  flex: 0 0 20.83333333%;
+  width: 20.83333333%;
+}
+
+.ef-form-item-label-col>.ef-form-item-label {
+  max-width: 100%;
+  color: rgb(78,89,105);
+  font-size: 14px;
+  white-space: normal;
+}
+
+.ef-form-item-wrapper-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  min-height: 32px;
+}
+
+.ef-col {
+  box-sizing: border-box;
+}
+
+.ef-col-19 {
+  flex: 0 0 79.16666667%;
+  width: 79.16666667%;
+}
+
+.ef-form-item-content-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.ef-form-item-content {
+  flex: 1;
+  max-width: 100%;
+  min-height: 32px;
+}
+
+.ef-form-item-content-flex {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.ef-space-align-center {
+  align-items: center;
+}
+
+.ef-space {
+  display: inline-flex;
+}
+
+.ef-space-horizontal .ef-space-item {
+  display: flex;
+  align-items: center;
+}
+
+/* .ef-input-wrapper {
+  display: inline-flex;
+  box-sizing: border-box;
+  width: 100%;
+  padding-right: 12px;
+  padding-left: 12px;
+  color: rgb(29,33,41);
+  font-size: 14px;
+  background-color: rgb(242,243,245);
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: text;
+  transition: color .1s cubic-bezier(0,0,1,1),border-color .1s cubic-bezier(0,0,1,1),background-color .1s cubic-bezier(0,0,1,1);
+} */
