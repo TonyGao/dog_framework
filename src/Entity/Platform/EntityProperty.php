@@ -128,6 +128,12 @@ class EntityProperty
     private $decimalScale = 0;
 
     /**
+     * 验证条件
+     * @ORM\Column(type="json", nullable=true)
+     */
+    private $validation;
+
+    /**
      * 属性所属的实体
      * @ORM\ManyToOne(
      *     targetEntity="Entity",
@@ -494,6 +500,26 @@ class EntityProperty
     public function setBusinessField($businessField)
     {
         $this->businessField = $businessField;
+
+        return $this;
+    }
+
+    /**
+     * Get 验证条件
+     */
+    public function getValidation()
+    {
+        return $this->validation;
+    }
+
+    /**
+     * Set 验证条件
+     *
+     * @return  self
+     */
+    public function setValidation($validation)
+    {
+        $this->validation = $validation;
 
         return $this;
     }

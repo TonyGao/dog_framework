@@ -1,9 +1,13 @@
+.org-sturcture-container {
+  overflow: auto;
+}
+
 .org-sturcture-container ol {
   list-style: none;
 }
 
 .outside-wrapper {
-  position: absolute;
+  position: inherit;
   overflow: auto;
   left: 0px;
   right: 0;
@@ -19,12 +23,13 @@
   -webkit-box-align: stretch;
   align-items: stretch;
   padding-top: 40px;
+  margin-bottom: 20px;
 }
 
 .inside-wrapper {
   display: flex;
   position: relative;
-  margin: 0 auto;
+  margin-left: 20%;
   transform: scale(1);
   margin-bottom: 60px;
 }

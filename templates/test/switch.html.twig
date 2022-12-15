@@ -1,0 +1,33 @@
+{% extends "base.html.twig" %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script>
+    $(document).ready(function() {
+      $(".ef-switch.ef-switch-type-circle").on("click", function() {
+        if ($(this).attr("aria-checked") === "true") {
+          $(this).attr("aria-checked", "false");
+          $(this).removeClass("ef-switch-checked");
+
+        } else {
+          $(this).attr("aria-checked", "true")
+          $(this).addClass("ef-switch-checked");
+        }
+      })
+    })
+  </script>
+{% endblock %}
+
+{% block body %}
+<button type="button" role="switch" aria-checked="false" class="ef-switch ef-switch-type-circle">
+  <span class="ef-switch-handle">
+    <span class="ef-switch-handle-icon"></span>
+  </span>
+</button>
+<br>
+<button type="button" role="switch" aria-checked="false" class="ef-switch ef-switch-type-circle ef-switch-small">
+  <span class="ef-switch-handle">
+    <span class="ef-switch-handle-icon"></span>
+  </span>
+</button>
+{% endblock %}

@@ -91,7 +91,7 @@ class Company implements GedmoNode
 
     /**
      * 状态: 启用、停用
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", options={"default"=1})
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
