@@ -5,6 +5,13 @@
     {{- parent() -}}
 {%- endblock form_start %}
 
+{%- block widget_attributes -%}
+    id="{{ id }}" name="{{ full_name }}"
+    {%- if disabled %} disabled="disabled"{% endif -%}
+    {%- if required %} required="required"{% endif -%}
+    {{ block('attributes') }}
+{%- endblock widget_attributes -%}
+
 {# Widgets #}
 
 {%- block form_widget_simple -%}
@@ -94,3 +101,43 @@
         </div>
     {%- endif %}
 {%- endblock form_errors %}
+
+{%- block switch_widget -%}
+<button type="button" role="switch" aria-checked="{% if checked %}true{% else %}false{% endif %}" class="ef-switch ef-switch-type-circle{% if checked %} ef-switch-checked{% endif %}">
+  <input type="hidden" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+  <span class="ef-switch-handle">
+    <span class="ef-switch-handle-icon"></span>
+  </span>
+</button>
+{%- endblock switch_widget -%}
+
+{%- block integer_widget -%}
+	<span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium" style="width: 320px;">
+    <input role="spinbutton"
+      {% if attr.numValuemax is defined %}
+        num-valuemax={{ attr.numValuemax }}
+      {% endif %}
+      {% if attr.numValuemin is defined %}
+        num-valuemin="{{ attr.numValuemin }}"
+      {% endif %}
+      num-value=""
+      {% if attr.step is defined %}
+        step="{{ attr.step }}"
+      {% endif %}
+      precision="0"
+      class="ef-input ef-input-size-medium number"
+      type="text"
+      placeholder="Please Enter"
+    >
+    <span class="ef-input-suffix">
+      <div class="ef-input-number-step">
+        <button class="ef-input-number-step-button add" type="button" tabindex="-1">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-up" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"><path d="M39.6 30.557 24.043 15 8.487 30.557"></path></svg>
+        </button>
+        <button class="ef-input-number-step-button subtract" type="button" tabindex="-1">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-down" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"><path d="M39.6 17.443 24.043 33 8.487 17.443"></path></svg>
+        </button>
+      </div>
+    </span>
+  </span>
+{%- endblock integer_widget -%}

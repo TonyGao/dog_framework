@@ -71,10 +71,10 @@ class OrgController extends AbstractController
   }
 
   #[Route('/admin/org/company/edit/{id}', name: 'org_company_edit')]
-  public function editCompany(Request $request, EntityManagerInterface $em): Response
+  public function editCompany(Request $request, EntityManagerInterface $em, int $id): Response
   {
     $repo = $em->getRepository(Company::class);
-    $company = $repo->findOneBy(['id'=>$request->query->get('id')]);
+    $company = $repo->findOneBy(['id'=>$id]);
 
     $form = $this->createForm(CompanyType::class, $company);
     $form->handleRequest($request);
@@ -84,7 +84,7 @@ class OrgController extends AbstractController
       $em->persist($submitCompany);
       $em->flush();
 
-      return $this->redirectToRoute('org_company');
+      return $this->redirectToRoute('org_corporation');
     }
 
     return $this->render('admin/org/companyEdit.html.twig', [

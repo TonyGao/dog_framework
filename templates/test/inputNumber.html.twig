@@ -3,7 +3,7 @@
 {% block javascripts %}
   {{ parent() }}
   <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
       $("input.ef-input.number").on("input", function() {
         if (numOject.isInteger($(this))) {
           $(this).val($(this).val().replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1'));
@@ -56,42 +56,44 @@
           return Number(precision);
         },
         modify: function(input, type) {
-          let step = numOject.getStepNum(input);
-          let min = numOject.getMinNum(input);
-          let max = numOject.getMaxNum(input);
-          let precision = numOject.getPrecision(input);
+          if (input.val() !== '') {
+            let step = numOject.getStepNum(input);
+            let min = numOject.getMinNum(input);
+            let max = numOject.getMaxNum(input);
+            let precision = numOject.getPrecision(input);
 
-          step = step ? step : 1;
-          if (numOject.isInteger(input)) {
-            step = Number(step.toFixed(0));
-          }
-
-          let num = Number(input.val());
-          if (type == "add") {
-            num = num + step;
-          }
-
-          if (type == 'subtract') {
-            num = num - step;
-          }
-
-          if (!isNaN(max)) {
-            if (num > max) {
-              num = max;
+            step = step ? step : 1;
+            if (numOject.isInteger(input)) {
+              step = Number(step.toFixed(0));
             }
-          }
 
-          if (!isNaN(min)) {
-            if (num < min) {
-              num = min;
+            let num = Number(input.val());
+            if (type == "add") {
+              num = num + step;
             }
-          }
 
-          if (!isNaN(precision)) {
-            num = num.toFixed(precision);
-          }
+            if (type == 'subtract') {
+              num = num - step;
+            }
 
-          input.val(num);
+            if (!isNaN(max)) {
+              if (num > max) {
+                num = max;
+              }
+            }
+
+            if (!isNaN(min)) {
+              if (num < min) {
+                num = min;
+              }
+            }
+
+            if (!isNaN(precision)) {
+              num = num.toFixed(precision);
+            }
+
+            input.val(num);
+          }
         },
 
       }
@@ -103,7 +105,7 @@
 	  <span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium input-demo" style="width: 320px;">
       <input role="spinbutton"
         num-valuemax="100"
-        num-valuemin="10"
+        num-valuemin="0"
         num-value=""
         step="1.5"
         precision="3"

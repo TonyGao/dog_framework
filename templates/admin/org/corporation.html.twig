@@ -15,6 +15,12 @@
         $(".node-edit", this).hide();
       });
 
+      $(".company h2").hover (function() {
+        $(".node-edit", this).show();
+      }, function() {
+        $(".node-edit", this).hide();
+      });
+
       let isadded = false;
       $("#add-company").on("click", function() {
         if (isadded == false) {

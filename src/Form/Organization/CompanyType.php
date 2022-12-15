@@ -3,8 +3,10 @@
 namespace App\Form\Organization;
 
 use App\Lib\Str;
+use App\Lib\Arr;
 use App\Entity\Organization\Company;
 use App\Entity\Platform\Entity;
+use App\Entity\Platform\EntityProperty;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,11 +30,20 @@ class CompanyType extends AbstractType
         $en = $repo->findOneBy([
             'fqn' => $reflectionClass->name,
         ]);
-        $fields = $en->getProperties();
+        //$fields = $en->getProperties();
+        $fields = $this->em->getRepository(EntityProperty::class)
+          ->findBy(['entity' => $en],['id' => 'ASC']);
         foreach ($fields as $field) {
+            $arr = [];
+            if ($field->getValidation()) {
+                $validation = $field->getValidation();
+                $arr = Arr::transValtoAttr($validation);
+            }
             $classType = Str::convertFormType($field->getType());
             $builder->add($field->getFieldName(), $classType, [
-                'label' => $field->getComment()
+                'label' => $field->getComment(),
+                'attr' => $arr,
+                'required' => $arr['required'] ?? false,
             ]);
         }
     }

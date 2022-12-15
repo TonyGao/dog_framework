@@ -6,6 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use App\Form\Common\SwitchType;
 
 class Str
 {
@@ -37,7 +38,7 @@ class Str
     public static function convertFormType($type) {
         switch ($type) {
             case 'boolean':
-                $class = CheckboxType::class;
+                $class = SwitchType::class;
                 break;
             case 'string':
                 $class = TextType::class;
