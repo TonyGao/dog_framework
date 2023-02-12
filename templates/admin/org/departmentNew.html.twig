@@ -1,0 +1,22 @@
+          {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+              <div class="ef-col ef-col-5 ef-form-item-label-col">
+                <label class="ef-form-item-label"></label>
+              </div>
+              <div class="ef-col ef-col-19 ef-form-item-wrapper-col">
+                <div class="ef-form-item-content-wrapper">
+                  <div class="ef-form-item-content ef-form-item-content-flex">
+                    <div class="ef-space ef-space-horizontal ef-space-align-center">
+                      <div class="ef-space-item" style="margin-right: 8px;">
+                        <button class="btn primary medium" type="submit">提交</button>
+                      </div>
+                      <div class="ef-space-item">
+                        <button class="btn primary medium" onclick="location.href='{{ app.request.headers.get('referer') }}'">返回</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {{ form_end(form) }}

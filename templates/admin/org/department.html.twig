@@ -1,0 +1,217 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('organization/department.css', 'admin') }}"/>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+  <script>
+	$(document).ready(function () {
+      $(".left-tree .arrow-icon").on("click", function (event) {
+        $(this).parent().nextAll(".sub-tree-content").toggle(0);
+				var icon = $(this).find('i');
+			  icon.toggleClass(function() {
+				if (icon.hasClass("fa-caret-down")) {
+					icon.removeClass("fa-caret-down");
+					return "fa-caret-right";
+				} else {
+					icon.removeClass("fa-caret-right");
+					return "fa-caret-down";
+				}
+			})
+    })
+
+    $(".org-text-content.company, .org-text-content.department").on("click", function (event) {
+      let thisChosen = false;
+      if ($(this).hasClass("chosen")) {
+        thisChosen = true;
+      }
+      $(".org-text-content.chosen").removeClass("chosen");
+      if (!thisChosen) {
+        $(this).addClass("chosen");
+      }
+    })
+
+    $("#create").on("click", function (event) {
+      $.ajax({
+        url: "{{ path("org_department_new") }}",
+        method: "GET",
+        dataType: "html",
+        success: function(data) {
+          $(".right-content").html(data);
+        }
+      })
+    })
+  })
+  </script>
+{% endblock %}
+
+{% block css %}
+<style>
+.outside-wrapper {
+  padding-top: 0;
+}
+</style>
+{% endblock %}
+
+{% block app_content_container %}
+	<div class="org-sturcture-container">
+		<div class="outside-wrapper">
+      <div class="toolbar">
+        <div class="toolbar-box">
+          <div class="toolbar-wrap">
+            <div class="toolbar-content">
+              <button class="btn outline primary medium mini round icon" id="create"><i class="fa-regular fa-square-plus"></i>新建</button>
+              <button class="btn outline primary medium mini round icon"><i class="fa-regular fa-pen-to-square"></i>修改</button>
+              <button class="btn outline primary medium mini round icon"><i class="fa-solid fa-ban"></i>停用</button>
+            </div>
+          </div>
+        </div>
+      </div>
+			<div class="inside-wrapper">
+				<div class="left-tree">
+					<div class="left-tree-wrapper">
+						<div class="search-department-wrapper">
+							<span class="ef-input-wrapper">
+								<input class="ef-input ef-input-size-mini text" type="text" clearable="true" placeholder="请输入部门名称"/>
+								<span class="ef-input-suffix">
+									<i class="fa-solid fa-magnifying-glass"></i>
+								</span>
+							</span>
+						</div>
+						<div class="department-tree-wrapper">
+              {{ departmentTree | raw }}
+							{# <ol class="ol-left-tree">
+								<li>
+									<div class="item-content scroll-item">
+										<div class="arrow-icon">
+											<i class="fa-solid fa-caret-down"></i>
+										</div>
+										<div class="org-icon">
+											<i class="fa-solid fa-building"></i>
+										</div>
+										<div class="org-name">
+											<div class="org-text-content">
+												集团名称
+											</div>
+										</div>
+									</div>
+									<span class="tree-indent"></span>
+									<ol class="sub-tree-content">
+										<li>
+											<div class="item-content scroll-item">
+												<div class="arrow-icon">
+													<i class="fa-solid fa-caret-down"></i>
+												</div>
+												<div class="org-icon">
+													<i class="fa-solid fa-building-user"></i>
+												</div>
+												<div class="org-name">
+													<div class="org-text-content">
+														天津总公司
+													</div>
+												</div>
+											</div>
+											<span class="tree-indent"></span>
+											<ol class="sub-tree-content">
+												<li>
+													<div class="item-content scroll-item">
+                          	<div class="arrow-icon">
+                            </div>
+														<div class="org-icon">
+															<i class="fa-solid fa-user-group"></i>
+														</div>
+														<div class="org-name">
+															<div class="org-text-content department">
+																综合管理部
+															</div>
+														</div>
+													</div>
+												</li>
+												<li>
+													<div class="item-content scroll-item">
+														<div class="arrow-icon">
+															<i class="fa-solid fa-caret-down"></i>
+														</div>
+														<div class="org-icon">
+															<i class="fa-solid fa-user-group"></i>
+														</div>
+														<div class="org-name">
+															<div class="org-text-content department">
+																研发部
+															</div>
+														</div>
+													</div>
+                          <span class="tree-indent"></span>
+													<ol class="sub-tree-content">
+														<li>
+															<div class="item-content scroll-item">
+                                <div class="arrow-icon"></div>
+																<div class="org-icon">
+																	<i class="fa-solid fa-user-group"></i>
+																</div>
+																<div class="org-name">
+																	<div class="org-text-content department">
+																		前端开发
+																	</div>
+																</div>
+															</div>
+														</li>
+														<li>
+															<div class="item-content scroll-item">
+                                <div class="arrow-icon"></div>
+																<div class="org-icon">
+																	<i class="fa-solid fa-user-group"></i>
+																</div>
+																<div class="org-name">
+																	<div class="org-text-content department">
+																		后端开发
+																	</div>
+																</div>
+															</div>
+														</li>
+														<li>
+															<div class="item-content scroll-item">
+                                <div class="arrow-icon"></div>
+																<div class="org-icon">
+																	<i class="fa-solid fa-user-group"></i>
+																</div>
+																<div class="org-name">
+																	<div class="org-text-content department">
+																		移动端开发
+																	</div>
+																</div>
+															</div>
+														</li>
+														<li>
+															<div class="item-content scroll-item">
+                                <div class="arrow-icon"></div>
+																<div class="org-icon">
+																	<i class="fa-solid fa-user-group"></i>
+																</div>
+																<div class="org-name">
+																	<div class="org-text-content department">
+																		测试
+																	</div>
+																</div>
+															</div>
+														</li>
+													</ol>
+												</li>
+											</ol>
+										</li>
+									</ol>
+								</li>
+							</ol> #}
+						</div>
+					</div>
+				</div>
+				<div class="right-content">
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

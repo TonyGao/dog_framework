@@ -13,7 +13,7 @@
         $(".dropdown-menu.hidden").toggle("slow", "swing");
       });
 
-      $(".scroll-item").on("click", function (event) {
+      $(".parent-menu .scroll-item").on("click", function (event) {
         $(this).next().toggle("fast");
 				var icon = $(this).find('.link-text i');
 				icon.toggleClass(function() {
