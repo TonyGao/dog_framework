@@ -200,29 +200,35 @@ body {
 
 @keyframes logomove {
   0% {
-   transform:translate3d(-30%,0,0);
+    transform: translate3d(-30%, 0, 0);
   }
   100% {
-   transform:translate3d(30%,0,0);
+    transform: translate3d(30%, 0, 0);
   }
- }
+}
 
- .logo-image::before {
-   content: " ";
-   position: absolute;
-   top: 0;
-   right: 0;
-   bottom: 0;
-   left: 50%;
-   z-index: 1;
-   width: 370%;
-   margin-left: -250%;
-   filter: blur(5px);
-   pointer-events: none;
-   -webkit-animation: logomove 2.5s linear infinite;
-   animation: logomove 2.5s linear infinite;
-   background: linear-gradient(to right,rgba(255,255,255,0) 46%,rgba(255,255,255,.65) 50%,rgba(255,255,255,0) 54%) 50% 50%;
- }
+.logo-image::before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 1;
+  width: 370%;
+  margin-left: -250%;
+  filter: blur(5px);
+  pointer-events: none;
+  -webkit-animation: logomove 2.5s linear infinite;
+  animation: logomove 2.5s linear infinite;
+  background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 46%,
+      rgba(255, 255, 255, 0.65) 50%,
+      rgba(255, 255, 255, 0) 54%
+    )
+    50% 50%;
+}
 
 .admin-header-right {
   display: flex;
@@ -284,7 +290,7 @@ body {
 }
 
 .fa-brands.fa-symfony {
-  color:rgb(31, 35, 41);
+  color: rgb(31, 35, 41);
 }
 
 .hSeperater {
@@ -857,16 +863,16 @@ body {
 }
 
 .item-menu-content:hover {
-  background-color: rgba(31,35,41,.08);
+  background-color: rgba(31, 35, 41, 0.08);
 }
 
 .item-menu-content.current {
-  color: #3370ff!important;
+  color: #3370ff !important;
   font-weight: bolder;
 }
 
 .current .link-text {
-  color: #3370ff!important;
+  color: #3370ff !important;
   font-weight: bolder;
 }
 
@@ -890,7 +896,12 @@ body {
   padding-left: 40px;
 }
 
-.parent-menu .parent-menu .parent-menu .parent-menu .sub-menu-content .link-text-content {
+.parent-menu
+  .parent-menu
+  .parent-menu
+  .parent-menu
+  .sub-menu-content
+  .link-text-content {
   padding-left: 60px;
 }
 
@@ -908,4 +919,34 @@ body {
 .warning-content button {
   width: fit-content;
   align-self: center;
+}
+
+.toolbar-box {
+  overflow: hidden;
+  border-top-width: 0px;
+  border-bottom-width: 0px;
+  border-left-width: 0px;
+  border-right-width: 0px;
+  border-color: #b6b6b6;
+  border-style: solid;
+  background: #f0f0f0;
+  font-size: 12px;
+  height: 35px;
+  padding-top: 5px;
+  zoom: 1;
+  display: block;
+}
+
+.toolbar-wrap {
+  overflow: hidden;
+  width: auto;
+  float: left;
+}
+
+.toolbar-content {
+  height: 30px;
+  white-space: nowrap;
+  width: auto;
+  margin-left: 0px;
+  padding-left: 15px;
 }

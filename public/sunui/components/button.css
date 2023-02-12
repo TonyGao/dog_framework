@@ -113,10 +113,6 @@ br {
   margin: 0 6px;
 }
 
-.btn.round {
-  border-radius: 16px;
-}
-
 .btn.circle {
   width: 32px;
   height: 32px;
@@ -156,6 +152,10 @@ br {
   padding: 0 19px;
   font-size: 14px;
   border-radius: 2px;
+}
+
+.btn.round {
+  border-radius: 16px;
 }
 
 .btn.primary.disabled {

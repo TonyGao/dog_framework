@@ -3,6 +3,7 @@
 namespace App\Controller\Api\Admin\Organization;
 
 use App\Entity\Organization\Company;
+use App\Entity\Organization\Department;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +37,16 @@ class OrgApiController extends AbstractController
       $com->setName($company)
         ->setAlias($company)
         ->setParent($root);
+
+      $depRepo = $em->getRepository(Department::class);
+      $depRoot = $depRepo->findOneBy(['lvl' => 0]);
+      $department = new Department();
+      $department->setName($company)
+          ->setAlias($company)
+          ->setType('公司')
+          ->setParent($depRoot);
       $em->persist($com);
+      $em->persist($department);
     }
     $em->flush();
     $data = ['status'=>'ok'];
