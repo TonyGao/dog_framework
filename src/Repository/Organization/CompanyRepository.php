@@ -18,4 +18,13 @@ class CompanyRepository extends NestedTreeRepository
       $manager = $registry->getManagerForClass($entityClass);
       parent::__construct($manager, $manager->getClassMetadata($entityClass));
     }
+
+    public function allCompany()
+    {
+      return $this->createQueryBuilder('c')
+          ->where('c.lvl != 0')
+          ->getQuery()
+          ->execute()
+      ;
+    }
 }

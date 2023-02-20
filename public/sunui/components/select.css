@@ -147,7 +147,7 @@
 }
 
 .ef-trigger-popup {
-  position: inherit;
+  position: absolute;
   z-index: 1000;
   display: none;
 }
