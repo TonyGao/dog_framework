@@ -23,11 +23,13 @@
         {% block javascripts %}
           <script src=" {{ asset('lib/jQuery/jquery-3.6.1.min.js', 'static') }} "></script>
           <script src=" {{ asset('lib/lodash/lodash.min.js', 'static') }} "></script>
-          <script src=" {{ asset('lib/ef/base/str.js') }} "
+          <script src=" {{ asset('lib/ef/base/common.js') }} "></script>
+          <script src=" {{ asset('lib/ef/base/str.js') }} "></script>
           <script src=" {{ asset('input.js', 'ui') }} "></script>
           <script src=" {{ asset('input-number.js', 'ui') }} "></script>
           <script src=" {{ asset('switch.js', 'ui') }} "></script>
           <script src=" {{ asset('textarea.js', 'ui') }} "></script>
+          <script src=" {{ asset('select.js', 'ui') }} "></script>
           {# <script src="https://kit.fontawesome.com/ef1baf8144.js" crossorigin="anonymous"></script> #}
           {{ encore_entry_script_tags('app') }}
         {% endblock %}

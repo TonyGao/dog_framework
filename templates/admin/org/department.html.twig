@@ -42,9 +42,21 @@
         dataType: "html",
         success: function(data) {
           $(".right-content").html(data);
+          Common.forceReloadJS('components');
         }
       })
     })
+
+    $("#collapseCompany").on("click", function () {
+      let leftTree = $(".left-tree");
+      if (leftTree.hasClass("visible")) {
+        let width = 0 - leftTree.outerWidth(true);
+        leftTree.animate({"left":+ width +"px"}, "slow").removeClass("visible");
+      } else {
+        leftTree.animate({"left":"0px"}, "slow").addClass('visible');
+      }
+    })
+
   })
   </script>
 {% endblock %}
@@ -72,7 +84,7 @@
         </div>
       </div>
 			<div class="inside-wrapper">
-				<div class="left-tree">
+				<div class="left-tree visible">
 					<div class="left-tree-wrapper">
 						<div class="search-department-wrapper">
 							<span class="ef-input-wrapper">
@@ -208,6 +220,9 @@
 							</ol> #}
 						</div>
 					</div>
+          <div class="fold-icon-wrapper collapse" id="collapseCompany">
+            <i class="fa-solid fa-play"></i>
+          </div>
 				</div>
 				<div class="right-content">
 				</div>

@@ -1,3 +1,4 @@
+{# 参照 symfony/src/Symfony/Bridge/Twig/Resources/views/Form/ 下文件 #}
 {% use 'form_div_layout.html.twig' %}
 
 {% block form_start -%}
@@ -141,3 +142,70 @@
     </span>
   </span>
 {%- endblock integer_widget -%}
+
+{%- block choice_widget_collapsed -%}
+    {% set selectInputId = random() %}
+    {% set selectContentId = random() %}
+    <input type="hidden" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    <span
+      class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
+      style="width: 320px;"
+      chosen="false"
+      id="{{ selectInputId }}"
+      contentId="{{ selectContentId }}"
+      >
+      <input class="ef-select-view-input" placeholder="Please select ...">
+      <span class="ef-select-view-value ef-select-view-value-hidden"></span>
+      <span class="ef-select-view-suffix">
+        <span class="ef-select-view-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
+            <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
+          </svg>
+        </span>
+      </span>
+    </span>
+    <div class="ef-trigger-popup ef-trigger-position-bl"
+         trigger-placement="bl"
+         style="z-index: 1001; pointer-events: auto; width: 320px;"
+         id="{{ selectContentId }}"
+         parentId="{{ selectInputId }}"
+        >
+      <div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+        <div class="ef-trigger-content">
+          <div class="ef-select-dropdown">
+            <div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+              <div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
+                <ul class="ef-select-dropdown-list">
+                  {%- if preferred_choices|length > 0 -%}
+                      {% set options = preferred_choices %}
+                      {% set render_preferred_choices = true %}
+                        {{- block('choice_widget_options') -}}
+                      {%- if choices|length > 0 and separator is not none -%}
+                        <li id="{{ random() }}" class="ef-select-option ef-select-option-disabled"><span class="ef-select-option-content">{{ separator }}</span></li>
+                      {%- endif -%}
+                  {%- endif -%}
+                  {%- set options = choices -%}
+                  {%- set render_preferred_choices = false -%}
+                  {{- block('choice_widget_options') -}}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{%- endblock choice_widget_collapsed -%}
+
+{%- block choice_widget_options -%}
+    {% for group_label, choice in options %}
+        {%- if choice is iterable -%}
+            <optgroup label="{{ choice_translation_domain is same as(false) ? group_label : group_label|trans({}, choice_translation_domain) }}">
+                {% set options = choice %}
+                {{- block('choice_widget_options') -}}
+            </optgroup>
+        {%- else -%}
+            {#<option value="{{ choice.value }}"{% if choice.attr %}{% with { attr: choice.attr } %}{{ block('attributes') }}{% endwith %}{% endif %}{% if not render_preferred_choices|default(false) and choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</option>#}
+            <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</span></li>
+        {%- endif -%}
+    {% endfor %}
+{%- endblock choice_widget_options -%}

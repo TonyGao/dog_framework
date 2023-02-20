@@ -21,6 +21,10 @@
         $(this).find(".ef-select-view-icon").html(searchIcon);
       }
       let contentId = $(this).attr("contentid");
+      let height = $(this).outerHeight();
+      let top = $(this).offset().top;
+      let left = $(this).offset().left;
+      $("#"+contentId).css({"left": left, "top": top + height + 6});
       $("#"+contentId).show();
     });
 
@@ -33,8 +37,6 @@
     $(".ef-select-view-input").on("focusout", function(event) {
       $(this).parent().find("svg").remove();
       $(this).parent().find('.ef-select-view-icon').html(selectIcon);
-      // let contentid = $(this).parent().attr("contentid");
-      //$("#"+contentid).hide();
     })
 
     $(document).on("click", function(event) {
@@ -86,11 +88,7 @@
       }
       // 除了搜索的li，其他全部隐藏
       let searchResult = Str.searchArr(dynamic['selectOrigin'+contentId], $(this).val().toLowerCase());
-      console.log('searchResult');
-      console.log(searchResult);
       let hideList = _.difference(dynamic['selectOrigin'+contentId], searchResult);
-      console.log('hideList');
-      console.log(hideList);
       if (hideList.length >= 0) {
         $.each(searchResult, function(idx, ele) {
           $("#"+ele.id).show();
@@ -105,8 +103,7 @@
       $(this).val("");
     })
 
-    //$(".ef-select-dropdown-list").height() - $(".ef-scrollbar-container.ef-select-dropdown-list-wrapper").height()
-    {# let ul;
+    /* let ul;
     $(".ef-scrollbar-container.ef-select-dropdown-list-wrapper").on("scroll", function(data) {
       ul = $(this).find(".ef-select-dropdown-list");
       let scrollheight = ul.height() - $(this).height();
@@ -156,8 +153,6 @@
         }
         clickedScrollBar.parent().css("top", dynamicDragTop);
 
-        //console.log(clickedScrollBar);
-
         ul = $(this).find(".ef-select-dropdown-list");
         let scrollheight = ul.height() - $(this).height();
         let mulriple = scrollheight/41;
@@ -175,7 +170,7 @@
         clickedScrollBar.css("background-color", "");
         clickedScrollBar.parent().css("opacity", "");
       }
-    }) #}
+    }) */
   })
 </script>
 {% endblock %}
@@ -201,7 +196,7 @@
 
 <div class="ef-trigger-popup ef-trigger-position-bl"
      trigger-placement="bl"
-     style="z-index: 1001; pointer-events: auto; left: 366px; top: 3736.31px; width: 320px; margin-top: 8px;"
+     style="z-index: 1001; pointer-events: auto; width: 320px;"
      id="{{ selectContentId }}"
      parentId="{{ selectInputId }}"
     >
