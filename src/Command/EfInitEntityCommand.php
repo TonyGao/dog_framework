@@ -58,7 +58,7 @@ class EfInitEntityCommand extends Command
         }
 
         /**
-         * 便利src/Entity目录的模型文件，并初始化到数据库
+         * 遍历src/Entity目录的模型文件，并初始化到数据库
          */
         if ($input->getOption('init')) {
             $finder = new Finder();
@@ -110,6 +110,45 @@ class EfInitEntityCommand extends Command
 
                         // $properties = $metaData->getReflectionProperties();
                         $fields = $metaData->fieldMappings;
+
+                        // 补充原fieldMappings不包含的Entity类型的字段属性
+                        $associationMappings = $metaData->associationMappings;
+
+                        foreach($associationMappings as $mappings) {
+                            foreach($mappings as $mapping) {
+                                $fields[key($mappings)]['fieldName'] = $mappings['fieldName'];
+                                $fields[key($mappings)]['type'] = 'entity';
+                                $fields[key($mappings)]['targetEntity'] = $mappings['targetEntity'];
+                                switch ($mappings['type']) {
+                                    case 1:
+                                        $associationType = 'OneToOne';
+                                        break;
+                                    case 2:
+                                        $associationType = 'ManyToOne';
+                                        break;
+                                    case 3:
+                                        $associationType = "ManyToMany";
+                                        break;
+                                    case 4:
+                                        $associationType = "OneToMany";
+                                        break;
+                                    default:
+                                        $associationType = null;
+                                        break;
+                                }
+                                $fields[key($mappings)]['associationType'] = $associationType;
+                                $fields[key($mappings)]['scale'] = null;
+                                $fields[key($mappings)]['length'] = null;
+                                $fields[key($mappings)]['unique'] = null;
+                                $fields[key($mappings)]['nullable'] = null;
+                                $fields[key($mappings)]['precision'] = null;
+                                if (array_key_exists('sourceToTargetKeyColumns', $mappings)) {
+                                    $fields[key($mappings)]['columnName'] = $mappings['sourceToTargetKeyColumns'][key($mappings['sourceToTargetKeyColumns'])];
+                                    $fields[key($mappings)]['targetId'] = key($mappings['sourceToTargetKeyColumns']);
+                                }
+                            }
+                        }
+
                         unset($fields['deletedAt']);
                         unset($fields['createdAt']);
                         unset($fields['updatedAt']);
@@ -128,6 +167,29 @@ class EfInitEntityCommand extends Command
                         $this->em->persist($entityGroup);
                         $this->em->flush();
 
+                        /**
+                         * 将Entity中的字段汇总到$fields数组中
+                         * 默认包含的字段，包括：
+                         * fieldName Entity字段名称
+                         * type 包括 string, integer
+                         * scale
+                         * length 字符串长度
+                         * unique 唯一性
+                         * nullable 可为空
+                         * precision 精确度
+                         * columnName mysql 数据库中的字段名称
+                         * ---------------------------------
+                         * 关联查询的字段默认不在此变量，前边已经
+                         * 处理加入此变量，其字段包括：
+                         * fieldName Entity字段名称
+                         * type 值固定为 "EntityType"
+                         * targetEntity 如 "App\Entity\Organization\Company"
+                         * associationType 原type重命名为此变量名
+                         *     1 --> OneToOne
+                         *     2 --> ManyToOne
+                         *     3 --> ManyToMany(maybe)
+                         *     4 --> OneToMany
+                         */
                         foreach ($fields as $field) {
                             $fieldName = $field['fieldName'];
                             $annotationField = $reflectionClass->getProperty($fieldName);
@@ -157,6 +219,10 @@ class EfInitEntityCommand extends Command
                                     ->setFieldName($field['columnName'])
                                     ->setUniqueable($field['unique'])
                                     ->setNullable($field['nullable']);
+
+                                if ($field['type'] == 'entity') {
+                                    $property->setTargetId($field['targetId']);
+                                }
 
                                 if ($field['precision'] !== null) {
                                     $property->setDecimalPrecision($field['precision']);

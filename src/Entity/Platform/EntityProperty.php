@@ -72,10 +72,22 @@ class EntityProperty
     private $type;
 
     /**
-     * 当$type为entity时的目标实体
+     * 当type为entity时的目标实体
      * @ORM\Column(type="string", length=100, nullable=true)
      */
     private $targetEntity = null;
+
+    /**
+     * 当type为entity时的目标实体的id
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $targetId = null;
+
+    /**
+     * 当$type为entity时的联合类型
+     * OneToOne, ManyToOne, ManyToMany, OneToMany
+     */
+    private $associationType = null;
 
     /**
      * 当属性类型为string时，定义的长度
@@ -91,13 +103,13 @@ class EntityProperty
 
     /**
      * 唯一性
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $uniqueable = false;
 
     /**
      * 是否可以为空
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $nullable = false;
 
@@ -117,13 +129,13 @@ class EntityProperty
 
     /**
      * 数字精度
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $decimalPrecision = 0;
 
     /**
      * 数字小数位数
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     private $decimalScale = 0;
 
@@ -520,6 +532,46 @@ class EntityProperty
     public function setValidation($validation)
     {
         $this->validation = $validation;
+
+        return $this;
+    }
+
+    /**
+     * Get 当type为entity时的目标实体的id
+     */
+    public function getTargetId()
+    {
+        return $this->targetId;
+    }
+
+    /**
+     * Set 当type为entity时的目标实体的id
+     *
+     * @return  self
+     */
+    public function setTargetId($targetId)
+    {
+        $this->targetId = $targetId;
+
+        return $this;
+    }
+
+    /**
+     * Get 当$type为entity时的联合类型
+     */
+    public function getAssociationType()
+    {
+        return $this->associationType;
+    }
+
+    /**
+     * Set 当$type为entity时的联合类型
+     *
+     * @return  self
+     */
+    public function setAssociationType($associationType)
+    {
+        $this->associationType = $associationType;
 
         return $this;
     }
