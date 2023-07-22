@@ -1,0 +1,135 @@
+.ef-modal-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.ef-modal-mask {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(29, 33, 41, 0.6);
+}
+
+.ef-modal-wrapper.ef-modal-wrapper-align-center {
+  display: flex;
+  white-space: nowrap;
+  align-items: center;
+}
+
+.ef-modal-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: auto;
+  text-align: center;
+}
+
+.ef-modal-wrapper.ef-modal-wrapper-align-center .ef-modal {
+  top: 0;
+  vertical-align: middle;
+}
+
+.ef-modal {
+  position: relative;
+  top: 100px;
+  display: inline-block;
+  width: 520px;
+  margin: 0 auto;
+  line-height: 1.5715;
+  white-space: initial;
+  text-align: left;
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+.ef-modal-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 34px;
+  padding: 0 20px;
+  border-bottom: 1px solid rgb(229, 230, 235);
+  background-color: #f6f6f6;
+  border-radius: 4px;
+}
+
+.ef-modal-header .ef-modal-title {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.ef-modal-header .ef-modal-title-align-center {
+  justify-content: center;
+}
+
+.ef-modal-header .ef-modal-title-align-left {
+  justify-content: left;
+}
+
+.ef-modal-title {
+  color: rgb(29, 33, 41);
+  font-weight: 500;
+  font-size: 1em;
+}
+
+.ef-modal-close-btn {
+  margin-left: -12px;
+  color: rgb(29, 33, 41);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ef-icon-hover {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  line-height: 12px;
+}
+
+.ef-modal-body {
+  position: relative;
+  padding: 24px 20px;
+  overflow: auto;
+  color: rgb(29, 33, 41);
+  font-size: 14px;
+}
+
+.ef-modal-footer {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 100%;
+  padding: 16px 20px;
+  text-align: right;
+  border-top: 1px solid rgb(229, 230, 235);
+}
+
+.ef-btn-secondary,
+.ef-btn-secondary[type="button"],
+.ef-btn-secondary[type="submit"] {
+  color: rgb(78, 89, 105);
+  background-color: rgb(242, 243, 245);
+  border: 1px solid transparent;
+}
+
+.ef-modal-footer > .ef-btn:not(:nth-child(1)) {
+  margin-left: 12px;
+}
+
+.ef-btn-primary,
+.ef-btn-primary[type="button"],
+.ef-btn-primary[type="submit"] {
+  color: #fff;
+  background-color: rgb(22, 93, 255);
+  border: 1px solid transparent;
+}

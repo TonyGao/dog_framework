@@ -1,0 +1,44 @@
+{% extends "base.html.twig" %}
+
+{% set radioid = random() %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+	<script></script>
+{% endblock %}
+
+{% block body %}
+	<div class="ef-space-item" style="margin-bottom: 24px;">
+		<span class="ef-radio-group ef-radio-group-size-undefined ef-radio-group-direction-horizontal">
+			<label class="ef-radio" radioId="{{ radioid }}">
+        <input type="radio" class="ef-radio-target" value="A">
+        <span class="ef-icon-hover ef-radio-icon-hover">
+					<span class="ef-radio-icon"></span>
+				</span>
+				<span class="ef-radio-label">A</span>
+			</label>
+			<label class="ef-radio" radioId="{{ radioid }}">
+        <input type="radio" class="ef-radio-target" value="B">
+        <span class="ef-icon-hover ef-radio-icon-hover">
+					<span class="ef-radio-icon"></span>
+				</span>
+				<span class="ef-radio-label">B</span>
+			</label>
+			<label class="ef-radio" radioId="{{ radioid }}">
+        <input type="radio" class="ef-radio-target" value="C">
+        <span class="ef-icon-hover ef-radio-icon-hover">
+					<span class="ef-radio-icon"></span>
+				</span>
+				<span class="ef-radio-label">C</span>
+			</label>
+			<label class="ef-radio" radioId="{{ radioid }}">
+        <input type="radio" class="ef-radio-target" value="D">
+        <span class="ef-icon-hover ef-radio-icon-hover">
+					<span class="ef-radio-icon"></span>
+				</span>
+				<span class="ef-radio-label">D</span>
+			</label>
+		</span>
+	</div>
+{% endblock %}

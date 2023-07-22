@@ -1,0 +1,61 @@
+{% extends "base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+	<script></script>
+{% endblock %}
+
+{% block css %}
+	<style>
+		.ef-space-vertical {
+			flex-direction: column;
+		}
+
+		.ef-space {
+			display: inline-flex;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="ef-space ef-space-vertical"><!----><div class="ef-space-item" style="margin-bottom: 24px;">
+			<span class="ef-checkbox-group ef-checkbox-group-direction-horizontal">
+				<label aria-disabled="false" class="ef-checkbox"><input type="checkbox" class="ef-checkbox-target" value="1"><span class="ef-icon-hover ef-checkbox-icon-hover">
+						<div class="ef-checkbox-icon"><!----></div>
+					</span>
+					<span class="ef-checkbox-label">Option 1</span>
+				</label>
+				<label aria-disabled="false" class="ef-checkbox"><input type="checkbox" class="ef-checkbox-target" value="2"><span class="ef-icon-hover ef-checkbox-icon-hover">
+						<div class="ef-checkbox-icon"><!----></div>
+					</span>
+					<span class="ef-checkbox-label">Option 2</span>
+				</label>
+				<label aria-disabled="false" class="ef-checkbox"><input type="checkbox" class="ef-checkbox-target" value="3"><span class="ef-icon-hover ef-checkbox-icon-hover">
+						<div class="ef-checkbox-icon"><!----></div>
+					</span>
+					<span class="ef-checkbox-label">Option 3</span>
+				</label>
+			</span>
+		</div><!----><div class="ef-space-item">
+			<span class="ef-checkbox-group ef-checkbox-group-direction-vertical">
+				<label aria-disabled="false" class="ef-checkbox"><input type="checkbox" class="ef-checkbox-target" value="1"><span class="ef-icon-hover ef-checkbox-icon-hover">
+						<div class="ef-checkbox-icon"><!----></div>
+					</span>
+					<span class="ef-checkbox-label">Option 1</span>
+				</label>
+				<label aria-disabled="false" class="ef-checkbox"><input type="checkbox" class="ef-checkbox-target" value="2"><span class="ef-icon-hover ef-checkbox-icon-hover">
+						<div class="ef-checkbox-icon"><!----></div>
+					</span>
+					<span class="ef-checkbox-label">Option 2</span>
+				</label>
+				<label aria-disabled="false" class="ef-checkbox"><input type="checkbox" class="ef-checkbox-target" value="3"><span class="ef-icon-hover ef-checkbox-icon-hover">
+						<div class="ef-checkbox-icon"><!----></div>
+					</span>
+					<span class="ef-checkbox-label">Option 3</span>
+				</label>
+			</span>
+		</div>
+	</div>
+
+{% endblock %}

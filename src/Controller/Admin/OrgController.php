@@ -36,9 +36,9 @@ class OrgController extends AbstractController
     $comRepo = $em->getRepository(Company::class);
     $comTree = $comRepo->childrenHierarchy();
 
-    return $this->render('admin/org/corporation.html.twig',[
-        'corporation' => $corporation,
-        'companies' => $comTree !== [] ? $comTree[0]['__children'] : null,
+    return $this->render('admin/org/corporation.html.twig', [
+      'corporation' => $corporation,
+      'companies' => $comTree !== [] ? $comTree[0]['__children'] : null,
     ]);
   }
 
@@ -61,43 +61,43 @@ class OrgController extends AbstractController
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-        $corporation = $form->getData();
-        $em->persist($corporation);
+      $corporation = $form->getData();
+      $em->persist($corporation);
 
-        // 如果是首次创建集团信息，初始化相关的根公司，再初始化相关的根部门
-        if ($isFirstTime) {
-          $company = new Company();
-          $department = new Department();
-        }
+      // 如果是首次创建集团信息，初始化相关的根公司，再初始化相关的根部门
+      if ($isFirstTime) {
+        $company = new Company();
+        $department = new Department();
+      }
 
-        // 如果不是第一次更新集团信息，同时更新根公司和根部门
-        if (!$isFirstTime) {
-          $repo = $em->getRepository(Company::class);
-          $company = $repo->findOneBy(['lvl' => 0]);
+      // 如果不是第一次更新集团信息，同时更新根公司和根部门
+      if (!$isFirstTime) {
+        $repo = $em->getRepository(Company::class);
+        $company = $repo->findOneBy(['lvl' => 0]);
 
-          $depRepo = $em->getRepository(Department::class);
-          $department = $depRepo->findOneBy(['lvl' => 0]);
-        }
+        $depRepo = $em->getRepository(Department::class);
+        $department = $depRepo->findOneBy(['lvl' => 0]);
+      }
 
-        $company->setName($corporation->getName());
-        if ($corporation->getAlias() != null) {
-            $company->setAlias($corporation->getAlias());
-        }
-        $em->persist($company);
+      $company->setName($corporation->getName());
+      if ($corporation->getAlias() != null) {
+        $company->setAlias($corporation->getAlias());
+      }
+      $em->persist($company);
 
-        $department->setName($corporation->getName())
-            ->setType('集团');
-        if ($corporation->getAlias() != null) {
-          $department->setAlias($corporation->getAlias());
-        }
-        $em->persist($department);
-        $em->flush();
+      $department->setName($corporation->getName())
+        ->setType('corperations');
+      if ($corporation->getAlias() != null) {
+        $department->setAlias($corporation->getAlias());
+      }
+      $em->persist($department);
+      $em->flush();
 
-        return $this->redirectToRoute('org_corporation');
+      return $this->redirectToRoute('org_corporation');
     }
 
     return $this->render('admin/org/corporationEdit.html.twig', [
-        'form' => $form->createView(),
+      'form' => $form->createView(),
     ]);
   }
 
@@ -108,7 +108,7 @@ class OrgController extends AbstractController
   public function editCompany(Request $request, EntityManagerInterface $em, int $id): Response
   {
     $repo = $em->getRepository(Company::class);
-    $company = $repo->findOneBy(['id'=>$id]);
+    $company = $repo->findOneBy(['id' => $id]);
     $oldName = $company->getName();
 
     $form = $this->createForm(CompanyType::class, $company);
@@ -121,7 +121,7 @@ class OrgController extends AbstractController
       $depRepo = $em->getRepository(Department::class);
       $department = $depRepo->findOneBy(['name' => $oldName]);
       $department->setName($submitCompany->getName())
-          ->setAlias($submitCompany->getAlias());
+        ->setAlias($submitCompany->getAlias());
       $em->persist($department);
       $em->flush();
 
@@ -148,6 +148,10 @@ class OrgController extends AbstractController
           return '<ol class="ol-left-tree">';
         }
 
+        if ($tree[0]['type'] === 'department') {
+          return '<span class="tree-indent" style="display: none;"></span><ol class="sub-tree-content" style="display: none;">';
+        }
+
         return '<span class="tree-indent"></span><ol class="sub-tree-content">';
       },
       'rootClose' => static function (array $child): ?string {
@@ -159,8 +163,8 @@ class OrgController extends AbstractController
       },
       'childOpen' => '<li>',
       'childClose' => '</li>',
-      'nodeDecorator' => static function(array $node) use (&$controller): ?string {
-        if ($node['type'] === '集团') {
+      'nodeDecorator' => static function (array $node) use (&$controller): ?string {
+        if ($node['type'] === 'corperations') {
           return '
           <div class="item-content scroll-item">
             <div class="arrow-icon">
@@ -170,50 +174,52 @@ class OrgController extends AbstractController
               <i class="fa-solid fa-building"></i>
 						</div>
 						<div class="org-name">
-							<div class="org-text-content">'.
-								$node['name']
-							.'</div>
+							<div class="org-text-content">' .
+            $node['name']
+            . '</div>
 						</div>
 					</div>
           ';
         }
 
-        if ($node['type'] === '公司') {
+        if ($node['type'] === 'company') {
+          $arrayIcon = !empty($node['__children']) ? '<i class="fa-solid fa-caret-right"></i>' : '';
+
           return '
           <div class="item-content scroll-item">
-            <div class="arrow-icon">
-              <i class="fa-solid fa-caret-down"></i>
-            </div>
+            <div class="arrow-icon">' . $arrayIcon . '</div>
 						<div class="org-icon">
               <i class="fa-solid fa-building-user"></i>
 						</div>
 						<div class="org-name">
-							<div class="org-text-content company">'.
-								$node['name']
-							.'</div>
+							<div class="org-text-content company" type="company">' .
+            $node['name']
+            . '</div>
 						</div>
 					</div>
           ';
         }
 
-        if ($node['type'] === '部门') {
+        if ($node['type'] === 'department') {
+          $arrayIcon = !empty($node['__children']) ? '<i class="fa-solid fa-caret-right"></i>' : '';
+
           return '
           <div class="item-content scroll-item">
-            <div class="arrow-icon"></div>
+            <div class="arrow-icon">' . $arrayIcon . '</div>
 						<div class="org-icon">
               <i class="fa-solid fa-user-group"></i>
 						</div>
 						<div class="org-name">
-							<div class="org-text-content department">'.
-								$node['name']
-							.'</div>
+							<div class="org-text-content department" type="department">' .
+            $node['name']
+            . '</div>
 						</div>
 					</div>
           ';
         }
       }
     ]);
-    return $this->render('admin/org/department.html.twig',[
+    return $this->render('admin/org/department.html.twig', [
       'departmentTree' => $department
     ]);
   }
@@ -225,11 +231,21 @@ class OrgController extends AbstractController
   public function createDepartment(Request $request, EntityManagerInterface $em): Response
   {
     $department = new Department();
-    $form = $this->createForm(DepartmentType::class, $department);
+    $form = $this->createForm(DepartmentType::class, $department, [
+      'action' => $this->generateUrl('org_department_new')
+    ]);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
       $department = $form->getData();
+      // 当新增部门里的类型为部门，并且上级部门为空时，将所属公司同名的部门找出作为上级部门
+      // 即这个部门是在个一级部门
+      if ($department->getType() == 'department' && $department->getParent() == null) {
+        $company = $department->getCompany()->getName();
+        $repo = $em->getRepository(Department::class);
+        $parent = $repo->findOneBy(['name' => $company]);
+        $department->setParent($parent);
+      }
       $em->persist($department);
       $em->flush();
 
@@ -248,7 +264,7 @@ class OrgController extends AbstractController
   public function departmentForm(Request $request, EntityManagerInterface $em, int $id): Response
   {
     $repo = $em->getRepository(Department::class);
-    $deparment = $repo->findOneBy(['id'=>$id]);
+    $deparment = $repo->findOneBy(['id' => $id]);
 
     $form = $this->createForm(DepartmentType::class, $deparment);
     $form->handleRequest($request);

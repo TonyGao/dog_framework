@@ -1,0 +1,38 @@
+{% extends "base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+	<div style="height: 100vh; width: 100%;">
+		<div class="ef-modal-container" style="z-index: 1001;">
+			<div class="ef-modal-mask"></div>
+			<div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+				<div class="ef-modal">
+					<div class="ef-modal-header">
+						<div class="ef-modal-title ef-modal-title-align-left">
+							Title
+						</div>
+						<div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn">
+							<span class="ef-icon-hover">
+								<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+									<path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+								</svg>
+							</span>
+						</div>
+					</div>
+					<div class="ef-modal-body">
+						<div>You can customize modal body text by the current situation. This modal will be closed immediately once you press the OK button.
+						</div>
+					</div>
+					<div class="ef-modal-footer">
+						<button class="btn secondary small" type="button">取消</button>
+						<button class="btn primary small" type="button">确定</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

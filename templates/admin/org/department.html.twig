@@ -7,22 +7,24 @@
 
 {% block javascripts %}
 	{{ parent() }}
+  <script src=" {{ asset('organization/department.js', 'admin') }} "></script>
 
   <script>
 	$(document).ready(function () {
-      $(".left-tree .arrow-icon").on("click", function (event) {
-        $(this).parent().nextAll(".sub-tree-content").toggle(0);
-				var icon = $(this).find('i');
-			  icon.toggleClass(function() {
-				if (icon.hasClass("fa-caret-down")) {
-					icon.removeClass("fa-caret-down");
-					return "fa-caret-right";
-				} else {
-					icon.removeClass("fa-caret-right");
-					return "fa-caret-down";
-				}
-			})
-    })
+    {# $(".left-tree .arrow-icon").on("click", function (event) {
+      $(this).parent().nextAll(".tree-indent, .sub-tree-content").toggle(0);
+
+        var icon = $(this).find('i');
+        icon.toggleClass(function() {
+        if (icon.hasClass("fa-caret-down")) {
+          icon.removeClass("fa-caret-down");
+          return "fa-caret-right";
+        } else {
+          icon.removeClass("fa-caret-right");
+          return "fa-caret-down";
+        }
+      })
+    }) #}
 
     $(".org-text-content.company, .org-text-content.department").on("click", function (event) {
       let thisChosen = false;
@@ -39,10 +41,12 @@
       $.ajax({
         url: "{{ path("org_department_new") }}",
         method: "GET",
+        async: false,
         dataType: "html",
         success: function(data) {
           $(".right-content").html(data);
           Common.forceReloadJS('components');
+          Common.forceReloadJS('admin');
         }
       })
     })
@@ -56,7 +60,6 @@
         leftTree.animate({"left":"0px"}, "slow").addClass('visible');
       }
     })
-
   })
   </script>
 {% endblock %}

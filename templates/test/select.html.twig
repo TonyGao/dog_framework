@@ -1,178 +1,12 @@
 {% extends "base.html.twig" %}
 
 {% set selectInputId = random() %}
+{% set selectInputId2 = random() %}
 {% set selectContentId = random() %}
+{% set selectContentId2 = random() %}
 
 {% block javascripts %}
 {{ parent() }}
-<script>
-  $(document).ready(function() {
-    $(".ef-select-view-search").on("click", function() {
-      let isSelected = $(this).attr("chosen");
-      if (isSelected !== "true") {
-        $(this).toggleClass("ef-select-view-opened");
-        $(this).find("input:first").focus();
-        $(this).find("svg").remove();
-        let searchIcon = `
-          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-search" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
-            <path d="M33.072 33.071c6.248-6.248 6.248-16.379 0-22.627-6.249-6.249-16.38-6.249-22.628 0-6.248 6.248-6.248 16.379 0 22.627 6.248 6.248 16.38 6.248 22.628 0Zm0 0 8.485 8.485"></path>
-          </svg>
-        `;
-        $(this).find(".ef-select-view-icon").html(searchIcon);
-      }
-      let contentId = $(this).attr("contentid");
-      let height = $(this).outerHeight();
-      let top = $(this).offset().top;
-      let left = $(this).offset().left;
-      $("#"+contentId).css({"left": left, "top": top + height + 6});
-      $("#"+contentId).show();
-    });
-
-    let selectIcon = `
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
-        <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
-      </svg>
-    `;
-
-    $(".ef-select-view-input").on("focusout", function(event) {
-      $(this).parent().find("svg").remove();
-      $(this).parent().find('.ef-select-view-icon').html(selectIcon);
-    })
-
-    $(document).on("click", function(event) {
-      if (!$(event.target).closest(".ef-trigger-popup-wrapper, .ef-select-view-single").length) {
-        $(".ef-trigger-popup.ef-trigger-position-bl").hide();
-      }
-    })
-
-    // 选取选项
-    $(".ef-select-option").not(".ef-select-option-disabled").on("click", function() {
-      let val = $(this).children(".ef-select-option-content").html();
-      let selectContent = $(this).parents().find(".ef-trigger-popup.ef-trigger-position-bl");
-      let id = selectContent.attr("parentId");
-      let selectInput = $("#"+id);
-      selectInput.children(".ef-select-view-input").addClass("ef-select-view-input-hidden");
-      selectInput.children(".ef-select-view-value").html(val).removeClass("ef-select-view-value-hidden");
-      let closeIon = '<i class="fa-regular fa-circle-xmark"></i>';
-      selectInput.children().find(".ef-select-view-icon").html(closeIon);
-      selectInput.attr("chosen", "true");
-
-      // 删掉选中的选项
-      $(".fa-regular.fa-circle-xmark").on("click", function(event) {
-        event.stopPropagation();
-        let selectInput = $(this).parents().find(".ef-select-view-single");
-        selectInput.attr("chosen", "false");
-        selectInput.children(".ef-select-view-input").removeClass("ef-select-view-input-hidden");
-        selectInput.children(".ef-select-view-value").addClass("ef-select-view-value-hidden");
-        selectInput.children(".ef-select-view-value").html("");
-        selectInput.children().find(".ef-select-view-icon").html(selectIcon);
-      })
-      selectContent.hide();
-    })
-
-    // 当在输入框输入时，将li元素遍历出来值并保存到原始数组中，并通过输入的内容模糊查询
-    let dynamic = [];
-    $(".ef-select-view-input").on("input change", _.debounce(function() {
-      let contentId = $(this).parent().attr("contentid");
-      let optionList = $("#"+contentId).children().find(".ef-select-option-content");
-      let ul = $("#"+contentId).children().find(".ef-select-dropdown-list");
-      if (dynamic['selectOrigin'+contentId] === undefined) {
-        dynamic['selectOrigin'+contentId] = [];
-        optionList.each(function(idx, element) {
-          let eleObj = {};
-          eleObj['lowerText'] = $(this).text().toLowerCase()
-          eleObj['orginText'] = $(this).text();
-          eleObj['id'] = $(this).parent().attr('id');
-          dynamic['selectOrigin'+contentId].push(eleObj);
-        })
-      }
-      // 除了搜索的li，其他全部隐藏
-      let searchResult = Str.searchArr(dynamic['selectOrigin'+contentId], $(this).val().toLowerCase());
-      let hideList = _.difference(dynamic['selectOrigin'+contentId], searchResult);
-      if (hideList.length >= 0) {
-        $.each(searchResult, function(idx, ele) {
-          $("#"+ele.id).show();
-        })
-        $.each(hideList, function(idx, ele) {
-          $("#"+ele.id).hide();
-        })
-      }
-    }, 500))
-
-    $(".ef-select-view-input").on("focusout", function() {
-      $(this).val("");
-    })
-
-    /* let ul;
-    $(".ef-scrollbar-container.ef-select-dropdown-list-wrapper").on("scroll", function(data) {
-      ul = $(this).find(".ef-select-dropdown-list");
-      let scrollheight = ul.height() - $(this).height();
-      let mulriple = scrollheight/41;
-      let dynamicTop = 41 - ul.offset().top / mulriple;
-      if (dynamicTop <= 0) {
-        dynamicTop = 0;
-      }
-      $(this).parent().find(".ef-scrollbar-thumb.ef-scrollbar-thumb-direction-vertical").css("top", dynamicTop);
-    });
-
-    let mousedown = false;
-    let isDragging = false;
-    let clickedScrollBar;
-    $(".ef-scrollbar-thumb-bar").on("mousedown", function() {
-      mousedown = true;
-      clickedScrollBar = $(this);
-      clickedScrollBar.css("background-color", "rgb(134,144,156)");
-      clickedScrollBar.parent().css("opacity", ".8");
-
-      ul = $(this).parents().find(".ef-scrollbar.ef-scrollbar-type-embed").children().find(".ef-select-dropdown-list");
-    });
-    let oldTop = null;
-    let dynamicDragTop;
-    let currentDistance;
-    let discrepancy;
-    $(document).on("mousemove", function(event) {
-      if (mousedown) {
-        isDragging = true;
-        discrepancy = event.clientY;
-
-        if (discrepancy !== oldTop) {
-          if (oldTop !== null) {
-            currentDistance = discrepancy - oldTop;
-          }
-          oldTop = discrepancy;
-        }
-
-        currentTop = parseInt(clickedScrollBar.parent().css("top"), 10);
-        dynamicDragTop = currentTop + currentDistance;
-        if (dynamicDragTop >= 40) {
-          dynamicDragTop = 40;
-        }
-
-        if (dynamicDragTop <= 0) {
-          dynamicDragTop = 0;
-        }
-        clickedScrollBar.parent().css("top", dynamicDragTop);
-
-        ul = $(this).find(".ef-select-dropdown-list");
-        let scrollheight = ul.height() - $(this).height();
-        let mulriple = scrollheight/41;
-        let dynamicTop = 41 - ul.offset().top / mulriple;
-        if (dynamicTop <= 0) {
-          dynamicTop = 0;
-        }
-        $(this).parent().find(".ef-scrollbar-thumb.ef-scrollbar-thumb-direction-vertical").css("top", dynamicTop);
-      }
-    }).on("mouseup", function() {
-      if (mousedown) {
-        mousedown = false;
-        isDragging = false;
-        oldTop = null;
-        clickedScrollBar.css("background-color", "");
-        clickedScrollBar.parent().css("opacity", "");
-      }
-    }) */
-  })
-</script>
 {% endblock %}
 
 {% block body %}
@@ -194,11 +28,57 @@
   </span>
 </span>
 
+<span
+  class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
+  style="width: 320px;"
+  chosen="false"
+  id="{{ selectInputId2 }}"
+  contentId="{{ selectContentId2 }}"
+  >
+  <input class="ef-select-view-input" placeholder="Please select ...">
+  <span class="ef-select-view-value ef-select-view-value-hidden"></span>
+  <span class="ef-select-view-suffix">
+    <span class="ef-select-view-icon">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
+        <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
+      </svg>
+    </span>
+  </span>
+</span>
+
 <div class="ef-trigger-popup ef-trigger-position-bl"
      trigger-placement="bl"
      style="z-index: 1001; pointer-events: auto; width: 320px;"
      id="{{ selectContentId }}"
      parentId="{{ selectInputId }}"
+    >
+	<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+		<div class="ef-trigger-content">
+			<div class="ef-select-dropdown">
+					<div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+            <div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
+              <ul class="ef-select-dropdown-list">
+                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Beijing</span></li>
+                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Shanghai</span></li>
+                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Guangzhou</span></li>
+                <li id="{{ random() }}" class="ef-select-option ef-select-option-disabled"><span class="ef-select-option-content">Disabled</span></li>
+                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Shenzhen</span></li>
+                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Chengdu</span></li>
+                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Wuhan</span></li>
+              </ul>
+            </div>
+					</div>
+				</div>
+      </div>
+		</div>
+  </div>
+</div>
+
+<div class="ef-trigger-popup ef-trigger-position-bl"
+     trigger-placement="bl"
+     style="z-index: 1001; pointer-events: auto; width: 320px;"
+     id="{{ selectContentId2 }}"
+     parentId="{{ selectInputId2 }}"
     >
 	<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
 		<div class="ef-trigger-content">

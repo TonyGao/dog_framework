@@ -30,9 +30,9 @@ class Corporation
 	 * 集团名称
 	 * @ORM\Column(type="string", length=180)
 	 * @Ef(
-     *     group="corporation_base_info",
-     *     isBF=true
-     * )
+   *     group="corporation_base_info",
+   *     isBF=true
+   * )
 	 */
 	private $name;
 

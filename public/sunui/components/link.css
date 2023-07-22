@@ -1,49 +1,49 @@
 .ef-link {
-  display: inline-block;
   padding: 1px 4px;
-  color: rgb(22,93,255);
+  color: rgb(22, 93, 255);
   font-size: 14px;
   line-height: 1.5715;
   text-decoration: none;
   background-color: transparent;
   border-radius: 2px;
   cursor: pointer;
-  transition: all .1s cubic-bezier(0,0,1,1);
+  transition: all 0.1s cubic-bezier(0, 0, 1, 1);
+  vertical-align: middle;
 }
 
 .ef-link:hover {
-  color: rgb(22,93,255);
-  background-color: rgb(242,243,245);
+  color: rgb(22, 93, 255);
+  background-color: rgb(242, 243, 245);
 }
 
 .ef-link.disabled {
-  color: rgb(148,191,255);
+  color: rgb(148, 191, 255);
   background: none;
   cursor: not-allowed;
 }
 
 .ef-link.success {
-  color: rgb(0,180,42);
+  color: rgb(0, 180, 42);
 }
 
 .ef-link.success:hover {
-  color: rgb(0,180,42);
+  color: rgb(0, 180, 42);
 }
 
 .ef-link.success.disabled {
-  color: rgb(123,225,136);
+  color: rgb(123, 225, 136);
 }
 
 .ef-link.warning {
-  color: rgb(255,125,0);
+  color: rgb(255, 125, 0);
 }
 
 .ef-link.warning:hover {
-  color: rgb(255,125,0);
+  color: rgb(255, 125, 0);
 }
 
 .ef-link.warning.disabled {
-  color: rgb(255,228,186);
+  color: rgb(255, 228, 186);
 }
 
 .ef-link .disabled {
@@ -52,18 +52,22 @@
 }
 
 .ef-link.danger {
-  color: rgb(245,63,63);
+  color: rgb(245, 63, 63);
 }
 
 .ef.danger:hover {
-  color: rgb(245,63,63);
+  color: rgb(245, 63, 63);
 }
 
 .ef-link.danger.disabled {
-  color: rgb(251,172,163);
+  color: rgb(251, 172, 163);
 }
 
 .ef-link.icon i {
   margin-right: 6px;
-  font-size: .6em;
+  font-size: 0.6em;
+}
+
+.ef-department-selection-li-content {
+  display: inline-block;
 }

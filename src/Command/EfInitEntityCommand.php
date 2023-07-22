@@ -114,11 +114,11 @@ class EfInitEntityCommand extends Command
                         // 补充原fieldMappings不包含的Entity类型的字段属性
                         $associationMappings = $metaData->associationMappings;
 
-                        foreach($associationMappings as $mappings) {
+                        foreach($associationMappings as $key=>$mappings) {
                             foreach($mappings as $mapping) {
-                                $fields[key($mappings)]['fieldName'] = $mappings['fieldName'];
-                                $fields[key($mappings)]['type'] = 'entity';
-                                $fields[key($mappings)]['targetEntity'] = $mappings['targetEntity'];
+                                $fields[$key]['fieldName'] = $mappings['fieldName'];
+                                $fields[$key]['type'] = 'entity';
+                                $fields[$key]['targetEntity'] = $mappings['targetEntity'];
                                 switch ($mappings['type']) {
                                     case 1:
                                         $associationType = 'OneToOne';
@@ -136,15 +136,15 @@ class EfInitEntityCommand extends Command
                                         $associationType = null;
                                         break;
                                 }
-                                $fields[key($mappings)]['associationType'] = $associationType;
-                                $fields[key($mappings)]['scale'] = null;
-                                $fields[key($mappings)]['length'] = null;
-                                $fields[key($mappings)]['unique'] = null;
-                                $fields[key($mappings)]['nullable'] = null;
-                                $fields[key($mappings)]['precision'] = null;
+                                $fields[$key]['associationType'] = $associationType;
+                                $fields[$key]['scale'] = null;
+                                $fields[$key]['length'] = null;
+                                $fields[$key]['unique'] = null;
+                                $fields[$key]['nullable'] = null;
+                                $fields[$key]['precision'] = null;
                                 if (array_key_exists('sourceToTargetKeyColumns', $mappings)) {
-                                    $fields[key($mappings)]['columnName'] = $mappings['sourceToTargetKeyColumns'][key($mappings['sourceToTargetKeyColumns'])];
-                                    $fields[key($mappings)]['targetId'] = key($mappings['sourceToTargetKeyColumns']);
+                                    $fields[$key]['columnName'] = key($mappings['sourceToTargetKeyColumns']);
+                                    $fields[$key]['targetId'] = $mappings['sourceToTargetKeyColumns'][key($mappings['sourceToTargetKeyColumns'])];
                                 }
                             }
                         }
@@ -218,10 +218,13 @@ class EfInitEntityCommand extends Command
                                     ->setType($field['type'])
                                     ->setFieldName($field['columnName'])
                                     ->setUniqueable($field['unique'])
-                                    ->setNullable($field['nullable']);
+                                    ->setNullable($field['nullable'])
+                                    ->setBusinessField(true)
+                                    ;
 
                                 if ($field['type'] == 'entity') {
                                     $property->setTargetId($field['targetId']);
+                                    $property->setTargetEntity($field['targetEntity']);
                                 }
 
                                 if ($field['precision'] !== null) {
@@ -299,7 +302,6 @@ class EfInitEntityCommand extends Command
         if ($input->getOption('listPerpertyGroup')) {
             $repo = $this->em->getRepository(EntityPropertyGroup::class);
             $tree = $repo->childrenHierarchy();
-            dump($tree);
         }
 
         $io->success('已成功初始化所有Entity文件到数据库');

@@ -6,6 +6,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Form\Common\SwitchType;
 
 class Str
@@ -48,6 +49,9 @@ class Str
                 break;
             case 'integer':
                 $class = IntegerType::class;
+                break;
+            case 'entity':
+                $class = EntityType::class;
                 break;
         }
 

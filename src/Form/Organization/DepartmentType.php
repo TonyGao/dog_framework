@@ -28,35 +28,45 @@ class DepartmentType extends AbstractType
 
   public function buildForm(FormBuilderInterface $builder, array $options): void
   {
-    // $reflectionClass = new \ReflectionClass(Department::class);
-    // $repo = $this->em->getRepository(Entity::class);
-    // $en = $repo->findOneBy([
-    //     'fqn' => $reflectionClass->name,
-    // ]);
+    $reflectionClass = new \ReflectionClass(Department::class);
+    $repo = $this->em->getRepository(Entity::class);
+    $en = $repo->findOneBy([
+        'fqn' => $reflectionClass->name,
+    ]);
 
-    // $fields = $this->em->getRepository(EntityProperty::class)
-    //   ->findBy(['entity' => $en],['id' => 'ASC']);
-    // foreach ($fields as $field) {
-    //     $arr = [];
-    //     if ($field->getValidation()) {
-    //         $validation = $field->getValidation();
-    //         $arr = Arr::transValtoAttr($validation);
-    //     }
-    //     $classType = Str::convertFormType($field->getType());
-    //     $builder->add($field->getFieldName(), $classType, [
-    //         'label' => $field->getComment(),
-    //         'attr' => $arr,
-    //         'required' => $arr['required'] ?? false,
+    $fields = $this->em->getRepository(EntityProperty::class)
+      ->findBy(['entity' => $en],['id' => 'ASC']);
+    foreach ($fields as $field) {
+        $arr = [];
+        if ($field->getValidation()) {
+            $validation = $field->getValidation();
+            $arr = Arr::transValtoAttr($validation);
+        }
+        $classType = Str::convertFormType($field->getType());
+        $options = [
+          'label' => $field->getComment(),
+          'attr' => $arr,
+          'required' => $arr['required'] ?? false,
+        ];
+
+        if ($field->getType() == "entity") {
+          $options['class'] = $field->getTargetEntity();
+        }
+
+        if ($field->getTargetEntity() == Company::class) {
+          $options['choices'] = $this->companyRepo->allCompany();
+          $options['choice_label'] = 'alias';
+        }
+        $builder->add($field->getPropertyName(), $classType, $options);
+    }
+    // $builder
+    //     ->add('name')
+    //     ->add('alias')
+    //     ->add('company', EntityType::class, [
+    //       'class' => Company::class,
+    //       'choices' => $this->companyRepo->allCompany(),
+    //       'choice_label' => 'name'
     //     ]);
-    // }
-    $builder
-        ->add('name')
-        ->add('alias')
-        ->add('company', EntityType::class, [
-          'class' => Company::class,
-          'choices' => $this->companyRepo->allCompany(),
-          'choice_label' => 'name'
-        ]);
   }
 
   public function configureOptions(OptionsResolver $resolver): void

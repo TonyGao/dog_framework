@@ -151,6 +151,7 @@
       class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
       style="width: 320px;"
       chosen="false"
+      for="{{ label }}"
       id="{{ selectInputId }}"
       contentId="{{ selectContentId }}"
       >
@@ -166,6 +167,7 @@
     </span>
     <div class="ef-trigger-popup ef-trigger-position-bl"
          trigger-placement="bl"
+         for="{{ label }}"
          style="z-index: 1001; pointer-events: auto; width: 320px;"
          id="{{ selectContentId }}"
          parentId="{{ selectInputId }}"
@@ -205,7 +207,7 @@
             </optgroup>
         {%- else -%}
             {#<option value="{{ choice.value }}"{% if choice.attr %}{% with { attr: choice.attr } %}{{ block('attributes') }}{% endwith %}{% endif %}{% if not render_preferred_choices|default(false) and choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</option>#}
-            <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</span></li>
+            <li id="{{ random() }}" value="{{ choice.value }}" class="ef-select-option"><span class="ef-select-option-content">{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</span></li>
         {%- endif -%}
     {% endfor %}
 {%- endblock choice_widget_options -%}

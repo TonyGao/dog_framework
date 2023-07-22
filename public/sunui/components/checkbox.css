@@ -1,0 +1,137 @@
+.ef-checkbox-group {
+  display: inline-block;
+}
+
+.ef-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding-left: 5px;
+  font-size: 14px;
+  line-height: unset;
+  cursor: pointer;
+}
+
+.ef-checkbox-group .ef-checkbox {
+  margin-right: 16px;
+}
+
+[type="checkbox"],
+[type="radio"] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.ef-checkbox > input[type="checkbox"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.ef-icon-hover:before {
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+  background-color: transparent;
+  border-radius: 50%;
+  transition: background-color 0.1s cubic-bezier(0, 0, 1, 1);
+  content: "";
+}
+
+.ef-icon-hover:before {
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+}
+
+.ef-icon-hover.ef-icon-hover-disabled:before {
+  opacity: 0;
+}
+
+.ef-icon-hover.ef-checkbox-icon-hover:before {
+  width: 24px;
+  height: 24px;
+}
+
+.ef-checkbox:hover .ef-checkbox-icon-hover:before {
+  background-color: rgb(242, 243, 245);
+}
+
+.ef-checkbox-icon-hover .ef-icon-hover-disabled:before {
+  background-color: transparent;
+}
+
+.ef-checkbox-icon {
+  position: relative;
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+  border: 2px solid rgb(229, 230, 235);
+  border-radius: 2px;
+  user-select: none;
+}
+
+.ef-checkbox-checked .ef-checkbox-icon {
+  background-color: rgb(22, 93, 255);
+  border-color: transparent;
+}
+
+.ef-checkbox-icon:after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 6px;
+  height: 2px;
+  background: var(--color-white);
+  border-radius: 0.5px;
+  transform: translate(-50%) translateY(-50%) scale(0);
+  content: "";
+}
+
+.ef-checkbox-label {
+  margin-left: 8px;
+  color: rgb(29, 33, 41);
+}
+
+.ef-checkbox-group-direction-vertical .ef-checkbox {
+  display: flex;
+  margin-right: 0;
+  line-height: 32px;
+}
+
+.ef-checkbox-icon-check {
+  position: relative;
+  display: block;
+  width: 8px;
+  height: 100%;
+  margin: 0 auto;
+  color: #ffffff;
+  transform: scale(0);
+  transform-origin: center 75%;
+}
+
+.ef-checkbox-checked .ef-checkbox-icon-check {
+  transform: scale(1);
+  transition: transform 0.3s cubic-bezier(0.3, 1.3, 0.3, 1);
+}
+
+.ef-checkbox-icon:after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 6px;
+  height: 2px;
+  background: #ffffff;
+  border-radius: 0.5px;
+  transform: translate(-50%) translateY(-50%) scale(0);
+  content: "";
+}
