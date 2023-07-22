@@ -9,6 +9,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Tree\Node as GedmoNode;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Repository\Organization\DepartmentRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * 部门
@@ -25,12 +26,14 @@ class Department implements GedmoNode
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"api"})
      */
     private $id;
 
     /**
      * 部门全称
      * @ORM\Column(type="string", length=180)
+     * @Groups({"api"})
      * @Ef(
      *     group="department_base_info",
      *     isBF=true
@@ -41,6 +44,7 @@ class Department implements GedmoNode
     /**
      * 部门简称
      * @ORM\Column(type="string", length=80, nullable=true)
+     * @Groups({"api"})
      * @Ef(
      *     group="department_base_info",
      *     isBF=true
@@ -52,6 +56,7 @@ class Department implements GedmoNode
      * 所属公司
      * @ORM\ManyToOne(targetEntity="Company")
      * @ORM\JoinColumn(name="company_id", referencedColumnName="id")
+     * @Groups({"api"})
      * @Ef(
      *   group="department_base_info",
      *   isBF=true
@@ -63,13 +68,13 @@ class Department implements GedmoNode
      * 在树状中的类型
      * 类型包括：集团、公司、部门
      * @ORM\Column(type="string")
+     * @Groups({"api"})
      */
-    private $type;
+    private $type = 'department';
 
     /**
      * 部门负责人
-     * @ORM\OneToOne(targetEntity="App\Entity\OrgUser")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @ORM\OneToMany(targetEntity="App\Entity\OrgUser", mappedBy="id")
      * @Ef(
      *     group="department_management_info",
      *     isBF=true
@@ -89,7 +94,8 @@ class Department implements GedmoNode
 
     /**
      * 编码
-	   * @ORM\Column(type="string", length=180, nullable=true)
+	 * @ORM\Column(type="string", length=180, nullable=true)
+     * @Groups({"api"})
      * @Ef(
      *    group="department_base_info",
      *    isBF=true
@@ -149,6 +155,10 @@ class Department implements GedmoNode
      * @ORM\OrderBy({"lft" = "ASC"})
      */
     private $children;
+
+    public function __toString() {
+        return $this->alias;
+    }
 
     /**
      * Get the value of id

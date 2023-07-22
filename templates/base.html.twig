@@ -1,42 +1,53 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
-        {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
-        {% block stylesheets %}
-          <link rel="stylesheet" href="{{ asset('/lib/font-awesome/css/all.min.css', 'static') }}">
-          <link rel="stylesheet" type="text/css" href="{{ asset('button.css', 'ui') }}">
-          <link rel="stylesheet" type="text/css" href="{{ asset('input-number.css', 'ui') }}">
-          <link rel="stylesheet" type="text/css" href="{{ asset('input.css', 'ui') }}">
-          <link rel="stylesheet" type="text/css" href="{{ asset('select.css', 'ui') }}">
-          <link rel="stylesheet" type="text/css" href="{{ asset('switch.css', 'ui') }}">
-          <link rel="stylesheet" type="text/css" href="{{ asset('textarea.css', 'ui') }}">
-          <link rel="stylesheet" type="text/css" href="{{ asset('link.css', 'ui') }}">
-          <link rel="stylesheet" type="text/css" href="{{ asset('divider.css', 'ui') }}">
-          <link rel="stylesheet" type="text/css" href="{{ asset('grid.css', 'ui') }}">
-          <link rel="stylesheet" type="text/css" href="{{ asset('layout.css', 'ui') }}">
-          <link rel="stylesheet" type="text/css" href="{{ asset('form.css', 'ui') }}">
-        {% endblock %}
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			{% block title %}Welcome!
+			{% endblock %}
+		</title>
+		<link
+		rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+		{# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
+		{% block stylesheets %}
+			<link rel="stylesheet" href="{{ asset('/lib/font-awesome/css/all.min.css', 'static') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('button.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('input-number.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('input.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('select.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('department.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('switch.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('radio.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('checkbox.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('textarea.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('link.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('divider.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('grid.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('layout.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('modal.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('form.css', 'ui') }}">
+		{% endblock %}
 
-        {% block javascripts %}
-          <script src=" {{ asset('lib/jQuery/jquery-3.6.1.min.js', 'static') }} "></script>
-          <script src=" {{ asset('lib/lodash/lodash.min.js', 'static') }} "></script>
-          <script src=" {{ asset('lib/ef/base/common.js') }} "></script>
-          <script src=" {{ asset('lib/ef/base/str.js') }} "></script>
-          <script src=" {{ asset('input.js', 'ui') }} "></script>
-          <script src=" {{ asset('input-number.js', 'ui') }} "></script>
-          <script src=" {{ asset('switch.js', 'ui') }} "></script>
-          <script src=" {{ asset('textarea.js', 'ui') }} "></script>
-          <script src=" {{ asset('select.js', 'ui') }} "></script>
-          {# <script src="https://kit.fontawesome.com/ef1baf8144.js" crossorigin="anonymous"></script> #}
-          {{ encore_entry_script_tags('app') }}
-        {% endblock %}
-        {% block css %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+		{% block javascripts %}
+			<script src="{{ asset('lib/jQuery/jquery-3.6.1.min.js', 'static') }}"></script>
+			<script src="{{ asset('lib/lodash/lodash.min.js', 'static') }}"></script>
+			<script src="{{ asset('lib/keypress/keypress-2.1.5.min.js', 'static') }}"></script>
+			<script src="{{ asset('lib/ef/base/common.js') }}"></script>
+			<script src="{{ asset('lib/ef/base/str.js') }}"></script>
+			<script src="{{ asset('input.js', 'ui') }}"></script>
+			<script src="{{ asset('input-number.js', 'ui') }}"></script>
+			<script src="{{ asset('switch.js', 'ui') }}"></script>
+			<script src="{{ asset('textarea.js', 'ui') }}"></script>
+			<script src="{{ asset('select.js', 'ui') }}"></script>
+			<script src="{{ asset('checkbox.js', 'ui') }}"></script>
+			<script src="{{ asset('radio.js', 'ui') }}"></script>
+			<script src="{{ asset('department.js', 'ui') }}"></script>
+			{# <script src="https://kit.fontawesome.com/ef1baf8144.js" crossorigin="anonymous"></script> #}
+			{{ encore_entry_script_tags('app') }}
+		{% endblock %}
+		{% block css %}{% endblock %}
+	</head>
+	<body>
+		{% block body %}{% endblock %}
+	</body>
 </html>

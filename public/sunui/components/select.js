@@ -1,4 +1,87 @@
 $(document).ready(function () {
+  let elements = document.getElementsByClassName("ef-select");
+  let config = {
+    prevent_repeat: true
+  };
+
+  /**
+   * 遍历class是ef-select的dom，获取id，存储selectList对象数组中
+   *
+   * selectList对象格式
+   * {
+   *  selectEleId: '557919876',
+   *  activeEle: '1999887089',
+   *  list: [
+   *    { id: "1999887089", idx: 1, value: 'Beijing' },
+   *    { id: "717768562", idx: 1, value: 'Shanghai' },
+   *    { id: "446617704", idx: 1, value: 'Guangzhou' },
+   *    { id: "475261113", idx: 1, value: 'Shenzhen' },
+   *    { id: "407502384", idx: 1, value: 'Chengdu' },
+   *    { id: "622693981", idx: 1, value: 'Wuhan' },
+   *  ]
+   * }
+   */
+
+  $.each($(".ef-select"), function () {
+    let selectList = {};
+    let selectEleId = $(this).attr('id');
+    selectList['selectEleId'] = selectEleId;
+  })
+
+  let selectList = {
+    selectEleId: '557919876',
+    activeEle: '1999887089',
+    list: [{
+        id: "1999887089",
+        idx: 1,
+        value: 'Beijing'
+      },
+      {
+        id: "1999887089",
+        idx: 1,
+        value: 'Shanghai'
+      },
+      {
+        id: "1999887089",
+        idx: 1,
+        value: 'Guangzhou'
+      },
+      {
+        id: "1999887089",
+        idx: 1,
+        value: 'Shenzhen'
+      },
+      {
+        id: "1999887089",
+        idx: 1,
+        value: 'Chengdu'
+      },
+      {
+        id: "1999887089",
+        idx: 1,
+        value: 'Wuhan'
+      },
+    ]
+  }
+
+  Array.prototype.forEach.call(elements, function (element) {
+    let listener = new window.keypress.Listener(element, config);
+    listener.register_combo({
+      "keys": "down",
+      "on_keydown": function (e) {
+        let id = $(e.target).parent().attr("id");
+        // console.log($(".ef-trigger-popup[parentid='"+ id +"']"));
+      }
+    });
+    listener.register_combo({
+      "keys": "up",
+      "on_keydown": function (e) {
+        console.log("up");
+        //console.log($(e.target).parent().attr("id"));
+      }
+    })
+  });
+
   $(".ef-select-view-search").on("click", function () {
     let isSelected = $(this).attr("chosen");
     if (isSelected !== "true") {
@@ -16,8 +99,12 @@ $(document).ready(function () {
     let height = $(this).outerHeight();
     let top = $(this).position().top + height + 6;
     let left = $(this).position().left;
-    $("#"+contentId).css({"left": left, "top": top});
-    console.log("left:"+left+" top:" + top);
+    $("#" + contentId).css({
+      "left": left,
+      "top": top
+    });
+    $(".ef-trigger-popup.ef-trigger-position-bl").hide();
+    // $("#" + contentId).children().find(".ef-select-dropdown-list li:first-child").addClass("arco-select-option-active");
     $("#" + contentId).show();
   });
 
@@ -38,12 +125,19 @@ $(document).ready(function () {
     }
   })
 
+  $(".ef-select-option").on("click", function (event) {
+    $(event.target).siblings('.arco-select-option-active').removeClass('arco-select-option-active');
+    $(event.target).addClass("arco-select-option-active");
+  })
+
   // 选取选项
   $(".ef-select-option").not(".ef-select-option-disabled").on("click", function () {
     let val = $(this).children(".ef-select-option-content").html();
-    let selectContent = $(this).parents().find(".ef-trigger-popup.ef-trigger-position-bl");
+    let value = $(this).attr("value");
+    let selectContent = $(this).closest(".ef-trigger-popup.ef-trigger-position-bl");
     let id = selectContent.attr("parentId");
     let selectInput = $("#" + id);
+    selectInput.prev('input').attr("value", value);
     selectInput.children(".ef-select-view-input").addClass("ef-select-view-input-hidden");
     selectInput.children(".ef-select-view-value").html(val).removeClass("ef-select-view-value-hidden");
     let closeIon = '<i class="fa-regular fa-circle-xmark"></i>';
@@ -53,7 +147,7 @@ $(document).ready(function () {
     // 删掉选中的选项
     $(".fa-regular.fa-circle-xmark").on("click", function (event) {
       event.stopPropagation();
-      let selectInput = $(this).parents().find(".ef-select-view-single");
+      let selectInput = $(this).closest(".ef-select-view-single");
       selectInput.attr("chosen", "false");
       selectInput.children(".ef-select-view-input").removeClass("ef-select-view-input-hidden");
       selectInput.children(".ef-select-view-value").addClass("ef-select-view-value-hidden");
@@ -65,30 +159,48 @@ $(document).ready(function () {
 
   // 当在输入框输入时，将li元素遍历出来值并保存到原始数组中，并通过输入的内容模糊查询
   let dynamic = [];
+
+  /**
+   * flag 用来标记是否为中文输入完毕
+   */
+  let flag = true;
+  $(".ef-select-view-input").on('compositionstart', function () {
+    flag = false;
+  })
+
+  $(".ef-select-view-input").on('compositionend', function () {
+    flag = true;
+  })
+
   $(".ef-select-view-input").on("input change", _.debounce(function () {
-    let contentId = $(this).parent().attr("contentid");
-    let optionList = $("#" + contentId).children().find(".ef-select-option-content");
-    let ul = $("#" + contentId).children().find(".ef-select-dropdown-list");
-    if (dynamic['selectOrigin' + contentId] === undefined) {
-      dynamic['selectOrigin' + contentId] = [];
-      optionList.each(function (idx, element) {
-        let eleObj = {};
-        eleObj['lowerText'] = $(this).text().toLowerCase()
-        eleObj['orginText'] = $(this).text();
-        eleObj['id'] = $(this).parent().attr('id');
-        dynamic['selectOrigin' + contentId].push(eleObj);
-      })
-    }
-    // 除了搜索的li，其他全部隐藏
-    let searchResult = Str.searchArr(dynamic['selectOrigin' + contentId], $(this).val().toLowerCase());
-    let hideList = _.difference(dynamic['selectOrigin' + contentId], searchResult);
-    if (hideList.length >= 0) {
-      $.each(searchResult, function (idx, ele) {
-        $("#" + ele.id).show();
-      })
-      $.each(hideList, function (idx, ele) {
-        $("#" + ele.id).hide();
-      })
+    if (flag) {
+      let contentId = $(this).parent().attr("contentid");
+      let optionList = $("#" + contentId).children().find(".ef-select-option-content");
+      let ul = $("#" + contentId).children().find(".ef-select-dropdown-list");
+      if (dynamic['selectOrigin' + contentId] === undefined) {
+        dynamic['selectOrigin' + contentId] = [];
+        optionList.each(function (idx, element) {
+          let eleObj = {};
+          eleObj['lowerText'] = $(this).text().toLowerCase()
+          eleObj['orginText'] = $(this).text();
+          eleObj['id'] = $(this).parent().attr('id');
+          dynamic['selectOrigin' + contentId].push(eleObj);
+        })
+      }
+      // 除了搜索的li，其他全部隐藏
+      let searchResult = Str.searchArr(dynamic['selectOrigin' + contentId], $(this).val().toLowerCase());
+      let hideList = _.difference(dynamic['selectOrigin' + contentId], searchResult);
+      if (hideList.length >= 0) {
+        $.each(searchResult, function (idx, ele) {
+          if (idx === 0) {
+            $("#" + ele.id).addClass("arco-select-option-active");
+          }
+          $("#" + ele.id).show();
+        })
+        $.each(hideList, function (idx, ele) {
+          $("#" + ele.id).hide();
+        })
+      }
     }
   }, 500))
 

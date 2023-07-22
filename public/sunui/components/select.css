@@ -198,6 +198,12 @@
   cursor: pointer;
 }
 
+.ef-select-dropdown .ef-select-option.arco-select-option-active {
+  color: rgb(29,33,41);
+  background-color: rgb(242,243,245);
+  transition: all .1s cubic-bezier(0,0,1,1);
+}
+
 .ef-select-dropdown .ef-select-option-content {
   overflow: hidden;
   white-space: nowrap;

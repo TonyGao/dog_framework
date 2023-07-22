@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use App\Repository\Organization\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -37,7 +37,7 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @var string
-     * 
+     *
      * @ORM\Column(type="string", unique=true, nullable=true)
      * @Assert\NotBlank()
      * @Assert\Email()
@@ -46,7 +46,7 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @var string
-     * 
+     *
      * @ORM\Column(type="string", unique=true, nullable=true)
      */
     private $phone;
@@ -159,7 +159,7 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Get the value of displayName
-     */ 
+     */
     public function getDisplayName(): string
     {
         return $this->displayName;
@@ -169,7 +169,7 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
      * Set the value of displayName
      *
      * @return  self
-     */ 
+     */
     public function setDisplayName($displayName): self
     {
         $this->displayName = $displayName;
@@ -181,7 +181,7 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
      * Get the value of email
      *
      * @return  string
-     */ 
+     */
     public function getEmail(): ?string
     {
         return $this->email;
@@ -193,7 +193,7 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
      * @param  string  $email
      *
      * @return  self
-     */ 
+     */
     public function setEmail(string $email): self
     {
         $this->email = $email;
@@ -205,7 +205,7 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
      * Get the value of phone
      *
      * @return  string
-     */ 
+     */
     public function getPhone(): ?string
     {
         return $this->phone;
@@ -217,7 +217,7 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
      * @param  string  $phone
      *
      * @return  self
-     */ 
+     */
     public function setPhone(string $phone): self
     {
         $this->phone = $phone;
@@ -239,7 +239,7 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Get the value of plainPassword
-     */ 
+     */
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
@@ -249,7 +249,7 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
      * Set the value of plainPassword
      *
      * @return  self
-     */ 
+     */
     public function setPlainPassword($plainPassword): self
     {
         $this->plainPassword = $plainPassword;

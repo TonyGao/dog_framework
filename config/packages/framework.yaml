@@ -28,7 +28,6 @@ framework:
                 base_path: 'sunui/components'
             admin:
                 base_path: 'sunui/admin'
-            
 
 when@test:
     framework:

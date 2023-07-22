@@ -49,7 +49,6 @@ class EfTestCommand extends Command
             $statusCode = $response->getStatusCode();
             // $statusCode = 200
             $contentType = $response->getHeaders();
-            dump($contentType);
             $content = $response->getContent();
             // $content = '{"id":521583, "name":"symfony-docs", ...}'
             // $content = ['id' => 521583, 'name' => 'symfony-docs', ...]
