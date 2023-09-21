@@ -72,6 +72,18 @@ class EntityProperty
     private $type;
 
     /**
+     * 表单类型
+     * boolean: SwitchType
+     * string: TextType
+     * text: TextareaType
+     * integer: IntegerType
+     * entity: EntityType
+     * department: DepartmentType
+     * @ORM\Column(type="string", length=80, nullable=true)
+     */
+    private $formType;
+
+    /**
      * 当type为entity时的目标实体
      * @ORM\Column(type="string", length=100, nullable=true)
      */
@@ -572,6 +584,26 @@ class EntityProperty
     public function setAssociationType($associationType)
     {
         $this->associationType = $associationType;
+
+        return $this;
+    }
+
+    /**
+     * Get 表单类型
+     */
+    public function getFormType()
+    {
+        return $this->formType;
+    }
+
+    /**
+     * Set 表单类型
+     *
+     * @return  self
+     */
+    public function setFormType($formType)
+    {
+        $this->formType = $formType;
 
         return $this;
     }

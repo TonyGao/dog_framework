@@ -45,7 +45,7 @@
   justify-content: flex-start;
   z-index: 1000;
   position: inherit;
-  min-width: 260px;
+  min-width: fit-content;
   margin-left: 20px;
   padding-top: 20px;
   border-right: 1px #dfdfdf solid;
@@ -108,7 +108,6 @@
 }
 
 .inside-wrapper .fold-icon-wrapper {
-  left: 260px;
   transform: rotate(180deg);
   position: absolute;
   top: 22px;
@@ -125,6 +124,7 @@
   border-bottom-right-radius: 0;
   cursor: pointer;
   font-size: 0.8em;
+  right: -20px;
 }
 
 .fold-icon-wrapper.collapse {

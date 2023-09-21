@@ -369,4 +369,12 @@ class Company implements GedmoNode
 
         return $this;
     }
+
+    /**
+     * 用魔法方法打印公司对象的名称
+     */
+    public function __toString()
+    {
+        return $this->name;
+    }
 }

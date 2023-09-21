@@ -6,13 +6,14 @@ use App\Entity\Organization\Corporation;
 use App\Entity\Organization\Company;
 use App\Entity\Organization\Department;
 use App\Form\Organization\CorporationFormType;
-use App\Form\Organization\DepartmentType;
+use App\Form\Organization\OrgDepartmentType;
 use App\Form\Organization\CompanyType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * 组织架构管理
@@ -140,7 +141,6 @@ class OrgController extends AbstractController
   public function department(Request $request, EntityManagerInterface $em): Response
   {
     $repo = $em->getRepository(Department::class);
-    // $department = $repo->childrenHierarchy();
     $department = $repo->childrenHierarchy(null, false, [
       'decorate' => true,
       'rootOpen' => static function (array $tree): ?string {
@@ -225,15 +225,115 @@ class OrgController extends AbstractController
   }
 
   /**
+   * 组织架构-部门选择器（单部门选择）
+   */
+  #[Route('/admin/org/departemnt/singleSelect', name: 'org_deparment_single_select')]
+  public function singleSelectDepartment(Request $request, EntityManagerInterface $em): Response
+  {
+    $repo = $em->getRepository(Department::class);
+    $departmentInputId = Uuid::v1();
+    $departmentSingleTree = $repo->childrenHierarchy(null, false, [
+      'decorate' => true,
+      'rootOpen' => static function (array $tree): ?string {
+        if ([] !== $tree && 0 == $tree[0]['lvl']) {
+          return '<ol class="ol-left-tree">';
+        }
+
+        if ($tree[0]['type'] === 'department') {
+          return '<span class="tree-indent" style="display: none;"></span><ol class="sub-tree-content" style="display: none;">';
+        }
+
+        return '<span class="tree-indent"></span><ol class="sub-tree-content">';
+      },
+      'rootClose' => static function (array $child): ?string {
+        // if ([] !== $child && 0 == $child[0]['lvl']) {
+        //   return '</ol>';
+        // }
+
+        return '</ol>';
+      },
+      'childOpen' => '<li>',
+      'childClose' => '</li>',
+      'nodeDecorator' => static function (array $node) use (&$controller, $departmentInputId): ?string {
+        if ($node['type'] === 'corperations') {
+          return '
+          <div class="item-content scroll-item">
+            <div class="arrow-icon">
+              <i class="fa-solid fa-caret-down"></i>
+            </div>
+						<div class="org-icon">
+              <i class="fa-solid fa-building"></i>
+						</div>
+						<div class="org-name">
+							<div class="org-text-content">' .
+            $node['name']
+            . '</div>
+						</div>
+					</div>
+          ';
+        }
+
+        if ($node['type'] === 'company') {
+          $arrayIcon = !empty($node['__children']) ? '<i class="fa-solid fa-caret-right"></i>' : '';
+
+          return '
+          <div class="item-content scroll-item">
+            <div class="arrow-icon">' . $arrayIcon . '</div>
+						<div class="org-icon">
+              <i class="fa-solid fa-building-user"></i>
+						</div>
+						<div class="org-name">
+							<div class="org-text-content company" type="company">' .
+            $node['name']
+            . '</div>
+						</div>
+					</div>
+          ';
+        }
+
+        if ($node['type'] === 'department') {
+          $arrayIcon = !empty($node['__children']) ? '<i class="fa-solid fa-caret-right"></i>' : '';
+          return '
+          <div class="item-content scroll-item">
+            <div class="arrow-icon">' . $arrayIcon . '</div>
+            <span class="department-select-line">
+              <label class="ef-radio" style="padding-right: 5px;" radioId="' . $departmentInputId . '">
+                <input type="radio" class="ef-radio-target" value="A">
+                <span class="ef-icon-hover ef-radio-icon-hover">
+                  <span class="ef-radio-icon"></span>
+                </span>
+              </label>
+              <div class="org-icon">
+                <i class="fa-solid fa-user-group"></i>
+              </div>
+              <div class="org-name">
+                <div class="org-text-content department" type="department">' .
+            $node['name']
+            . '</div>
+              </div>
+            </span>
+					</div>
+          ';
+        }
+      }
+    ]);
+
+    return $this->render('admin/org/department/singleSelect.html.twig', [
+      'departmentSingleTree' => $departmentSingleTree
+    ]);
+  }
+
+  /**
    * 新建部门表单
    */
   #[Route('/admin/org/department/new', name: 'org_department_new')]
   public function createDepartment(Request $request, EntityManagerInterface $em): Response
   {
     $department = new Department();
-    $form = $this->createForm(DepartmentType::class, $department, [
+    $form = $this->createForm(OrgDepartmentType::class, $department, [
       'action' => $this->generateUrl('org_department_new')
     ]);
+    // $form = $this->createForm(OrgDepartmentType::class, $department);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
@@ -266,7 +366,7 @@ class OrgController extends AbstractController
     $repo = $em->getRepository(Department::class);
     $deparment = $repo->findOneBy(['id' => $id]);
 
-    $form = $this->createForm(DepartmentType::class, $deparment);
+    $form = $this->createForm(OrgDepartmentType::class, $deparment);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {

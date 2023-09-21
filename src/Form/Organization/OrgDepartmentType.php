@@ -16,7 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Translation\TranslatableMessage;
 
-class DepartmentType extends AbstractType
+class OrgDepartmentType extends AbstractType
 {
   public $em;
   private $companyRepo;
@@ -49,7 +49,7 @@ class DepartmentType extends AbstractType
           'required' => $arr['required'] ?? false,
         ];
 
-        if ($field->getType() == "entity") {
+        if ($field->getTargetEntity() != null) {
           $options['class'] = $field->getTargetEntity();
         }
 
@@ -59,14 +59,6 @@ class DepartmentType extends AbstractType
         }
         $builder->add($field->getPropertyName(), $classType, $options);
     }
-    // $builder
-    //     ->add('name')
-    //     ->add('alias')
-    //     ->add('company', EntityType::class, [
-    //       'class' => Company::class,
-    //       'choices' => $this->companyRepo->allCompany(),
-    //       'choice_label' => 'name'
-    //     ]);
   }
 
   public function configureOptions(OptionsResolver $resolver): void

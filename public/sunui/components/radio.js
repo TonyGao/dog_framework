@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  $(".ef-radio").on("click", function () {
+  $(".radio-wrapper").on("click", ".ef-radio", function (event) {
     let id = $(this).attr("radioid");
     let chosenRadio = $(`label.ef-radio-checked[radioid=${id}]`);
     if (!$(this).hasClass("ef-radio-checked")) {
@@ -10,5 +10,7 @@ $(document).ready(function () {
       let hover = $(this).children("span.ef-icon-hover").first();
       hover.addClass("ef-icon-hover-disabled");
     }
+
+    event.stopPropagation();
   })
 })

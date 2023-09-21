@@ -57,6 +57,15 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
     private $roles = [];
 
     /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Organization\Department", inversedBy="manager")
+     * @ORM\JoinTable(name="org_department_managers",
+     *   joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *   inverseJoinColumns={@ORM\JoinColumn(name="department_id", referencedColumnName="id")}
+     * )
+     */
+    private $managedDepartments;
+
+    /**
      * @Assert\NotBlank()
      * @Assert\Length(max=4096)
      */
@@ -253,6 +262,26 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword($plainPassword): self
     {
         $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    /**
+     * Get joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     */
+    public function getManagedDepartments()
+    {
+        return $this->managedDepartments;
+    }
+
+    /**
+     * Set joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *
+     * @return  self
+     */
+    public function setManagedDepartments($managedDepartments)
+    {
+        $this->managedDepartments = $managedDepartments;
 
         return $this;
     }

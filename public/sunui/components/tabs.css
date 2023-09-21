@@ -1,0 +1,235 @@
+.tabs-container {
+  overflow: hidden;
+}
+
+.tabs-header {
+  border-width: 1px;
+  border-style: solid;
+  border-bottom-width: 0;
+  position: relative;
+  padding: 0;
+  padding-top: 2px;
+  overflow: hidden;
+}
+
+.tabs-header-plain {
+  border: 0px;
+  background: transparent;
+}
+
+.tabs-header, .tabs-scroller-left, .tabs-scroller-right, .tabs-tool, .tabs, .tabs-panels, .tabs li .tabs-inner, .tabs li.tabs-selected .tabs-inner, .tabs-header-bottom .tabs li.tabs-selected .tabs-inner, .tabs-header-left .tabs li.tabs-selected .tabs-inner, .tabs-header-right .tabs li.tabs-selected .tabs-inner {
+  border-color: #D3D3D3;
+}
+
+.tabs-header, .tabs-tool {
+  background-color: #f3f3f3;
+}
+
+.tabs-header-plain {
+  background: transparent;
+}
+
+.tabs-panels {
+  margin: 0px;
+  padding: 0px;
+  border-width: 1px;
+  border-style: solid;
+  border-top-width: 0;
+  overflow: hidden;
+}
+
+.tabs-scroller-left, .tabs-scroller-right {
+  position: absolute;
+  top: auto;
+  bottom: 0;
+  width: 18px;
+  font-size: 1px;
+  display: none;
+  cursor: pointer;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.tabs-scroller-left {
+  left: 0;
+}
+
+tabs-scroller-left {
+  background: #f3f3f3 url(/img/icon/tabs_icons.png) no-repeat 1px center;
+}
+
+.tabs-scroller-right {
+  right: 0;
+}
+
+tabs-scroller-right {
+  background: #f3f3f3 url(/img/icon/tabs_icons.png) no-repeat -15px center;
+}
+
+.tabs-wrap {
+  position: relative;
+  left: 0;
+  overflow: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.tabs {
+  list-style-type: none;
+  height: 22px;
+  margin: 0px;
+  padding: 0px;
+  padding-left: 4px;
+  width: 50000px;
+  border-style: solid;
+  border-width: 0 0 1px 0;
+}
+
+.tabs li {
+  float: left;
+  display: inline-block;
+  margin: 0 0 -1px 0;
+  padding: 0;
+  position: relative;
+  border: 0;
+}
+
+
+element.style {
+  height: 22px;
+  line-height: 30px;
+}
+.tabs li.tabs-selected .tabs-inner {
+  border-bottom: 1px solid #ffffff;
+}
+.tabs-header, .tabs-scroller-left, .tabs-scroller-right, .tabs-tool, .tabs, .tabs-panels, .tabs li .tabs-inner, .tabs li.tabs-selected .tabs-inner, .tabs-header-bottom .tabs li.tabs-selected .tabs-inner, .tabs-header-left .tabs li.tabs-selected .tabs-inner, .tabs-header-right .tabs li.tabs-selected .tabs-inner {
+  border-color: #D3D3D3;
+}
+.tabs li.tabs-selected .tabs-inner {
+  background-color: #ffffff;
+  color: #575765;
+  background: -webkit-linear-gradient(top,#F8F8F8 0,#ffffff 100%);
+  background: -moz-linear-gradient(top,#F8F8F8 0,#ffffff 100%);
+  background: -o-linear-gradient(top,#F8F8F8 0,#ffffff 100%);
+  background: linear-gradient(to bottom,#F8F8F8 0,#ffffff 100%);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#F8F8F8,endColorstr=#ffffff,GradientType=0);
+}
+.tabs li.tabs-selected .tabs-inner {
+  font-weight: bold;
+  outline: none;
+}
+.tabs li .tabs-inner {
+  color: #575765;
+  background-color: #f3f3f3;
+  background: -webkit-linear-gradient(top,#F8F8F8 0,#eeeeee 100%);
+  background: -moz-linear-gradient(top,#F8F8F8 0,#eeeeee 100%);
+  background: -o-linear-gradient(top,#F8F8F8 0,#eeeeee 100%);
+  background: linear-gradient(to bottom,#F8F8F8 0,#eeeeee 100%);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#F8F8F8,endColorstr=#eeeeee,GradientType=0);
+}
+.tabs li .tabs-inner {
+  display: inline-block;
+  text-decoration: none;
+  cursor: hand;
+  cursor: pointer;
+  margin: 0;
+  padding: 0 10px;
+  height: 25px;
+  line-height: 25px;
+  text-align: center;
+  white-space: nowrap;
+  border-width: 1px;
+  border-style: solid;
+  -moz-border-radius: 5px 5px 0 0;
+  -webkit-border-radius: 5px 5px 0 0;
+  border-radius: 5px 5px 0 0;
+}
+
+.tabs li.tabs-selected .tabs-inner {
+  font-weight: bold;
+  outline: none;
+}
+
+.tabs li.tabs-selected .tabs-inner {
+  background-color: #ffffff;
+  color: #575765;
+  background: -webkit-linear-gradient(top,#F8F8F8 0,#ffffff 100%);
+  background: -moz-linear-gradient(top,#F8F8F8 0,#ffffff 100%);
+  background: -o-linear-gradient(top,#F8F8F8 0,#ffffff 100%);
+  background: linear-gradient(to bottom,#F8F8F8 0,#ffffff 100%);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#F8F8F8,endColorstr=#ffffff,GradientType=0);
+}
+
+.tabs li.tabs-selected .tabs-inner {
+  border-bottom: 1px solid #ffffff;
+}
+
+.tabs-title {
+  font-size: 14px;
+}
+
+.tabs-icon {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 10px;
+  top: 50%;
+  margin-top: -8px;
+}
+
+.tabs li .tabs-close, .tabs-p-tool {
+  position: absolute;
+  font-size: 1px;
+  display: block;
+  height: 12px;
+  padding: 0;
+  top: 50%;
+  margin-top: -6px;
+  overflow: hidden;
+}
+
+.tabs li .tabs-close {
+  width: 12px;
+  right: 5px;
+  opacity: 0.6;
+  filter: alpha(opacity=60);
+}
+
+.tabs li .tabs-close {
+  background: url(/img/icon/tabs_icons.png) no-repeat -34px center;
+}
+
+.tabs-with-icon {
+  padding-left: 18px;
+}
+
+.tabs-title {
+  font-size: 10px;
+}
+
+.tabs-closable {
+  padding-right: 8px;
+}
+
+.ef-tabs-icon {
+  margin-right: 4px;
+}
+
+.ef-tabs-close{
+  font-size: 12px;
+}
+
+.tabs li .tabs-inner {
+  height: 22px;
+  line-height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.ef-tabs ul .tabs {
+  height: 22px;
+}

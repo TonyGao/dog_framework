@@ -68,7 +68,7 @@ $(document).ready(function () {
 
                 // 如果已经选中了，就忽略，如果没选中过添加
                 if (!selectionIds.includes(randomId.toString())) {
-                  let liTemplate = `<li id = "${randomId}" class="ef-department-option"><span class="ef-department-option-content">${item.name}</span></li>`;
+                  let liTemplate = `<li id = "${randomId}" class="ef-department-option"><span class="ef-department-option-content">${item.displayName}</span></li>`;
                   liHtml += liTemplate;
                   num += 1;
                 }
@@ -167,7 +167,7 @@ $(document).ready(function () {
     )
   }
 
-  $(".left-tree-wrapper .arrow-icon").on("click", function (event) {
+  $(".department-tree-wrapper").on("click", ".sub-tree-content .arrow-icon", function (event) {
     $(this).parent().nextAll(".tree-indent, .sub-tree-content").toggle(0);
 
       var icon = $(this).find('i');
@@ -184,8 +184,44 @@ $(document).ready(function () {
 
   refreshSelectionHover();
 
+  $(".department-tree-wrapper").on("click", ".department-select-line", function (event) {
+    $(this).children(".ef-radio").trigger("click");
+    event.stopPropagation();
+  })
+
   // 退出部门弹窗
   $(".cancelDepartment").on("click", function () {
+    let inputid = $(this).attr("inputid");
+    $(".ef-modal-container[inputid='" + inputid + "']").hide();
+  })
 
+  // 显示部门弹窗
+  $(".show-department-modal").on("click", async function () {
+    let inputid = $(this).parent().attr("id");
+    let modal = $(".ef-modal-container[inputid='" + inputid + "']");
+    modal.show();
+    // 调用部门接口，如果已经调用过就不在调用了，而是直接使用缓存
+    let singleDepCache = await Common.getCache("org.singleDepartment");
+    if (singleDepCache === null) {
+      $.ajax({
+        url: "/admin/org/departemnt/singleSelect",
+        method: "GET",
+        async: false,
+        dataType: "html",
+        success: async function(data) {
+          await Common.setCache("org.singleDepartment", data);
+          $(".department-tree-wrapper").html(data);
+          // Common.forceReloadJS('components');
+          // Common.forceReloadJS('admin');
+        }
+      })
+    } else {
+      modal.children().find(".department-tree-wrapper").html(singleDepCache);
+    }
+  })
+
+  $(".ef-modal-close-btn").on("click", function() {
+    let inputid = $(this).attr("inputid");
+    $(".ef-modal-container[inputid='" + inputid + "']").hide();
   })
 })

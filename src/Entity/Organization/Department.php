@@ -53,6 +53,17 @@ class Department implements GedmoNode
     private $alias;
 
     /**
+     * 部门显示名称
+     * @ORM\Column(type="string", length=200, nullable=true)
+     * @Groups({"api"})
+     * @Ef(
+     *     group="department_base_info_displayname",
+     *     isBF=true
+     * )
+     */
+    private $displayName;
+
+    /**
      * 所属公司
      * @ORM\ManyToOne(targetEntity="Company")
      * @ORM\JoinColumn(name="company_id", referencedColumnName="id")
@@ -74,13 +85,13 @@ class Department implements GedmoNode
 
     /**
      * 部门负责人
-     * @ORM\OneToMany(targetEntity="App\Entity\OrgUser", mappedBy="id")
+     * @ORM\ManyToMany(targetEntity="App\Entity\OrgUser", mappedBy="managedDepartments")
      * @Ef(
      *     group="department_management_info",
      *     isBF=true
      * )
      */
-    private $owner;
+    private $manager;
 
     /**
      * 排序号
@@ -356,6 +367,46 @@ class Department implements GedmoNode
     public function setParent($parent)
     {
         $this->parent = $parent;
+
+        return $this;
+    }
+
+    /**
+     * Get 部门显示名称
+     */
+    public function getDisplayName()
+    {
+        return $this->displayName;
+    }
+
+    /**
+     * Set 部门显示名称
+     *
+     * @return  self
+     */
+    public function setDisplayName($displayName)
+    {
+        $this->displayName = $displayName;
+
+        return $this;
+    }
+
+    /**
+     * Get 部门负责人
+     */
+    public function getManager()
+    {
+        return $this->manager;
+    }
+
+    /**
+     * Set 部门负责人
+     *
+     * @return  self
+     */
+    public function setManager($manager)
+    {
+        $this->manager = $manager;
 
         return $this;
     }

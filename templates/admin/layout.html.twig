@@ -8,6 +8,11 @@
 {% block javascripts %}
 	{{ parent() }}
 	<script>
+  // 初始化 localforage 数据库名
+  localforage.config({
+    name: 'EnterpriseFramework'
+  });
+
 	$(document).ready(function () {
       $(".hPerson-avatar-box").on("click", function () {
         $(".dropdown-menu.hidden").toggle("slow", "swing");

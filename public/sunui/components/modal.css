@@ -122,6 +122,10 @@
   border: 1px solid transparent;
 }
 
+.ef-modal-footer {
+  background: var(--light-grad-pink-blue, radial-gradient(ellipse at 40% 0%, #bf398910 0, transparent 75%), radial-gradient(ellipse at 60% 0%, #096bde10 0, transparent 75%));
+}
+
 .ef-modal-footer > .ef-btn:not(:nth-child(1)) {
   margin-left: 12px;
 }
