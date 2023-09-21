@@ -33,7 +33,7 @@
   padding: 0;
 }
 
-.ef-icon-hover {
+.ef-icon-hover.ef-radio-icon-hover {
   position: relative;
   display: inline-block;
   cursor: pointer;
@@ -71,7 +71,7 @@
   color: rgb(29, 33, 41);
 }
 
-.ef-icon-hover:before {
+.ef-icon-hover.ef-radio-icon-hover:before {
   position: absolute;
   display: block;
   box-sizing: border-box;
@@ -81,7 +81,7 @@
   content: "";
 }
 
-.ef-icon-hover:before {
+.ef-icon-hover.ef-radio-icon-hover:before {
   top: 50%;
   left: 50%;
   width: 20px;
@@ -89,7 +89,7 @@
   transform: translate(-50%, -50%);
 }
 
-.ef-icon-hover:hover:before {
+.ef-icon-hover.ef-radio-icon-hover:hover:before {
   background-color: rgb(242, 243, 245);
 }
 

@@ -73,18 +73,21 @@ class EfInitAdminMenuCommand extends Command
                 $uri = $menuItem[2];
                 $parentMenu = $menuItem[3];
 
-                $menuEntity = new Menu();
-                $menuEntity->setLabel($label)
-                    ->setIcon($icon)
-                    ->setUri($uri);
+                $isExitMenu = $this->menuRepo->findOneBy(['label' => $label]);
+                if (!$isExitMenu) {
+                    $menuEntity = new Menu();
+                    $menuEntity->setLabel($label)
+                        ->setIcon($icon)
+                        ->setUri($uri);
 
-                if ($label !== "root") {
-                    $parent = $this->menuRepo->findOneBy(['label' => $parentMenu]);
-                    $menuEntity->setParent($parent);
+                    if ($label !== "root") {
+                        $parent = $this->menuRepo->findOneBy(['label' => $parentMenu]);
+                        $menuEntity->setParent($parent);
+                    }
+
+                    $this->em->persist($menuEntity);
+                    $this->em->flush();
                 }
-
-                $this->em->persist($menuEntity);
-                $this->em->flush();
             }
         }
 

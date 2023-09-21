@@ -37,15 +37,6 @@
   white-space: nowrap;
 }
 
-.ef-col {
-  box-sizing: border-box;
-}
-
-.ef-col-5 {
-  flex: 0 0 20.83333333%;
-  width: 20.83333333%;
-}
-
 .ef-form-item-label-col>.ef-form-item-label {
   max-width: 100%;
   color: rgb(78,89,105);
@@ -64,11 +55,6 @@
 
 .ef-col {
   box-sizing: border-box;
-}
-
-.ef-col-19 {
-  flex: 0 0 79.16666667%;
-  width: 79.16666667%;
 }
 
 .ef-form-item-content-wrapper {

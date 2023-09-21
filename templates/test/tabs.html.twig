@@ -1,0 +1,108 @@
+{% extends "base.html.twig" %}
+
+{% set id1 = random() %}
+{% set id2 = random() %}
+{% set id3 = random() %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+	<script>
+    $(document).ready(function() {
+      $("#add").on("click", function() {
+        let id = Math.random();
+        let liTemplate = `<li id="${id}"><span class="tabs-inner"><span class="tabs-title">Title</span></span></li>`;
+        $("#tt .tabs .tabs-selected").after(liTemplate);
+
+        let panelTemplate = `<div class="panel panel-htop" style="" liid="{{ id1 }}">
+					<div title="" style="padding: 10px;" class="panel-body panel-body-noheader panel-body-noborder" id="">
+            <div title="" style="padding: 10px;" class="panel-body panel-body-noheader panel-body-noborder" id="">
+              <p style="font-size:14px">jQuery EasyUI framework helps you build your web pages easily.</p>
+              <ul>
+                <li>easyui is a collection of user-interface plugin based on jQuery.</li>
+                <li>easyui provides essential functionality for building modem, interactive, javascript applications.</li>
+                <li>using easyui you don't need to write many javascript code, you usually defines user-interface by writing some HTML markup.</li>
+                <li>complete framework for HTML5 web page.</li>
+                <li>easyui save your time and scales while developing your products.</li>
+                <li>easyui is very easy but powerful.</li>
+              </ul>
+            </div>
+					</div>`;
+      })
+    })
+
+  </script>
+{% endblock %}
+
+{% block body %}
+
+		<div id="tt" class="ef-tabs tabs-container" style="width: 500px;">
+			<div class="tabs-header tabs-header-plain" style="">
+				<div class="tabs-scroller-left" style="display: none;"></div>
+				<div class="tabs-scroller-right" style="display: none;"></div>
+				<div class="tabs-wrap" style="margin-left: 0px; margin-right: 0px;">
+					<ul class="tabs">
+						<li class="tabs-first tabs-selected" id="{{ id1 }}">
+							<span class="tabs-inner">
+								<span class="tabs-title">About</span>
+							</span>
+						</li>
+						<li class="" id="{{ id2 }}">
+							<span class="tabs-inner">
+								<span class="tabs-title">My Documents</span>
+							</span>
+						</li>
+						<li class="tabs-last" id="{{ id3 }}">
+							<span class="tabs-inner">
+								<span class="tabs-title tabs-closable">
+                  <span class="ef-tabs-icon"><i class="fa-solid fa-circle-question"></i></span>Help
+                </span>
+                <span class="ef-tabs-close"><i class="fa-solid fa-xmark"></i></span>
+							</span>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="tabs-panels" style="">
+				<div class="panel panel-htop" style="" liid="{{ id1 }}">
+					<div title="" style="padding: 10px;" class="panel-body panel-body-noheader panel-body-noborder" id="">
+            <div title="" style="padding: 10px;" class="panel-body panel-body-noheader panel-body-noborder" id="">
+              <p style="font-size:14px">jQuery EasyUI framework helps you build your web pages easily.</p>
+              <ul>
+                <li>easyui is a collection of user-interface plugin based on jQuery.</li>
+                <li>easyui provides essential functionality for building modem, interactive, javascript applications.</li>
+                <li>using easyui you don't need to write many javascript code, you usually defines user-interface by writing some HTML markup.</li>
+                <li>complete framework for HTML5 web page.</li>
+                <li>easyui save your time and scales while developing your products.</li>
+                <li>easyui is very easy but powerful.</li>
+              </ul>
+            </div>
+					</div>
+				</div>
+				<div class="panel panel-htop" style="display: none;" liid="{{ id2 }}">
+					<div title="" style="padding: 10px;" class="panel-body panel-body-noheader panel-body-noborder" id="">
+						<div title="" data-options="href:'_content.html',closable:true" style="padding: 10px; width: 698px; height: 214px;" class="panel-body panel-body-noheader panel-body-noborder" id="">
+              <p style="font-size:14px">Here is the content loaded via AJAX.</p>
+              <ul>
+                <li>easyui is a collection of user-interface plugin based on jQuery.</li>
+                <li>easyui provides essential functionality for building modem, interactive, javascript applications.</li>
+                <li>using easyui you don't need to write many javascript code, you usually defines user-interface by writing some HTML markup.</li>
+                <li>complete framework for HTML5 web page.</li>
+                <li>easyui save your time and scales while developing your products.</li>
+                <li>easyui is very easy but powerful.</li>
+              </ul>
+            </div>
+					</div>
+				</div>
+				<div class="panel panel-htop" style="display: none;" liid="{{ id3 }}">
+					<div title="" data-options="iconCls:'icon-help',closable:true" style="padding: 10px;" class="panel-body panel-body-noheader panel-body-noborder" id="">
+						three
+					</div>
+				</div>
+			</div>
+		</div>
+
+    <div style="margin-top: 10px;">
+      <button class="btn primary medium icon circle" id="add"><i class="fa-solid fa-plus"></i></button>
+    </div>
+{% endblock %}

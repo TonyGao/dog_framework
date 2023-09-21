@@ -10,397 +10,184 @@
 {% endblock %}
 
 {% block body %}
-	<h3>单部门选择器</h3>
-	<div class="ef-deparment-element">
-		<div class="ef-department-selection">
-			<span class="ef-department-selection-span">
-				<ul></ul>
-			</span>
-		</div>
-		<span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search" style="width: 260px;" chosen="false" id="{{ departmentInputId }}" contentid="{{ departmentContentId }}">
-			<input class="ef-department-view-input" placeholder="请输入部门名称 ..." mode="single">
-			<span class="ef-department-view-value ef-department-view-value-hidden"></span>
-			<span class="ef-department-view-suffix">
-				<span class="ef-department-view-icon">
-					<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-search" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
-						<path d="M33.072 33.071c6.248-6.248 6.248-16.379 0-22.627-6.249-6.249-16.38-6.249-22.628 0-6.248 6.248-6.248 16.379 0 22.627 6.248 6.248 16.38 6.248 22.628 0Zm0 0 8.485 8.485"></path>
-					</svg>
+	<div class="container" style="padding-left: 20px;">
+		<h3>单部门选择器（UI静态）</h3>
+		<div class="ef-deparment-element" style="margin-bottom: 20px;">
+			<div class="ef-department-selection">
+				<span class="ef-department-selection-span">
+					<ul></ul>
+				</span>
+			</div>
+			<span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search" style="width: 260px;" chosen="false" id="{{ departmentInputId }}" contentid="{{ departmentContentId }}">
+				<input class="ef-department-view-input" placeholder="请输入部门名称 ..." mode="single">
+				<span class="ef-department-view-value ef-department-view-value-hidden"></span>
+				<span class="ef-department-view-suffix show-department-modal">
+					<span class="ef-department-view-icon">
+						<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-search" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+							<path d="M33.072 33.071c6.248-6.248 6.248-16.379 0-22.627-6.249-6.249-16.38-6.249-22.628 0-6.248 6.248-6.248 16.379 0 22.627 6.248 6.248 16.38 6.248 22.628 0Zm0 0 8.485 8.485"></path>
+						</svg>
+					</span>
 				</span>
 			</span>
-		</span>
 
-		<div class="ef-modal-container" style="z-index: 1001;">
-			<div class="ef-modal-mask"></div>
-			<div class="ef-modal-wrapper ef-modal-wrapper-align-center">
-				<div class="ef-modal" style="width: 784px">
-					<div class="ef-modal-header">
-						<div class="ef-modal-title ef-modal-title-align-left">
-							单部门选择
+			<div class="ef-modal-container" style="z-index: 1001;" inputid="{{ departmentInputId }}">
+				<div class="ef-modal-mask"></div>
+				<div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+					<div class="ef-modal" style="width: 784px">
+						<div class="ef-modal-header">
+							<div class="ef-modal-title ef-modal-title-align-left">
+								单部门选择
+							</div>
+							<div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" inputid="{{ departmentInputId }}">
+								<span class="ef-icon-hover">
+									<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+										<path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+									</svg>
+								</span>
+							</div>
 						</div>
-						<div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn">
-							<span class="ef-icon-hover">
-								<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
-									<path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
-								</svg>
-							</span>
-						</div>
-					</div>
-					<div class="ef-modal-body">
-						<div class="department-modal-body">
-							<div class="left-tree-wrapper">
-								<div class="search-department-wrapper">
-									<span class="ef-input-wrapper">
-										<input class="ef-input ef-input-size-mini text" type="text" clearable="true" placeholder="请输入部门名称">
-										<span class="ef-input-suffix">
-											<i class="fa-solid fa-magnifying-glass"></i>
+						<div class="ef-modal-body">
+							<div class="department-modal-body">
+								<div class="left-tree-wrapper">
+									<div class="search-department-wrapper">
+										<span class="ef-input-wrapper">
+											<input class="ef-input ef-input-size-mini text" type="text" clearable="true" placeholder="请输入部门名称">
+											<span class="ef-input-suffix">
+												<i class="fa-solid fa-magnifying-glass"></i>
+											</span>
 										</span>
-									</span>
+									</div>
+									<div class="department-tree-wrapper radio-wrapper"></div>
 								</div>
-								<div class="department-tree-wrapper">
-									<ol class="ol-left-tree">
-										<li>
-											<div class="item-content scroll-item">
-												<div class="arrow-icon">
-													<i class="fa-solid fa-caret-down"></i>
-												</div>
-												<div class="org-icon">
-													<i class="fa-solid fa-building"></i>
-												</div>
-												<div class="org-name">
-													<div class="org-text-content">天津港集团有限公司1</div>
+								<div class="right-department-wrapper">
+									<div id="department">
+										<div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+											<div class="ef-col ef-col-6 ef-form-item-label-col">
+												<label class="ef-form-item-label" for="department_name">部门全称</label>
+											</div>
+											<div class="ef-col ef-col-18 ef-form-item-wrapper-col">
+												<div class="ef-form-item-content-wrapper">
+													<div class="ef-form-item-content ef-form-item-content-flex">行业解决方案部三</div>
 												</div>
 											</div>
-											<span class="tree-indent"></span>
-											<ol class="sub-tree-content">
-												<li>
-													<div class="item-content scroll-item">
-														<div class="arrow-icon">
-															<i class="fa-solid fa-caret-right"></i>
-														</div>
-														<div class="org-icon">
-															<i class="fa-solid fa-building-user"></i>
-														</div>
-														<div class="org-name">
-															<div class="org-text-content company" type="company">天津港公司2</div>
-														</div>
-													</div>
-													<span class="tree-indent" style="display: none;"></span>
-													<ol class="sub-tree-content" style="display: none;">
-														<li>
-															<div class="item-content scroll-item">
-																<div class="arrow-icon">
-																	<i class="fa-solid fa-caret-right"></i>
-																</div>
-                                <span class="department-select-line">
-                                  <label class="ef-radio" style="padding-right: 5px;" radioId="{{ departmentInputId }}">
-                                    <input type="radio" class="ef-radio-target" value="A">
-                                    <span class="ef-icon-hover ef-radio-icon-hover">
-                                      <span class="ef-radio-icon"></span>
-                                    </span>
-                                  </label>
-                                  <div class="org-icon">
-                                    <i class="fa-solid fa-user-group"></i>
-                                  </div>
-                                  <div class="org-name">
-                                    <div class="org-text-content department" type="department">行业解决方案部三</div>
-                                  </div>
-                                </span>
-															</div>
-															<span class="tree-indent" style="display: none;"></span>
-															<ol class="sub-tree-content" style="display: none;">
-																<li>
-																	<div class="item-content scroll-item">
-																		<div class="arrow-icon"></div>
-                                    <label class="ef-radio" style="padding-right: 5px;" radioId="{{ departmentInputId }}">
-                                      <input type="radio" class="ef-radio-target" value="A">
-                                      <span class="ef-icon-hover ef-radio-icon-hover">
-					                              <span class="ef-radio-icon"></span>
-                                      </span>
-                                    </label>
-																		<div class="org-icon">
-																			<i class="fa-solid fa-user-group"></i>
-																		</div>
-																		<div class="org-name">
-																			<div class="org-text-content department" type="department">行业子部门</div>
-																		</div>
-																	</div>
-																</li>
-                                <li>
-																	<div class="item-content scroll-item">
-																		<div class="arrow-icon"></div>
-                                    <label class="ef-radio" style="padding-right: 5px;" radioId="{{ departmentInputId }}">
-                                      <input type="radio" class="ef-radio-target" value="A">
-                                      <span class="ef-icon-hover ef-radio-icon-hover">
-					                              <span class="ef-radio-icon"></span>
-                                      </span>
-                                    </label>
-																		<div class="org-icon">
-																			<i class="fa-solid fa-user-group"></i>
-																		</div>
-																		<div class="org-name">
-																			<div class="org-text-content department" type="department">行业子部门</div>
-																		</div>
-																	</div>
-																</li>
-                                <li>
-																	<div class="item-content scroll-item">
-																		<div class="arrow-icon"></div>
-                                    <label class="ef-radio" style="padding-right: 5px;" radioId="{{ departmentInputId }}">
-                                      <input type="radio" class="ef-radio-target" value="A">
-                                      <span class="ef-icon-hover ef-radio-icon-hover">
-					                              <span class="ef-radio-icon"></span>
-                                      </span>
-                                    </label>
-																		<div class="org-icon">
-																			<i class="fa-solid fa-user-group"></i>
-																		</div>
-																		<div class="org-name">
-																			<div class="org-text-content department" type="department">行业子部门</div>
-																		</div>
-																	</div>
-																</li>
-                                <li>
-																	<div class="item-content scroll-item">
-																		<div class="arrow-icon"></div>
-                                    <label class="ef-radio" style="padding-right: 5px;" radioId="{{ departmentInputId }}">
-                                      <input type="radio" class="ef-radio-target" value="A">
-                                      <span class="ef-icon-hover ef-radio-icon-hover">
-					                              <span class="ef-radio-icon"></span>
-                                      </span>
-                                    </label>
-																		<div class="org-icon">
-																			<i class="fa-solid fa-user-group"></i>
-																		</div>
-																		<div class="org-name">
-																			<div class="org-text-content department" type="department">行业子部门</div>
-																		</div>
-																	</div>
-																</li>
-                                <li>
-																	<div class="item-content scroll-item">
-																		<div class="arrow-icon"></div>
-                                    <label class="ef-radio" style="padding-right: 5px;" radioId="{{ departmentInputId }}">
-                                      <input type="radio" class="ef-radio-target" value="A">
-                                      <span class="ef-icon-hover ef-radio-icon-hover">
-					                              <span class="ef-radio-icon"></span>
-                                      </span>
-                                    </label>
-																		<div class="org-icon">
-																			<i class="fa-solid fa-user-group"></i>
-																		</div>
-																		<div class="org-name">
-																			<div class="org-text-content department" type="department">行业子部门</div>
-																		</div>
-																	</div>
-																</li>
-                                <li>
-																	<div class="item-content scroll-item">
-																		<div class="arrow-icon"></div>
-                                    <label class="ef-radio" style="padding-right: 5px;" radioId="{{ departmentInputId }}">
-                                      <input type="radio" class="ef-radio-target" value="A">
-                                      <span class="ef-icon-hover ef-radio-icon-hover">
-					                              <span class="ef-radio-icon"></span>
-                                      </span>
-                                    </label>
-																		<div class="org-icon">
-																			<i class="fa-solid fa-user-group"></i>
-																		</div>
-																		<div class="org-name">
-																			<div class="org-text-content department" type="department">行业子部门</div>
-																		</div>
-																	</div>
-																</li>
-															</ol>
-														</li>
-														<li>
-															<div class="item-content scroll-item">
-																<div class="arrow-icon"></div>
-                                <label class="ef-radio" style="padding-right: 5px;" radioId="{{ departmentInputId }}">
-                                  <input type="radio" class="ef-radio-target" value="A">
-                                    <span class="ef-icon-hover ef-radio-icon-hover">
-					                            <span class="ef-radio-icon"></span>
-                                    </span>
-                                </label>
-																<div class="org-icon">
-																	<i class="fa-solid fa-user-group"></i>
-																</div>
-																<div class="org-name">
-																	<div class="org-text-content department" type="department">行业解决方案部一</div>
-																</div>
-															</div>
-														</li>
-													</ol>
-												</li>
-												<li>
-													<div class="item-content scroll-item">
-														<div class="arrow-icon"></div>
-														<div class="org-icon">
-															<i class="fa-solid fa-building-user"></i>
-														</div>
-														<div class="org-name">
-															<div class="org-text-content company" type="company">天津港公司1</div>
-														</div>
-													</div>
-												</li>
-												<li>
-													<div class="item-content scroll-item">
-														<div class="arrow-icon">
-															<i class="fa-solid fa-caret-right"></i>
-														</div>
-														<div class="org-icon">
-															<i class="fa-solid fa-building-user"></i>
-														</div>
-														<div class="org-name">
-															<div class="org-text-content company" type="company">天津港公司3</div>
-														</div>
-													</div>
-													<span class="tree-indent" style="display: none;"></span>
-													<ol class="sub-tree-content" style="display: none;">
-														<li>
-															<div class="item-content scroll-item">
-																<div class="arrow-icon"></div>
-                                <label class="ef-radio" style="padding-right: 5px;" radioId="{{ departmentInputId }}">
-                                  <input type="radio" class="ef-radio-target" value="A">
-                                    <span class="ef-icon-hover ef-radio-icon-hover">
-					                            <span class="ef-radio-icon"></span>
-                                    </span>
-                                </label>
-																<div class="org-icon">
-																	<i class="fa-solid fa-user-group"></i>
-																</div>
-																<div class="org-name">
-																	<div class="org-text-content department" type="department">人力资源部</div>
-																</div>
-															</div>
-														</li>
-													</ol>
-												</li>
-												<li>
-													<div class="item-content scroll-item">
-														<div class="arrow-icon"></div>
-														<div class="org-icon">
-															<i class="fa-solid fa-building-user"></i>
-														</div>
-														<div class="org-name">
-															<div class="org-text-content company" type="company">天津港公司4</div>
-														</div>
-													</div>
-												</li>
-												<li>
-													<div class="item-content scroll-item">
-														<div class="arrow-icon"></div>
-														<div class="org-icon">
-															<i class="fa-solid fa-building-user"></i>
-														</div>
-														<div class="org-name">
-															<div class="org-text-content company" type="company">公司5</div>
-														</div>
-													</div>
-												</li>
-												<li>
-													<div class="item-content scroll-item">
-														<div class="arrow-icon"></div>
-														<div class="org-icon">
-															<i class="fa-solid fa-building-user"></i>
-														</div>
-														<div class="org-name">
-															<div class="org-text-content company" type="company">公司6</div>
-														</div>
-													</div>
-												</li>
-												<li>
-													<div class="item-content scroll-item">
-														<div class="arrow-icon"></div>
-														<div class="org-icon">
-															<i class="fa-solid fa-building-user"></i>
-														</div>
-														<div class="org-name">
-															<div class="org-text-content company" type="company">公司7</div>
-														</div>
-													</div>
-												</li>
-											</ol>
-										</li>
-									</ol>
+										</div>
+										<div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+											<div class="ef-col ef-col-6 ef-form-item-label-col">
+												<label class="ef-form-item-label" for="department_alias">部门简称</label>
+											</div>
+											<div class="ef-col ef-col-18 ef-form-item-wrapper-col">
+												<div class="ef-form-item-content-wrapper">
+													<div class="ef-form-item-content ef-form-item-content-flex">行业解决方案部三</div>
+												</div>
+											</div>
+										</div>
+										<div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+											<div class="ef-col ef-col-6 ef-form-item-label-col">
+												<label class="ef-form-item-label" for="department_company">所属公司</label>
+											</div>
+											<div class="ef-col ef-col-18 ef-form-item-wrapper-col">
+												<div class="ef-form-item-content-wrapper">
+													<div class="ef-form-item-content ef-form-item-content-flex">天津港公司2</div>
+												</div>
+											</div>
+										</div>
+										<div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+											<div class="ef-col ef-col-6 ef-form-item-label-col">
+												<label class="ef-form-item-label" for="department_owner">部门负责人</label>
+											</div>
+											<div class="ef-col ef-col-18 ef-form-item-wrapper-col">
+												<div class="ef-form-item-content-wrapper">
+													<div class="ef-form-item-content ef-form-item-content-flex">高强</div>
+												</div>
+											</div>
+										</div>
+										<div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+											<div class="ef-col ef-col-6 ef-form-item-label-col">
+												<label class="ef-form-item-label" for="department_parent">上级部门</label>
+											</div>
+											<div class="ef-col ef-col-18 ef-form-item-wrapper-col">
+												<div class="ef-form-item-content-wrapper">
+													<div class="ef-form-item-content ef-form-item-content-flex"></div>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
 							</div>
-							<div class="right-department-wrapper">
-								right info
+						</div>
+						<div class="ef-modal-footer">
+							<button class="btn secondary small cancelDepartment" type="button" inputid="{{ departmentInputId }}">取消</button>
+							<button class="btn primary small" type="button">确定</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="ef-trigger-popup ef-trigger-position-bl" trigger-placement="bl" style="z-index: 1001; pointer-events: auto; min-width: 260px; width: fit-content" id="{{ departmentContentId }}" parentid="{{ departmentInputId }}">
+			<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+				<div class="ef-trigger-content">
+					<div class="ef-department-dropdown">
+						<div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+							<div class="ef-scrollbar-container ef-department-dropdown-list-wrapper">
+								<ul class="ef-department-dropdown-list">
+									<li id="{{ random() }}" class="ef-department-option"></li>
+								</ul>
 							</div>
 						</div>
 					</div>
-					<div class="ef-modal-footer">
-						<button class="btn secondary small cancelDepartment" type="button">取消</button>
-						<button class="btn primary small" type="button">确定</button>
-					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="ef-trigger-popup ef-trigger-position-bl" trigger-placement="bl" style="z-index: 1001; pointer-events: auto; min-width: 260px; width: fit-content" id="{{ departmentContentId }}" parentid="{{ departmentInputId }}">
-		<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
-			<div class="ef-trigger-content">
-				<div class="ef-department-dropdown">
-					<div class="ef-scrollbar ef-scrollbar-type-embed" style="">
-						<div class="ef-scrollbar-container ef-department-dropdown-list-wrapper">
-							<ul class="ef-department-dropdown-list">
-								<li id="{{ random() }}" class="ef-department-option"></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 
-	<h3>多部门选择器</h3>
-	<div class="ef-deparment-element">
-		<div class="ef-department-selection">
-			<span class="ef-department-selection-span">
-				<ul>
-					<li class="ef-department-selection-li">
-						<div class="ef-department-selection-li-content">
-							<a href="link" class="ef-link" id="123">北京子公司/高性能研发部/高性能前端设计部1</a>
-							<span class="ef-department-view-suffix">
-								<span class="ef-department-view-icon">
-									<i class="fa-regular fa-circle-xmark"></i>
+		<h3>多部门选择器</h3>
+		<div class="ef-deparment-element">
+			<div class="ef-department-selection">
+				<span class="ef-department-selection-span">
+					<ul>
+						<li class="ef-department-selection-li">
+							<div class="ef-department-selection-li-content">
+								<a href="link" class="ef-link" id="123">北京子公司/高性能研发部/高性能前端设计部1</a>
+								<span class="ef-department-view-suffix">
+									<span class="ef-department-view-icon">
+										<i class="fa-regular fa-circle-xmark"></i>
+									</span>
 								</span>
-							</span>
-						</div>
-					</li>
-				</ul>
-			</span>
-		</div>
-		<span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search" style="width: 260px;" chosen="false" id="{{ departmentInputId2 }}" contentid="{{ departmentContentId2 }}">
-			<input class="ef-department-view-input" placeholder="请输入部门名称 ..." mode="multiple">
-			<span class="ef-department-view-value ef-department-view-value-hidden"></span>
-			<span class="ef-department-view-suffix">
-				<span class="ef-department-view-icon">
-					<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-search" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
-						<path d="M33.072 33.071c6.248-6.248 6.248-16.379 0-22.627-6.249-6.249-16.38-6.249-22.628 0-6.248 6.248-6.248 16.379 0 22.627 6.248 6.248 16.38 6.248 22.628 0Zm0 0 8.485 8.485"></path>
-					</svg>
+							</div>
+						</li>
+					</ul>
+				</span>
+			</div>
+			<span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search" style="width: 260px;" chosen="false" id="{{ departmentInputId2 }}" contentid="{{ departmentContentId2 }}">
+				<input class="ef-department-view-input" placeholder="请输入部门名称 ..." mode="multiple">
+				<span class="ef-department-view-value ef-department-view-value-hidden"></span>
+				<span class="ef-department-view-suffix">
+					<span class="ef-department-view-icon">
+						<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-search" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+							<path d="M33.072 33.071c6.248-6.248 6.248-16.379 0-22.627-6.249-6.249-16.38-6.249-22.628 0-6.248 6.248-6.248 16.379 0 22.627 6.248 6.248 16.38 6.248 22.628 0Zm0 0 8.485 8.485"></path>
+						</svg>
+					</span>
 				</span>
 			</span>
-		</span>
-	</div>
-	<div class="ef-trigger-popup ef-trigger-position-bl" trigger-placement="bl" style="z-index: 1001; pointer-events: auto; min-width: 260px; width: fit-content" id="{{ departmentContentId2 }}" parentid="{{ departmentInputId2 }}">
-		<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
-			<div class="ef-trigger-content">
-				<div class="ef-department-dropdown">
-					<div class="ef-scrollbar ef-scrollbar-type-embed" style="">
-						<div class="ef-scrollbar-container ef-department-dropdown-list-wrapper">
-							<ul class="ef-department-dropdown-list">
-								<li id="{{ random() }}" class="ef-department-option"></li>
-							</ul>
+		</div>
+		<div class="ef-trigger-popup ef-trigger-position-bl" trigger-placement="bl" style="z-index: 1001; pointer-events: auto; min-width: 260px; width: fit-content" id="{{ departmentContentId2 }}" parentid="{{ departmentInputId2 }}">
+			<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+				<div class="ef-trigger-content">
+					<div class="ef-department-dropdown">
+						<div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+							<div class="ef-scrollbar-container ef-department-dropdown-list-wrapper">
+								<ul class="ef-department-dropdown-list">
+									<li id="{{ random() }}" class="ef-department-option"></li>
+								</ul>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="ef-trigger-popup-close-button">
-			<button class="btn primary medium icon circle">
-				<i class="fa-solid fa-xmark"></i>
-			</button>
+			<div class="ef-trigger-popup-close-button">
+				<button class="btn primary medium icon circle">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+			</div>
 		</div>
 	</div>
 {% endblock %}

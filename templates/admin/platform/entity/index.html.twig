@@ -1,0 +1,48 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block stylesheets %}
+	{{ parent() }}
+  <link rel="stylesheet" type="text/css" href="{{ asset('organization/department.css', 'admin') }}"/>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+
+{% endblock %}
+
+{% block css %}
+<style>
+.outside-wrapper {
+  padding-top: 0;
+}
+</style>
+{% endblock %}
+
+{% block app_content_container %}
+	<div class="org-sturcture-container">
+		<div class="outside-wrapper">
+			<div class="inside-wrapper">
+				<div class="left-tree visible">
+					<div class="left-tree-wrapper">
+						<div class="search-department-wrapper">
+							<span class="ef-input-wrapper">
+								<input class="ef-input ef-input-size-mini text" type="text" clearable="true" placeholder="请输入实体、字段名称"/>
+								<span class="ef-input-suffix">
+									<i class="fa-solid fa-magnifying-glass"></i>
+								</span>
+							</span>
+						</div>
+						<div class="department-tree-wrapper">
+							{{ entity | raw }}
+						</div>
+					</div>
+					<div class="fold-icon-wrapper collapse" id="collapseCompany">
+						<i class="fa-solid fa-play"></i>
+					</div>
+				</div>
+				<div class="right-content"></div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+

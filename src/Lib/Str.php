@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Form\Common\SwitchType;
+use App\Form\Common\DepartmentType;
 
 class Str
 {
@@ -50,12 +51,32 @@ class Str
             case 'integer':
                 $class = IntegerType::class;
                 break;
+            case 'department':
+                $class = DepartmentType::class;
+                break;
             case 'entity':
                 $class = EntityType::class;
                 break;
         }
 
         return $class;
+    }
+
+    /**
+     * 将 Entity 类型的实体属性从targetEntity字符串转化为特定的formType
+     * targetEntity字符串类似 "App\Entity\Organization\Department"
+     */
+    public static function convertFormTypeFromTargetEntity($targetEntity) {
+        switch ($targetEntity) {
+            case 'App\Entity\Organization\Department':
+                $formType = DepartmentType::class;
+                break;
+            default:
+                $formType = EntityType::class;
+                break;
+        }
+
+        return $formType;
     }
 
     // public static function getGroup($text) {

@@ -39,12 +39,20 @@ class CompanyType extends AbstractType
                 $validation = $field->getValidation();
                 $arr = Arr::transValtoAttr($validation);
             }
-            $classType = Str::convertFormType($field->getType());
-            $builder->add($field->getFieldName(), $classType, [
+            $type = $field->getType();
+            $classType = Str::convertFormType($type);
+
+            $builderOptions = [
                 'label' => $field->getComment(),
                 'attr' => $arr,
                 'required' => $arr['required'] ?? false,
-            ]);
+            ];
+
+            if ($type === 'entity') {
+                $builderOptions['class'] = $field->getTargetEntity();
+            }
+
+            $builder->add($field->getPropertyName(), $classType, $builderOptions);
         }
     }
 

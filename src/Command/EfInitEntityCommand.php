@@ -143,7 +143,7 @@ class EfInitEntityCommand extends Command
                                 $fields[$key]['nullable'] = null;
                                 $fields[$key]['precision'] = null;
                                 if (array_key_exists('sourceToTargetKeyColumns', $mappings)) {
-                                    $fields[$key]['columnName'] = key($mappings['sourceToTargetKeyColumns']);
+                                    $fields[$key]['fieldName'] = key($mappings['sourceToTargetKeyColumns']);
                                     $fields[$key]['targetId'] = $mappings['sourceToTargetKeyColumns'][key($mappings['sourceToTargetKeyColumns'])];
                                 }
                             }
@@ -190,8 +190,9 @@ class EfInitEntityCommand extends Command
                          *     3 --> ManyToMany(maybe)
                          *     4 --> OneToMany
                          */
-                        foreach ($fields as $field) {
-                            $fieldName = $field['fieldName'];
+                        dump($fields);
+                        foreach ($fields as $key => $field) {
+                            $fieldName = $key;
                             $annotationField = $reflectionClass->getProperty($fieldName);
                             $reader = new AnnotationReader();
                             $anno = $reader->getPropertyAnnotation(
@@ -211,20 +212,35 @@ class EfInitEntityCommand extends Command
                                 $propertyToken = sha1(random_bytes(10));
 
                                 $comment = Str::getComment($class->properties[$fieldName]->getComment());
+                                // if (!array_key_exists('columnName', $field)) {
+                                //     dump($field);
+                                // }
                                 $property->setToken($propertyToken)
                                     ->setIsCustomized(false)
                                     ->setPropertyName($fieldName)
                                     ->setComment($comment)
                                     ->setType($field['type'])
-                                    ->setFieldName($field['columnName'])
+                                    ->setFieldName($field['fieldName'])
                                     ->setUniqueable($field['unique'])
                                     ->setNullable($field['nullable'])
                                     ->setBusinessField(true)
                                     ;
 
+                                // 如果是entity类型就额外设置目标id和目标entity，以及formType
+                                $targetIdExists = ['ManyToOne', 'OneToOne'];
                                 if ($field['type'] == 'entity') {
-                                    $property->setTargetId($field['targetId']);
+                                    if (in_array($field['associationType'], $targetIdExists)) {
+                                        $property->setTargetId($field['targetId']);
+                                    }
+
                                     $property->setTargetEntity($field['targetEntity']);
+
+                                    if ($field['targetEntity'] === 'App\Entity\Organization\Department') {
+                                        $property->setType('department');
+                                    }
+
+                                    // 根据targetEntity获得formType
+                                    $property->setFormType(Str::convertFormTypeFromTargetEntity($field['targetEntity']));
                                 }
 
                                 if ($field['precision'] !== null) {

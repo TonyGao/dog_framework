@@ -83,16 +83,20 @@ class OrgApiController extends AbstractController
     foreach ($data as $item) {
       $name = '';
       $path = $repo->getPath($item);
+      // 如果父级是'department'类型，那就不用再继续拼接非部门(集团、公司)的类型
+      $type = $item?->getParent()?->getType();
       foreach ($path as $pathItem) {
         // 如果是集团、公司类型就用简称拼写，如果是部门就用名称拼写
-        if ($pathItem->getType() != 'department') {
+        $itemType = $pathItem->getType();
+        if ($itemType == 'corperations' || $itemType == 'company') {
           $name .= $pathItem->getAlias() . '/';
-        } else {
+        }
+        if ($pathItem->getType() == 'department') {
           $name .= $pathItem->getName() . '/';
         }
       }
       $name = rtrim($name, "/");
-      $item->setName($name);
+      $item->setDisplayName($name);
     }
 
     $content = $serializer->serialize($data, 'json', ['groups' => ['api']]);

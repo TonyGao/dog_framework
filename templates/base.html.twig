@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
+    <meta name="session" session="{{ app.session.getId() }}">
 		<title>
 			{% block title %}Welcome!
 			{% endblock %}
@@ -26,12 +27,14 @@
 			<link rel="stylesheet" type="text/css" href="{{ asset('layout.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('modal.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('form.css', 'ui') }}">
+      <link rel="stylesheet" type="text/css" href="{{ asset('tabs.css', 'ui') }}">
 		{% endblock %}
 
 		{% block javascripts %}
 			<script src="{{ asset('lib/jQuery/jquery-3.6.1.min.js', 'static') }}"></script>
 			<script src="{{ asset('lib/lodash/lodash.min.js', 'static') }}"></script>
 			<script src="{{ asset('lib/keypress/keypress-2.1.5.min.js', 'static') }}"></script>
+      <script src="{{ asset('lib/localForage/localforage.min.js', 'static') }}"></script>
 			<script src="{{ asset('lib/ef/base/common.js') }}"></script>
 			<script src="{{ asset('lib/ef/base/str.js') }}"></script>
 			<script src="{{ asset('input.js', 'ui') }}"></script>
@@ -42,6 +45,7 @@
 			<script src="{{ asset('checkbox.js', 'ui') }}"></script>
 			<script src="{{ asset('radio.js', 'ui') }}"></script>
 			<script src="{{ asset('department.js', 'ui') }}"></script>
+      <script src="{{ asset('tabs.js', 'ui') }}"></script>
 			{# <script src="https://kit.fontawesome.com/ef1baf8144.js" crossorigin="anonymous"></script> #}
 			{{ encore_entry_script_tags('app') }}
 		{% endblock %}
