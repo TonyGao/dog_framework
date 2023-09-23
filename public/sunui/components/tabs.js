@@ -8,5 +8,10 @@ $(document).ready(function () {
     li.css("display", "");
     li.siblings().css("display", "none");
   })
+
+  $(".ef-tabs").on("click", ".ef-tabs-close", function() {
+    let closeId = $(this).closest('li').attr('id');
+    $("[id='"+ closeId +"']").remove();
+  })
 })
 
