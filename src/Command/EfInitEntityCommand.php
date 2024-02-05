@@ -83,7 +83,6 @@ class EfInitEntityCommand extends Command
 
                 foreach ($finder as $file) {
                     $absolutFilePath = $file->getRealPath();
-                    $fileName = $file->getRelativePathname();
 
                     $filePath = $absolutFilePath;
                     $file = PhpFile::fromCode(file_get_contents($filePath));

@@ -10,27 +10,7 @@
 	<script>
     $(document).ready(function() {
       $("#add").on("click", function() {
-        let id = Math.random();
-        let liTemplate = `<li id="${id}">
-                <span class="tabs-inner">
-                    <span class="tabs-title tabs-closable">Title</span>
-                    <span class="ef-tabs-close"><i class="fa-solid fa-xmark"></i></span>
-                </span>
-            </li>`;
-        let currentTab = $("#tt .tabs .tabs-selected");
-        currentId = currentTab.attr('id');
-        currentTab.after(liTemplate);
-
-        let panelTemplate = `<div class="panel panel-htop" style="display: none;" liid="${id}">
-					<div title="" style="padding: 10px;" class="panel-body panel-body-noheader panel-body-noborder" id="">
-            <div title="" style="padding: 10px;" class="panel-body panel-body-noheader panel-body-noborder" id="">
-              <p style="font-size:14px">Hello world</p>
-               Dynamic content balabala ${id}
-            </div>
-					</div>`;
-
-          $(".panel-htop[liid='"+ currentId + "']").after(panelTemplate);
-
+        EfTabs.addTab('tt');
       })
     })
 
@@ -41,13 +21,16 @@
 
 		<div id="tt" class="ef-tabs tabs-container" style="width: 500px;">
 			<div class="tabs-header tabs-header-plain" style="">
-				<div class="tabs-scroller-left" style="display: none;"></div>
-				<div class="tabs-scroller-right" style="display: none;"></div>
+				<div class="tabs-scroller-left" style="display: none;"><i class="fa-solid fa-angles-left"></i></div>
+				<div class="tabs-scroller-right" style="display: none;"><i class="fa-solid fa-angles-right"></i></div>
 				<div class="tabs-wrap" style="">
 					<ul class="tabs">
 						<li class="tabs-first tabs-selected" id="{{ id1 }}">
 							<span class="tabs-inner">
-								<span class="tabs-title">About</span>
+                <span class="tabs-title tabs-closable">
+								  <span class="tabs-title">About</span>
+                </span>
+                <span class="ef-tabs-close"><i class="fa-solid fa-xmark"></i></span>
 							</span>
 						</li>
 						<li class="" id="{{ id2 }}">
@@ -105,7 +88,21 @@
 			</div>
 		</div>
 
-    <div style="margin-top: 10px;">
+		<div style="margin-top: 10px;">
       <button class="btn primary medium icon circle" id="add"><i class="fa-solid fa-plus"></i></button>
     </div>
+
+		<div id="tt2" class="ef-tabs tabs-container" style="width: 500px;">
+			<div class="tabs-header tabs-header-plain" style="">
+				<div class="tabs-scroller-left" style="display: none;"><i class="fa-solid fa-angles-left"></i></div>
+				<div class="tabs-scroller-right" style="display: none;"><i class="fa-solid fa-angles-right"></i></div>
+				<div class="tabs-wrap" style="">
+					<ul class="tabs">
+
+					</ul>
+				</div>
+			</div>
+			<div class="tabs-panels" style="">
+			</div>
+		</div>
 {% endblock %}

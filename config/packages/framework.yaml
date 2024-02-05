@@ -26,6 +26,8 @@ framework:
                 version: ~
             ui:
                 base_path: 'sunui/components'
+            uilib:
+                base_path: 'sunui/lib'
             admin:
                 base_path: 'sunui/admin'
 

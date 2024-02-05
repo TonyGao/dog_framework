@@ -11,120 +11,118 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * @ORM\Entity(repositoryClass=CorporationRepository::class)
- * @ORM\Table(name="org_corporation")
  * isBusinessEntity
  */
+#[ORM\Entity(repositoryClass: CorporationRepository::class)]
+#[ORM\Table(name: 'org_corporation')]
 class Corporation
 {
 	use CommonTrait;
 
-	/**
-	 * @ORM\Id
-	 * @ORM\GeneratedValue
-	 * @ORM\Column(type="integer")
-	 */
+	#[ORM\Id]
+	#[ORM\GeneratedValue]
+	#[ORM\Column(type: 'integer')]
 	private $id;
 
 	/**
 	 * 集团名称
-	 * @ORM\Column(type="string", length=180)
 	 * @Ef(
    *     group="corporation_base_info",
    *     isBF=true
    * )
 	 */
+	#[ORM\Column(type: 'string', length: 180)]
 	private $name;
 
 	/**
 	 * 简称
-	 * @ORM\Column(type="string", length=80, nullable=true)
 	 * @Ef(
-     *     group="corporation_base_info",
-     *     isBF=true
-     * )
+   *     group="corporation_base_info",
+   *     isBF=true
+   * )
 	 */
+	#[ORM\Column(type: "string", length: 80, nullable: true)]
 	private $alias;
 
 	/**
 	 * 编码
-	 * @ORM\Column(type="string", length=180, nullable=true)
 	 * @Ef(
      *     group="corporation_base_info",
      *     isBF=true
      * )
 	 */
+	#[ORM\Column(type: "string", length: 180, nullable: true)]
 	private $code;
 
 	/**
 	 * 描述
-	 * @ORM\Column(type="text", nullable=true)
 	 * @Ef(
      *     group="corporation_base_info",
      *     isBF=true
      * )
 	 */
+	#[ORM\Column(type: 'text', nullable: true)]
 	private $remark;
 
 	/**
 	 * 单位类型 国有企业、国有控股企业、外资企业、合资企业、私营企业
-	 * @ORM\OneToOne(targetEntity="App\Entity\Platform\OptionValue")
-	 * @ORM\JoinColumn(name="type_id", referencedColumnName="id")
 	 * @Ef(
      *     group="corporation_base_info",
      *     isBF=true
      * )
 	 */
+	#[ORM\OneToOne(targetEntity: 'App\Entity\Platform\OptionValue')]
+	#[ORM\JoinColumn(name: "type_id", referencedColumnName: "id")]
 	private $type = null;
 
 	/**
 	 * 负责人
-	 * @ORM\Column(type="string", length=80, nullable=true)
 	 * @Ef(
      *     group="corporation_base_info",
      *     isBF=true
      * )
 	 */
+	#[ORM\Column(type: 'string', length: 80, nullable: true)]
 	private $president;
 
 	/**
 	 * 地址
-	 * @ORM\Column(type="string", length=180, nullable=true)
 	 * @Ef(
      *     group="corporation_base_info",
      *     isBF=true
      * )
 	 */
+	#[ORM\Column(type: 'string', length: 180, nullable: true)]
 	private $address;
 
 	/**
 	 * 电话
-	 * @ORM\Column(type="string", length=40, nullable=true)
 	 * @Ef(
      *     group="corporation_base_info",
      *     isBF=true
      * )
 	 */
+	#[ORM\Column(type: 'string', length: 40, nullable: true)]
 	private $phone;
 
 	/**
 	 * 网址
-	 * @ORM\Column(type="string", length=180, nullable=true)
 	 * @Ef(
      *     group="corporation_base_info",
      *     isBF=true
      * )
 	 */
+	#[ORM\Column(type: "string", length: 180, nullable: true)]
 	private $website;
 
 	/**
 	 * 邮件地址
-	 * @ORM\Column(type="string", length=180, nullable=true)
 	 * @Ef(
      *     group="corporation_base_info",
      *     isBF=true
      * )
 	 */
+	#[ORM\Column(type: 'string', length: 180, nullable: true)]
 	private $email;
 
 	/**

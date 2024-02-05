@@ -11,7 +11,7 @@
 		rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
 		{# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
 		{% block stylesheets %}
-			<link rel="stylesheet" href="{{ asset('/lib/font-awesome/css/all.min.css', 'static') }}">
+			<link rel="stylesheet" href="{{ asset('/lib/font-awesome-642/css/all.min.css', 'static') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('button.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('input-number.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('input.css', 'ui') }}">
@@ -28,6 +28,8 @@
 			<link rel="stylesheet" type="text/css" href="{{ asset('modal.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('form.css', 'ui') }}">
       <link rel="stylesheet" type="text/css" href="{{ asset('tabs.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('tree.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('table.css', 'ui') }}">
 		{% endblock %}
 
 		{% block javascripts %}
@@ -46,6 +48,7 @@
 			<script src="{{ asset('radio.js', 'ui') }}"></script>
 			<script src="{{ asset('department.js', 'ui') }}"></script>
       <script src="{{ asset('tabs.js', 'ui') }}"></script>
+      <script src="{{ asset('components.js', 'uilib') }}"></script>
 			{# <script src="https://kit.fontawesome.com/ef1baf8144.js" crossorigin="anonymous"></script> #}
 			{{ encore_entry_script_tags('app') }}
 		{% endblock %}

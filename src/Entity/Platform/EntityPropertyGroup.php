@@ -24,90 +24,74 @@ use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
  *      \           /Group3-   \Group6
  *       \--EntityB-        \--
  *                  \PropertyThree
- *
- * @Gedmo\Tree(type="nested")
- * @ORM\Table(name="platform_entity_property_group",
- *     indexes={@ORM\Index(name="entity_property_group_idx", columns={"type"})}
- * )
- * @ORM\Entity(repositoryClass=NestedTreeRepository::class)
  */
+#[Gedmo\Tree(type: 'nested')]
+#[ORM\Table(name: "platform_entity_property_group")]
+#[ORM\Index(name: 'entity_property_group_idx', columns: ["type"])]
+#[ORM\Entity(repositoryClass: NestedTreeRepository::class)]
 class EntityPropertyGroup implements GedmoNode
 {
     use CommonTrait;
 
-    /**
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: "AUTO")]
     private $id;
 
     /**
      * 分组名称
-     * @ORM\Column("group_name", type="string", length=64, nullable=true)
      */
+    #[ORM\Column('group_name', type: 'string', length: 64, nullable: true)]
     private $name = null;
 
     /**
      * 分组标签
-     * @ORM\Column("group_label", type="string", length=64, nullable=true)
      */
+    #[ORM\Column('group_label', type: 'string', length: 64, nullable: true)]
     private $label = null;
 
     /**
      * 类型: root, entity, group, property
-     * @ORM\Column(type="string", length=20)
      */
+    #[ORM\Column(type: 'string', length: 20)]
     private $type;
 
     /**
      * entity, property的token
-     * @ORM\Column(type="string", length=40, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 40, nullable: true)]
     private $token = null;
 
     /**
      * entity namespace + class name
-     * @ORM\Column(type="string", length=40, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 40, nullable: true)]
     private $fqn = null;
 
-    /**
-     * @Gedmo\TreeLeft
-     * @ORM\Column(name="lft", type="integer")
-     */
+    #[Gedmo\TreeLeft]
+    #[ORM\Column(name: "lft", type: "integer")]
     private $lft;
 
-    /**
-     * @Gedmo\TreeLevel
-     * @ORM\Column(name="lvl", type="integer")
-     */
+    #[Gedmo\TreeLevel]
+    #[ORM\Column(name: "lvl", type: "integer")]
     private $lvl;
 
-    /**
-     * @Gedmo\TreeRight
-     * @ORM\Column(name="rgt", type="integer")
-     */
+    #[Gedmo\TreeRight]
+    #[ORM\Column(name: "rgt", type: "integer")]
     private $rgt;
 
-    /**
-     * @Gedmo\TreeRoot
-     * @ORM\ManyToOne(targetEntity="EntityPropertyGroup")
-     * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
-     */
+    #[Gedmo\TreeRoot]
+    #[ORM\ManyToOne(targetEntity: "EntityPropertyGroup")]
+    #[ORM\JoinColumn(name: "tree_root", referencedColumnName: "id", onDelete: "CASCADE")]
     private $root;
 
-    /**
-     * @Gedmo\TreeParent
-     * @ORM\ManyToOne(targetEntity="EntityPropertyGroup", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
-     */
+    #[Gedmo\TreeParent]
+    #[ORM\ManyToOne(targetEntity: "EntityPropertyGroup", inversedBy: "children")]
+    #[ORM\JoinColumn(name: "parent_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private $parent;
 
-    /**
-     * @ORM\OneToMany(targetEntity="EntityPropertyGroup", mappedBy="parent")
-     * @ORM\OrderBy({"lft" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: "EntityPropertyGroup", mappedBy: "parent")]
+    #[ORM\OrderBy(["lft" => "ASC"])]
     private $children;
 
     /**

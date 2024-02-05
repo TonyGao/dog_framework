@@ -42,16 +42,22 @@
   position: absolute;
   top: auto;
   bottom: 0;
-  width: 18px;
-  font-size: 1px;
+  width: 14px;
+  font-size: 10px;
   display: none;
   cursor: pointer;
   border-width: 1px;
   border-style: solid;
+  height: 21px;
+  justify-content: center;
+  align-items: center;
 }
 
 .tabs-scroller-left {
   left: 0;
+  background-color: #ffffff;
+  z-index: 1;
+  cursor: pointer;
 }
 
 tabs-scroller-left {
@@ -60,6 +66,9 @@ tabs-scroller-left {
 
 .tabs-scroller-right {
   right: 0;
+  background-color: #ffffff;
+  z-index: 1;
+  cursor: pointer;
 }
 
 tabs-scroller-right {

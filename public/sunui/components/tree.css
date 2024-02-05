@@ -1,0 +1,132 @@
+.org-sturcture-container {
+  overflow: auto;
+  height: 100vh;
+}
+
+.org-sturcture-container ol {
+  list-style: none;
+  display: inline-block;
+}
+
+.outside-wrapper {
+  height: 100vh;
+  position: inherit;
+  overflow: auto;
+  left: 0px;
+  right: 0;
+  bottom: 0;
+  top: 0px;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  -webkit-box-pack: justify;
+  justify-content: center;
+  -webkit-box-align: stretch;
+  align-items: stretch;
+  padding-top: 40px;
+  margin-bottom: 20px;
+}
+
+.inside-wrapper {
+  height: 100vh;
+  display: flex;
+  position: relative;
+  transform: scale(1);
+  margin-bottom: 60px;
+  border-left: 1px #dfdfdf solid;
+  border-top: 1px #dfdfdf solid;
+}
+
+.left-tree {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  z-index: 1000;
+  position: inherit;
+  min-width: fit-content;
+  margin-left: 20px;
+  padding-top: 20px;
+  border-right: 1px #dfdfdf solid;
+  padding-right: 20px;
+}
+
+.right-content {
+  display: inline-flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  position: relative;
+  width: 80vw;
+}
+
+.left-tree .item-content.scroll-item {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.arrow-icon {
+  display: flex;
+  margin-right: 10px;
+  width: 8.75px;
+}
+
+.org-icon {
+  margin-right: 4px;
+}
+
+.department-tree-wrapper {
+  margin-top: 10px;
+}
+
+.tree-indent {
+  display: inline-block;
+  width: 16px;
+  height: 18px;
+  margin: 4px 0;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.tree-text-content.branch:hover {
+  cursor: pointer;
+  background-color: #f0f8ff;
+}
+
+.tree-text-content.branch:hover {
+  cursor: pointer;
+  background-color: #f0f8ff;
+}
+
+.tree-text-content.branch:hover {
+  cursor: pointer;
+  background-color: #f0f8ff;
+}
+
+.tree-text-content.chosen {
+  background-color: #f0f8ff;
+}
+
+.inside-wrapper .fold-icon-wrapper {
+  transform: rotate(180deg);
+  position: absolute;
+  top: 22px;
+  z-index: 1;
+  width: 19px;
+  height: 32px;
+  line-height: 28px;
+  text-align: center;
+  border: 1px solid #dee0e3;
+  border-radius: 4px;
+  background-color: White;
+  border-right: none;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  cursor: pointer;
+  font-size: 0.8em;
+  right: -20px;
+}
+
+.fold-icon-wrapper.collapse {
+  cursor: pointer;
+}

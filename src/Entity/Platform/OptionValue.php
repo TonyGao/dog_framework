@@ -7,55 +7,51 @@ use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use App\Repository\Platform\OptionValueRepository;
 
-/**
- * @ORM\Entity(repositoryClass=OptionValueRepository::class)
- * @ORM\Table(name="platform_optionvalue")
- */
+#[ORM\Entity(repositoryClass: OptionValueRepository::class)]
+#[ORM\Table(name: 'platform_optionvalue')]
 class OptionValue
 {
     use CommonTrait;
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
      * 编码
-     * @ORM\Column(type="string", length=80)
      */
+    #[ORM\Column(type: 'string', length: 80)]
     private $code;
 
     /**
      * 字符串型的值
-     * @ORM\Column(type="string", length=500, nullable=true)
      */
+    #[ORM\Column(type: 'string', length: 500, nullable: true)]
     private $stringValue;
 
     /**
      * 整型的值
-     * @ORM\Column(type="integer", nullable=true)
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $integerValue;
 
     /**
      * 布尔值类型的值
-     * @ORM\Column(type="boolean", nullable=true)
      */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     private $booleanValue;
 
     /**
      * 小数型的值
-     * @ORM\Column(type="decimal", nullable=true)
      */
+    #[ORM\Column(type: 'decimal', nullable: true)]
     private $decimalValue;
 
     /**
      * 日期时间类型的值
-     * @ORM\Column(type="datetime", nullable=true)
      */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private $datetime;
 
     /**
