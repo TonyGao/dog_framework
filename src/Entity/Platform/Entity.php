@@ -10,72 +10,67 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * 实体模型
- * @ORM\Entity(repositoryClass=EntityRepository::class)
- * @ORM\Table(name="platform_entity",
- *     indexes={@ORM\Index(name="entity_idx", columns={"token"})}
- * )
  */
+#[ORM\Entity(repositoryClass: EntityRepository::class)]
+#[ORM\Table(name: "platform_entity")]
+#[ORM\Index(name: "entity_idx", columns: ["token"])]
 class Entity
 {
     use CommonTrait;
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
     /**
      * 实体名称
-     * @ORM\Column(type="string", length=40)
      */
+    #[ORM\Column(type: "string", length: 40)]
     private $name;
 
     /**
      * 编码
-     * @ORM\Column(type="string", length=80, nullable=true)
      */
+    #[ORM\Column(type: "string", length: 80, nullable: true)]
     private $code = null;
 
     /**
      * 实体令牌
-     * @ORM\Column(type="string", length=40)
      */
+    #[ORM\Column(type: "string", length: 40)]
     private $token;
 
     /**
      * entity 的命名空间
-     * @ORM\Column(type="string", length=40, nullable=true)
      */
+    #[ORM\Column(type: "string", length: 40, nullable: true)]
     private $fqn = null;
 
     /**
      * 是自定义的
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: "boolean")]
     private $isCustomized;
 
     /**
      * 实体的类名称
-     * @ORM\Column(type="string", length=80)
      */
+    #[ORM\Column(type: "string", length: 80)]
     private $className;
 
     /**
      * 数据库表名称
-     * @ORM\Column(type="string", length=80)
      */
+    #[ORM\Column(type: "string", length: 80)]
     private $dataTableName;
 
-    /**
-     * @ORM\OneToMany(
-     *     targetEntity="EntityProperty",
-     *     mappedBy="entity",
-     *     orphanRemoval=true,
-     *     cascade={"persist"}
-     * )
-     */
+    #[ORM\OneToMany(
+        targetEntity: EntityProperty::class,
+        mappedBy: "entity",
+        orphanRemoval: true,
+        cascade: ["persist"]
+    )]
     private $properties;
 
     public function __construct() {

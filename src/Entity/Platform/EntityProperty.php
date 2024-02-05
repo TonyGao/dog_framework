@@ -9,56 +9,53 @@ use App\Repository\Platform\EntityPropertyRepository;
 
 /**
  * 实体属性
- * @ORM\Entity(repositoryClass=EntityPropertyRepository::class)
- * @ORM\Table(name="platform_entity_property",
- *     indexes={@ORM\Index(name="entity_property_idx", columns={"token"})}
- * )
  */
+#[ORM\Entity(repositoryClass: EntityPropertyRepository::class)]
+#[ORM\Table(name: 'platform_entity_property')]
+#[ORM\Index(name: "entity_property_idx", columns: ["token"])]
 class EntityProperty
 {
     use CommonTrait;
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: "integer")]
     private $id;
 
     /**
      * 编码
-     * @ORM\Column(type="string", length=80, nullable=true)
      */
+    #[ORM\Column(type: "string", length: 80, nullable: true)]
     private $code = null;
 
     /**
      * 属性令牌
-     * @ORM\Column(type="string", length=40, nullable=true)
      */
+    #[ORM\Column(type: "string", length: 40, nullable: true)]
     private $token = null;
 
     /**
      * 是自定义的
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: "boolean")]
     private $isCustomized;
 
     /**
      * 业务字段，这个布尔值决定了增删改查时是否显示此字段
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: "boolean")]
     private $businessField = false;
 
     /**
      * 属性名称
-     * @ORM\Column(type="string", length=40)
      */
+    #[ORM\Column(type: "string", length: 40)]
     private $propertyName;
 
     /**
      * 属性备注
-     * @ORM\Column(type="string", length=500)
      */
+    #[ORM\Column(type: "string", length: 500)]
     private $comment;
 
     /**
@@ -67,8 +64,8 @@ class EntityProperty
      *  decimal, date, time, datetime, datetimez, text,
      *  object, array, simple_array, json_array, float,
      *  guid, blob, entity)
-     * @ORM\Column(type="string", length=40)
      */
+    #[ORM\Column(type: "string", length: 40)]
     private $type;
 
     /**
@@ -79,20 +76,20 @@ class EntityProperty
      * integer: IntegerType
      * entity: EntityType
      * department: DepartmentType
-     * @ORM\Column(type="string", length=80, nullable=true)
      */
+    #[ORM\Column(type: "string", length: 80, nullable: true)]
     private $formType;
 
     /**
      * 当type为entity时的目标实体
-     * @ORM\Column(type="string", length=100, nullable=true)
      */
+    #[ORM\Column(type: "string", length: 100, nullable: true)]
     private $targetEntity = null;
 
     /**
      * 当type为entity时的目标实体的id
-     * @ORM\Column(type="string", length=100, nullable=true)
      */
+    #[ORM\Column(type: "string", length: 100, nullable: true)]
     private $targetId = null;
 
     /**
@@ -103,69 +100,69 @@ class EntityProperty
 
     /**
      * 当属性类型为string时，定义的长度
-     * @ORM\Column(type="integer", nullable=true)
      */
+    #[ORM\Column(type: "integer", nullable: true)]
     private $length = null;
 
     /**
      * schema 数据中表中的字段名称
-     * @ORM\Column(type="string", length=80)
      */
+    #[ORM\Column(type: "string", length: 80)]
     private $fieldName;
 
     /**
      * 唯一性
-     * @ORM\Column(type="boolean", nullable=true)
      */
+    #[ORM\Column(type: "boolean", nullable: true)]
     private $uniqueable = false;
 
     /**
      * 是否可以为空
-     * @ORM\Column(type="boolean", nullable=true)
      */
+    #[ORM\Column(type: "boolean", nullable: true)]
     private $nullable = false;
 
     /**
      * 是否允许插入
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: "boolean")]
     private $insertable = true;
 
 
     /**
      * 是否允许更新
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: "boolean")]
     private $updatable = true;
 
 
     /**
      * 数字精度
-     * @ORM\Column(type="integer", nullable=true)
      */
+    #[ORM\Column(type: "integer", nullable: true)]
     private $decimalPrecision = 0;
 
     /**
      * 数字小数位数
-     * @ORM\Column(type="integer", nullable=true)
      */
+    #[ORM\Column(type: "integer", nullable: true)]
     private $decimalScale = 0;
 
     /**
      * 验证条件
-     * @ORM\Column(type="json", nullable=true)
      */
+    #[ORM\Column(type: "json", nullable: true)]
     private $validation;
 
     /**
      * 属性所属的实体
-     * @ORM\ManyToOne(
-     *     targetEntity="Entity",
-     *     inversedBy="properties",
-     *     cascade={"persist"}
-     * )
-     * ORM\JoinColumn(name="entity_id", referencedColumnName="id", , onDelete="SET NULL")
      */
+    #[ORM\ManyToOne(
+        targetEntity: "Entity",
+        inversedBy: "properties",
+        cascade: ["persist"]
+    )]
+    #[ORM\JoinColumn(name: "entity_id", referencedColumnName: "id", onDelete: "SET NULL")]
     private $entity = null;
 
     /**

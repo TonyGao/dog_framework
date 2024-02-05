@@ -8,76 +8,55 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Tree\Node as GedmoNode;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 
-/**
- * @Gedmo\Tree(type="nested")
- * @ORM\Table(name="admin_menu")
- * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\NestedTreeRepository")
- */
+#[Gedmo\Tree(type: 'nested')]
+#[ORM\Table(name: 'admin_menu')]
+#[ORM\Entity(repositoryClass: Gedmo\Tree\Entity\Repository\NestedTreeRepository::class)]
 class Menu implements GedmoNode
 {
     use CommonTrait;
 
-    /**
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
-    /**
-     * @ORM\Column("menu_label", type="string", length=64)
-     */
+    #[ORM\Column("menu_label", type: "string", length: 64)]
     private $label;
 
-    /**
-     * @ORM\Column("menu_uri", type="string", length=64)
-     */
+    #[ORM\Column('menu_uri', type: 'string', length: 64)]
     private $uri;
 
     /**
      * 菜单图标
      * @var string
-     *
-     * @ORM\Column("icon", length=255, nullable=true)
      */
+    #[ORM\Column('icon', length: 255, nullable: true)]
     private $icon;
 
-    /**
-     * @Gedmo\TreeLeft
-     * @ORM\Column(name="lft", type="integer")
-     */
+    #[Gedmo\TreeLeft]
+    #[ORM\Column(name: 'lft', type: 'integer')]
     private $lft;
 
-    /**
-     * @Gedmo\TreeLevel
-     * @ORM\Column(name="lvl", type="integer")
-     */
+    #[Gedmo\TreeLevel]
+    #[ORM\Column(name: 'lvl', type: 'integer')]
     private $lvl;
 
-    /**
-     * @Gedmo\TreeRight
-     * @ORM\Column(name="rgt", type="integer")
-     */
+    #[Gedmo\TreeRight]
+    #[ORM\Column(name: 'rgt', type: 'integer')]
     private $rgt;
 
-    /**
-     * @Gedmo\TreeRoot
-     * @ORM\ManyToOne(targetEntity="Menu")
-     * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
-     */
+    #[Gedmo\TreeRoot]
+    #[ORM\ManyToOne(targetEntity: Menu::class)]
+    #[ORM\JoinColumn(name: 'tree_root', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private $root;
 
-    /**
-     * @Gedmo\TreeParent
-     * @ORM\ManyToOne(targetEntity="Menu", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
-     */
+    #[Gedmo\TreeParent]
+    #[ORM\ManyToOne(targetEntity: Menu::class, inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private $parent;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Menu", mappedBy="parent")
-     * @ORM\OrderBy({"lft" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: Menu::class, mappedBy: "parent")]
+    #[ORM\OrderBy(["lft" => "ASC"])]
     private $children;
 
     /**

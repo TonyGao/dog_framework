@@ -7,6 +7,7 @@
 
 {% block javascripts %}
 	{{ parent() }}
+	<script src=" {{ asset('platform/entity.js', 'admin') }} "></script>
 
 {% endblock %}
 
@@ -40,7 +41,24 @@
 						<i class="fa-solid fa-play"></i>
 					</div>
 				</div>
-				<div class="right-content"></div>
+				<div class="right-content">
+				  <div class="empty-content" id="platform-entity-empty">
+					  <img src="{{ asset('status/empty.png', 'image') }}" width="587px">
+					</div>
+					<div id="platform-entity" class="ef-tabs tabs-container" style="display: none;">
+						<div class="tabs-header tabs-header-plain" style="">
+							<div class="tabs-scroller-left" style="display: none;"><i class="fa-solid fa-angles-left"></i></div>
+							<div class="tabs-scroller-right" style="display: none;"><i class="fa-solid fa-angles-right"></i></div>
+							<div class="tabs-wrap" style="">
+								<ul class="tabs">
+
+								</ul>
+							</div>
+						</div>
+						<div class="tabs-panels" style="">
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

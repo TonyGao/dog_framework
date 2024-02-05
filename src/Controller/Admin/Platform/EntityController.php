@@ -47,10 +47,10 @@ class EntityController extends AbstractController
               <i class="fa-solid fa-caret-down"></i>
             </div>
 						<div class="org-icon">
-              <i class="fa-solid fa-building"></i>
+              <i class="fa-solid fa-database"></i>
 						</div>
-						<div class="org-name">
-							<div class="org-text-content">模型</div>
+						<div class="node-name">
+							<div class="tree-text-content">模型</div>
 						</div>
 					</div>
           ';
@@ -63,10 +63,10 @@ class EntityController extends AbstractController
           <div class="item-content scroll-item">
             <div class="arrow-icon">' . $arrayIcon . '</div>
 						<div class="org-icon">
-              <i class="fa-solid fa-building-user"></i>
+              <i class="fa-solid fa-table"></i>
 						</div>
-						<div class="org-name">
-							<div class="org-text-content company" type="company">' .
+						<div class="node-name">
+							<div class="tree-text-content branch" type="entity" id="'. $node['token'] .'">' .
             $node['name']
             . '</div>
 						</div>
@@ -81,10 +81,10 @@ class EntityController extends AbstractController
           <div class="item-content scroll-item">
             <div class="arrow-icon">' . $arrayIcon . '</div>
 						<div class="org-icon">
-              <i class="fa-solid fa-user-group"></i>
+              <i class="fa-solid fa-o"></i>
 						</div>
-						<div class="org-name">
-							<div class="org-text-content department" type="department">' .
+						<div class="node-name">
+							<div class="tree-text-content branch" type="branch">' .
             $node['name']
             . '</div>
 						</div>

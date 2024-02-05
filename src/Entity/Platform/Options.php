@@ -9,54 +9,52 @@ use App\Repository\Platform\OptionsRepository;
 
 /**
  * 选项，实现动态属性
- * @ORM\Entity(repositoryClass=OptionsRepository::class)
- * @ORM\Table(name="platform_options")
  */
+#[ORM\Entity(repositoryClass: OptionsRepository::class)]
+#[ORM\Table(name: 'platform_options')]
 class Options
 {
     use CommonTrait;
 
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
     /**
      * 选项名称
-     * @ORM\Column(type="string", length=40)
      */
+    #[ORM\Column(type: 'string', length: 40)]
     private $name;
 
     /**
      * 编码
-     * @ORM\Column(type="string", length=80)
      */
+    #[ORM\Column(type: 'string', length: 80)]
     private $code;
 
     /**
      * 选项数据类型
-     * @ORM\Column(type="string", length=40)
      */
+    #[ORM\Column(type: 'string', length: 40)]
     private $type;
 
     /**
      * 是自定义的，如果为系统自带值为 false
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: 'boolean')]
     private $isCustom = false;
 
     /**
      * 授权类型
-     * @ORM\Column(type="json")
      */
+    #[ORM\Column(type: 'json')]
     private $permitType;
 
     /**
      * 选项值
-     * @ORM\OneToMany(targetEntity="OptionValue", mappedBy="optionValue")
      */
+    #[ORM\OneToMany(targetEntity: 'OptionValue', mappedBy: 'optionValue')]
     private $OptionValue;
 
     /**

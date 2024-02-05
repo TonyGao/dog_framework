@@ -1,0 +1,215 @@
+.ef-table {
+  position: relative;
+}
+
+.ef-table .ef-spin {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ef-table-container {
+  position: relative;
+  border-radius: 4px 4px 0 0;
+}
+
+.ef-table-container {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+}
+
+.ef-table-border .ef-table-container {
+  border-top: 1px solid rgb(229,230,235);
+  border-left: 1px solid rgb(229,230,235);
+}
+
+.ef-table-border:not(.ef-table-border-cell) .ef-table-container {
+  border-right: 1px solid rgb(229,230,235);
+}
+
+.ef-scrollbar {
+  position: relative;
+}
+
+.ef-scrollbar-container {
+  position: relative;
+  scrollbar-width: none;
+}
+
+.ef-table-container .ef-table-content {
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  height: 100%;
+}
+
+.ef-scrollbar-container {
+  position: relative;
+}
+
+.ef-table-container .ef-table-content {
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  height: 100%;
+}
+
+.ef-table-container .ef-table-content-scroll-x {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.ef-vue-site {
+  color: rgb(78,89,105);
+  font-size: 14px;
+  background-color: #fff;
+}
+
+.ef-table .ef-table-element {
+  width: 100%;
+  min-width: 100%;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+colgroup {
+  display: table-column-group;
+}
+
+.ef-table-td {
+  box-sizing: border-box;
+  color: rgb(29,33,41);
+  line-height: 1.5715;
+  text-align: left;
+  word-break: break-all;
+  background-color: #fff;
+  border-bottom: 1px solid rgb(229,230,235);
+}
+
+.ef-table .ef-table-td {
+  font-size: 14px;
+}
+
+.ef-table-cell {
+  display: flex;
+  align-items: center;
+}
+
+.ef-table .ef-table-cell {
+  padding: 9px 16px;
+}
+
+.ef-table-th {
+  position: relative;
+  box-sizing: border-box;
+  color: rgb(29,33,41);
+  font-weight: 500;
+  line-height: 1.5715;
+  text-align: left;
+  background-color: rgb(242,243,245);
+}
+
+.ef-table .ef-table-th {
+  font-size: 14px;
+}
+
+.ef-table-border .ef-table-tr .ef-table-th {
+  border-bottom: 1px solid rgb(229,230,235);
+}
+
+tr, th {
+  margin: 0;
+  padding: 0;
+}
+
+.ef-table-td-content {
+  display: block;
+  width: 100%;
+}
+
+.ef-table-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.ef-pagination {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.ef-pagination-list {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  list-style: none;
+}
+
+.ef-pagination-item {
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 0 8px;
+  color: rgb(78,89,105);
+  text-align: center;
+  vertical-align: middle;
+  list-style: none;
+  background-color: transparent;
+  border: 0 solid transparent;
+  border-radius: 2px;
+  outline: 0;
+  cursor: pointer;
+  user-select: none;
+  min-width: 32px;
+  height: 32px;
+  font-size: 14px;
+  line-height: 32px;
+}
+
+.ef-pagination-item-disabled, .ef-pagination-item-disabled:hover {
+  color: rgb(201,205,212);
+  background-color: transparent;
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
+.ef-pagination-item-previous, .ef-pagination-item-next {
+  color: rgb(78,89,105);
+  font-size: 12px;
+  background-color: transparent;
+}
+
+.ef-pagination-item:not(:last-child) {
+  margin-right: 8px;
+}
+
+.ef-pagination .ef-pagination-item-previous.ef-pagination-item-disabled, .ef-pagination .ef-pagination-item-next.ef-pagination-item-disabled {
+  color: rgb(201,205,212);
+  background-color: transparent;
+}
+
+.ef-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  color: inherit;
+  font-style: normal;
+  vertical-align: -2px;
+  outline: none;
+  stroke: currentColor;
+}
+
+.ef-pagination-item-active, .ef-pagination-item-active:hover {
+  color: rgb(22,93,255);
+  background-color: rgb(232,243,255);
+  border-color: transparent;
+  transition: color .2s cubic-bezier(0,0,1,1),background-color .2s cubic-bezier(0,0,1,1);
+}
+
+.ef-table-hover:not(.ef-table-dragging) .ef-table-tr:not(.ef-table-tr-empty):not(.ef-table-tr-summary):hover .ef-table-td:not(.ef-table-col-fixed-left):not(.ef-table-col-fixed-right), .ef-table-hover .ef-table-tr-drag .ef-table-td:not(.ef-table-col-fixed-left):not(.ef-table-col-fixed-right) {
+  background-color: rgb(247,248,250);
+}

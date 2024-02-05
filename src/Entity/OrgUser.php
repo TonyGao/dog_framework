@@ -10,76 +10,58 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\Mapping\AssociationOverride;
 
-/**
- * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ORM\Table(name="`org_user`")
- * @UniqueEntity(fields={"username"}, message="There is already an account with this username")
- */
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table(name: '`org_user`')]
+#[UniqueEntity(fields: ["username"], message: "There is already an account with this username")]
 class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true)
-     */
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
     private $username;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true, nullable=true)
-     */
+    #[ORM\Column(type: 'string', length: 180, unique: true, nullable: true)]
     private $displayName;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", unique=true, nullable=true)
-     * @Assert\NotBlank()
-     * @Assert\Email()
      */
+    #[ORM\Column(type: 'string', unique: true, nullable: true)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
     private $email;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string", unique=true, nullable=true)
      */
+    #[ORM\Column(type: 'string', unique: true, nullable: true)]
     private $phone;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: 'json')]
     private $roles = [];
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Organization\Department", inversedBy="manager")
-     * @ORM\JoinTable(name="org_department_managers",
-     *   joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *   inverseJoinColumns={@ORM\JoinColumn(name="department_id", referencedColumnName="id")}
-     * )
-     */
+    #[ORM\ManyToMany(targetEntity: "App\Entity\Organization\Department", inversedBy: "manager")]
+    #[ORM\JoinTable(name: "org_department_managers")]
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id")]
+    #[ORM\InverseJoinColumn(name: "department_id", referencedColumnName: "id")]
     private $managedDepartments;
 
-    /**
-     * @Assert\NotBlank()
-     * @Assert\Length(max=4096)
-     */
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 4096)]
     private $plainPassword;
 
     /**
      * @var string The hashed password
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     private $password;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     private $isVerified = false;
 
     public function getId(): ?int

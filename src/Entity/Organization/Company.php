@@ -13,156 +13,144 @@ use App\Repository\Organization\CompanyRepository;
 
 /**
  * 公司, 分组: 公司基本信息, 公司关联信息, 公司管理信息, 公司说明信息
- * @Gedmo\Tree(type="nested")
- * @ORM\Table(name="org_company")
- * @ORM\Entity(repositoryClass=CompanyRepository::class)
  * isBusinessEntity
  */
+#[Gedmo\Tree(type: 'nested')]
+#[ORM\Table(name: 'org_company')]
+#[ORM\Entity(repositoryClass: CompanyRepository::class)]
 class Company implements GedmoNode
 {
     use CommonTrait;
 
-	/**
-	 * @ORM\Id
-	 * @ORM\GeneratedValue
-	 * @ORM\Column(type="integer")
-	 */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
 	private $id;
 
 	/**
 	 * 公司名称
-	 * @ORM\Column(type="string", length=180)
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
      * )
 	 */
+    #[ORM\Column(type: 'string', length: 180)]
 	private $name;
 
 	/**
 	 * 简称
-	 * @ORM\Column(type="string", length=80, nullable=true)
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
      * )
 	 */
+    #[ORM\Column(type: 'string', length: 80, nullable: true)]
 	private $alias;
 
 	/**
 	 * 编码
-	 * @ORM\Column(type="string", length=180, nullable=true)
      * @Ef(
      *    group="company_base_info",
      *    isBF=true
      * )
 	 */
+    #[ORM\Column(type: 'string', length: 180, nullable: true)]
 	private $code;
 
 	/**
 	 * 描述
-	 * @ORM\Column(type="text", nullable=true)
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
      * )
 	 */
+    #[ORM\Column(type: 'text', nullable: true)]
 	private $remark;
 
     /**
      * 排序号
-     * @ORM\Column(type="integer", nullable=true)
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
      * )
      */
+    #[ORM\Column(type: 'integer', nullable: true)]
 	private $orderNum;
 
     /**
      * 重复排序号处理: 插入、重复
-     * @ORM\Column(type="string", nullable=true)
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
      * )
      */
+    #[ORM\Column(type: 'string', nullable: true)]
     private $repetitionNumHandling;
 
     /**
      * 状态: 启用、停用
-     * @ORM\Column(type="boolean", options={"default"=1})
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
      * )
      */
+    #[ORM\Column(type: "boolean", options: ["default" => 1])]
     private $state = true;
 
     /**
      * 独立登录页
-     * @ORM\Column(type="boolean", nullable=true)
      * @Ef(
      *     group="company_base_info",
      *     isBF=true
      * )
      */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     private $loginIndependent;
 
     /**
      * 上级公司
-     * @Gedmo\TreeParent
-     * @ORM\ManyToOne(targetEntity="Company", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
      * @Ef(
      *     group="company_associated_info",
      *     isBF=true
      * )
      */
+    #[Gedmo\TreeParent]
+    #[ORM\ManyToOne(targetEntity: 'Company', inversedBy: 'children')]
+    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private $parent;
 
     /**
      * 访问范围，一个公司有可见多个公司
-     * @ORM\OneToMany(targetEntity="Company", mappedBy="accessSourcing")
      */
+    #[ORM\OneToMany(targetEntity: 'Company', mappedBy: 'accessSourcing')]
     private $accessScope;
 
     /**
      * 被什么公司访问
-     * @ORM\ManyToOne(targetEntity="Company", inversedBy="accessScope")
-     * @ORM\JoinColumn(name="access_sourcing_company_id", referencedColumnName="id")
      */
+    #[ORM\ManyToOne(targetEntity: 'Company', inversedBy: 'accessScope')]
+    #[ORM\JoinColumn(name: "access_sourcing_company_id", referencedColumnName: "id")]
     private $accessSourcing = null;
 
-    /**
-     * @Gedmo\TreeLeft
-     * @ORM\Column(name="lft", type="integer")
-     */
+    #[Gedmo\TreeLeft]
+    #[ORM\Column(name: "lft", type: "integer")]
     private $lft;
 
-    /**
-     * @Gedmo\TreeLevel
-     * @ORM\Column(name="lvl", type="integer")
-     */
+    #[Gedmo\TreeLevel]
+    #[ORM\Column(name: 'lvl', type: 'integer')]
     private $lvl;
 
-    /**
-     * @Gedmo\TreeRight
-     * @ORM\Column(name="rgt", type="integer")
-     */
+    #[Gedmo\TreeRight]
+    #[ORM\Column(name: 'rgt', type: 'integer')]
     private $rgt;
 
-    /**
-     * @Gedmo\TreeRoot
-     * @ORM\ManyToOne(targetEntity="Company")
-     * @ORM\JoinColumn(name="tree_root", referencedColumnName="id", onDelete="CASCADE")
-     */
+    #[Gedmo\TreeRoot]
+    #[ORM\ManyToOne(targetEntity: "Company")]
+    #[ORM\JoinColumn(name: "tree_root", referencedColumnName: "id", onDelete: "CASCADE")]
     private $root;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Company", mappedBy="parent")
-     * @ORM\OrderBy({"lft" = "ASC"})
-     */
+    #[ORM\OneToMany(targetEntity: 'Company', mappedBy: 'parent')]
+    #[ORM\OrderBy(["lft" => "ASC"])]
     private $children;
 
     public function __construct()
