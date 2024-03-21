@@ -67,7 +67,8 @@ class OrgApiController extends AbstractController
     Request $request,
     EntityManagerInterface $em,
     SerializerInterface $serializer
-  ): ApiResponse {
+  ): ApiResponse 
+  {
     $payload = $request->toArray();
     $repo = $em->getRepository(Department::class);
     $data = $repo->createQueryBuilder('d')

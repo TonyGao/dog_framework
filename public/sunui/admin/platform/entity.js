@@ -8,12 +8,88 @@ $(document).ready(function () {
     let id = $(this).attr('id');
     let liId = 'tab-'+id;
     let tabName = $(this).text();
+    let entityData;
+
+    // 根据点击的模型的token查询模型数据
+    $.ajax({
+      url: "/admin/platform/entity/itemtable",
+      method: "GET",
+      async: false,
+      dataType: "html",
+      data: {token: id},
+      success: function(data) {
+        entityData = data;
+      }
+    })
 
     // 如果右侧没有没有任何标签页
     if (tabsIsEmpty) {
       $(".empty-content").hide();
       $("#platform-entity").show();
-      EfTabs.addTab('platform-entity', liId, tabName, "hello");
+      EfTabs.addTab('platform-entity', liId, tabName, "hello", entityData);
     }
+
+    // $(".create.btn").off('click')
+    // $(".create.btn").on('click', function() {
+    //   let token = $(this).attr('token');
+    // })
   })
+
+  // $("#platform-entity").off("click", "button .create");
+  $("#platform-entity").on("click", "button.create", function() {
+    let token = $(this).attr("token");
+    let id = 'drawer' + token;
+
+    // 检查是否已在DOM中存在相同ID的元素
+    if ($("#" + id).length > 0) {
+      // 如果已存在相同ID的元素，则提前返回，不执行后续操作
+      $().showDrawer(id);
+      return;
+    }
+
+    let payload = {
+      token: id
+    }
+    $.ajax({
+      url: "/admin/platform/entity/addFieldDrawer",
+      method: "POST",
+      dataType: "html",
+      contentType: 'application/json',
+      data: JSON.stringify(payload),
+      success: function (response) {
+        $("#app").append(response);
+        $().showDrawer(id);
+      }
+    })
+  })
+
+  $("body").on('click', '#addField', function () {
+    $.ajax({
+			url: "/admin/platform/entity/addField",
+			method: "GET",
+			async: false,
+			dataType: "html",
+			success: function (data) {
+				$("#ef-drawer-body-form").append(data);
+			}
+		})
+  })
+
+  let flag = true;
+  $("body").on('compositionstart', 'input[name="form[fieldComment]"]', function () {
+    flag = false;
+  })
+
+  $("body").on('compositionend', 'input[name="form[fieldComment]"]',function () {
+    flag = true;
+  })
+
+	$("body").on("input change", 'input[name="form[fieldComment]"]', _.debounce(function() {
+		if (flag) {
+      let pinyin = Pinyin.convertToPinyin($(this).val(), '~', true);
+      camelCasePinyin = Str.firstLetterToLowerCase(Str.toCamelCase(pinyin));
+			let engName = $(this).closest('.ef-row.ef-row-align-start.ef-row-justify-start').find('input[name="form[fieldName]"]');
+			$(this).closest('.ef-row.ef-row-align-start.ef-row-justify-start').find('input[name="form[fieldName]"]').val(camelCasePinyin);
+		}
+	}, 500))
 })

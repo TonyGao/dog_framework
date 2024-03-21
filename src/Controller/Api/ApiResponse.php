@@ -35,4 +35,19 @@ class ApiResponse extends Response
     $response->setContent(json_encode($data));
     return $response;
   }
+
+  public static function error(
+    $content = '',
+    $code = null,
+    $msg = null
+  ) {
+    $response = new ApiResponse('', 500, ['Content-Type' => 'application/json'], $code, $msg);
+    $data = [
+        'code' => $code,
+        'message' => $msg,
+        'data' => json_decode($content),
+    ];
+    $response->setContent(json_encode($data));
+    return $response;
+  }
 }

@@ -23,4 +23,24 @@ class Str {
     result = _.uniqWith(result);
     return result;
   }
+
+  /**
+   * 将 "ce~shi~hao" 转化为 "ceShiHao"
+   * @param {*} str 
+   * @returns 
+   */
+  static toCamelCase(str) {
+		return str.replace(/(~\w)/g, function(match) {
+			return match.charAt(1).toUpperCase();
+		});
+  }
+
+  /**
+   * 将首字母进行小写化
+   * @param {*} str 
+   * @returns 
+   */
+  static firstLetterToLowerCase(str) {
+    return str.charAt(0).toLowerCase() + str.slice(1);
+  }
 }

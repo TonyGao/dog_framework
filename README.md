@@ -11,11 +11,16 @@
   - [x] Switch 切换按钮
   - [x] Select 选择框
   - [x] Textarea 多行文本
+  - [x] Modal 模态窗口
+  - [x] Radio 单选框
+  - [x] Checkbox 复选框
+  - [x] Tabs 标签页
+  - [ ] Table 表格
   - [ ] 公司选择器
     - [ ] 静态页面
     - [ ] formtype CompanyType
   - [ ] 部门选择器
-    - [ ] 静态页面
+    - [x] 静态页面
     - [ ] formtype DepartmentType
   - [ ] 人员选择器
     - [ ] 静态页面
@@ -37,3 +42,8 @@
 - [ ] 模型动态属性的尝试
   - [x] 构建模型、属性、属性分组的模型
   - [x] 初始化 Entity 到数据库的命令行工具v0.1
+  - [ ] 图形界面增加动态属性
+
+# 第三方库
+
+- <https://prismjs.com/index.html>

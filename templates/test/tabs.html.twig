@@ -10,7 +10,8 @@
 	<script>
     $(document).ready(function() {
       $("#add").on("click", function() {
-        EfTabs.addTab('tt');
+				let random = Math.random();
+        EfTabs.addTab('tt', random, random, 'hello', "hi world "+random);
       })
     })
 

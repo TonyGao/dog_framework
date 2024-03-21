@@ -30,6 +30,7 @@
       <link rel="stylesheet" type="text/css" href="{{ asset('tabs.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('tree.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('table.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('drawer.css', 'ui') }}">
 		{% endblock %}
 
 		{% block javascripts %}
@@ -39,6 +40,7 @@
       <script src="{{ asset('lib/localForage/localforage.min.js', 'static') }}"></script>
 			<script src="{{ asset('lib/ef/base/common.js') }}"></script>
 			<script src="{{ asset('lib/ef/base/str.js') }}"></script>
+			<script src="{{ asset('lib/pinyin/browser.js') }}"></script>
 			<script src="{{ asset('input.js', 'ui') }}"></script>
 			<script src="{{ asset('input-number.js', 'ui') }}"></script>
 			<script src="{{ asset('switch.js', 'ui') }}"></script>
@@ -49,6 +51,7 @@
 			<script src="{{ asset('department.js', 'ui') }}"></script>
       <script src="{{ asset('tabs.js', 'ui') }}"></script>
       <script src="{{ asset('components.js', 'uilib') }}"></script>
+			<script src="{{ asset('drawer.js', 'ui') }}"></script>
 			{# <script src="https://kit.fontawesome.com/ef1baf8144.js" crossorigin="anonymous"></script> #}
 			{{ encore_entry_script_tags('app') }}
 		{% endblock %}
