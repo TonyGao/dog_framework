@@ -53,7 +53,7 @@ class EfTabs {
   /**
    * 如果 tabId 里已经存在 liId 了，就就转为focus到这个标签页
    */
-  static addTab(tabId, liId = '', tabName = '', tabPanel = '') {
+  static addTab(tabId, liId = '', tabName = '', tabPanel = '', entityData) {
 
     if ($('#'+tabId+" #"+liId).length > 0) {
       $('#'+tabId+" #"+liId).click();
@@ -76,8 +76,7 @@ class EfTabs {
       let panelTemplate = `<div class="panel panel-htop" style="display: none;" liid="${id}">
       <div title="" style="padding: 10px;" class="panel-body panel-body-noheader panel-body-noborder" id="">
         <div title="" style="padding: 10px;" class="panel-body panel-body-noheader panel-body-noborder" id="">
-          <p style="font-size:14px">Hello world</p>
-          Dynamic content balabala ${id}
+          ${entityData}
         </div>
       </div>`;
       if (currentTab.length !== 0) {

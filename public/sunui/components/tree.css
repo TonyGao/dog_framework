@@ -8,7 +8,7 @@
   display: inline-block;
 }
 
-.outside-wrapper {
+.org-sturcture-container.outside-wrapper {
   height: 100vh;
   position: inherit;
   overflow: auto;
@@ -29,7 +29,7 @@
   margin-bottom: 20px;
 }
 
-.inside-wrapper {
+.org-sturcture-container .inside-wrapper {
   height: 100vh;
   display: flex;
   position: relative;

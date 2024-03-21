@@ -1,0 +1,47 @@
+{% extends "base.html.twig" %}
+
+{% set drawerid = random() %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		$(function() {
+			$('#clickbutton').on('click', function() {
+				$('.ef-drawer').showDrawer('1488845800');
+			})
+		})
+	</script>
+
+{% endblock %}
+
+{% block body %}
+	<div style="height: 100%; width: 100%;">
+		<button class="btn primary medium" id="clickbutton">点击弹出</button>
+
+		<div class="ef-drawer-container" style="z-index: 1001; display: none;" id="1488845800">
+			<div class="ef-drawer-mask" maskid="1488845800"></div>
+			<div class="ef-drawer" style="right: -340px; width: 340px;">
+				<div class="ef-drawer-header">
+					<div class="ef-drawer-title">
+						Title
+					</div>
+					<div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn">
+						<span class="ef-icon-hover">
+							<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+								<path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+							</svg>
+						</span>
+					</div>
+				</div>
+				<div class="ef-drawer-body">
+					<div>You can customize modal body text by the current situation. This modal will be closed immediately once you press the OK button.
+					</div>
+				</div>
+				<div class="ef-drawer-footer">
+					<button class="cancelDrawer btn secondary medium" type="button">取消</button>
+					<button class="confirmDrawer btn primary medium" type="button">确定</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

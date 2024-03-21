@@ -93,7 +93,7 @@ class EfInitEntityCommand extends Command
 
                     if ($class->isClass() && $isBusinessEntity) {
                         $entity = new Entity();
-                        $entityToken = sha1(random_bytes(10));
+                        $entityToken = Str::generateFieldToken();
                         $entityClass = $class->getNamespace()->getName() . '\\' . $class->getName();
                         $metaData = $this->em->getClassMetadata($entityClass);
                         $tableName = $metaData->getTableName();

@@ -7,7 +7,8 @@
 {%- endblock form_start %}
 
 {%- block widget_attributes -%}
-    id="{{ id }}" name="{{ full_name }}"
+    id="{{ attr.id is defined ? attr.id : id }}"
+    name="{{ attr.name is defined ? attr.name : full_name }}"
     {%- if disabled %} disabled="disabled"{% endif -%}
     {%- if required %} required="required"{% endif -%}
     {{ block('attributes') }}
@@ -22,7 +23,7 @@
         {%- set required = false -%}
     {%- endif -%}
     {%- if type == 'text' -%}
-    <span class="ef-input-wrapper" style="width: 320px;">
+    <span class="ef-input-wrapper" style="max-width: 320px;">
       <input class="ef-input ef-input-size-medium" clearable="true" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     </span>
     {%- else -%}
@@ -113,7 +114,7 @@
 {%- endblock switch_widget -%}
 
 {%- block integer_widget -%}
-	<span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium" style="width: 320px;">
+	<span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium" style="max-width: 320px;">
     <input role="spinbutton"
       {% if attr.numValuemax is defined %}
         num-valuemax={{ attr.numValuemax }}
@@ -149,7 +150,7 @@
     <input type="hidden" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     <span
       class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
-      style="width: 320px;"
+      style="max-width: 320px;"
       chosen="false"
       for="{{ label }}"
       id="{{ selectInputId }}"
@@ -168,7 +169,7 @@
     <div class="ef-trigger-popup ef-trigger-position-bl"
          trigger-placement="bl"
          for="{{ label }}"
-         style="z-index: 1001; pointer-events: auto; width: 320px;"
+         style="z-index: 1001; pointer-events: auto; min-width: 200px;"
          id="{{ selectContentId }}"
          parentId="{{ selectInputId }}"
         >

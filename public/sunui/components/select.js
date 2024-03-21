@@ -70,7 +70,6 @@ $(document).ready(function () {
       "keys": "down",
       "on_keydown": function (e) {
         let id = $(e.target).parent().attr("id");
-        // console.log($(".ef-trigger-popup[parentid='"+ id +"']"));
       }
     });
     listener.register_combo({
@@ -82,7 +81,7 @@ $(document).ready(function () {
     })
   });
 
-  $(".ef-select-view-search").on("click", function () {
+  $("body").on("click", ".ef-select-view-search",function () {
     let isSelected = $(this).attr("chosen");
     if (isSelected !== "true") {
       $(this).toggleClass("ef-select-view-opened");
@@ -95,14 +94,30 @@ $(document).ready(function () {
     `;
       $(this).find(".ef-select-view-icon").html(searchIcon);
     }
+
+    let id = $(this).attr("id");
     let contentId = $(this).attr("contentid");
     let height = $(this).outerHeight();
     let top = $(this).position().top + height + 6;
     let left = $(this).position().left;
-    $("#" + contentId).css({
-      "left": left,
-      "top": top
-    });
+
+    let elementOffset = $(this).offset(); // 获取元素相对于文档的偏移位置
+    let elementWidth = $(this).outerWidth(); // 获取元素的宽度
+
+    let documentWidth = $("#app").width(); // 获取文档的宽度
+    let rightDistance = documentWidth - (elementOffset.left + elementWidth);
+    if ((rightDistance + elementWidth) < $("#"+contentId).width()) {
+      $("#" + contentId).css({  
+        "right": 20,
+        "top": top
+      });
+    } else {
+      $("#" + contentId).css({  
+        "left": left,
+        "top": top
+      });
+    }
+
     $(".ef-trigger-popup.ef-trigger-position-bl").hide();
     // $("#" + contentId).children().find(".ef-select-dropdown-list li:first-child").addClass("arco-select-option-active");
     $("#" + contentId).show();
@@ -114,7 +129,7 @@ $(document).ready(function () {
   </svg>
 `;
 
-  $(".ef-select-view-input").on("focusout", function (event) {
+  $("body").on("focusout", ".ef-select-view-input",function (event) {
     $(this).parent().find("svg").remove();
     $(this).parent().find('.ef-select-view-icon').html(selectIcon);
   })
@@ -125,13 +140,13 @@ $(document).ready(function () {
     }
   })
 
-  $(".ef-select-option").on("click", function (event) {
+  $("body").on("click", ".ef-select-option",function (event) {
     $(event.target).siblings('.arco-select-option-active').removeClass('arco-select-option-active');
     $(event.target).addClass("arco-select-option-active");
   })
 
   // 选取选项
-  $(".ef-select-option").not(".ef-select-option-disabled").on("click", function () {
+  $("body").not(".ef-select-option-disabled").on("click", ".ef-select-option", function () {
     let val = $(this).children(".ef-select-option-content").html();
     let value = $(this).attr("value");
     let selectContent = $(this).closest(".ef-trigger-popup.ef-trigger-position-bl");
@@ -145,7 +160,7 @@ $(document).ready(function () {
     selectInput.attr("chosen", "true");
 
     // 删掉选中的选项
-    $(".fa-regular.fa-circle-xmark").on("click", function (event) {
+    $("body").on("click", ".fa-regular.fa-circle-xmark", function (event) {
       event.stopPropagation();
       let selectInput = $(this).closest(".ef-select-view-single");
       selectInput.attr("chosen", "false");
@@ -164,15 +179,15 @@ $(document).ready(function () {
    * flag 用来标记是否为中文输入完毕
    */
   let flag = true;
-  $(".ef-select-view-input").on('compositionstart', function () {
+  $("body").on('compositionstart', '.ef-select-view-input', function () {
     flag = false;
   })
 
-  $(".ef-select-view-input").on('compositionend', function () {
+  $("body").on('compositionend', '.ef-select-view-input',function () {
     flag = true;
   })
 
-  $(".ef-select-view-input").on("input change", _.debounce(function () {
+  $("body").on("input change", '.ef-select-view-input',_.debounce(function () {
     if (flag) {
       let contentId = $(this).parent().attr("contentid");
       let optionList = $("#" + contentId).children().find(".ef-select-option-content");
@@ -204,7 +219,7 @@ $(document).ready(function () {
     }
   }, 500))
 
-  $(".ef-select-view-input").on("focusout", function () {
+  $("body").on("focusout", '.ef-select-view-input',function () {
     $(this).val("");
   })
 })

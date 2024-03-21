@@ -34,6 +34,15 @@ services:
     App\Serializer\Serializer:
         arguments:
             - ['api']
+    App\Twig\TwigExtension:
+        tags: ['twig.extension']
+    App\Service\FileResolver:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+    App\Service\Entity\EntityService:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+    App\Doctrine\CustomNamingStrategy: '@doctrine.orm.naming_strategy.default'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

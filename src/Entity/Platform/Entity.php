@@ -65,6 +65,11 @@ class Entity
     #[ORM\Column(type: "string", length: 80)]
     private $dataTableName;
 
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
     #[ORM\OneToMany(
         targetEntity: EntityProperty::class,
         mappedBy: "entity",

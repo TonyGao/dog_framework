@@ -1,0 +1,95 @@
+.ef-drawer-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1001;
+}
+
+.ef-drawer-mask {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(29, 33, 41, .6);
+}
+
+.ef-drawer {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%; 
+  overflow: auto;
+  line-height: 1.5715;
+  background-color: #fff;
+}
+
+.ef-drawer-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border-bottom: 1px solid rgb(229,230,235);
+}
+
+.ef-drawer-header .ef-drawer-title {
+  margin-right: auto;
+  color: rgb(29,33,41);
+  font-weight: 500;
+  font-size: 16px;
+  text-align: left;
+}
+
+.ef-drawer-header .ef-drawer-close-btn {
+  margin-left: 8px;
+  color: rgb(29,33,41);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ef-icon-hover {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  line-height: 12px;
+}
+
+.ef-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  color: inherit;
+  font-style: normal;
+  vertical-align: -2px;
+  outline: none;
+  stroke: currentColor;
+}
+
+.ef-icon-hover .ef-icon {
+  position: relative;
+}
+
+.ef-drawer-body {
+  position: relative;
+  flex: 1;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 12px 16px;
+  overflow: auto;
+  color: rgb(29,33,41);
+}
+
+.ef-drawer-footer {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 16px;
+  text-align: right;
+  border-top: 1px solid rgb(229,230,235);
+}
+

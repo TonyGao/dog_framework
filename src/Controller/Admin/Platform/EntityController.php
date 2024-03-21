@@ -2,12 +2,17 @@
 
 namespace App\Controller\Admin\Platform;
 
-use App\Entity\Platform\EntityPropertyGroup;
+use App\Lib\Str;
+use App\Entity\Platform\Entity;
+use App\Entity\Platform\EntityProperty;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
+use App\Entity\Platform\EntityPropertyGroup;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * 实体控制器
@@ -96,5 +101,102 @@ class EntityController extends AbstractController
     return $this->render('admin/platform/entity/index.html.twig',[
       'entity' => $entity
     ]);
+  }
+
+  /**
+   * 实体数据表格
+   */
+  #[Route('/admin/platform/entity/itemtable', name: 'platform_entity_itemtable')]
+  public function item(Request $request, EntityManagerInterface $em): Response
+  {
+    $repo = $em->getRepository(Entity::class);
+    $token = $request->query->get('token');
+    $entity = $repo->findOneBy(['token' => $token]);
+    $repoProperty = $em->getRepository(EntityProperty::class);
+    $entityProperties = $repoProperty->findBy(['entity' => $entity]);
+
+    $arr = array();
+    foreach($entityProperties as $entity) {
+      $et = new \stdClass();
+      $et->name = $entity->getPropertyName();
+      $et->comment = $entity->getComment();
+      $et->type = $entity->getType();
+      $et->length = $entity->getLength();
+      $et->entity = $entity->getEntity();
+      $arr[] = $et;
+    }
+
+    $button = '<div class="toolbar-box">
+      <div class="toolbar-wrap">
+        <div class="toolbar-content">
+          <button class="create btn outline primary medium mini round icon" token="'. $token .'"><i class="fa-regular fa-square-plus"></i>添加自定义字段</button>
+        </div>
+      </div>
+    </div>';
+
+    return $this->render('ui/table.html.twig', [
+      'entities' => $arr,
+      'toolbar' => $button,
+    ]);
+
+    // $original = $response->getContent();
+    // $final = $button.$original;
+    // $response->setContent($final);
+    // return $response;
+  }
+
+  #[Route(
+    '/admin/platform/entity/addFieldDrawer', 
+    name: 'platform_entity_addFieldDrawer', 
+    methods: ['POST']
+  )]
+  public function addFieldDrawer(Request $request): Response
+  {
+    $payload = $request->toArray();
+
+    $formHtml = $this->addField()->getContent();
+    
+    return $this->render('ui/drawer/drawer.html.twig', [
+      'id' => $payload['token'],
+      'drawerTitle' => '添加字段',
+      'width' => '740',
+      'drawerContent' => $formHtml
+    ]);
+  }
+
+  #[Route(
+    '/admin/platform/entity/addField', 
+    name: 'platform_entity_addField', 
+    methods: ['GET']
+  )]
+  public function addField()
+  {
+    $formView = $this->getFieldView();
+    dump($formView);
+    return $this->render('ui/drawer/addField.html.twig', [
+      'formView' => $formView
+    ]);
+  }
+
+  public function getFieldView()
+  {
+    $formBuilder = $this->createFormBuilder();
+    $formBuilder
+    ->add('fieldComment', TextType::class, [
+      'attr' => ['id' => Str::generateFieldToken()]
+    ])
+    ->add('fieldName', TextType::class)
+    ->add('fieldType', ChoiceType::class, [
+      'choices' => [
+        '文本' => 'text',
+        '网页' => 'link',
+        '选项' => 'options',
+        '人员' => 'user'
+      ]
+    ]);
+
+    $form = $formBuilder->getForm();
+    $formView = $form->createView();
+    return $formView;
   }
 }
