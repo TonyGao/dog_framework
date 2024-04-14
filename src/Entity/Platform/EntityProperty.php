@@ -31,7 +31,7 @@ class EntityProperty
     /**
      * 属性令牌
      */
-    #[ORM\Column(type: "string", length: 40, nullable: true)]
+    #[ORM\Column(type: "string", length: 40, nullable: true, unique: true)]
     private $token = null;
 
     /**
@@ -158,12 +158,19 @@ class EntityProperty
      * 属性所属的实体
      */
     #[ORM\ManyToOne(
-        targetEntity: "Entity",
+        targetEntity: Entity::class,
         inversedBy: "properties",
         cascade: ["persist"]
     )]
     #[ORM\JoinColumn(name: "entity_id", referencedColumnName: "id", onDelete: "SET NULL")]
     private $entity = null;
+
+    /**
+     * 字段分组，对应EntityPropertyGroup
+     */
+    #[ORM\ManyToOne(targetEntity: EntityPropertyGroup::class)]
+    #[ORM\JoinColumn(name: 'group_id', referencedColumnName: 'id')]
+    private $group;
 
     /**
      * Get the value of id
@@ -601,6 +608,26 @@ class EntityProperty
     public function setFormType($formType)
     {
         $this->formType = $formType;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of group
+     */ 
+    public function getGroup()
+    {
+        return $this->group;
+    }
+
+    /**
+     * Set the value of group
+     *
+     * @return  self
+     */ 
+    public function setGroup($group)
+    {
+        $this->group = $group;
 
         return $this;
     }

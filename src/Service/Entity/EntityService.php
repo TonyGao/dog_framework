@@ -17,6 +17,7 @@ use Doctrine\ORM\Mapping\DefaultNamingStrategy;
 
 class EntityService
 {
+  private $entity;
   private $projectDir;
   private $filePath;
   private $class;
@@ -48,6 +49,7 @@ class EntityService
     if ($entity === null) {
       throw EntityException::noEntityTokenFound($entityToken);
     }
+    $this->entity = $entity;
     $this->namespace = $entity->getFqn();
     $filePath = $this->fR->resolveFilePath($this->namespace);
     $this->setPath($filePath);
@@ -134,6 +136,7 @@ class EntityService
       ->addComment($comment.' Getter')
       ->addBody('return $this->' . $pName . ';');
 
+    $this->insertEntityProperty($property);
     return $this;
   }
 
@@ -147,7 +150,18 @@ class EntityService
       ->setIsCustomized(true)
       ->setBusinessField(true)
       ->setPropertyName($property['name'])
+      ->setComment($property['comment'])
+      ->setType($property['type'])
+      ->setFieldName(Str::tableize($property['name']))
+      ->setNullable(true)
+      ->setEntity($this->entity)
+      ;
+    
+    if ($property['type'] === 'string') {
+      $prop->setLength($property['length']);
+    }
 
+    $this->em->persist($prop);
   }
 
   public function isExisted($propertyName)
@@ -161,6 +175,7 @@ class EntityService
    */
   public function save()
   {
+    $this->em->flush();
     $this->backupEntity();
     $fileContent = (string) $this->file;
     file_put_contents($this->filePath, $fileContent);

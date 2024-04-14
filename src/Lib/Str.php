@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Doctrine\Inflector\InflectorFactory;
 
 class Str
 {
@@ -88,6 +89,16 @@ class Str
     public static function generateFieldToken()
     {
         return sha1(random_bytes(10));
+    }
+
+    /**
+     * 将驼峰名称转变为蛇形命名
+     * fieldName ==> field_name
+     */
+    public static function tableize($name)
+    {
+        $inflector = InflectorFactory::create()->build();
+        return $inflector->tableize($name);
     }
 
     // public static function getGroup($text) {

@@ -37,12 +37,18 @@ class EntityPropertyGroup implements GedmoNode
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: "AUTO")]
     private $id;
-
+ 
     /**
      * 分组名称
      */
     #[ORM\Column('group_name', type: 'string', length: 64, nullable: true)]
     private $name = null;
+
+    /**
+     * 是否为默认分组，此属性只在 type 为 group 时有意义
+     */
+    #[ORM\Column('is_default', type: 'boolean', nullable: true)]
+    private $isDefault = false;
 
     /**
      * 分组标签
@@ -57,9 +63,9 @@ class EntityPropertyGroup implements GedmoNode
     private $type;
 
     /**
-     * entity, property的token
+     * EntityProperty的token
      */
-    #[ORM\Column(type: 'string', length: 40, nullable: true)]
+    #[ORM\Column(type: 'string', length: 40, nullable: true, unique: true)]
     private $token = null;
 
     /**
