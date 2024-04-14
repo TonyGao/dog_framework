@@ -5,19 +5,20 @@ namespace App\Controller\Admin\Platform;
 use App\Lib\Str;
 use App\Entity\Platform\Entity;
 use App\Entity\Platform\EntityProperty;
+use App\Controller\BaseController;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Service\Entity\EntityFormService;
 use App\Entity\Platform\EntityPropertyGroup;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * 实体控制器
  */
-class EntityController extends AbstractController
+class EntityController extends BaseController
 {
   /**
    * 实体管理首页
@@ -90,7 +91,7 @@ class EntityController extends AbstractController
 						</div>
 						<div class="node-name">
 							<div class="tree-text-content branch" type="branch">' .
-            $node['name']
+            $node['label']
             . '</div>
 						</div>
 					</div>
@@ -113,7 +114,10 @@ class EntityController extends AbstractController
     $token = $request->query->get('token');
     $entity = $repo->findOneBy(['token' => $token]);
     $repoProperty = $em->getRepository(EntityProperty::class);
-    $entityProperties = $repoProperty->findBy(['entity' => $entity]);
+    $entityProperties = $repoProperty->findBy(
+      ['entity' => $entity],
+      ['group' => 'ASC', 'propertyName' => 'ASC']
+    );
 
     $arr = array();
     foreach($entityProperties as $entity) {
@@ -123,6 +127,7 @@ class EntityController extends AbstractController
       $et->type = $entity->getType();
       $et->length = $entity->getLength();
       $et->entity = $entity->getEntity();
+      $et->group = $entity->getGroup()->getLabel();
       $arr[] = $et;
     }
 
@@ -130,6 +135,7 @@ class EntityController extends AbstractController
       <div class="toolbar-wrap">
         <div class="toolbar-content">
           <button class="create btn outline primary medium mini round icon" token="'. $token .'"><i class="fa-regular fa-square-plus"></i>添加自定义字段</button>
+          <button class="group btn outline primary medium mini round icon" token="'. $token .'"><i class="fa-regular fa-object-group"></i>字段分组管理</button>
         </div>
       </div>
     </div>';
@@ -138,11 +144,6 @@ class EntityController extends AbstractController
       'entities' => $arr,
       'toolbar' => $button,
     ]);
-
-    // $original = $response->getContent();
-    // $final = $button.$original;
-    // $response->setContent($final);
-    // return $response;
   }
 
   #[Route(
@@ -150,53 +151,34 @@ class EntityController extends AbstractController
     name: 'platform_entity_addFieldDrawer', 
     methods: ['POST']
   )]
-  public function addFieldDrawer(Request $request): Response
+  public function addFieldDrawer(Request $request, EntityFormService $formService): Response
   {
     $payload = $request->toArray();
+    $entityToken = $payload['token'];
 
-    $formHtml = $this->addField()->getContent();
-    
+    $form = $formService->addField($entityToken, true);
+
     return $this->render('ui/drawer/drawer.html.twig', [
-      'id' => $payload['token'],
+      'id' => $entityToken,
       'drawerTitle' => '添加字段',
-      'width' => '740',
-      'drawerContent' => $formHtml
+      'width' => '840',
+      'drawerContent' => $form['form'],
+      'drawerTitleAddon' => $form['additional'],
+      //'drawerTitleAddonTwig' => $this->_getDrawTitleAddon(),
     ]);
   }
 
   #[Route(
-    '/admin/platform/entity/addField', 
-    name: 'platform_entity_addField', 
+    '/admin/platform/entity/addField/',
+    name: 'platform_entity_addField',
     methods: ['GET']
   )]
-  public function addField()
+  public function addField(Request $request, EntityFormService $formService)
   {
-    $formView = $this->getFieldView();
-    dump($formView);
-    return $this->render('ui/drawer/addField.html.twig', [
-      'formView' => $formView
-    ]);
-  }
-
-  public function getFieldView()
-  {
-    $formBuilder = $this->createFormBuilder();
-    $formBuilder
-    ->add('fieldComment', TextType::class, [
-      'attr' => ['id' => Str::generateFieldToken()]
-    ])
-    ->add('fieldName', TextType::class)
-    ->add('fieldType', ChoiceType::class, [
-      'choices' => [
-        '文本' => 'text',
-        '网页' => 'link',
-        '选项' => 'options',
-        '人员' => 'user'
-      ]
-    ]);
-
-    $form = $formBuilder->getForm();
-    $formView = $form->createView();
-    return $formView;
+    $token = $request->query->get('token');
+    $htmlContent = $formService->addField($token, false);
+    $response = new Response($htmlContent['form']);
+    $response->headers->set('Content-Type', 'text/html');
+    return $response;
   }
 }

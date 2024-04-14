@@ -1,0 +1,3 @@
+parameters:
+    twig_path:
+        drawTitleAddon: 'admin/platform/entity/drawerTitleAddon.html.twig'

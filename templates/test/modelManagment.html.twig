@@ -1,0 +1,565 @@
+{% extends "base.html.twig" %}
+
+{% set group1 = random() %}
+{% set group2 = random() %}
+{% set group3 = random() %}
+{% set group4 = random() %}
+
+{% block css %}
+<style>
+.ef-entity-group-container {
+    position: relative;
+}
+
+.ef-entity-group-entity {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.ef-entity-group-line {
+    display: flex;
+    align-items: center;
+		margin-left: 3px;
+    height: 20px;	
+}
+
+.ef-connection-line {
+    width: 1px; /* 竖线的宽度 */
+    height: 20px; /* 竖线的高度，减去图标的高度 */
+    border-left: 1px dashed #000; /* 竖线的样式和颜色 */
+    margin: 0 10px 0 20px;
+}
+
+.ef-traverse-line {
+	width: 40px;
+	height: 1px;
+	border-top: 1px dashed #000;
+	margin-right: 5px;
+}
+
+.ef-entity-add-group {
+    margin: 0 0 0 10px; /* 图标与竖线、文字之间的距离 */
+		cursor: pointer;
+		color: rgb(22, 93, 255);
+}
+
+.ef-entity-grouplabel {
+	height: 20px;
+	margin-bottom: 2px;
+}
+
+.ef-entity-grouplabel .btn.mini{
+  padding-top: 2px;
+	border-radius: 20px;
+}
+
+.ef-group-body {
+  display: table;
+  align-items: center;
+  margin-left: 20px;
+  height: 20px;
+  padding: 20px 0 20px 30px;
+  border-left: 1px dashed #000;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.ef-group-field-line {
+  display: flex;
+  align-items: center;
+  margin-left: 3px;
+  height: 20px;
+  margin-bottom: 15px;
+	min-width: 167.297px;
+}
+
+.ef-group-field-wrapper {
+	margin-left: 10px;
+}
+
+.ef-group-filed-handler-wrapper {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  width: 100%; /* 使其铺满父容器 */
+  height: 100%; /* 使其铺满父容器 */
+}
+
+.ef-group-filed-handler-wrapper .circle {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background-color: rgb(22, 93, 255);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 13px;
+  cursor: move;
+}
+
+.ef-group-field-name {
+  text-align: center;
+  height: 34px;
+  width: fit-content;
+  padding: 2px 20px;
+  color: #fefefe;
+  font-size: 14px;
+  background-color: rgb(22, 93, 255);
+  line-height: 30px;
+  border-radius: 16px;
+  z-index: 9999;
+  box-shadow: 2px 3px 5px 0 rgb(39 63 114 / 70%);
+	cursor: default;
+}
+
+.ef-group-field-ordernum .number {
+	width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: rgb(22, 93, 255);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 13px;
+  display: inline-flex;
+	cursor: default;
+	cursor: pointer;
+}
+
+/* 编辑状态的样式 */
+.ef-group-field-ordernum.editing {
+  width: 50px;
+  border: 1px solid #ccc;
+  border-radius: 0;
+}
+
+/* 输入框 */
+.ef-group-field-ordernum input {
+  width: 50px;
+  height: 18px;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  font-size: inherit;
+  text-align: center;
+}
+
+.ef-group-field-ordernum .ef-group-field-check {
+	color: rgb(111 187 9);
+	position: relative;
+  top: 1px;
+	right: 2px;
+	cursor: pointer;
+}
+
+</style>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+			// Wait for the document to be ready
+			$(document).ready(function() {
+					// Hide the edit buttons
+					$('.node-edit').hide();
+
+          // Show edit button when hovering over the group label
+					$('.ef-entity-group-container').on('mouseenter', '.ef-entity-grouplabel', function() {
+							$(this).find('.node-edit').show();
+					});
+
+					$('.ef-entity-group-container').on('mouseleave', '.ef-entity-grouplabel', function() {
+							$(this).find('.node-edit').hide();
+					});
+
+					$('.ef-group-body').sortable({
+							handle: '.ef-group-filed-handler-wrapper',
+							cursor: 'move',
+							axis: 'y',
+							opacity: 0.7,
+							containment: 'parent', // 限制拖拽范围为父容器
+							group: '.ef-entity-group-container', // 将不同的排序列表分组
+							cancel: '.ef-entity-group-line', // 取消拖拽的元素
+							update: function(event, ui) {
+								  // 这里尽情请求，先存储到数据库新位置，在返回响应时再进行以下排序
+									console.log('hey, ajax here;)')
+
+									// 获取当前排序的元素列表
+									let sortedItems = $(this).find('.ef-group-field-line');
+									
+									// 更新排序数字
+									sortedItems.each(function(index) {
+											$(this).find('.ef-group-field-ordernum .number').text(index + 1);
+									});
+							}
+					});
+					$('.ef-group-body').disableSelection();
+
+          // 点击加号图标添加group类型
+					$('body').on('click', '.ef-entity-add-group i', function() {
+						let groupId = $(this).closest('.ef-entity-group-line').attr('id');
+						let randomId = 'group_' + Math.random().toString(36).substr(2, 9);
+						let groupTemplate = `
+							<div class="ef-entity-group-line" id="${randomId}">
+								<div class="ef-entity-add-group"><i class="fa-solid fa-circle-plus"></i></div>
+								<div class="ef-traverse-line"></div>
+								<div class="ef-entity-grouplabel">
+									<span>${randomId}</span>
+									<a class="btn primary mini node-edit" style="display: none;">编辑</a>
+								</div>
+							</div>
+							<div class="ef-group-body ui-sortable" groupid="${randomId}">
+								<div class="ef-group-field-line">
+									<button class="btn primary mini long" style="border-radius: 6px;">
+										<i class="fa-solid fa-plus"></i>添加字段
+									</button>
+								</div>
+							</div>
+					  `;
+						$(`div[groupid="${groupId}"]`).after(groupTemplate);
+					})
+
+					$('.ef-entity-group-container').on('click', '.ef-group-field-ordernum', function() {
+						// 检查点击的目标元素是否是input或者.ef-group-field-check
+						if ($(event.target).is('.number')) {
+								// 切换编辑状态的类
+								$(this).toggleClass('editing');
+								
+								// 如果处于编辑状态，则让输入框获取焦点
+								if ($(this).hasClass('editing')) {
+									let input = $(this).find('input');
+									input.show().textFocus();
+									setTimeout(function() {
+											// 获取输入框的值的长度
+											let valueLength = input.val().length;
+
+											// 将光标移动到文本的末尾
+											input.selectionStart = valueLength;
+											input.selectionEnd = valueLength;
+									}, 10);
+									
+									$(this).find('.ef-group-field-check').show();
+									$(this).find('span.number').hide();
+								} else {
+										$(this).find('input').hide();
+										$(this).find('.ef-group-field-check').hide();
+										$(this).find('span.number').show();
+								}
+						}
+					})
+
+					$('.ef-entity-group-container').on('click', '.ef-group-field-check i', function() {
+						// 获取点击确认按钮所在的 .ef-group-field-line 元素
+						let line = $(this).closest('.ef-group-field-line');
+
+						// 获取该元素在其父容器中的索引位置
+						let currentIndex = line.index();
+
+						// 获取输入的数字
+						let input = line.find('.ef-group-field-ordernum input');
+						let inputNumber = parseInt(input.val());
+
+						// 获取该元素所在的容器
+						let groupBody = line.parent();
+
+						// 计算已存在的行数
+						let existingLines = groupBody.children('.ef-group-field-line').length;
+
+						// 如果输入的数字超过已存在的行数，则不进行任何操作
+						if (inputNumber >= existingLines) {
+								return;
+						}
+
+						// 根据输入的数字确定新的索引位置
+						let newIndex = inputNumber - 1; // 数字从 1 开始，而索引从 0 开始
+
+						// 移动该元素到新的索引位置
+						if (newIndex >= 0 && newIndex < groupBody.children().length && newIndex !== currentIndex) {
+								if (newIndex < currentIndex) {
+										line.insertBefore(groupBody.children().eq(newIndex));
+								} else {
+										line.insertAfter(groupBody.children().eq(newIndex));
+								}
+						}
+
+						let checkButton = line.find('.ef-group-field-check');
+						let numberCircle = line.find('.number');
+						let orderNum = line.find('.ef-group-field-ordernum');
+						input.hide();
+						checkButton.hide()
+						orderNum.removeClass('editing');
+						numberCircle.show();
+
+						// 获取当前排序的元素列表
+						let sortedItems = groupBody.find('.ef-group-field-line');
+									
+						// 更新排序数字
+						sortedItems.each(function(index) {
+							$(this).find('.ef-group-field-ordernum .number').text(index + 1);
+						});
+					})
+			});
+	</script>
+{% endblock %}
+
+{% block body %}
+	<div style="height: 100%; width: 100%;">
+		<div class="ef-entity-group-container">
+      <div class="ef-entity-group-entity">Entity Name</div>
+			<div class="ef-connection-line"></div>
+			<div class="ef-entity-group-line" id="{{ group1 }}">
+			  <div class="ef-entity-add-group"><i class="fa-solid fa-circle-plus"></i></div>
+				<div class="ef-traverse-line"></div>
+				<div class="ef-entity-grouplabel">
+				  <span>Group Label</span>
+					<label class="ef-label mini" style="position: relative; top: -2px;">Default</label>
+					<a class="btn primary mini node-edit" style="display: none;">编辑</a>
+				</div>
+			</div>
+			<div class="ef-group-body" groupId="{{ group1 }}">
+			  <div class="ef-group-field-line" id="{{ random() }}">
+				  <div class="ef-group-field-handler">
+					  <div class="ef-group-filed-handler-wrapper">
+							<div class="circle">
+								<i class="fa-solid fa-arrows-up-down-left-right"></i>
+							</div>
+						</div>
+					</div>
+					<div class="ef-group-field-wrapper">
+					  <span class="ef-group-field-name">FieldName1</span>
+						<span class="ef-group-field-ordernum">
+						  <span class="number">1</span>
+							<input type="text" value="1" style="display: none;">
+							<span class="ef-group-field-check" style="display: none">
+						    <i class="fa-solid fa-circle-check"></i>
+						  </span>
+						</span>
+					</div>
+				</div>
+			  <div class="ef-group-field-line" id="{{ random() }}">
+				  <div class="ef-group-field-handler">
+					  <div class="ef-group-filed-handler-wrapper">
+							<div class="circle">
+								<i class="fa-solid fa-arrows-up-down-left-right"></i>
+							</div>
+						</div>
+					</div>
+					<div class="ef-group-field-wrapper">
+					  <span class="ef-group-field-name">FieldName2</span>
+						<span class="ef-group-field-ordernum">
+						  <span class="number">2</span>
+							<input type="text" value="2" style="display: none;">
+							<span class="ef-group-field-check" style="display: none">
+						    <i class="fa-solid fa-circle-check"></i>
+						  </span>
+						</span>
+					</div>
+				</div>
+			  <div class="ef-group-field-line" id="{{ random() }}">
+				  <div class="ef-group-field-handler">
+					  <div class="ef-group-filed-handler-wrapper">
+							<div class="circle">
+								<i class="fa-solid fa-arrows-up-down-left-right"></i>
+							</div>
+						</div>
+					</div>
+					<div class="ef-group-field-wrapper">
+					  <span class="ef-group-field-name">FieldName3</span>
+						<span class="ef-group-field-ordernum">
+						  <span class="number">3</span>
+							<input type="text" value="3" style="display: none;">
+							<span class="ef-group-field-check" style="display: none">
+						    <i class="fa-solid fa-circle-check"></i>
+						  </span>
+						</span>
+					</div>
+				</div>
+			  <div class="ef-group-field-line" id="{{ random() }}">
+				  <div class="ef-group-field-handler">
+					  <div class="ef-group-filed-handler-wrapper">
+							<div class="circle">
+								<i class="fa-solid fa-arrows-up-down-left-right"></i>
+							</div>
+						</div>
+					</div>
+					<div class="ef-group-field-wrapper">
+					  <span class="ef-group-field-name">FieldName4</span>
+						<span class="ef-group-field-ordernum">
+						  <span class="number">4</span>
+							<input type="text" value="4" style="display: none;">
+							<span class="ef-group-field-check" style="display: none">
+						    <i class="fa-solid fa-circle-check"></i>
+						  </span>
+						</span>
+					</div>
+				</div>
+			  <div class="ef-group-field-line" id="{{ random() }}">
+				  <div class="ef-group-field-handler">
+					  <div class="ef-group-filed-handler-wrapper">
+							<div class="circle">
+								<i class="fa-solid fa-arrows-up-down-left-right"></i>
+							</div>
+						</div>
+					</div>
+					<div class="ef-group-field-wrapper">
+					  <span class="ef-group-field-name">FieldName5</span>
+						<span class="ef-group-field-ordernum">
+						  <span class="number">5</span>
+							<input type="text" value="5" style="display: none;">
+							<span class="ef-group-field-check" style="display: none">
+						    <i class="fa-solid fa-circle-check"></i>
+						  </span>
+						</span>
+					</div>
+				</div>
+        <div class="ef-group-field-line">
+					<button class="btn primary mini long" style="border-radius: 6px;">
+					  <i class="fa-solid fa-plus"></i>添加字段
+					</button>
+				</div>
+			</div>
+			<div class="ef-entity-group-line" id="{{ group2 }}">
+			  <div class="ef-entity-add-group"><i class="fa-solid fa-circle-plus"></i></div>
+				<div class="ef-traverse-line"></div>
+				<div class="ef-entity-grouplabel">
+				  <span>Group2</span>
+					<a class="btn primary mini node-edit" style="display: none;">编辑</a>
+				</div>
+			</div>
+			<div class="ef-group-body" groupId="{{ group2 }}">
+			  <div class="ef-group-field-line" id="{{ random() }}">
+				  <div class="ef-group-field-handler">
+					  <div class="ef-group-filed-handler-wrapper">
+							<div class="circle">
+								<i class="fa-solid fa-arrows-up-down-left-right"></i>
+							</div>
+						</div>
+					</div>
+					<div class="ef-group-field-wrapper">
+					  <span class="ef-group-field-name">FieldName1</span>
+						<span class="ef-group-field-ordernum">
+						  <span class="number">1</span>
+							<input type="text" value="1" style="display: none;">
+							<span class="ef-group-field-check" style="display: none">
+						    <i class="fa-solid fa-circle-check"></i>
+						  </span>
+						</span>
+					</div>
+				</div>
+			  <div class="ef-group-field-line" id="{{ random() }}">
+				  <div class="ef-group-field-handler">
+					  <div class="ef-group-filed-handler-wrapper">
+							<div class="circle">
+								<i class="fa-solid fa-arrows-up-down-left-right"></i>
+							</div>
+						</div>
+					</div>
+					<div class="ef-group-field-wrapper">
+					  <span class="ef-group-field-name">FieldName2</span>
+						<span class="ef-group-field-ordernum">
+						  <span class="number">2</span>
+							<input type="text" value="2" style="display: none;">
+							<span class="ef-group-field-check" style="display: none">
+						    <i class="fa-solid fa-circle-check"></i>
+						  </span>
+						</span>
+					</div>
+				</div>
+			  <div class="ef-group-field-line" id="{{ random() }}">
+				  <div class="ef-group-field-handler">
+					  <div class="ef-group-filed-handler-wrapper">
+							<div class="circle">
+								<i class="fa-solid fa-arrows-up-down-left-right"></i>
+							</div>
+						</div>
+					</div>
+					<div class="ef-group-field-wrapper">
+					  <span class="ef-group-field-name">FieldName3</span>
+						<span class="ef-group-field-ordernum">
+						  <span class="number">3</span>
+							<input type="text" value="3" style="display: none;">
+							<span class="ef-group-field-check" style="display: none">
+						    <i class="fa-solid fa-circle-check"></i>
+						  </span>
+						</span>
+					</div>
+				</div>
+			  <div class="ef-group-field-line" id="{{ random() }}">
+				  <div class="ef-group-field-handler">
+					  <div class="ef-group-filed-handler-wrapper">
+							<div class="circle">
+								<i class="fa-solid fa-arrows-up-down-left-right"></i>
+							</div>
+						</div>
+					</div>
+					<div class="ef-group-field-wrapper">
+					  <span class="ef-group-field-name">FieldName4</span>
+						<span class="ef-group-field-ordernum">
+						  <span class="number">4</span>
+							<input type="text" value="4" style="display: none;">
+							<span class="ef-group-field-check" style="display: none">
+						    <i class="fa-solid fa-circle-check"></i>
+						  </span>
+						</span>
+					</div>
+				</div>
+			  <div class="ef-group-field-line" id="{{ random() }}">
+				  <div class="ef-group-field-handler">
+					  <div class="ef-group-filed-handler-wrapper">
+							<div class="circle">
+								<i class="fa-solid fa-arrows-up-down-left-right"></i>
+							</div>
+						</div>
+					</div>
+					<div class="ef-group-field-wrapper">
+					  <span class="ef-group-field-name">FieldName5</span>
+						<span class="ef-group-field-ordernum">
+						  <span class="number">5</span>
+							<input type="text" value="5" style="display: none;">
+							<span class="ef-group-field-check" style="display: none">
+						    <i class="fa-solid fa-circle-check"></i>
+						  </span>
+						</span>
+					</div>
+				</div>
+				<div class="ef-group-field-line">
+					<button class="btn primary mini long" style="border-radius: 6px;">
+					  <i class="fa-solid fa-plus"></i>添加字段
+					</button>
+				</div>
+			</div>
+			<div class="ef-entity-group-line" id="{{ group3 }}">
+			  <div class="ef-entity-add-group"><i class="fa-solid fa-circle-plus"></i></div>
+				<div class="ef-traverse-line"></div>
+				<div class="ef-entity-grouplabel">
+				  <span>Group2</span>
+					<a class="btn primary mini node-edit" style="display: none;">编辑</a>
+				</div>
+			</div>
+			<div class="ef-group-body" groupId="{{ group3 }}">
+				<div class="ef-group-field-line">
+					<button class="btn primary mini long" style="border-radius: 6px;">
+					  <i class="fa-solid fa-plus"></i>添加字段
+					</button>
+				</div>
+			</div>
+			<div class="ef-entity-group-line" id="{{ group4 }}">
+			  <div class="ef-entity-add-group"><i class="fa-solid fa-circle-plus"></i></div>
+				<div class="ef-traverse-line"></div>
+				<div class="ef-entity-grouplabel">
+				  <span>Group2</span>
+					<a class="btn primary mini node-edit" style="display: none;">编辑</a>
+				</div>
+			</div>
+			<div class="ef-group-body" groupId="{{ group4 }}">
+				<div class="ef-group-field-line">
+					<button class="btn primary mini long" style="border-radius: 6px;">
+					  <i class="fa-solid fa-plus"></i>添加字段
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

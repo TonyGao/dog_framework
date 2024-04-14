@@ -21,7 +21,7 @@ class EntityApiController extends AbstractController
    * 1，读取请求体，并分析出来需要增加的字段。
    * 2，判断字段名称是否已经存在，如果已存在就返回错误。
    * 3，实例化实体，并循环添加每个字段和相应的setter, getter。
-   * 4，保存相应的字段信息到Entity, EntityProperty, EntityPropertyGroup（事务级）
+   * 4，保存相应的字段信息到EntityProperty, EntityPropertyGroup（事务级）
    * 5，备份原Entity文件，备份路径和命名格式为 var/backup/entity/Name.php.微秒.bak
    * 6，保存新的Entity文件
    * 7，通过 Doctrine Migrations 组件进行迁移生成和应用，以最终让数据库字段同步。
@@ -52,7 +52,11 @@ class EntityApiController extends AbstractController
       }
     }
 
-    $et->save();
+    try {
+      $et->save();
+    } catch (\Exception $e) {
+      return ApiResponse::error('', '500', $e->getMessage());
+    }
     
     return ApiResponse::success('', 'success', 'Added Property');
   }

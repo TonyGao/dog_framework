@@ -3,31 +3,34 @@ $(document).ready(function () {
    * 点击左侧树状的实体名称，如果右侧存在标签页就按原逻辑增加标签页
    * 如果右侧没有任何标签页，就将empty-content隐藏，并将platform-entity显出出来
    */
-  let tabsIsEmpty = true;
+  let tabsIsEmpty = {};
   $(".node-name").on("click", ".tree-text-content.branch[type=entity]", function () {
     let id = $(this).attr('id');
     let liId = 'tab-'+id;
     let tabName = $(this).text();
     let entityData;
 
-    // 根据点击的模型的token查询模型数据
-    $.ajax({
-      url: "/admin/platform/entity/itemtable",
-      method: "GET",
-      async: false,
-      dataType: "html",
-      data: {token: id},
-      success: function(data) {
-        entityData = data;
-      }
-    })
+    console.log(tabsIsEmpty['tabsIsEmpty'+id]);
 
     // 如果右侧没有没有任何标签页
-    if (tabsIsEmpty) {
+    if (tabsIsEmpty['tabsIsEmpty'+id] === undefined) {
+      // 根据点击的模型的token查询模型数据
+      $.ajax({
+        url: "/admin/platform/entity/itemtable",
+        method: "GET",
+        async: false,
+        dataType: "html",
+        data: {token: id},
+        success: function(data) {
+          entityData = data;
+        }
+      })
       $(".empty-content").hide();
       $("#platform-entity").show();
-      EfTabs.addTab('platform-entity', liId, tabName, "hello", entityData);
+      tabsIsEmpty['tabsIsEmpty'+id] = false;
     }
+
+    EfTabs.addTab('platform-entity', liId, tabName, "hello", entityData);
 
     // $(".create.btn").off('click')
     // $(".create.btn").on('click', function() {
@@ -48,7 +51,7 @@ $(document).ready(function () {
     }
 
     let payload = {
-      token: id
+      token: token
     }
     $.ajax({
       url: "/admin/platform/entity/addFieldDrawer",
@@ -64,11 +67,15 @@ $(document).ready(function () {
   })
 
   $("body").on('click', '#addField', function () {
+    // 获取 ef-drawer-container 元素的 entitytoken 属性值
+    let entityToken = $(".ef-drawer-container").attr("entitytoken");
+
     $.ajax({
 			url: "/admin/platform/entity/addField",
 			method: "GET",
 			async: false,
 			dataType: "html",
+      data: { token: entityToken },
 			success: function (data) {
 				$("#ef-drawer-body-form").append(data);
 			}

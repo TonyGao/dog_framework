@@ -38,7 +38,7 @@ class Entity
     /**
      * 实体令牌
      */
-    #[ORM\Column(type: "string", length: 40)]
+    #[ORM\Column(type: "string", length: 40, unique: true)]
     private $token;
 
     /**
