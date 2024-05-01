@@ -200,7 +200,7 @@ $(document).ready(function () {
     let inputid = $(this).parent().attr("id");
     let modal = $(".ef-modal-container[inputid='" + inputid + "']");
     modal.show();
-    // 调用部门接口，如果已经调用过就不在调用了，而是直接使用缓存
+    // 调用部门接口，如果已经调用过就不再调用了，而是直接使用缓存
     let singleDepCache = await Common.getCache("org.singleDepartment");
     if (singleDepCache === null) {
       $.ajax({

@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Controller\Api\ApiResponse;
 
 /**
  * 实体控制器
@@ -156,7 +157,7 @@ class EntityController extends BaseController
     $payload = $request->toArray();
     $entityToken = $payload['token'];
 
-    $form = $formService->addField($entityToken, true);
+    $form = $formService->addField($entityToken, null, true);
 
     return $this->render('ui/drawer/drawer.html.twig', [
       'id' => $entityToken,
@@ -169,14 +170,16 @@ class EntityController extends BaseController
   }
 
   #[Route(
-    '/admin/platform/entity/addField/',
+    '/admin/platform/entity/addField',
     name: 'platform_entity_addField',
-    methods: ['GET']
+    methods: ['POST']
   )]
   public function addField(Request $request, EntityFormService $formService)
   {
-    $token = $request->query->get('token');
-    $htmlContent = $formService->addField($token, false);
+    $payload = $request->getPayload();
+    $token = $payload->get('token');
+    $choosedGroup = $payload->get('choosedGroup');
+    $htmlContent = $formService->addField($token, $choosedGroup, false);
     $response = new Response($htmlContent['form']);
     $response->headers->set('Content-Type', 'text/html');
     return $response;

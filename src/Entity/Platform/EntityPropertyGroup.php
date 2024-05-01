@@ -339,4 +339,24 @@ class EntityPropertyGroup implements GedmoNode
 
         return $this;
     }
+
+    /**
+     * Get the value of isDefault
+     */ 
+    public function getIsDefault()
+    {
+        return $this->isDefault;
+    }
+
+    /**
+     * Set the value of isDefault
+     *
+     * @return  self
+     */ 
+    public function setIsDefault($isDefault)
+    {
+        $this->isDefault = $isDefault;
+
+        return $this;
+    }
 }

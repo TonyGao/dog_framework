@@ -34,32 +34,66 @@ class EntityFormService
    * 添加字段的表单字段，其中Group是通过查询EntityPropertyGroup动态获取的这个Entity的分组
    * 每个Entity都有各自的Group
    */
-  public function getFieldView($entityToken, $init = true)
+  public function getFieldView($entityToken, $choosedGroup, $init = true)
   {
     $groupRepo = $this->em->getRepository(EntityPropertyGroup::class);
     $entity = $groupRepo->findOneBy(['token' => $entityToken]);
     $group = $groupRepo->getChildren($entity, true, 'lft', 'asc');
     $groupArr = [];
+    $defaultValue = '';
     foreach ($group as $key => $g) {
-      $groupArr[$g->getLabel()] = $g->getId();
+      $id = $g->getId();
+      $groupArr[$g->getLabel()] = $id;
+
+      /**
+       * 如果分组为null，则采用默认分组，否则采用传入的分组id
+       */
+      if ($choosedGroup == null) {
+        if ($g->getIsDefault()) {
+          $defaultValue = $id;
+        }
+      }
+    }
+
+    if ($choosedGroup !== null) {
+      $defaultValue = $choosedGroup;
     }
 
     $formBuilder = $this->createFormBuilder();
     $formBuilder
       ->add('fieldComment', TextType::class, [
-        'attr' => ['id' => Str::generateFieldToken()]
+        'attr' => [
+          'class' => 'fieldComment',
+          'id' => Str::generateFieldToken(),
+          'name' => 'fieldComment'.Str::generateFieldToken(),
+        ]
       ])
-      ->add('fieldName', TextType::class)
+      ->add('fieldName', TextType::class, [
+        'attr' => [
+          'class' => 'fieldName',
+          'id' => Str::generateFieldToken(),
+          'name' => 'fieldName'.Str::generateFieldToken(),
+        ]
+      ])
       ->add('fieldType', ChoiceType::class, [
         'choices' => [
           '文本' => 'text',
           '网页' => 'link',
           '选项' => 'options',
           '人员' => 'user'
+        ],
+        'attr' => [
+          'id' => Str::generateFieldToken(),
+          'name' => 'fieldType'.Str::generateFieldToken(),
         ]
       ])
       ->add('fieldGroup', ChoiceType::class, [
-        'choices' => $groupArr
+        'choices' => $groupArr,
+        'data' => $defaultValue,
+        'attr' => [
+          'id' => Str::generateFieldToken(),
+          'name' => 'fieldGroup'.Str::generateFieldToken(),  
+        ]
       ]);
 
     $form = $formBuilder->getForm();
@@ -70,7 +104,7 @@ class EntityFormService
     $result['form'] = $formView;
 
     if ($init) {
-      $additional = $this->getSingleFieldView('entityGroup', ChoiceType::class, ['choices' => $groupArr]);
+      $additional = $this->getSingleFieldView('entityGroup', ChoiceType::class, ['choices' => $groupArr, 'data' => $defaultValue]);
       $result['additional'] = $additional;
     }
     
@@ -116,16 +150,18 @@ class EntityFormService
     ]);
   }
 
-  public function addField($token, $init = true)
+  public function addField($token, $group = null, $init = true)
   {
-    $formView = $this->getFieldView($token, $init);
+    $formView = $this->getFieldView($token, $group, $init);
     $form = $this->twig->render('ui/drawer/addField.html.twig', [
       'formView' => $formView['form']
     ]);
-    $additional = $formView['additional'];
     $result = [];
     $result['form'] = $form;
-    $result['additional'] = $additional;
+    if (isset($formView['additional'])) {
+      $additional = $formView['additional'];
+      $result['additional'] = $additional;
+    }
     return $result;
   }
 }

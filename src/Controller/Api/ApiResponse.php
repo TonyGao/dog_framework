@@ -23,8 +23,8 @@ class ApiResponse extends Response
 
   public static function success(
     $content = '',
-    $code = null,
-    $msg = null
+    $code = 200,
+    $msg = 'success'
   ) {
     $response = new ApiResponse('', 200, ['Content-Type' => 'application/json'], $code, $msg);
     $data = [
