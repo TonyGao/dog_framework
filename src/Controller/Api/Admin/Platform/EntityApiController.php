@@ -60,4 +60,16 @@ class EntityApiController extends AbstractController
     
     return ApiResponse::success('', 'success', 'Added Property');
   }
+
+  #[Route(
+    '/api/admin/platform/entity/submitFields',
+    name: 'api_platform_entity_submitFields',
+    methods: ['POST']
+  )]
+  public function submitFields(Request $request)
+  {
+    $payload = $request->getPayload();
+    dump($payload);
+    return ApiResponse::success();
+  }
 }

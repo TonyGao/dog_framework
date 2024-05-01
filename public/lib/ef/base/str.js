@@ -43,4 +43,15 @@ class Str {
   static firstLetterToLowerCase(str) {
     return str.charAt(0).toLowerCase() + str.slice(1);
   }
+
+  // 将序列化的表单数据转换为JSON对象
+  static serializeToJson(serializedForm) {
+    const formDataArray = serializedForm.split('&');
+    const formDataJson = {};
+    formDataArray.forEach(item => {
+      const pair = item.split('=');
+      formDataJson[pair[0]] = decodeURIComponent(pair[1] || '');
+    });
+    return formDataJson;
+  }
 }

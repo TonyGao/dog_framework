@@ -16,8 +16,8 @@
 			{% endif %}
 
 			{% if drawerTitleAddon is defined %}
-			<div class="ef-drawer-addon">
-			  {{ drawerTitleAddon|raw }}
+			<div class="ef-drawer-addon" style="display: flex; justify-content: center; align-items: center;">
+			  <span style="margin-right: 10px;">默认分组</span> <span>{{ drawerTitleAddon|raw }}</span>
 			</div>
 			{% endif %}
 			<div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn">
@@ -29,16 +29,18 @@
 			</div>
 		</div>
 		<div class="ef-drawer-body">
+		<form action="{{ path('api_platform_entity_submitFields') }}" method="post" id="submitFields">
 			<div class="ef-col-24" id="ef-drawer-body-form">
-			  {{ drawerContent|raw }}
+				{{ drawerContent|raw }}
 			</div>
 			<div class="ef-col-24" style="padding: 0 10px;">
 				<button class="btn primary medium long" id="addField">新增字段</button>
 			</div>
+		</form>
 		</div>
 		<div class="ef-drawer-footer">
 			<button class="cancelDrawer btn secondary medium" type="button">取消</button>
-			{% include confirmButton|default('ui/drawer/confirmButton.html.twig') %}
+			{% include confirmButton|default('ui/drawer/confirmButton.html.twig') with {'submit': false, 'id': 'submitFormButton'} %}
 		</div>
 	</div>
 </div>

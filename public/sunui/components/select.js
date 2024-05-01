@@ -1,7 +1,7 @@
 $(document).ready(function () {
   let elements = document.getElementsByClassName("ef-select");
   let config = {
-    prevent_repeat: true
+    prevent_repeat: true,
   };
 
   /**
@@ -24,64 +24,65 @@ $(document).ready(function () {
 
   $.each($(".ef-select"), function () {
     let selectList = {};
-    let selectEleId = $(this).attr('id');
-    selectList['selectEleId'] = selectEleId;
-  })
+    let selectEleId = $(this).attr("id");
+    selectList["selectEleId"] = selectEleId;
+  });
 
   let selectList = {
-    selectEleId: '557919876',
-    activeEle: '1999887089',
-    list: [{
+    selectEleId: "557919876",
+    activeEle: "1999887089",
+    list: [
+      {
         id: "1999887089",
         idx: 1,
-        value: 'Beijing'
+        value: "Beijing",
       },
       {
         id: "1999887089",
         idx: 1,
-        value: 'Shanghai'
+        value: "Shanghai",
       },
       {
         id: "1999887089",
         idx: 1,
-        value: 'Guangzhou'
+        value: "Guangzhou",
       },
       {
         id: "1999887089",
         idx: 1,
-        value: 'Shenzhen'
+        value: "Shenzhen",
       },
       {
         id: "1999887089",
         idx: 1,
-        value: 'Chengdu'
+        value: "Chengdu",
       },
       {
         id: "1999887089",
         idx: 1,
-        value: 'Wuhan'
+        value: "Wuhan",
       },
-    ]
-  }
+    ],
+  };
 
   Array.prototype.forEach.call(elements, function (element) {
     let listener = new window.keypress.Listener(element, config);
     listener.register_combo({
-      "keys": "down",
-      "on_keydown": function (e) {
+      keys: "down",
+      on_keydown: function (e) {
         let id = $(e.target).parent().attr("id");
-      }
+      },
     });
     listener.register_combo({
-      "keys": "up",
-      "on_keydown": function (e) {
+      keys: "up",
+      on_keydown: function (e) {
         console.log("up");
         //console.log($(e.target).parent().attr("id"));
-      }
-    })
+      },
+    });
   });
 
-  $("body").on("click", ".ef-select-view-search",function () {
+  $("body").on("click", ".ef-select-view-search", function () {
     let isSelected = $(this).attr("chosen");
     if (isSelected !== "true") {
       $(this).toggleClass("ef-select-view-opened");
@@ -106,20 +107,19 @@ $(document).ready(function () {
 
     let documentWidth = $("#app").width(); // 获取文档的宽度
     let rightDistance = documentWidth - (elementOffset.left + elementWidth);
-    if ((rightDistance + elementWidth) < $("#"+contentId).width()) {
-      $("#" + contentId).css({  
-        "right": 20,
-        "top": top
+    if (rightDistance + elementWidth < $("#" + contentId).width()) {
+      $("#" + contentId).css({
+        right: 20,
+        top: top,
       });
     } else {
-      $("#" + contentId).css({  
-        "left": left,
-        "top": top
+      $("#" + contentId).css({
+        left: left,
+        top: top,
       });
     }
 
     $(".ef-trigger-popup.ef-trigger-position-bl").hide();
-    // $("#" + contentId).children().find(".ef-select-dropdown-list li:first-child").addClass("arco-select-option-active");
     $("#" + contentId).show();
   });
 
@@ -129,48 +129,75 @@ $(document).ready(function () {
   </svg>
 `;
 
-  $("body").on("focusout", ".ef-select-view-input",function (event) {
+  $("body").on("focusout", ".ef-select-view-input", function (event) {
     $(this).parent().find("svg").remove();
-    $(this).parent().find('.ef-select-view-icon').html(selectIcon);
-  })
+    $(this).parent().find(".ef-select-view-icon").html(selectIcon);
+  });
 
   $(document).on("click", function (event) {
-    if (!$(event.target).closest(".ef-trigger-popup-wrapper, .ef-select-view-single").length) {
+    if (
+      !$(event.target).closest(
+        ".ef-trigger-popup-wrapper, .ef-select-view-single"
+      ).length
+    ) {
       $(".ef-trigger-popup.ef-trigger-position-bl").hide();
     }
-  })
+  });
 
-  $("body").on("click", ".ef-select-option",function (event) {
-    $(event.target).siblings('.arco-select-option-active').removeClass('arco-select-option-active');
-    $(event.target).addClass("arco-select-option-active");
-  })
+  $("body").on("click", ".ef-select-option", function (event) {
+    // 检查事件的目标元素是否是 span 元素
+    if ($(event.target).is("span")) {
+      $(this).closest('.ef-select-option').trigger('click');
+    }
+
+    if ($(event.target).is("li")) {
+      $(event.target)
+      .siblings(".ef-select-option-active")
+      .removeClass("ef-select-option-active");
+      $(event.target).addClass("ef-select-option-active");
+    }
+  });
 
   // 选取选项
-  $("body").not(".ef-select-option-disabled").on("click", ".ef-select-option", function () {
-    let val = $(this).children(".ef-select-option-content").html();
-    let value = $(this).attr("value");
-    let selectContent = $(this).closest(".ef-trigger-popup.ef-trigger-position-bl");
-    let id = selectContent.attr("parentId");
-    let selectInput = $("#" + id);
-    selectInput.prev('input').attr("value", value);
-    selectInput.children(".ef-select-view-input").addClass("ef-select-view-input-hidden");
-    selectInput.children(".ef-select-view-value").html(val).removeClass("ef-select-view-value-hidden");
-    let closeIon = '<i class="fa-regular fa-circle-xmark"></i>';
-    selectInput.children().find(".ef-select-view-icon").html(closeIon);
-    selectInput.attr("chosen", "true");
+  $("body")
+    .not(".ef-select-option-disabled")
+    .on("click", ".ef-select-option", function () {
+      let val = $(this).children(".ef-select-option-content").html();
+      let value = $(this).attr("value");
+      let selectContent = $(this).closest(
+        ".ef-trigger-popup.ef-trigger-position-bl"
+      );
+      let id = selectContent.attr("parentId");
+      let selectInput = $("#" + id);
+      selectInput.prev("input").attr("value", value);
+      selectInput
+        .children(".ef-select-view-input")
+        .addClass("ef-select-view-input-hidden");
+      selectInput
+        .children(".ef-select-view-value")
+        .html(val)
+        .removeClass("ef-select-view-value-hidden");
+      let closeIon = '<i class="fa-regular fa-circle-xmark"></i>';
+      selectInput.children().find(".ef-select-view-icon").html(closeIon);
+      selectInput.attr("chosen", "true");
 
-    // 删掉选中的选项
-    $("body").on("click", ".fa-regular.fa-circle-xmark", function (event) {
-      event.stopPropagation();
-      let selectInput = $(this).closest(".ef-select-view-single");
-      selectInput.attr("chosen", "false");
-      selectInput.children(".ef-select-view-input").removeClass("ef-select-view-input-hidden");
-      selectInput.children(".ef-select-view-value").addClass("ef-select-view-value-hidden");
-      selectInput.children(".ef-select-view-value").html("");
-      selectInput.children().find(".ef-select-view-icon").html(selectIcon);
-    })
-    selectContent.hide();
-  })
+      selectContent.hide();
+    });
+
+  // 删掉选中的选项
+  $("body").on("click", ".ef-select-view-icon .fa-regular.fa-circle-xmark", function (event) {
+    event.stopPropagation();
+    let selectInput = $(this).closest(".ef-select-view-single");
+    selectInput.attr("chosen", "false");
+    selectInput
+      .children(".ef-select-view-input")
+      .removeClass("ef-select-view-input-hidden");
+    selectInput
+      .children(".ef-select-view-value")
+      .addClass("ef-select-view-value-hidden");
+    selectInput.children(".ef-select-view-value").html("");
+    selectInput.children().find(".ef-select-view-icon").html(selectIcon);
+  });
 
   // 当在输入框输入时，将li元素遍历出来值并保存到原始数组中，并通过输入的内容模糊查询
   let dynamic = [];
@@ -179,47 +206,61 @@ $(document).ready(function () {
    * flag 用来标记是否为中文输入完毕
    */
   let flag = true;
-  $("body").on('compositionstart', '.ef-select-view-input', function () {
+  $("body").on("compositionstart", ".ef-select-view-input", function () {
     flag = false;
-  })
+  });
 
-  $("body").on('compositionend', '.ef-select-view-input',function () {
+  $("body").on("compositionend", ".ef-select-view-input", function () {
     flag = true;
-  })
+  });
 
-  $("body").on("input change", '.ef-select-view-input',_.debounce(function () {
-    if (flag) {
-      let contentId = $(this).parent().attr("contentid");
-      let optionList = $("#" + contentId).children().find(".ef-select-option-content");
-      let ul = $("#" + contentId).children().find(".ef-select-dropdown-list");
-      if (dynamic['selectOrigin' + contentId] === undefined) {
-        dynamic['selectOrigin' + contentId] = [];
-        optionList.each(function (idx, element) {
-          let eleObj = {};
-          eleObj['lowerText'] = $(this).text().toLowerCase()
-          eleObj['orginText'] = $(this).text();
-          eleObj['id'] = $(this).parent().attr('id');
-          dynamic['selectOrigin' + contentId].push(eleObj);
-        })
+  $("body").on(
+    "input change",
+    ".ef-select-view-input",
+    _.debounce(function () {
+      if (flag) {
+        let contentId = $(this).parent().attr("contentid");
+        let optionList = $("#" + contentId)
+          .children()
+          .find(".ef-select-option-content");
+        let ul = $("#" + contentId)
+          .children()
+          .find(".ef-select-dropdown-list");
+        if (dynamic["selectOrigin" + contentId] === undefined) {
+          dynamic["selectOrigin" + contentId] = [];
+          optionList.each(function (idx, element) {
+            let eleObj = {};
+            eleObj["lowerText"] = $(this).text().toLowerCase();
+            eleObj["orginText"] = $(this).text();
+            eleObj["id"] = $(this).parent().attr("id");
+            dynamic["selectOrigin" + contentId].push(eleObj);
+          });
+        }
+        // 除了搜索的li，其他全部隐藏
+        let searchResult = Str.searchArr(
+          dynamic["selectOrigin" + contentId],
+          $(this).val().toLowerCase()
+        );
+        let hideList = _.difference(
+          dynamic["selectOrigin" + contentId],
+          searchResult
+        );
+        if (hideList.length >= 0) {
+          $.each(searchResult, function (idx, ele) {
+            if (idx === 0) {
+              $("#" + ele.id).addClass("ef-select-option-active");
+            }
+            $("#" + ele.id).show();
+          });
+          $.each(hideList, function (idx, ele) {
+            $("#" + ele.id).hide();
+          });
+        }
       }
-      // 除了搜索的li，其他全部隐藏
-      let searchResult = Str.searchArr(dynamic['selectOrigin' + contentId], $(this).val().toLowerCase());
-      let hideList = _.difference(dynamic['selectOrigin' + contentId], searchResult);
-      if (hideList.length >= 0) {
-        $.each(searchResult, function (idx, ele) {
-          if (idx === 0) {
-            $("#" + ele.id).addClass("arco-select-option-active");
-          }
-          $("#" + ele.id).show();
-        })
-        $.each(hideList, function (idx, ele) {
-          $("#" + ele.id).hide();
-        })
-      }
-    }
-  }, 500))
+    }, 500)
+  );
 
-  $("body").on("focusout", '.ef-select-view-input',function () {
+  $("body").on("focusout", ".ef-select-view-input", function () {
     $(this).val("");
-  })
-})
+  });
+});

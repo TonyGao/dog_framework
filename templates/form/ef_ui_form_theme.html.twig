@@ -22,12 +22,13 @@
         {# Attribute "required" is not supported #}
         {%- set required = false -%}
     {%- endif -%}
+    {%- set class_attr = attr.class is defined ? attr.class : '' %}
     {%- if type == 'text' -%}
     <span class="ef-input-wrapper" style="max-width: 320px;">
-      <input class="ef-input ef-input-size-medium" clearable="true" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+      <input class="ef-input ef-input-size-medium {{ class_attr }}" clearable="true" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     </span>
     {%- else -%}
-      <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+      <input type="{{ type }}" {{ block('widget_attributes')|merge({class: 'ef-input ef-input-size-medium ' ~ class_attr}) }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     {%- endif -%}
 {%- endblock form_widget_simple -%}
 
@@ -147,22 +148,35 @@
 {%- block choice_widget_collapsed -%}
     {% set selectInputId = random() %}
     {% set selectContentId = random() %}
-    <input type="hidden" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+    {% set isDefault = value is not empty %}
+    <input type="hidden" {{ block('widget_attributes') }} {% if isDefault %} value="{{ value }}" {% endif %}/>
     <span
       class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
       style="max-width: 320px;"
-      chosen="false"
+      chosen="{{ isDefault ? 'true' : 'false' }}"
       for="{{ label }}"
       id="{{ selectInputId }}"
       contentId="{{ selectContentId }}"
       >
-      <input class="ef-select-view-input" placeholder="Please select ...">
-      <span class="ef-select-view-value ef-select-view-value-hidden"></span>
+      <input class="ef-select-view-input {% if isDefault %} ef-select-view-input-hidden {% endif %}" placeholder="Please select ...">
+      {% set defaultLabel = '' %}
+      {%- for key, choice_attr in choices -%}
+        {%- if choice_attr.value == value -%} {# 如果选项值等于默认值 #}
+          {%- set defaultLabel = choice_attr.label -%}
+        {%- endif -%}
+      {%- endfor -%}
+      <span class="ef-select-view-value {% if not isDefault %} ef-select-view-value-hidden {% endif %}">{{ defaultLabel }}</span>
       <span class="ef-select-view-suffix">
         <span class="ef-select-view-icon">
-          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
-            <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
-          </svg>
+          {% if isDefault %}
+            <i class="fa-regular fa-circle-xmark"></i>
+          {% endif %}
+
+          {% if not isDefault %}
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
+              <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
+            </svg>
+          {% endif %}
         </span>
       </span>
     </span>
@@ -207,8 +221,8 @@
                 {{- block('choice_widget_options') -}}
             </optgroup>
         {%- else -%}
-            {#<option value="{{ choice.value }}"{% if choice.attr %}{% with { attr: choice.attr } %}{{ block('attributes') }}{% endwith %}{% endif %}{% if not render_preferred_choices|default(false) and choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</option>#}
-            <li id="{{ random() }}" value="{{ choice.value }}" class="ef-select-option"><span class="ef-select-option-content">{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</span></li>
+            {# <option value="{{ choice.value }}"{% if choice.attr %}{% with { attr: choice.attr } %}{{ block('attributes') }}{% endwith %}{% endif %}{% if not render_preferred_choices|default(false) and choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</option> #}
+            <li id="{{ random() }}" value="{{ choice.value }}" class="ef-select-option {% if not render_preferred_choices|default(false) and choice is selectedchoice(value) %} ef-select-option-active {% endif %}"><span class="ef-select-option-content">{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</span></li>
         {%- endif -%}
     {% endfor %}
 {%- endblock choice_widget_options -%}
