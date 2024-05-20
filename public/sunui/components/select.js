@@ -170,6 +170,7 @@ $(document).ready(function () {
       let id = selectContent.attr("parentId");
       let selectInput = $("#" + id);
       selectInput.prev("input").attr("value", value);
+      selectInput.removeClass("ef-select-error");
       selectInput
         .children(".ef-select-view-input")
         .addClass("ef-select-view-input-hidden");
@@ -177,6 +178,7 @@ $(document).ready(function () {
         .children(".ef-select-view-value")
         .html(val)
         .removeClass("ef-select-view-value-hidden");
+
       let closeIon = '<i class="fa-regular fa-circle-xmark"></i>';
       selectInput.children().find(".ef-select-view-icon").html(closeIon);
       selectInput.attr("chosen", "true");
@@ -197,6 +199,9 @@ $(document).ready(function () {
       .addClass("ef-select-view-value-hidden");
     selectInput.children(".ef-select-view-value").html("");
     selectInput.children().find(".ef-select-view-icon").html(selectIcon);
+
+    // 设置相应的 input[component='select'] 的值为空
+    selectInput.prev("input[component='select']").val("");
   });
 
   // 当在输入框输入时，将li元素遍历出来值并保存到原始数组中，并通过输入的内容模糊查询

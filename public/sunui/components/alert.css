@@ -1,0 +1,189 @@
+.ef-alert {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 15px;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.5715;
+  text-align: left;
+  border-radius: 0.4rem;
+}
+
+.ef-alert-info {
+  background-color: rgb(232,243,255);
+  border: 1px solid transparent;
+}
+
+.ef-alert-icon {
+  margin-right: 8px;
+}
+
+.ef-alert-icon svg {
+  font-size: 16px;
+  vertical-align: -3px;
+}
+
+.ef-alert-info .ef-alert-icon svg {
+  color: rgb(22,93,255);
+}
+
+.ef-alert-body {
+  position: relative;
+  flex: 1;
+}
+
+.ef-alert-info .ef-alert-content {
+  color: rgb(29,33,41);
+}
+
+.ef-alert-success {
+  background-color: rgb(232,255,234);
+  border: 1px solid transparent;
+}
+
+.ef-alert-success .ef-alert-icon svg {
+  color: rgb(0,180,42);
+}
+
+.ef-alert-success .ef-alert-content {
+  color: rgb( 29,33,41);
+}
+
+.ef-alert-warning {
+  background-color: rgb(255,247,232);
+  border: 1px solid transparent;
+}
+
+.ef-alert-warning .ef-alert-icon svg {
+  color: rgb(255,125,0);
+}
+
+.ef-alert-warning .ef-alert-content {
+  color: rgb( 29,33,41);
+}
+
+.ef-alert-error {
+  background-color: rgb( 255,236,232);
+  border: 1px solid transparent;
+}
+
+.ef-alert-error .ef-alert-icon svg {
+  color: rgb(245,63,63);
+}
+
+.ef-alert-error .ef-alert-content {
+  color: rgb( 29,33,41);
+}
+
+.ef-alert-normal {
+  background-color: rgb( 242,243,245);
+  border: 1px solid transparent;
+}
+
+.ef-alert-normal .ef-alert-icon svg {
+  color: rgb( 201,205,212);
+}
+
+.ef-alert-normal .ef-alert-content {
+  color: rgb( 29,33,41);
+}
+
+.ef-alert-with-title {
+  align-items: flex-start;
+  padding: 15px;
+}
+
+.ef-alert-with-title .ef-alert-icon svg {
+  font-size: 18px;
+  vertical-align: -5px;
+}
+
+.ef-alert-info.ef-alert-with-title .ef-alert-content {
+  color: rgb( 78,89,105);
+}
+
+.ef-alert-close-btn {
+  top: 4px;
+  right: 0;
+  box-sizing: border-box;
+  margin-left: 8px;
+  padding: 0;
+  color: rgb( 78,89,105);
+  font-size: 12px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: color .1s cubic-bezier(0,0,1,1);
+}
+
+.ef-icon-hover {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  line-height: 12px;
+}
+
+.ef-icon-hover:before {
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+  background-color: transparent;
+  border-radius: 50%;
+  transition: background-color .1s cubic-bezier(0,0,1,1);
+  content: "";
+}
+
+.ef-icon-hover:before {
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  transform: translate(-50%, -50%);
+}
+
+.ef-icon-hover .ef-icon {
+  position: relative;
+}
+
+.ef-alert-title {
+  margin-bottom: 4px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.ef-alert-info .ef-alert-title {
+  color: rgb( 29,33,41);
+}
+
+.ef-alert-warning.ef-alert-with-title .ef-alert-content {
+  color: rgb( 78,89,105);
+}
+
+.ef-alert-success.ef-alert-with-title .ef-alert-content {
+  color: rgb( 78,89,105);
+}
+
+.ef-alert-error.ef-alert-with-title .ef-alert-content {
+  color: rgb( 78,89,105);
+}
+
+.ef-alert-center {
+  justify-content: center;
+}
+
+.ef-alert-banner {
+  border: none;
+  border-radius: 0;
+}
+
+.ef-alert-center .ef-alert-body {
+  flex: initial;
+}
+
+.cell-demo {
+  margin-bottom: 20px;
+}

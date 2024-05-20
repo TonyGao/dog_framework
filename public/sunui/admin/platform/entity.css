@@ -1,3 +1,7 @@
 #form_entityGroup + span.ef-select-view-single {
   border-radius: 20px;
 }
+
+.close-field-row {
+  cursor: pointer;
+}

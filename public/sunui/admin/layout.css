@@ -149,6 +149,10 @@ body {
   background-color: #f2f3f5;
 }
 
+.error {
+  color: red;
+}
+
 .app-header {
   border-bottom-color: transparent;
   display: flex;

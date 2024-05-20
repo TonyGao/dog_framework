@@ -28,11 +28,23 @@
   border-color: rgb(22, 93, 255);
 }
 
+.ef-select-view-single.ef-select-error:hover {
+  background-color: rgb(253, 205, 197);
+  border-color: transparent;
+}
+
 .ef-select-view-single:focus-within {
   background-color: #fff;
   border-color: rgb(22 93 255 / 62%);
   box-shadow: 0 0 0 0 rgb(190 218 255);
   outline: 3px solid rgb(22 93 255 / 23%);
+}
+
+.ef-select-view-single.ef-select-error:focus-within {
+  background-color: #fff;
+  border-color: rgb(245,63,63);
+  box-shadow: 0 0 0 0 rgb(253,205,197);
+  outline: transparent;
 }
 
 .ef-select-view-single.ef-select-view-size-medium .ef-select-view-input, .ef-select-view-single.ef-select-view-size-medium .ef-select-view-value {
@@ -269,4 +281,9 @@
 
 .ef-select-view-single .fa-regular.fa-circle-xmark:hover {
   cursor: pointer;
+}
+
+.ef-select-error {
+  background-color: rgb(255, 236, 232);
+  border-color: transparent;
 }
