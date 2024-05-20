@@ -10,7 +10,7 @@
     id="{{ attr.id is defined ? attr.id : id }}"
     name="{{ attr.name is defined ? attr.name : full_name }}"
     {%- if disabled %} disabled="disabled"{% endif -%}
-    {%- if required %} required="required"{% endif -%}
+    {%- if required %} required{% endif -%}
     {{ block('attributes') }}
 {%- endblock widget_attributes -%}
 
@@ -25,7 +25,7 @@
     {%- set class_attr = attr.class is defined ? attr.class : '' %}
     {%- if type == 'text' -%}
     <span class="ef-input-wrapper" style="max-width: 320px;">
-      <input class="ef-input ef-input-size-medium {{ class_attr }}" clearable="true" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+      <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" clearable="true" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     </span>
     {%- else -%}
       <input type="{{ type }}" {{ block('widget_attributes')|merge({class: 'ef-input ef-input-size-medium ' ~ class_attr}) }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
@@ -149,7 +149,7 @@
     {% set selectInputId = random() %}
     {% set selectContentId = random() %}
     {% set isDefault = value is not empty %}
-    <input type="hidden" {{ block('widget_attributes') }} {% if isDefault %} value="{{ value }}" {% endif %}/>
+    <input type="hidden" component="select" {{ block('widget_attributes') }} {% if isDefault %} value="{{ value }}" {% endif %}/>
     <span
       class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
       style="max-width: 320px;"

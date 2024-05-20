@@ -4,6 +4,7 @@ $(document).ready(function () {
    * 如果右侧没有任何标签页，就将empty-content隐藏，并将platform-entity显出出来
    */
   let tabsIsEmpty = {};
+
   $(".node-name").on(
     "click",
     ".tree-text-content.branch[type=entity]",
@@ -13,7 +14,7 @@ $(document).ready(function () {
       let tabName = $(this).text();
       let entityData;
 
-      console.log(tabsIsEmpty["tabsIsEmpty" + id]);
+      // console.log(tabsIsEmpty["tabsIsEmpty" + id]);
 
       // 如果右侧没有没有任何标签页
       if (tabsIsEmpty["tabsIsEmpty" + id] === undefined) {
@@ -73,9 +74,10 @@ $(document).ready(function () {
   let fieldLineNum = 1;
   $("body").on("click", "#addField", function () {
     // 获取 ef-drawer-container 元素的 entitytoken 属性值
-    let entityToken = $(".ef-drawer-container").attr("entitytoken");
+    let container = $(this).closest(".ef-drawer-container");
+    let entityToken = container.attr("entitytoken");
     let payload = { token: entityToken };
-    let choosedGroup = $("#form_entityGroup").attr("value");
+    let choosedGroup = container.find("#form_entityGroup").attr("value");
     //自增行数
     fieldLineNum++;
 
@@ -88,8 +90,8 @@ $(document).ready(function () {
       dataType: "html",
       contentType: "application/json",
       data: JSON.stringify(payload),
-      success: function (data) {
-        $("#ef-drawer-body-form").append(data);
+      success: function (response) {
+        container.find("#ef-drawer-body-form").append(response);
       },
     });
   });
@@ -121,20 +123,50 @@ $(document).ready(function () {
         let engName = $(this)
           .closest(".ef-row.ef-row-align-start.ef-row-justify-start")
           .find('input.fieldName');
-        $(this)
+        let fieldName =  $(this)
           .closest(".ef-row.ef-row-align-start.ef-row-justify-start")
           .find('input.fieldName')
           .val(camelCasePinyin);
+
+        if (somethingWrong) {
+          fieldName.valid();
+        }
       }
     }, 500)
   );
 
   const route = new Route();
+  let somethingWrong = false;
   $("body").on("click", "#submitFormButton", function (e) {
     e.preventDefault(); // 阻止按钮的默认行为
+    $(this).closest(".ef-drawer");
 
-    // 收集表单数据
-    let formData = Str.serializeToJson($("#submitFields").serialize());
+    // 校验表单必填和规则校验
+    let form = $(this).parents('.ef-drawer').find("#submitFields");
+    form.formValid();
+
+    if (!form.valid()) {
+      somethingWrong = true;
+      return;
+    }
+
+    let formData = Str.serializeToJson(form.serialize());
+    let length = Object.entries(formData).length;
+    // 每行的字段个数
+    const indexPerLine = Math.floor(length / fieldLineNum);
+    let groupArr = [];
+    let arr = [];
+    Object.entries(formData).forEach((entry, index) => {
+      const [key, value] = entry;
+      let obj = {};
+      obj[key] = value;
+      arr.push(obj);
+      // console.log(`Index: ${index}, Key: ${key}, Value: ${value}`);
+      if ((index + 1) % indexPerLine === 0) {
+        groupArr.push(arr);
+        arr = [];
+      }
+    });
 
     // 发送 AJAX 请求
     let field = route.generate("api_platform_entity_submitFields");
@@ -142,7 +174,7 @@ $(document).ready(function () {
       type: field.methods[0],
       url: field.path, // 提交表单的路由路径
       contentType: "application/json",
-      data: JSON.stringify(formData),
+      data: JSON.stringify(groupArr),
       success: function (response) {
         // 在成功响应时执行的操作，可以是重定向、显示消息等
         console.log("表单提交成功！");
@@ -155,4 +187,18 @@ $(document).ready(function () {
       },
     });
   });
+
+  $("body").on("click", "#ef-drawer-body-form .close-field-row", function (e) {
+    const row = $(this).closest('.ef-row');
+    // 检查是否只剩下一行
+    if ($(this).closest("#ef-drawer-body-form").children(".ef-row").length > 1) {
+      if (row) {
+        row.remove();
+      }
+    } else {
+      // 如果只剩下一行，给出相应的提示或者不执行任何操作
+      let alert = new Alert($(this).closest(".ef-drawer"));
+      alert.warning("至少需要保留一行字段", "40%", "不能再删除了");
+    }
+  }); 
 });
