@@ -32,11 +32,11 @@ class EntityService
 
   public function __construct(string $projectDir, EntityManagerInterface $em, FileResolver $fileResolver, $filePath = '')
   {
-      $this->projectDir = $projectDir;
-      $this->filePath = $filePath;
-      $this->em = $em;
-      $this->fR = $fileResolver;
-      $this->namingStrategy = new DefaultNamingStrategy();
+    $this->projectDir = $projectDir;
+    $this->filePath = $filePath;
+    $this->em = $em;
+    $this->fR = $fileResolver;
+    $this->namingStrategy = new DefaultNamingStrategy();
   }
 
   /**
@@ -73,7 +73,7 @@ class EntityService
 
     $backupFileName = basename($this->filePath, '.php') . str_replace('.', '', Time::curMicroSec()) . '.php';
     $backupFilePath = $backupDir . $backupFileName;
-    $zipName = $backupFilePath.'.zip';
+    $zipName = $backupFilePath . '.zip';
     copy($this->filePath, $backupFilePath);
     $this->fR->createZip($zipName, [$backupFilePath]);
     return $this;
@@ -99,30 +99,51 @@ class EntityService
    */
   public function addProperty($property)
   {
-    $pName = $property['name'];
+    $pName = $property['name']['value'];
+    $nullable = $property['nullable']['value'] === '1' ? true : false;
+    $property['nullable']['value'] = $nullable;
 
-    // 检查属性是否已存在于数据库中
-    if ($this->isExisted($pName)) {
+    $unique = $property['unique']['value'] === '1' ? true : false;
+    $property['unique']['value'] = $unique;
+
+    // 检查属性是否已存在于数据库模型中以及EntityProperty中
+    if ($this->isExisted($property)) {
       throw EntityException::alreadyExistsProperty($this->class, $pName);
     }
 
-    $comment = $property['comment'];
-    if ($property['type'] = 'string') {
+    $comment = $property['comment']['value'];
+    if ($property['type']['value'] = 'string') {
       $finalType = 'string';
 
-      $this->class
-      ->addProperty($property['name'])
-      ->setVisibility('private')
-      ->addComment($comment)
-      ->addAttribute('Doctrine\ORM\Mapping\Column',['type' => 'string', 'length' => (integer) $property['length'], 'nullable' => true])
-      ;
+      $class = $this->class
+        ->addProperty($pName)
+        ->setVisibility('private')
+        ->addComment($comment);
+
+      $attributeArr = ['type' => 'string', 'length' => (int) $property['length']['value'], 'nullable' => $nullable];
+
+      // 默认值
+      if ($property['defaultValue']['value'] !== '') {
+        $defaultValue = $property['defaultValue']['value'];
+        $attributeArr['options'] = ['default' => $defaultValue];
+        $this->class->setDefaultValue($pName, $defaultValue);
+      }
+
+      // 唯一性
+      if ($unique) {
+        $attributeArr['unique'] = $unique;
+      }
+
+      dump($attributeArr);
+
+      $class->addAttribute('Doctrine\ORM\Mapping\Column', $attributeArr);
     }
 
     // 添加属性的 setter 方法
     $setterMethodName = 'set' . ucfirst($pName);
     $method = $this->class->addMethod($setterMethodName)
       ->setReturnType($this->namespace)
-      ->addComment($comment.' Setter')
+      ->addComment($comment . ' Setter')
       ->addComment('@return self')
       ->addBody('$this->' . $pName . ' = $' . $pName . ';')
       ->addBody('return $this;');
@@ -133,7 +154,7 @@ class EntityService
     $getterMethodName = 'get' . ucfirst($pName);
     $this->class->addMethod($getterMethodName)
       ->setReturnType($finalType)
-      ->addComment($comment.' Getter')
+      ->addComment($comment . ' Getter')
       ->addBody('return $this->' . $pName . ';');
 
     $this->insertEntityProperty($property);
@@ -145,29 +166,46 @@ class EntityService
    */
   public function insertEntityProperty($property)
   {
+    $groupId = $property['group']['value'];
+    // 获取 EntityPropertyGroup 对象
+    $groupRepo = $this->em->getRepository(EntityPropertyGroup::class);
+    $group = $groupRepo->find($groupId);
+
+    if ($group === null) {
+      throw new \Exception("Group with ID '{$groupId}' not found.");
+    }
+
     $prop = new EntityProperty();
-    $prop->setToken($property['fieldToken'])
+    $prop->setToken(sha1(random_bytes(10)))
       ->setIsCustomized(true)
       ->setBusinessField(true)
-      ->setPropertyName($property['name'])
-      ->setComment($property['comment'])
-      ->setType($property['type'])
-      ->setFieldName(Str::tableize($property['name']))
+      ->setPropertyName($property['name']['value'])
+      ->setComment($property['comment']['value'])
+      ->setType($property['type']['value'])
+      ->setFieldName(Str::tableize($property['name']['value']))
       ->setNullable(true)
       ->setEntity($this->entity)
-      ;
-    
-    if ($property['type'] === 'string') {
-      $prop->setLength($property['length']);
+      ->setGroup($group);
+
+    if ($property['type']['value'] === 'string') {
+      $prop->setLength((int) $property['length']['value']);
     }
 
     $this->em->persist($prop);
   }
 
-  public function isExisted($propertyName)
+  public function isExisted($property)
   {
+    // 判断属性的name(英文字段名)在模型中是否已经存在
+    $propertyName = $property['name']['value'];
     $pName = $this->namingStrategy->propertyToColumnName($propertyName);
-    return in_array($pName, $this->columnNames);
+    $result = in_array($pName, $this->columnNames);
+
+    // 判断中文名称是否在EntityProperty中已经存在
+    $comment = $property['comment']['value'];
+    $epRepo = $this->em->getRepository(EntityProperty::class);
+    $ep = $epRepo->findOneBy(['comment' => $comment]);
+    return $ep !== null && $result;
   }
 
   /**

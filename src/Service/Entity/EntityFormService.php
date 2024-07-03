@@ -60,40 +60,50 @@ class EntityFormService
     }
 
     $formBuilder = $this->createFormBuilder();
+    $commentToken = Str::generateFieldToken();
+    $fieldNameToken = Str::generateFieldToken();
+    $fileTypeToken = Str::generateFieldToken();
+    $fieldGroupToken = Str::generateFieldToken();
+
     $formBuilder
       ->add('fieldComment', TextType::class, [
         'attr' => [
           'class' => 'fieldComment',
-          'id' => Str::generateFieldToken(),
-          'name' => 'fieldComment'.Str::generateFieldToken(),
+          'id' => $commentToken,
+          'name' => 'fieldComment'.$commentToken,
+          'fieldName' => 'comment',
         ]
       ])
       ->add('fieldName', TextType::class, [
         'attr' => [
           'class' => 'fieldName',
-          'id' => Str::generateFieldToken(),
-          'name' => 'fieldName'.Str::generateFieldToken(),
+          'id' => $fieldNameToken,
+          'name' => 'fieldName'.$fieldNameToken,
+          'fieldName' => 'name',
         ]
       ])
       ->add('fieldType', ChoiceType::class, [
         'choices' => [
-          '文本' => 'text',
+          '文本' => 'string',
           '网页' => 'link',
           '选项' => 'options',
           '人员' => 'user'
         ],
         'attr' => [
-          'id' => Str::generateFieldToken(),
-          'name' => 'fieldType'.Str::generateFieldToken(),
-        ]
+          'id' => $fileTypeToken,
+          'name' => 'fieldType'.$fileTypeToken,
+          'data-field-type' => 'true',
+          'fieldName' => 'type',
+        ],
       ])
       ->add('fieldGroup', ChoiceType::class, [
         'choices' => $groupArr,
         'data' => $defaultValue,
         'attr' => [
-          'id' => Str::generateFieldToken(),
-          'name' => 'fieldGroup'.Str::generateFieldToken(),  
-        ]
+          'id' => $fieldGroupToken,
+          'name' => 'fieldGroup'.$fieldGroupToken,
+          'fieldName' => 'group',
+        ],
       ]);
 
     $form = $formBuilder->getForm();

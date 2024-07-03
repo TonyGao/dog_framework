@@ -383,23 +383,4 @@ class Company implements GedmoNode
 		return $this->name;
 	}
 
-
-	/**
-	 * ERP部门编码 Setter
-	 * @return self
-	 */
-	public function setErpDepartmentCode($erpDepartmentCode): Company
-	{
-		$this->erpDepartmentCode = $erpDepartmentCode;
-		return $this;
-	}
-
-
-	/**
-	 * ERP部门编码 Getter
-	 */
-	public function getErpDepartmentCode(): string
-	{
-		return $this->erpDepartmentCode;
-	}
 }

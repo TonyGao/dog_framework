@@ -1,6 +1,6 @@
 $(document).ready(function () {
-  $("label.ef-checkbox").unbind("click").bind("click", function (event) {
-    let chosenCheckbox = $(this).parent().children("label.ef-checkbox-checked");
+  $("body").on("click", "label.ef-checkbox", function (event) {
+    // let chosenCheckbox = $(this).parent().children("label.ef-checkbox-checked");
     let checkboxHover = $(this).children("span.ef-checkbox-icon-hover").first();
     let notChecked = !$(this).hasClass("ef-checkbox-checked");
     if (notChecked) {
