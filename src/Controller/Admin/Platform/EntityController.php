@@ -128,6 +128,7 @@ class EntityController extends BaseController
       $et->type = $entity->getType();
       $et->length = $entity->getLength();
       $et->entity = $entity->getEntity();
+      dump($entity);
       $et->group = $entity->getGroup()->getLabel();
       $arr[] = $et;
     }

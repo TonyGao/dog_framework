@@ -15,7 +15,6 @@ class Route {
       // Now that routes are available, proceed with generating routes
       // Move this line here from the constructor
       const submitFieldsRoute = this.generate("api_platform_entity_submitFields");
-      console.log("Submit Fields Route:", submitFieldsRoute);
     } catch (error) {
       console.error("Error fetching cached routes:", error);
     }

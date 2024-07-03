@@ -15,10 +15,11 @@
 .ef-row {
   display: flex;
   flex-flow: row wrap;
+  align-items: center;
 }
 
 .ef-row-align-start {
-  align-items: flex-start;
+  align-items: center;
 }
 
 .ef-row-justify-start {
@@ -139,6 +140,12 @@ vertical .ud__form__item__label>label {
   font-size: 14px;
   margin-inline-start: 2px;
   width: 8px;
+}
+
+.ef-field-control-wrapper {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
 }
 
 /* .ef-input-wrapper {

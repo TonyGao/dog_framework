@@ -93,4 +93,19 @@
     // Allow chaining
     return this;
   };
+
+  $.fn.serializeWithId = function() {
+    var formArray = this.serializeArray();
+    var serializedData = {};
+
+    $.each(formArray, function() {
+        // 使用 id 作为键
+        var id = $('[name="' + this.name + '"]').attr('id');
+        if (id) {
+            serializedData[id] = this.value;
+        }
+    });
+
+    return serializedData;
+};
 })(jQuery);

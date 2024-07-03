@@ -1,39 +1,49 @@
-<div class="ef-row ef-row-align-start ef-row-justify-start">
-	<div class="ef-col-6" style="padding-left: 12px; padding-right: 12px;">
-		<div class="ud__col ud__form__item__label">
-			<label class="ud__form__item-required" title="字段名">字段名<div class="ud__form__item__required-mark">*</div>
-			</label>
+<div class="ef-logic-row">
+	<div class="ef-row ef-row-align-start ef-row-justify-start">
+		<div class="ef-col-6" style="padding-left: 12px; padding-right: 12px;">
+			<div class="ud__col ud__form__item__label">
+				<label class="ud__form__item-required" title="字段名">字段名<div class="ud__form__item__required-mark">*</div>
+				</label>
+			</div>
+			{# {{ form_widget(formView.fieldComment) }} #}
+			<div class="ef-field-control-wrapper">
+				{{ form_widget(formView.fieldComment) }}
+			</div>
 		</div>
-		{# {{ form_widget(formView.fieldComment) }} #}
-		{{ form_widget(formView.fieldComment) }}
-	</div>
-	<div class="ef-col-6" style="padding-left: 12px; padding-right: 12px;">
-		<div class="ud__col ud__form__item__label">
-			<label class="ud__form__item-required" title="字段英文名">字段英文名<div class="ud__form__item__required-mark">*</div>
-			</label>
+		<div class="ef-col-6" style="padding-left: 12px; padding-right: 12px;">
+			<div class="ud__col ud__form__item__label">
+				<label class="ud__form__item-required" title="字段英文名">字段英文名<div class="ud__form__item__required-mark">*</div>
+				</label>
+			</div>
+			<div class="ef-field-control-wrapper">
+				{{ form_widget(formView.fieldName) }}
+			</div>
 		</div>
-		{{ form_widget(formView.fieldName) }}
-	</div>
-	<div class="ef-col-5" style="padding-left: 12px; padding-right: 12px;">
-		<div class="ud__col ud__form__item__label">
-			<label class="ud__form__item-required" title="字段类型">字段类型<div class="ud__form__item__required-mark">*</div>
-			</label>
+		<div class="ef-col-5" style="padding-left: 12px; padding-right: 12px;">
+			<div class="ud__col ud__form__item__label">
+				<label class="ud__form__item-required" title="字段类型">字段类型<div class="ud__form__item__required-mark">*</div>
+				</label>
+			</div>
+			<div class="ef-field-control-wrapper">
+				{{ form_widget(formView.fieldType) }}
+			</div>
 		</div>
-		{{ form_widget(formView.fieldType) }}
-	</div>
-	<div class="ef-col-6" style="padding-left: 12px; padding-right: 12px;">
-		<div class="ud__col ud__form__item__label">
-			<label class="ud__form__item-required" title="分组">分组<div class="ud__form__item__required-mark">*</div>
-			</label>
+		<div class="ef-col-6" style="padding-left: 12px; padding-right: 12px;">
+			<div class="ud__col ud__form__item__label">
+				<label class="ud__form__item-required" title="分组">分组<div class="ud__form__item__required-mark">*</div>
+				</label>
+			</div>
+			<div class="ef-field-control-wrapper">
+				{{ form_widget(formView.fieldGroup) }}
+			</div>
 		</div>
-		{{ form_widget(formView.fieldGroup) }}
-	</div>
-	<div class="ef-col-1" style="padding-left: 12px; padding-right: 12px;">
-		<div class="ud__col ud__form__item__label">
-			<label class="ud__form__item-required">
-			  <div class="ud__form__item__required-mark"></div>
-			</label>
+		<div class="ef-col-1" style="padding-left: 12px; padding-right: 12px;">
+			<div class="ud__col ud__form__item__label">
+				<label class="ud__form__item-required">
+					<div class="ud__form__item__required-mark"></div>
+				</label>
+			</div>
+			<i class="fa-solid fa-circle-xmark close-field-row" style="font-size: larger;"></i>
 		</div>
-		<i class="fa-solid fa-circle-xmark close-field-row" style="font-size: larger;"></i>
 	</div>
 </div>
