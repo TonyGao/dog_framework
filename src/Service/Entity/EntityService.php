@@ -3,6 +3,7 @@
 namespace App\Service\Entity;
 
 use App\Service\FileResolver;
+use App\Service\Entity\MigrationService;
 use App\Entity\Platform\Entity;
 use App\Entity\Platform\EntityProperty;
 use App\Entity\Platform\EntityPropertyGroup;
@@ -27,16 +28,23 @@ class EntityService
   private $namespace;
   private $columnNames;
   private $namingStrategy;
+  private $migrationService;
   // EntityProperty
   private $eProperty;
 
-  public function __construct(string $projectDir, EntityManagerInterface $em, FileResolver $fileResolver, $filePath = '')
-  {
+  public function __construct(
+    string $projectDir,
+    EntityManagerInterface $em,
+    FileResolver $fileResolver,
+    MigrationService $migrationService,
+    $filePath = ''
+  ) {
     $this->projectDir = $projectDir;
     $this->filePath = $filePath;
     $this->em = $em;
     $this->fR = $fileResolver;
     $this->namingStrategy = new DefaultNamingStrategy();
+    $this->migrationService = $migrationService;
   }
 
   /**
@@ -134,8 +142,6 @@ class EntityService
         $attributeArr['unique'] = $unique;
       }
 
-      dump($attributeArr);
-
       $class->addAttribute('Doctrine\ORM\Mapping\Column', $attributeArr);
     }
 
@@ -213,10 +219,18 @@ class EntityService
    */
   public function save()
   {
-    $this->em->flush();
-    $this->backupEntity();
-    $fileContent = (string) $this->file;
-    file_put_contents($this->filePath, $fileContent);
+    try {
+      $this->em->flush();
+      $this->backupEntity();
+      $fileContent = (string) $this->file;
+      file_put_contents($this->filePath, $fileContent);
+
+      // 执行 doctrine migrations
+      $this->migrationService->executeMigrationsDiff();
+      $this->migrationService->executeMigrationsMigrate();
+    } catch (\Exception $e) {
+      return $e;
+    }
   }
 
   public function setPath($filePath)
