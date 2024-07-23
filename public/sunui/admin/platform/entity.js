@@ -159,7 +159,7 @@ $(document).ready(function () {
     console.log(JSON.stringify(payload, null, 2));
 
     // 发送 AJAX 请求
-    let field = route.generate("api_platform_entity_submitFields");
+    let field = route.generate("api_platform_entity_batchfields");
     $.ajax({
       type: field.methods[0],
       url: field.path, // 提交表单的路由路径

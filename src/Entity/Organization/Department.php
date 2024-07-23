@@ -163,6 +163,10 @@ class Department implements GedmoNode
 	#[ORM\Column(type: 'string', length: 255, nullable: true, unique: true)]
 	private $buMenJingLi;
 
+	/** 部门总监 */
+	#[ORM\Column(type: 'string', length: 255, nullable: true, unique: true)]
+	private $buMenZongJian;
+
 
 	public function __toString()
 	{
@@ -449,5 +453,25 @@ class Department implements GedmoNode
 	public function getBuMenJingLi(): string
 	{
 		return $this->buMenJingLi;
+	}
+
+
+	/**
+	 * 部门总监 Setter
+	 * @return self
+	 */
+	public function setBuMenZongJian($buMenZongJian): Department
+	{
+		$this->buMenZongJian = $buMenZongJian;
+		return $this;
+	}
+
+
+	/**
+	 * 部门总监 Getter
+	 */
+	public function getBuMenZongJian(): string
+	{
+		return $this->buMenZongJian;
 	}
 }

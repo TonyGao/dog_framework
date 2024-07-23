@@ -117,7 +117,7 @@ class EntityController extends BaseController
     $repoProperty = $em->getRepository(EntityProperty::class);
     $entityProperties = $repoProperty->findBy(
       ['entity' => $entity],
-      ['group' => 'ASC', 'propertyName' => 'ASC']
+      ['createdAt' => 'ASC']
     );
 
     $arr = array();
@@ -128,7 +128,6 @@ class EntityController extends BaseController
       $et->type = $entity->getType();
       $et->length = $entity->getLength();
       $et->entity = $entity->getEntity();
-      dump($entity);
       $et->group = $entity->getGroup()->getLabel();
       $arr[] = $et;
     }
