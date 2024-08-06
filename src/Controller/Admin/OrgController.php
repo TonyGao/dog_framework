@@ -381,4 +381,21 @@ class OrgController extends AbstractController
       'form' => $form->createView(),
     ]);
   }
+
+    /**
+   * 用来返回部门弹窗的html
+   */
+  #[Route('/admin/org/department/modal', name: 'api_org_department_modal', methods: ['POST'])]
+  public function departmentModal(Request $request, EntityManagerInterface $em): Response
+  {
+    $payload = $request->toArray();
+    $type = $payload['departmentType'];
+    $departmentInputId = $payload['departmentInputId'];
+
+    if ($type == 'single') {
+      return $this->render('admin/org/department/department_modal.html.twig', [
+        'departmentInputId' => $departmentInputId
+      ]);
+    }
+  }
 }

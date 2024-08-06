@@ -2,11 +2,17 @@
 {% use 'form_div_layout.html.twig' %}
 
 {% block form_start -%}
+    {%- if attr is not defined or attr is not iterable -%}
+        {%- set attr = {} -%}
+    {%- endif -%}
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' ef-form ef-form-layout-horizontal ef-form-size-medium ef-form-auto-label-width')|trim}) %}
     {{- parent() -}}
 {%- endblock form_start %}
 
 {%- block widget_attributes -%}
+    {%- if attr is not defined or attr is not iterable -%}
+        {%- set attr = {} -%}
+    {%- endif -%}
     id="{{ attr.id is defined ? attr.id : id }}"
     name="{{ attr.name is defined ? attr.name : full_name }}"
     {%- if disabled %} disabled="disabled"{% endif -%}
@@ -17,6 +23,9 @@
 {# Widgets #}
 
 {%- block form_widget_simple -%}
+    {%- if attr is not defined or attr is not iterable -%}
+        {%- set attr = {} -%}
+    {%- endif -%}
     {%- set type = type|default('text') -%}
     {%- if type == 'range' or type == 'color' -%}
         {# Attribute "required" is not supported #}
@@ -28,7 +37,8 @@
       <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" clearable="true" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     </span>
     {%- else -%}
-      <input type="{{ type }}" {{ block('widget_attributes')|merge({class: 'ef-input ef-input-size-medium ' ~ class_attr}) }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+      <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+      {# <input type="{{ type }}" {{ block('widget_attributes')|merge({class: 'ef-input ef-input-size-medium ' ~ class_attr}) }} {% if value is not empty %}value="{{ value }}" {% endif %}/> #}
     {%- endif -%}
 {%- endblock form_widget_simple -%}
 
@@ -57,6 +67,9 @@
 {%- endblock submit_widget -%}
 
 {% block button_widget -%}
+  {%- if attr is not defined or attr is not iterable -%}
+      {%- set attr = {} -%}
+  {%- endif -%}
   <div class="ef-space-item">
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' btn primary medium')|trim}) %}
     {{- parent() -}}
@@ -66,6 +79,9 @@
 {# Labels #}
 
 {% block form_label -%}
+  {%- if label_attr is not defined or label_attr is not iterable -%}
+      {%- set label_attr = {} -%}
+  {%- endif -%}
   {%- set label_attr = label_attr|merge({ class: label_attr.class|default(label_class|default('ef-form-item-label')) }) -%}
   {{- parent() -}}
 {%- endblock form_label %}

@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  $(".radio-wrapper").on("click", ".ef-radio", function (event) {
+  $("body").on("click", ".ef-radio", function (event) {
     let id = $(this).attr("radioid");
     let chosenRadio = $(`label.ef-radio-checked[radioid=${id}]`);
     if (!$(this).hasClass("ef-radio-checked")) {

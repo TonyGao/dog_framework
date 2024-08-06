@@ -35,8 +35,8 @@
   position: relative;
   transform: scale(1);
   margin-bottom: 60px;
-  border-left: 1px #dfdfdf solid;
-  border-top: 1px #dfdfdf solid;
+  /* border-left: 1px #dfdfdf solid;
+  border-top: 1px #dfdfdf solid; */
 }
 
 .left-tree {
