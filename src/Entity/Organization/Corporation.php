@@ -72,7 +72,7 @@ class Corporation
      * )
 	 */
 	#[ORM\OneToOne(targetEntity: 'App\Entity\Platform\OptionValue')]
-	#[ORM\JoinColumn(name: "type_id", referencedColumnName: "id")]
+	#[ORM\JoinColumn(name: "type_id", referencedColumnName: "id", nullable: true)]
 	private $type = null;
 
 	/**
@@ -241,6 +241,11 @@ class Corporation
 	public function getType()
 	{
 		return $this->type;
+	}
+
+	public function getTypeId(): ?int
+	{
+			return $this->type ? $this->type->getId() : null;
 	}
 
 

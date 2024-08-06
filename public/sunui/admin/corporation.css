@@ -22,16 +22,19 @@
   justify-content: center;
   -webkit-box-align: stretch;
   align-items: stretch;
-  padding-top: 40px;
   margin-bottom: 20px;
 }
 
 .inside-wrapper {
   display: flex;
   position: relative;
-  margin-left: 20%;
+  margin-left: 5%;
   transform: scale(1);
   margin-bottom: 60px;
+}
+
+.inside-wrapper .ef-row {
+  width: -webkit-fill-available;
 }
 
 .start {
@@ -114,6 +117,16 @@
   display: flex;
   margin: 0 auto;
 }
+
+.ef-textarea-wrapper {
+  max-width: 320px;
+}
+
+.ef-row-align-start {
+  align-items: flex-start;
+}
+
+
 
 /*
 .ol-wrapper > ol > li > h2:before {

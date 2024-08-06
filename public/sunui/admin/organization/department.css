@@ -9,7 +9,7 @@
 }
 
 .outside-wrapper {
-  height: 100vh;
+  height: -webkit-fill-available;
   position: inherit;
   overflow: auto;
   left: 0px;
@@ -22,11 +22,15 @@
   flex-direction: column;
   flex-wrap: nowrap;
   -webkit-box-pack: justify;
-  justify-content: center;
+  justify-content: flex-start;
   -webkit-box-align: stretch;
   align-items: stretch;
   padding-top: 40px;
   margin-bottom: 20px;
+}
+
+.outside-wrapper::-webkit-scrollbar {
+  display: none; /* 隐藏滚动条 */
 }
 
 .inside-wrapper {

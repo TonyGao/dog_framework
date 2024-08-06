@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  $(".ef-department-view-search").on("click", function () {
+  $("body").on("click", ".ef-department-view-search", function () {
     $(this).find("input:first").focus();
   });
 
@@ -10,15 +10,15 @@ $(document).ready(function () {
    * flag 用来标记是否为中文输入完毕
    */
   let flag = true;
-  $(".ef-department-view-input").on('compositionstart', function () {
+  $("body").on('compositionstart', ".ef-department-view-input", function () {
     flag = false;
   })
 
-  $(".ef-department-view-input").on('compositionend', function () {
+  $("body").on('compositionend', ".ef-department-view-input", function () {
     flag = true;
   })
 
-  $(".ef-department-view-input").on("input change", _.debounce(function () {
+  $("body").on("input change", ".ef-department-view-input", _.debounce(function () {
     if (flag) {
       let v = $(this).val();
       let departmentInput;
@@ -127,7 +127,7 @@ $(document).ready(function () {
                 }
 
                 refreshSelectionHover();
-                departmentInput.find("input").val("");
+                //departmentInput.find("input").val("");
 
                 // 删除选项
                 $(".ef-department-view-suffix").on("click", function () {
@@ -167,19 +167,26 @@ $(document).ready(function () {
     )
   }
 
-  $(".department-tree-wrapper").on("click", ".sub-tree-content .arrow-icon", function (event) {
+  $("body").on("click", ".department-tree-wrapper .sub-tree-content .arrow-icon", function (event) {
+    // 阻止事件冒泡
+    event.stopPropagation();
     $(this).parent().nextAll(".tree-indent, .sub-tree-content").toggle(0);
 
-      var icon = $(this).find('i');
-      icon.toggleClass(function() {
-      if (icon.hasClass("fa-caret-down")) {
-        icon.removeClass("fa-caret-down");
-        return "fa-caret-right";
-      } else {
-        icon.removeClass("fa-caret-right");
-        return "fa-caret-down";
-      }
-    })
+    let icon = $(this).find('i');
+    if (icon.hasClass("fa-caret-down")) {
+      icon.removeClass("fa-caret-down").addClass("fa-caret-right");
+    } else {
+      icon.removeClass("fa-caret-right").addClass("fa-caret-down");
+    }
+    // icon.toggleClass(function () {
+    //   if (icon.hasClass("fa-caret-down")) {
+    //     icon.removeClass("fa-caret-down");
+    //     return "fa-caret-right";
+    //   } else {
+    //     icon.removeClass("fa-caret-right");
+    //     return "fa-caret-down";
+    //   }
+    // })
   })
 
   refreshSelectionHover();
@@ -190,37 +197,143 @@ $(document).ready(function () {
   })
 
   // 退出部门弹窗
-  $(".cancelDepartment").on("click", function () {
+  $("body").on("click", ".cancelDepartment", function () {
     let inputid = $(this).attr("inputid");
     $(".ef-modal-container[inputid='" + inputid + "']").hide();
   })
 
   // 显示部门弹窗
-  $(".show-department-modal").on("click", async function () {
+  $("body").on("click", ".show-department-modal",async function () {
     let inputid = $(this).parent().attr("id");
+
+    // 检查是否已经存在该 inputid 的模态弹窗容器
     let modal = $(".ef-modal-container[inputid='" + inputid + "']");
-    modal.show();
-    // 调用部门接口，如果已经调用过就不再调用了，而是直接使用缓存
-    let singleDepCache = await Common.getCache("org.singleDepartment");
-    if (singleDepCache === null) {
-      $.ajax({
-        url: "/admin/org/departemnt/singleSelect",
-        method: "GET",
-        async: false,
-        dataType: "html",
-        success: async function(data) {
-          await Common.setCache("org.singleDepartment", data);
-          $(".department-tree-wrapper").html(data);
-          // Common.forceReloadJS('components');
-          // Common.forceReloadJS('admin');
-        }
-      })
+    if (modal.length > 0) {
+      modal.show();
     } else {
-      modal.children().find(".department-tree-wrapper").html(singleDepCache);
+      let modalWindow = `
+    <div class="ef-modal-container" style="z-index: 1001;" inputid="${inputid}">
+    <div class="ef-modal-mask"></div>
+    <div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+      <div class="ef-modal" style="width: 784px">
+        <div class="ef-modal-header">
+          <div class="ef-modal-title ef-modal-title-align-left">
+            单部门选择
+          </div>
+          <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" inputid="${inputid}">
+            <span class="ef-icon-hover">
+              <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+              </svg>
+            </span>
+          </div>
+        </div>
+        <div class="ef-modal-body">
+          <div class="department-modal-body">
+            <div class="left-tree-wrapper">
+              <div class="search-department-wrapper">
+                <span class="ef-input-wrapper">
+                  <input class="ef-input ef-input-size-mini text" type="text" clearable="true" placeholder="请输入部门名称">
+                  <span class="ef-input-suffix">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                  </span>
+                </span>
+              </div>
+              <div class="department-tree-wrapper">
+                
+              </div>
+            </div>
+            <div class="right-department-wrapper">
+              <div id="department">
+                <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+                  <div class="ef-col ef-col-6 ef-form-item-label-col">
+                    <label class="ef-form-item-label" for="department_name">部门全称</label>
+                  </div>
+                  <div class="ef-col ef-col-18 ef-form-item-wrapper-col">
+                    <div class="ef-form-item-content-wrapper">
+                      <div class="ef-form-item-content ef-form-item-content-flex">行业解决方案部三</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+                  <div class="ef-col ef-col-6 ef-form-item-label-col">
+                    <label class="ef-form-item-label" for="department_alias">部门简称</label>
+                  </div>
+                  <div class="ef-col ef-col-18 ef-form-item-wrapper-col">
+                    <div class="ef-form-item-content-wrapper">
+                      <div class="ef-form-item-content ef-form-item-content-flex">行业解决方案部三</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+                  <div class="ef-col ef-col-6 ef-form-item-label-col">
+                    <label class="ef-form-item-label" for="department_company">所属公司</label>
+                  </div>
+                  <div class="ef-col ef-col-18 ef-form-item-wrapper-col">
+                    <div class="ef-form-item-content-wrapper">
+                      <div class="ef-form-item-content ef-form-item-content-flex">天津港公司2</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+                  <div class="ef-col ef-col-6 ef-form-item-label-col">
+                    <label class="ef-form-item-label" for="department_owner">部门负责人</label>
+                  </div>
+                  <div class="ef-col ef-col-18 ef-form-item-wrapper-col">
+                    <div class="ef-form-item-content-wrapper">
+                      <div class="ef-form-item-content ef-form-item-content-flex">高强</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+                  <div class="ef-col ef-col-6 ef-form-item-label-col">
+                    <label class="ef-form-item-label" for="department_parent">上级部门</label>
+                  </div>
+                  <div class="ef-col ef-col-18 ef-form-item-wrapper-col">
+                    <div class="ef-form-item-content-wrapper">
+                      <div class="ef-form-item-content ef-form-item-content-flex"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ef-modal-footer">
+          <button class="btn secondary small cancelDepartment" type="button" inputid="${inputid}">取消</button>
+          <button class="btn primary small" type="button">确定</button>
+        </div>
+      </div>
+    </div>
+    </div>`;
+
+      // 将模态弹窗插入到页面中
+      $('body').append(modalWindow);
+
+      let modal = $(".ef-modal-container[inputid='" + inputid + "']");
+      modal.show();
+      // 调用部门接口，如果已经调用过就不再调用了，而是直接使用缓存
+      let singleDepCache = await Common.getCache("org.singleDepartment");
+      if (singleDepCache === null) {
+        $.ajax({
+          url: "/admin/org/departemnt/singleSelect",
+          method: "GET",
+          async: false,
+          dataType: "html",
+          success: async function (data) {
+            await Common.setCache("org.singleDepartment", data);
+            $(".department-tree-wrapper").html(data);
+            // Common.forceReloadJS('components');
+            // Common.forceReloadJS('admin');
+          }
+        })
+      } else {
+        modal.children().find(".department-tree-wrapper").html(singleDepCache);
+      }
     }
   })
 
-  $(".ef-modal-close-btn").on("click", function() {
+  $("body").on("click", ".ef-modal-close-btn", function() {
     let inputid = $(this).attr("inputid");
     $(".ef-modal-container[inputid='" + inputid + "']").hide();
   })
