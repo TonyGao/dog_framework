@@ -45,13 +45,15 @@ class EfInitEntityCommand extends Command
         $this
             ->addArgument('arg1', InputArgument::OPTIONAL, 'Argument description')
             ->addOption('--init', null, InputOption::VALUE_NONE, '初始化模型文件到数据库')
-            ->addOption('--listPerpertyGroup', null, InputOption::VALUE_NONE, '列出所有的属性分组');
+            ->addOption('--listPerpertyGroup', null, InputOption::VALUE_NONE, '列出所有的属性分组')
+            ->addOption('--entity', null, InputOption::VALUE_REQUIRED, '指定要初始化的实体类名称');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $arg1 = $input->getArgument('arg1');
+        $entityName = $input->getOption('entity'); // 获取 --entity 选项
 
         if ($arg1) {
             $io->note(sprintf('You passed an argument: %s', $arg1));
@@ -62,7 +64,13 @@ class EfInitEntityCommand extends Command
          */
         if ($input->getOption('init')) {
             $finder = new Finder();
-            $finder->files()->in('src/Entity');
+
+            if ($entityName) {
+              $finder->files()->in('src/Entity/')->name($entityName . '.php');
+            } else {
+              $finder->files()->in('src/Entity');
+            }
+            
 
             if ($finder->hasResults()) {
                 $repo = $this->em->getRepository(EntityPropertyGroup::class);
@@ -210,7 +218,7 @@ class EfInitEntityCommand extends Command
                                 $property = new EntityProperty();
                                 $propertyToken = sha1(random_bytes(10));
 
-                                $comment = Str::getComment($class->properties[$fieldName]->getComment());
+                                $comment = Str::getComment($class->getProperties()[$fieldName]->getComment());
                                 // if (!array_key_exists('columnName', $field)) {
                                 //     dump($field);
                                 // }
@@ -289,23 +297,15 @@ class EfInitEntityCommand extends Command
                                         ->setParent($propertyGroup);
 
                                     $this->em->persist($groupProperty);
-                                    $this->em->flush();
+                                    $property->setGroup($propertyGroup);
+                                    // $this->em->flush();
                                 }
 
                                 $entity->addProperty($property);
                                 $this->em->persist($property);
-                                $this->em->flush();
+                                // $this->em->flush();
                             }
                         }
-
-                        // $dynamicClass = new $entityClass();
-                        // $reflectionClass = new ReflectionClass($dynamicClass::class);
-                        // $annotationReader = new AnnotationReader();
-                        // $classAnnotations = $annotationReader->getClassAnnotation($reflectionClass, 'Doctrine\ORM\Mapping\Table');
-                        // dump($classAnnotations->name);
-
-                        // $repoClass = 'App\Repository\Organization\CorporationRepository';
-                        // $repoInstance = new $repoClass();
 
                         $this->em->persist($entity);
                         $this->em->flush();

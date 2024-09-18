@@ -2,7 +2,7 @@
 
 {% block stylesheets %}
 	{{ parent() }}
-	<link rel="stylesheet" type="text/css" href="{{ asset('organization/department.css', 'admin') }}"/>
+	<link rel="stylesheet" type="text/css" href="{{ asset('platform/treeLayout.css', 'admin') }}"/>
 {% endblock %}
 
 {% block javascripts %}
@@ -30,8 +30,6 @@
         dataType: "html",
         success: function(data) {
           $(".right-content").html(data);
-          {# Common.forceReloadJS('components');
-          Common.forceReloadJS('admin'); #}
         }
       })
     })

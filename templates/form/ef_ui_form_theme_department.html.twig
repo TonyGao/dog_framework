@@ -5,13 +5,16 @@
 {% set departmentContentId = random() %}
 
   <div class="ef-deparment-element">
-		<div class="ef-department-selection">
-			<span class="ef-department-selection-span">
-				<ul></ul>
-			</span>
-		</div>
 		<span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search" style="width: 260px;" chosen="false" id="{{ departmentInputId }}" contentid="{{ departmentContentId }}">
-			<input class="ef-department-view-input" placeholder="请输入部门名称 ..." mode="single">
+			<div class="ef-department-selection-container">
+				<div class="ef-department-selection">
+					<span class="ef-department-selection-span">
+						<ul>
+						</ul>
+					</span>
+				</div>
+				<input class="ef-department-view-input" placeholder="请输入部门名称 ..." mode="single" chose="false">
+			</div>
 			<span class="ef-department-view-value ef-department-view-value-hidden"></span>
 			<span class="ef-department-view-suffix show-department-modal">
 				<span class="ef-department-view-icon">

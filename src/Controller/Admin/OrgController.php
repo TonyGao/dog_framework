@@ -210,7 +210,7 @@ class OrgController extends AbstractController
               <i class="fa-solid fa-user-group"></i>
 						</div>
 						<div class="org-name">
-							<div class="org-text-content department" type="department">' .
+							<div class="org-text-content department" type="department" path="'. $node['path'] .'" id="'. $node['id'] .'">' .
             $node['name']
             . '</div>
 						</div>
@@ -222,6 +222,18 @@ class OrgController extends AbstractController
     return $this->render('admin/org/department.html.twig', [
       'departmentTree' => $department
     ]);
+  }
+
+  private function buildDepartmentPath(array $node, array $repo): string
+  {
+    // 递归构建路径，如果有父节点则加上父节点的路径
+    if (!empty($node['parent'])) {
+      $parentNode = $repo->find($node['parent']['id']);
+      return $this->buildDepartmentPath($parentNode, $repo) . '/' . $node['name'];
+    }
+
+    // 如果没有父节点，则返回当前节点名称
+    return $node['name'];
   }
 
   /**
@@ -307,7 +319,7 @@ class OrgController extends AbstractController
                 <i class="fa-solid fa-user-group"></i>
               </div>
               <div class="org-name">
-                <div class="org-text-content department" type="department">' .
+                <div class="org-text-content department" type="department" path="'. $node['path'] .'" id="'. $node['id'] .'">' .
             $node['name']
             . '</div>
               </div>
@@ -333,20 +345,19 @@ class OrgController extends AbstractController
     $form = $this->createForm(OrgDepartmentType::class, $department, [
       'action' => $this->generateUrl('org_department_new')
     ]);
-    // $form = $this->createForm(OrgDepartmentType::class, $department);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-      $department = $form->getData();
+      $departmentPost = $form->getData();
       // 当新增部门里的类型为部门，并且上级部门为空时，将所属公司同名的部门找出作为上级部门
       // 即这个部门是在个一级部门
-      if ($department->getType() == 'department' && $department->getParent() == null) {
-        $company = $department->getCompany()->getName();
+      if ($departmentPost->getType() == 'department' && $departmentPost->getParent() == null) {
+        $company = $departmentPost->getCompany()->getName();
         $repo = $em->getRepository(Department::class);
         $parent = $repo->findOneBy(['name' => $company]);
-        $department->setParent($parent);
+        $departmentPost->setParent($parent);
       }
-      $em->persist($department);
+      $em->persist($departmentPost);
       $em->flush();
 
       return $this->redirectToRoute('org_department');

@@ -1,0 +1,12 @@
+twig:
+    globals:
+        icons:
+            create: 'fa-regular fa-square-plus'
+            modify: 'fa-regular fa-pen-to-square'
+            delete: 'fa-regular fa-trash'
+            save: 'fa-regular fa-save'
+        label:
+            create: '新建'
+            modify: '修改'
+            delete: '删除'
+            save: '保存'

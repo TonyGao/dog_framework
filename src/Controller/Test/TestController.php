@@ -22,7 +22,7 @@ class TestController extends AbstractController
   public function element(Request $request, $element): Response
   {
     $session = $this->requestStack->getSession();
-    $session->setId("AAA");
+    // $session->setId("AAA");
     $template = 'test/' . $element . '.html.twig';
     return $this->render($template);
   }

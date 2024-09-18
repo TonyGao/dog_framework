@@ -1,0 +1,127 @@
+.ef-menu-left-title {
+  margin-bottom: 10px;
+}
+
+.ef-menu-left-title {
+  display: flex;
+  justify-content: space-between; /* 让左右两边的元素自动分开 */
+  align-items: center; /* 垂直居中对齐 */
+}
+
+.ef-menu-left-title-content {
+  font-size: medium;
+  margin-right: 5px;
+}
+
+.ef-menu-left-title-button {
+  margin-left: 5px;
+}
+
+.ef-select-option-content {
+  margin-left: 5px;
+}
+
+.ef-menu-left-title {
+  position: relative; /* 设置相对定位 */
+}
+
+.ef-group-filed-handler-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.ef-group-filed-handler-wrapper .circle {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background-color: rgb(88 88 88);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 13px;
+  cursor: move;
+}
+
+.item-content.scroll-item {
+  display: flex;
+  align-items: center; /* 垂直居中 */
+  justify-content: flex-start; /* 元素在水平方向上按原顺序排列 */
+}
+
+.org-icon, .node-name, .node-tail-icon {
+  display: flex;
+  align-items: center; /* 保证内部的元素也垂直居中 */
+}
+
+.node-tail-icon {
+  margin-left: 8px;
+}
+
+.arrow-icon {
+  display: flex;
+  align-items: center; /* 确保箭头图标垂直居中 */
+}
+
+.ef-group-field-handler .circle {
+  display: flex;
+  align-items: center; /* 圆形图标垂直居中 */
+  justify-content: center; /* 圆形图标水平居中 */
+}
+
+.item-original {
+  display: flex;
+}
+
+.sortable-placeholder {
+  background-color: #f0f0f0;
+  border: 2px dashed #ddd;
+  height: 50px;
+  margin: 5px;
+}
+
+.dragging {
+  background-color: #e0e0e0;
+  opacity: 0.8;
+}
+
+.sub-tree-content:empty::before {
+  content: "\00a0"; /* 不可见字符 */
+  display: inline-block;
+  min-width: calc(100% - 16px);
+  height: 1px; /* 可以调整 */
+}
+
+.sub-tree-content:empty {
+  display: inline-block;
+  vertical-align: top;
+  background-color: #f0f0f0; /* 提供放置区域提示 */
+  min-height: 20px; /* 确保空区域可以拖放 */
+  min-width: calc(100% - 16px);
+  background-color: transparent; /* 确保空的元素不会显示背景 */
+  border: 1px dashed red;
+}
+
+.sub-tree-content li {
+  min-width: 150px;
+}
+
+.ui-sortable-placeholder {
+  min-width: 100%; /* 占位符宽度 */
+  background: none; /* 避免视觉问题 */
+}
+
+.tree-indent {
+  display: inline-block;
+  vertical-align: top; /* 保证和 ol 在同一行 */
+}
+
+.sub-tree-content {
+  display: block;
+}
+
+
+

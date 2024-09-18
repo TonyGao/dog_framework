@@ -2,7 +2,7 @@ class Route {
   constructor() {
     // Check if routes are cached in localforage
     this.routes = null;
-    this.getCachedRoutes();
+    this.ready = this.getCachedRoutes();
   }
 
   async getCachedRoutes() {
@@ -12,9 +12,6 @@ class Route {
         // Fetch routes from Symfony server and cache them
         await this.fetchRoutes();
       }
-      // Now that routes are available, proceed with generating routes
-      // Move this line here from the constructor
-      // const submitFieldsRoute = this.generate("api_platform_entity_submitFields");
     } catch (error) {
       console.error("Error fetching cached routes:", error);
     }
@@ -42,7 +39,9 @@ class Route {
     }
   }
 
-  generate(routeName, parameters = {}) {
+  async generate(routeName, parameters = {}) {
+    await this.ready;
+    
     if (!this.routes) {
       console.error("Routes not available. Please try again later.");
       return null;
@@ -50,7 +49,13 @@ class Route {
 
     const route = this.routes[routeName];
     if (!route) {
-      console.error(`Route "${routeName}" not found.`);
+      console.warn(`Route "${routeName}" not found. Attempting to refresh routes.`);
+      await this.fetchRoutes();
+      route = this.routes[routeName];
+      if (!route) {
+        console.error(`Route "${routeName}" not found after refresh.`);
+        return null;
+      }
       return null;
     }
 

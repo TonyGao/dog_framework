@@ -1,0 +1,11 @@
+{# EF标准Twig UI库 #}
+
+{% macro barButton(type = 'create', text = null, classes = 'btn outline primary medium mini round icon') %}
+    {% set icon = icons[type] ?? 'fa-regular fa-question-circle' %}
+    {% set buttonText = text is not null ? text : (label[type]) %}
+    
+    <button class="{{ classes }}" id="{{ type }}">
+        <i class="{{ icon }}"></i> {{ buttonText }}
+    </button>
+{% endmacro %}
+

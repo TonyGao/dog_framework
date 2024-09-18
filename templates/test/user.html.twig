@@ -1,0 +1,114 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% set userInputId = random() %}
+{% set userInputId2 = random() %}
+{% set userContentId = random() %}
+{% set userContentId2 = random() %}
+
+{% block javascripts %}
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	<div class="container" style="padding-left: 20px;">
+		<h3>单用户选择器（UI静态）</h3>
+		<div class="ef-deparment-element" style="margin-bottom: 20px;">
+			<span class="ef-user-view-single ef-user ef-user-view ef-user-view-size-medium ef-user-view-search" style="width: 260px;" chosen="false" id="{{ userInputId }}" contentid="{{ userContentId }}">
+			  <div class="ef-user-selection-container">
+					<div class="ef-user-selection">
+						<span class="ef-user-selection-span">
+							<ul>
+								<li class="ef-user-selection-li">
+									<div class="ef-user-selection-li-content">
+										<a href="link" class="ef-link" id="21">集团简称/公司简称/行业解决方案部三/行业子部门</a>
+										<span class="ef-user-view-suffix" style="display: none;">
+											<span class="ef-user-view-icon">
+												<i class="fa-regular fa-circle-xmark"></i>
+											</span>
+										</span>
+									</div>
+								</li>
+							</ul>
+						</span>
+					</div>
+					<input class="ef-user-view-input" placeholder="请输入部门名称 ..." mode="single" chose="false">
+        </div>
+
+				<span class="ef-user-view-value ef-user-view-value-hidden"></span>
+				<span class="ef-user-view-suffix show-user-modal">
+					<span class="ef-user-view-icon">
+						<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-search" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+							<path d="M33.072 33.071c6.248-6.248 6.248-16.379 0-22.627-6.249-6.249-16.38-6.249-22.628 0-6.248 6.248-6.248 16.379 0 22.627 6.248 6.248 16.38 6.248 22.628 0Zm0 0 8.485 8.485"></path>
+						</svg>
+					</span>
+				</span>
+			</span>
+		</div>
+		<div class="ef-trigger-popup ef-trigger-position-bl" trigger-placement="bl" style="z-index: 1001; pointer-events: auto; min-width: 260px; width: fit-content" id="{{ userContentId }}" parentid="{{ userInputId }}">
+			<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+				<div class="ef-trigger-content">
+					<div class="ef-user-dropdown">
+						<div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+							<div class="ef-scrollbar-container ef-user-dropdown-list-wrapper">
+								<ul class="ef-user-dropdown-list">
+									<li id="{{ random() }}" class="ef-user-option"></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<h3>多部门选择器</h3>
+		<div class="ef-deparment-element">
+			<div class="ef-user-selection">
+				<span class="ef-user-selection-span">
+					<ul>
+						<li class="ef-user-selection-li">
+							<div class="ef-user-selection-li-content">
+								<a href="link" class="ef-link" id="123">北京子公司/高性能研发部/高性能前端设计部1</a>
+								<span class="ef-user-view-suffix">
+									<span class="ef-user-view-icon">
+										<i class="fa-regular fa-circle-xmark"></i>
+									</span>
+								</span>
+							</div>
+						</li>
+					</ul>
+				</span>
+			</div>
+			<span class="ef-user-view-single ef-user ef-user-view ef-user-view-size-medium ef-user-view-search" style="width: 260px;" chosen="false" id="{{ userInputId2 }}" contentid="{{ userContentId2 }}">
+				<input class="ef-user-view-input" placeholder="请输入部门名称 ..." mode="multiple" chose="false">
+				<span class="ef-user-view-value ef-user-view-value-hidden"></span>
+				<span class="ef-user-view-suffix">
+					<span class="ef-user-view-icon">
+						<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-search" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+							<path d="M33.072 33.071c6.248-6.248 6.248-16.379 0-22.627-6.249-6.249-16.38-6.249-22.628 0-6.248 6.248-6.248 16.379 0 22.627 6.248 6.248 16.38 6.248 22.628 0Zm0 0 8.485 8.485"></path>
+						</svg>
+					</span>
+				</span>
+			</span>
+		</div>
+		<div class="ef-trigger-popup ef-trigger-position-bl" trigger-placement="bl" style="z-index: 1001; pointer-events: auto; min-width: 260px; width: fit-content" id="{{ userContentId2 }}" parentid="{{ userInputId2 }}">
+			<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+				<div class="ef-trigger-content">
+					<div class="ef-user-dropdown">
+						<div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+							<div class="ef-scrollbar-container ef-user-dropdown-list-wrapper">
+								<ul class="ef-user-dropdown-list">
+									<li id="{{ random() }}" class="ef-user-option"></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="ef-trigger-popup-close-button">
+				<button class="btn primary medium icon circle">
+					<i class="fa-solid fa-xmark"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+{% endblock %}

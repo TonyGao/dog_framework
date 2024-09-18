@@ -48,10 +48,10 @@
   line-height: 1.5715;
 }
 
-.ef-department-view-single.ef-department-view-search .ef-department-view-input,
+/* .ef-department-view-single.ef-department-view-search .ef-department-view-input,
 .ef-department-view-single.ef-department-view-search .ef-department-view-value {
   pointer-events: none;
-}
+} */
 
 .ef-department-view-single .ef-department-view-input {
   width: 100%;
@@ -85,10 +85,6 @@
   padding-bottom: 4px;
   font-size: 14px;
   line-height: 1.5715;
-}
-.ef-department-view-single.ef-department-view-search .ef-department-view-input,
-.ef-department-view-single.ef-department-view-search .ef-department-view-value {
-  pointer-events: none;
 }
 
 .ef-department-view-single .ef-department-view-value {
@@ -422,4 +418,10 @@
 .department-select-line {
   display: flex;
   cursor: pointer;
+}
+
+.ef-department-selection-container {
+  width: 100%;
+  padding-right: 0;
+  padding-left: 0;
 }

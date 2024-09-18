@@ -7,43 +7,24 @@
 
 {% block javascripts %}
 	{{ parent() }}
+	<script src="{{ asset('layout.js', 'admin') }}"></script>
 	<script>
   // 初始化 localforage 数据库名
   localforage.config({
     name: 'EnterpriseFramework'
   });
-
-	$(document).ready(function () {
-      $(".hPerson-avatar-box").on("click", function () {
-        $(".dropdown-menu.hidden").toggle("slow", "swing");
-      });
-
-      $(".parent-menu .scroll-item").on("click", function (event) {
-        $(this).next().toggle("fast");
-				var icon = $(this).find('.link-text i');
-				icon.toggleClass(function() {
-					if (icon.hasClass("fa-chevron-down")) {
-						icon.removeClass("fa-chevron-down");
-						return "fa-chevron-up";
-					} else {
-						icon.removeClass("fa-chevron-up");
-						return "fa-chevron-down";
-					}
-				})
-      })
-    })
 	</script>
 {% endblock %}
 
 {% block body %}
 	<div id="app">
 		<section class="layout-container">
-			<header class="app-header">
+			<header class="app-header {{ headerState == 'shrunk' ? 'shrunk' : '' }}">
 				<div class="admin-left-logo">
 					<div class="admin-left-logo-container">
-						<div class="admin-logo">
+						<div class="admin-logo {{ headerState == 'shrunk' ? 'shrunk' : '' }}">
 							<a href="/admin/index">
-								<div class="logo-image" style="background-image: url('{{ asset('logo/logo.png', 'image') }}');"></div>
+								<div class="logo-image {{ headerState == 'shrunk' ? 'shrunk' : '' }}" style="background-image: url('{{ asset('logo/logo.png', 'image') }}');"></div>
 							</a>
 						</div>
 					</div>
@@ -61,7 +42,7 @@
 					<div class="hSeperater"></div>
 					<span>
 						<div class="module-container">
-							<div class="module-icon-container">
+							<div class="module-icon-container {{ headerState == 'shrunk' ? 'shrunk' : '' }}">
 								<span class="universe-icon">
 									<a class="fa-brands fa-symfony" href="/_profiler/empty/search/results?limit=20" target="_blank"></a>
 								</span>
@@ -71,8 +52,8 @@
 					<span>
 						<div class="hPerson-container">
 							<div class="hPerson-control">
-								<div class="hPerson-avatar-box">
-									<div class="hPerson-avatar">Tony</div>
+								<div class="hPerson-avatar-box {{ headerState == 'shrunk' ? 'shrunk' : '' }}">
+									<div class="hPerson-avatar" style="display: {{ headerState == 'shrunk' ? 'none' : 'block' }}">Tony</div>
 									<div class="hPerson-content">
 										<div class="hPerson-name">Tony Gao</div>
 									</div>
@@ -119,6 +100,11 @@
 							</div>
 						</div>
 					</span>
+				</div>
+				<div class="header-toggle">
+						<button id="toggle-header-button">
+								<i class="fa-solid fa-angle-up"></i> <!-- 向上箭头图标 -->
+						</button>
 				</div>
 			</header>
 			<section class="app-body">
