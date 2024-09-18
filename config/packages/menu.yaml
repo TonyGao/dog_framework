@@ -28,3 +28,11 @@ parameters:
         "/admin/platform/restful/index",
         "模型和接口",
       ]
+    - ["应用程序构建器", "", "#", "root"]
+    - [
+        "表单设计器",
+        "",
+        "/admin/platform/application/form/builder",
+        "应用程序构建器"
+      ]
+      

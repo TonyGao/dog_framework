@@ -39,7 +39,6 @@
         // Default: No error label
       },
       highlight: function (element) {
-        console.log($(element));
         if ($(element).is("[component='input']")) {
           // Add aria-invalid="true" attribute and error class when input is invalid
           $(element).attr("aria-invalid", "true").addClass("error");

@@ -1,129 +1,197 @@
 <section class="app-side-menu">
-	<aside class="admin-aside-outer">
-		<div class="side-menu-one">
-			<div class="side-menu-two">
-				<div class="universe-icon side-scroll-btn">
-					<i class="fa-solid fa-angles-left"></i>
-				</div>
-				<div class="side-menu-content">
-					
-					
-																								                        													<a class="side-home link item-menu-content {{'/admin/index'== app.request.requestUri ? 'current' : '' }}" href="/admin/index">
-								<div class="link-icon">
-									<i class="fa-solid fa-house"></i>
-								</div>
-								<div class="link-text">
-									<div class="link-text-content" style="max-width: 83%;">首页</div>
-								</div>
-							</a>
-											
-																			                        													<div class="parent-menu">
-								<div class="item-menu-content scroll-item">
-									<div class="link-icon">
-																					<i class="fa-solid fa-sitemap"></i>
-																			</div>
-									<div class="link-text">
-										<div class="link-text-content" style="max-width: 83%;">组织架构</div>
-										<i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
-									</div>
-								</div>
-								<div class="sub-menu-content" style="{{'#'== app.request.requestUri ? 'display: none;' : '' }}">
-																									                        													<a class=" link item-menu-content {{'/admin/org/corporation'== app.request.requestUri ? 'current' : '' }}" href="/admin/org/corporation">
-								<div class="link-icon">
-									<i class="fa-solid fa-building"></i>
-								</div>
-								<div class="link-text">
-									<div class="link-text-content" style="max-width: 83%;">公司架构</div>
-								</div>
-							</a>
-											
-																									                        													<a class=" link item-menu-content {{'/admin/org/department'== app.request.requestUri ? 'current' : '' }}" href="/admin/org/department">
-								<div class="link-icon">
-									<i class="fa-solid fa-people-roof"></i>
-								</div>
-								<div class="link-text">
-									<div class="link-text-content" style="max-width: 83%;">部门管理</div>
-								</div>
-							</a>
-											
-																									                        													<a class=" link item-menu-content {{'/admin/org/title'== app.request.requestUri ? 'current' : '' }}" href="/admin/org/title">
-								<div class="link-icon">
-									<i class="fa-solid fa-user-tie"></i>
-								</div>
-								<div class="link-text">
-									<div class="link-text-content" style="max-width: 83%;">岗位管理</div>
-								</div>
-							</a>
-											
-																									                        													<a class=" link item-menu-content {{'/admin/org/grade'== app.request.requestUri ? 'current' : '' }}" href="/admin/org/grade">
-								<div class="link-icon">
-									<i class="fa-solid fa-layer-group"></i>
-								</div>
-								<div class="link-text">
-									<div class="link-text-content" style="max-width: 83%;">职级管理</div>
-								</div>
-							</a>
-											
-																									                        													<div class="parent-menu">
-								<div class="item-menu-content scroll-item">
-									<div class="link-icon">
-																					<i class="fa-solid fa-people-group"></i>
-																			</div>
-									<div class="link-text">
-										<div class="link-text-content" style="max-width: 83%;">人员管理</div>
-										<i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
-									</div>
-								</div>
-								<div class="sub-menu-content" style="{{'#'== app.request.requestUri ? 'display: none;' : '' }}">
-																									                        													<a class=" link item-menu-content {{'/admin/hr/employee'== app.request.requestUri ? 'current' : '' }}" href="/admin/hr/employee">
-								<div class="link-icon">
-									<i class="fa-solid fa-address-card"></i>
-								</div>
-								<div class="link-text">
-									<div class="link-text-content" style="max-width: 83%;">人员信息</div>
-								</div>
-							</a>
-											
-																	</div>
-							</div>
-											
-																	</div>
-							</div>
-											
-																			                        													<div class="parent-menu">
-								<div class="item-menu-content scroll-item">
-									<div class="link-icon">
-																					<i class="fa-solid fa-database"></i>
-																			</div>
-									<div class="link-text">
-										<div class="link-text-content" style="max-width: 83%;">模型和接口</div>
-										<i class="fa-solid fa-chevron-down" style="transform: rotate(0deg);"></i>
-									</div>
-								</div>
-								<div class="sub-menu-content" style="{{'#'== app.request.requestUri ? 'display: none;' : '' }}">
-																									                        													<a class=" link item-menu-content {{'/admin/platform/entity/index'== app.request.requestUri ? 'current' : '' }}" href="/admin/platform/entity/index">
-								<div class="link-icon">
-									<i class="fa-solid fa-coins"></i>
-								</div>
-								<div class="link-text">
-									<div class="link-text-content" style="max-width: 83%;">模型管理</div>
-								</div>
-							</a>
-											
-																									                        													<a class=" link item-menu-content {{'/admin/platform/restful/index'== app.request.requestUri ? 'current' : '' }}" href="/admin/platform/restful/index">
-								<div class="link-icon">
-									<i class="fa-solid fa-manat-sign"></i>
-								</div>
-								<div class="link-text">
-									<div class="link-text-content" style="max-width: 83%;">接口管理</div>
-								</div>
-							</a>
-											
-																	</div>
-							</div>
-											
-															</div>
-			</div>
-		</div>
-	</aside>
+  <aside class="admin-aside-outer">
+    <div class="side-menu-one">
+      <div class="side-menu-two">
+        <div class="universe-icon side-scroll-btn">
+          <i class="fa-solid fa-angles-left"></i>
+        </div>
+        <div class="side-menu-content">
+          <a
+            class="side-home link item-menu-content {{'/admin/index'== app.request.requestUri ? 'current' : '' }}"
+            href="/admin/index"
+          >
+            <div class="link-icon">
+              <i class="fa-solid fa-house"></i>
+            </div>
+            <div class="link-text">
+              <div class="link-text-content" style="max-width: 83%">首页</div>
+            </div>
+          </a>
+
+          <div class="parent-menu">
+            <div class="item-menu-content scroll-item">
+              <div class="link-icon">
+                <i class="fa-solid fa-sitemap"></i>
+              </div>
+              <div class="link-text">
+                <div class="link-text-content" style="max-width: 83%">
+                  组织架构
+                </div>
+                <i
+                  class="fa-solid fa-chevron-down"
+                  style="transform: rotate(0deg)"
+                ></i>
+              </div>
+            </div>
+            <div
+              class="sub-menu-content"
+              style="{{'#'== app.request.requestUri ? 'display: none;' : '' }}"
+            >
+              <a
+                class=" link item-menu-content {{'/admin/org/corporation'== app.request.requestUri ? 'current' : '' }}"
+                href="/admin/org/corporation"
+              >
+                <div class="link-icon">
+                  <i class="fa-solid fa-building"></i>
+                </div>
+                <div class="link-text">
+                  <div class="link-text-content" style="max-width: 83%">
+                    公司架构
+                  </div>
+                </div>
+              </a>
+
+              <a
+                class=" link item-menu-content {{'/admin/org/department'== app.request.requestUri ? 'current' : '' }}"
+                href="/admin/org/department"
+              >
+                <div class="link-icon">
+                  <i class="fa-solid fa-people-roof"></i>
+                </div>
+                <div class="link-text">
+                  <div class="link-text-content" style="max-width: 83%">
+                    部门管理
+                  </div>
+                </div>
+              </a>
+
+              <a
+                class=" link item-menu-content {{'/admin/org/title'== app.request.requestUri ? 'current' : '' }}"
+                href="/admin/org/title"
+              >
+                <div class="link-icon">
+                  <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <div class="link-text">
+                  <div class="link-text-content" style="max-width: 83%">
+                    岗位管理
+                  </div>
+                </div>
+              </a>
+
+              <a
+                class=" link item-menu-content {{'/admin/org/grade'== app.request.requestUri ? 'current' : '' }}"
+                href="/admin/org/grade"
+              >
+                <div class="link-icon">
+                  <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div class="link-text">
+                  <div class="link-text-content" style="max-width: 83%">
+                    职级管理
+                  </div>
+                </div>
+              </a>
+
+              <div class="parent-menu">
+                <div class="item-menu-content scroll-item">
+                  <div class="link-icon">
+                    <i class="fa-solid fa-people-group"></i>
+                  </div>
+                  <div class="link-text">
+                    <div class="link-text-content" style="max-width: 83%">
+                      人员管理
+                    </div>
+                    <i
+                      class="fa-solid fa-chevron-down"
+                      style="transform: rotate(0deg)"
+                    ></i>
+                  </div>
+                </div>
+                <div
+                  class="sub-menu-content"
+                  style="{{'#'== app.request.requestUri ? 'display: none;' : '' }}"
+                >
+                  <a
+                    class=" link item-menu-content {{'/admin/hr/employee'== app.request.requestUri ? 'current' : '' }}"
+                    href="/admin/hr/employee"
+                  >
+                    <div class="link-icon">
+                      <i class="fa-solid fa-address-card"></i>
+                    </div>
+                    <div class="link-text">
+                      <div class="link-text-content" style="max-width: 83%">
+                        人员信息
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="parent-menu">
+            <div class="item-menu-content scroll-item">
+              <div class="link-icon">
+                <i class="fa-solid fa-database"></i>
+              </div>
+              <div class="link-text">
+                <div class="link-text-content" style="max-width: 83%">
+                  模型和接口
+                </div>
+                <i
+                  class="fa-solid fa-chevron-down"
+                  style="transform: rotate(0deg)"
+                ></i>
+              </div>
+            </div>
+            <div
+              class="sub-menu-content"
+              style="{{'#'== app.request.requestUri ? 'display: none;' : '' }}"
+            >
+              <a
+                class=" link item-menu-content {{'/admin/platform/entity/index'== app.request.requestUri ? 'current' : '' }}"
+                href="/admin/platform/entity/index"
+              >
+                <div class="link-icon">
+                  <i class="fa-solid fa-coins"></i>
+                </div>
+                <div class="link-text">
+                  <div class="link-text-content" style="max-width: 83%">
+                    模型管理
+                  </div>
+                </div>
+              </a>
+
+              <a
+                class=" link item-menu-content {{'/admin/platform/restful/index'== app.request.requestUri ? 'current' : '' }}"
+                href="/admin/platform/restful/index"
+              >
+                <div class="link-icon">
+                  <i class="fa-solid fa-manat-sign"></i>
+                </div>
+                <div class="link-text">
+                  <div class="link-text-content" style="max-width: 83%">
+                    接口管理
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <a
+            class=" link item-menu-content {{'/admin/platform/menu/index'== app.request.requestUri ? 'current' : '' }}"
+            href="/admin/platform/menu/index"
+          >
+            <div class="link-icon">
+              <i class="fa-regular fa-compass"></i>
+            </div>
+            <div class="link-text">
+              <div class="link-text-content" style="max-width: 83%">Menu</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
 </section>

@@ -1,16 +1,22 @@
 <?php
 
-namespace App\Entity\Admin;
+namespace App\Entity\Platform;
 
+use App\Annotation\Ef;
 use App\Entity\CommonTrait;
+use App\Repository\Platform\MenuRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Tree\Node as GedmoNode;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 
+/**
+ * 菜单
+ * isBusinessEntity
+ */
 #[Gedmo\Tree(type: 'nested')]
 #[ORM\Table(name: 'admin_menu')]
-#[ORM\Entity(repositoryClass: Gedmo\Tree\Entity\Repository\NestedTreeRepository::class)]
+#[ORM\Entity(repositoryClass: MenuRepository::class)]
 class Menu implements GedmoNode
 {
     use CommonTrait;
@@ -20,18 +26,78 @@ class Menu implements GedmoNode
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
+    /**
+     * 菜单名称
+     * @Ef(
+     *     group="menu_base_info",
+     *     isBF=true
+     * )
+     */
     #[ORM\Column("menu_label", type: "string", length: 64)]
     private $label;
 
-    #[ORM\Column('menu_uri', type: 'string', length: 64)]
+    /**
+     * uri
+     * type: system or custom
+     * @Ef(
+     *     group="menu_base_info",
+     *     isBF=true
+     * )
+     */
+    #[ORM\Column('menu_uri', type: 'string', length: 250)]
     private $uri;
 
     /**
+     * Symfony route name
+     * type: system or custom
+     * @Ef(
+     *     group="menu_base_info",
+     *     isBF=true
+     * )
+     */
+    #[ORM\Column('menu_routeName', type: 'string', length: 250, nullable: true)]
+    private $routeName;
+
+    /**
+     * 外部链接 url
+     * @EF(
+     *     group="menu_base_info",
+     *     isBF=true
+     * )
+     */
+    #[ORM\Column('menu_url', type: 'string', length: 500, nullable: true)]
+    private $url;
+
+    /**
      * 菜单图标
-     * @var string
+     * @Ef(
+     *     group="menu_base_info",
+     *     isBF=true
+     * )
      */
     #[ORM\Column('icon', length: 255, nullable: true)]
     private $icon;
+
+    /**
+     * 菜单类型
+     * 分为 system 系统菜单 custom 自定义菜单 outside 外部链接
+     * @Ef(
+     *     group="menu_base_info",
+     *     isBF=true
+     * )
+     */
+    #[ORM\Column("menu_type", type: "string", length: 64, nullable: true)]
+    private $type = 'system';
+
+    /**
+     * 菜单描述
+     * @Ef(
+     *     group="menu_base_info",
+     *     isBF=true
+     * )
+     */
+    #[ORM\Column("menu_description", type: "string", length: 200, nullable: true)]
+    private $description;
 
     #[Gedmo\TreeLeft]
     #[ORM\Column(name: 'lft', type: 'integer')]
@@ -255,6 +321,106 @@ class Menu implements GedmoNode
     public function setChildren($children)
     {
         $this->children = $children;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of routePath
+     */ 
+    public function getRoutePath()
+    {
+        return $this->routePath;
+    }
+
+    /**
+     * Set the value of routePath
+     *
+     * @return  self
+     */ 
+    public function setRoutePath($routePath)
+    {
+        $this->routePath = $routePath;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of url
+     */ 
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * Set the value of url
+     *
+     * @return  self
+     */ 
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of type
+     */ 
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set the value of type
+     *
+     * @return  self
+     */ 
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of routeName
+     */ 
+    public function getRouteName()
+    {
+        return $this->routeName;
+    }
+
+    /**
+     * Set the value of routeName
+     *
+     * @return  self
+     */ 
+    public function setRouteName($routeName)
+    {
+        $this->routeName = $routeName;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of description
+     */ 
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Set the value of description
+     *
+     * @return  self
+     */ 
+    public function setDescription($description)
+    {
+        $this->description = $description;
 
         return $this;
     }

@@ -26,7 +26,7 @@ $(document).ready(function () {
       // 避免重复或空值执行
       if (window[departmentVar] != v && v != '') {
         let mode = $(this).attr('mode'); // 模式分为单选 single，和多选 mutiple
-        departmentInput = $(this).parent();
+        departmentInput = $(this).parents('.ef-department-view-single.ef-department');
         contentId = departmentInput.attr("contentid");
 
         window[departmentVar] = v;
@@ -45,7 +45,7 @@ $(document).ready(function () {
               let height = departmentInput.outerHeight();
               let top = departmentInput.position().top + height + 6;
               let left = departmentInput.position().left;
-              let selectionUl = departmentInput.parent().children(".ef-department-selection").find("ul");
+              let selectionUl = departmentInput.children().find(".ef-department-selection-span ul");
               $("#" + contentId).css({
                 "left": left,
                 "top": top
@@ -93,7 +93,7 @@ $(document).ready(function () {
                 let template = `<li class="ef-department-selection-li">
                                   <div class="ef-department-selection-li-content">
                                     <a href="link" class="ef-link" id="${id}">${content}</a>
-                                    <span class="ef-department-view-suffix" style="display: none;">
+                                    <span class="ef-department-view-suffix close-chose-department" style="display: none;">
                                       <span class="ef-department-view-icon">
                                         <i class="fa-regular fa-circle-xmark"></i>
                                       </span>
@@ -105,6 +105,10 @@ $(document).ready(function () {
                   // 清空上边选中的部门
                   selectionUl.html(template);
                   $("#" + contentId).hide();
+                  let input = $('[contentId="'+ contentId +'"]').find('.ef-department-selection-container input');
+                  input.attr("chose", "true");
+                  input.val("");
+                  input.hide();
                 }
 
                 if (mode === 'multiple') {
@@ -130,7 +134,13 @@ $(document).ready(function () {
                 //departmentInput.find("input").val("");
 
                 // 删除选项
-                $(".ef-department-view-suffix").on("click", function () {
+                $(".close-chose-department").on("click", function () {
+                  if (mode === 'single') {
+                    let input = $(this).parents('.ef-department-selection-container').find('input');
+                    input.attr("chose", "false");
+                    input.show();
+                    input.focus();
+                  }
                   $(this).parents(".ef-department-selection-li").remove();
                 })
               })
@@ -147,30 +157,51 @@ $(document).ready(function () {
         window[departmentVar] = '';
       }
     }
-  }, 500))
+  }, 200))
 
-  // 隐藏选项弹窗，这是公共行为
+  //隐藏选项弹窗，隐藏上方有选定部门的输入框，这是公共行为
   $(document).on("click", function (event) {
-    if (!$(event.target).closest(".ef-trigger-popup-wrapper, .ef-select-view-single").length) {
-      $(".ef-department-view-input").val("");
+    if ($(event.target).closest(".ef-trigger-popup-wrapper, .ef-select-view-single").length > 0 || $(event.target).children().find(".ef-department-selection-li-content").length > 0) {
+      let input = $(".ef-department-view-input");
+      if (input.length > 0) {
+        $.each(input, function(idx, ele) {
+          if ($(ele).attr("chose") == 'true') {
+            $(ele).hide();
+          }
+        })
+      }
+      input.val("");
     }
   })
 
+  // function refreshSelectionHover() {
+  //   $(".ef-department-selection-li").hover(
+  //     function () {
+  //       $(this).children().find(".ef-department-view-suffix").show();
+  //     },
+  //     function () {
+  //       $(this).children().find(".ef-department-view-suffix").hide();
+  //     }
+  //   )
+  // }
+
   function refreshSelectionHover() {
-    $(".ef-department-selection-li").hover(
-      function () {
-        $(this).children().find(".ef-department-view-suffix").show();
-      },
-      function () {
-        $(this).children().find(".ef-department-view-suffix").hide();
-      }
-    )
-  }
+    $("body").on("mouseenter", ".ef-department-selection-li", function() {
+        $(this).find(".close-chose-department").show();
+    });
+
+    $("body").on("mouseleave", ".ef-department-selection-li", function() {
+        $(this).find(".close-chose-department").hide();
+    });
+}
+
 
   $("body").on("click", ".department-tree-wrapper .sub-tree-content .arrow-icon", function (event) {
     // 阻止事件冒泡
     event.stopPropagation();
-    $(this).parent().nextAll(".tree-indent, .sub-tree-content").toggle(0);
+    // 找到最近的 item-content 容器，然后找到里面的 .tree-indent 和 .sub-tree-content
+    const parentItem = $(this).closest('.item-content');
+    parentItem.nextAll(".tree-indent, .sub-tree-content").toggle(0);
 
     let icon = $(this).find('i');
     if (icon.hasClass("fa-caret-down")) {
@@ -178,23 +209,26 @@ $(document).ready(function () {
     } else {
       icon.removeClass("fa-caret-right").addClass("fa-caret-down");
     }
-    // icon.toggleClass(function () {
-    //   if (icon.hasClass("fa-caret-down")) {
-    //     icon.removeClass("fa-caret-down");
-    //     return "fa-caret-right";
-    //   } else {
-    //     icon.removeClass("fa-caret-right");
-    //     return "fa-caret-down";
-    //   }
-    // })
   })
 
   refreshSelectionHover();
 
-  $(".department-tree-wrapper").on("click", ".department-select-line", function (event) {
+  $("body").on("click", ".department-tree-wrapper .department-select-line", function (event) {
     $(this).children(".ef-radio").trigger("click");
-    event.stopPropagation();
   })
+
+  $("body").on("click", ".department-tree-wrapper .ef-radio", function (event) {
+    // 获取部门id值
+    let line = $(this).parent();
+    let content = line.children().find('.org-text-content.department[type="department"]');
+    let id = content.attr("id");
+    let path = content.attr("path");
+    // 给确定按钮赋值选中的部门id
+    let button = line.parents(".ef-modal").children().find('.confirmDepartment[type="button"]');
+    button.attr("choseId", id);
+    button.attr("path", path);
+    event.stopPropagation();
+  });
 
   // 退出部门弹窗
   $("body").on("click", ".cancelDepartment", function () {
@@ -205,6 +239,7 @@ $(document).ready(function () {
   // 显示部门弹窗
   $("body").on("click", ".show-department-modal",async function () {
     let inputid = $(this).parent().attr("id");
+    let mode = $(this).parent().children().find(".ef-department-view-input").attr("mode");
 
     // 检查是否已经存在该 inputid 的模态弹窗容器
     let modal = $(".ef-modal-container[inputid='" + inputid + "']");
@@ -218,7 +253,7 @@ $(document).ready(function () {
       <div class="ef-modal" style="width: 784px">
         <div class="ef-modal-header">
           <div class="ef-modal-title ef-modal-title-align-left">
-            单部门选择
+            ${mode == 'single'?'单部门选择':'多部门选择'}
           </div>
           <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" inputid="${inputid}">
             <span class="ef-icon-hover">
@@ -301,7 +336,7 @@ $(document).ready(function () {
         </div>
         <div class="ef-modal-footer">
           <button class="btn secondary small cancelDepartment" type="button" inputid="${inputid}">取消</button>
-          <button class="btn primary small" type="button">确定</button>
+          <button class="btn primary small confirmDepartment" type="button" mode="${mode}" inputid="${inputid}">确定</button>
         </div>
       </div>
     </div>
@@ -336,5 +371,53 @@ $(document).ready(function () {
   $("body").on("click", ".ef-modal-close-btn", function() {
     let inputid = $(this).attr("inputid");
     $(".ef-modal-container[inputid='" + inputid + "']").hide();
+  })
+
+  $("body").on("click", ".ef-department-selection-li-content", function(event) {
+    event.stopPropagation();
+    let input = $(this).parents('.ef-department-selection-container').find('input');
+    input.show().focus();
+  })
+
+  $("body").on("click", "[type='button'].confirmDepartment", function() {
+    let inputid = $(this).attr("inputid");
+    let choseId = $(this).attr("choseId");
+    let mode = $(this).attr("mode");
+    let path = $(this).attr("path");
+    let departmentInput = $('#'+inputid);
+    let selectionUl = departmentInput.children().find(".ef-department-selection-span ul");
+    let template = `<li class="ef-department-selection-li">
+    <div class="ef-department-selection-li-content">
+      <a href="link" class="ef-link" id="${choseId}">${path}</a>
+      <span class="ef-department-view-suffix close-chose-department" style="display: none;">
+        <span class="ef-department-view-icon">
+          <i class="fa-regular fa-circle-xmark"></i>
+        </span>
+      </span>
+    </div>
+    </li>`;
+
+    let modal = $(this).parents(".ef-modal-container[inputid='"+inputid+"']");
+    if (mode === 'single') {
+      selectionUl.html(template);
+      modal.hide();
+      let input = departmentInput.find('.ef-department-selection-container input');
+      input.attr("chose", "true");
+      input.val("");
+      input.hide();
+    }
+
+    refreshSelectionHover();
+
+    // 删除选项
+    $(".close-chose-department").on("click", function () {
+      if (mode === 'single') {
+        let input = $(this).parents('.ef-department-selection-container').find('input');
+        input.attr("chose", "false");
+        input.show();
+        input.focus();
+      }
+      $(this).parents(".ef-department-selection-li").remove();
+    })
   })
 })

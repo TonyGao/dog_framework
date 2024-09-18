@@ -2,8 +2,9 @@
 
 namespace App\Command;
 
-use App\Entity\Admin\Menu;
-use App\Repository\Admin\MenuRepository;
+use App\Entity\Platform\Menu;
+use App\Repository\Platform\MenuRepository;
+use App\Service\Platform\MenuStaticGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -28,18 +29,21 @@ class EfInitAdminMenuCommand extends Command
     private $em;
     private $menuRepo;
     private $twig;
+    private $menuStaticGenerator;
 
     public function __construct(
         $menuYaml,
         EntityManagerInterface $em,
         MenuRepository $menuRepo,
         Environment $twig,
+        MenuStaticGenerator $menuStaticGenerator,
     ) {
         parent::__construct();
         $this->em = $em;
         $this->menu = $menuYaml;
         $this->menuRepo = $menuRepo;
         $this->twig = $twig;
+        $this->menuStaticGenerator = $menuStaticGenerator;
     }
 
     protected function configure(): void
@@ -54,17 +58,12 @@ class EfInitAdminMenuCommand extends Command
 
     protected function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $this->io = new SymfonyStyle($input, $output);
+        // $this->io = new SymfonyStyle($input, $output);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        // $arg1 = $input->getArgument('arg1');
-
-        // if ($arg1) {
-        //     $io->note(sprintf('You passed an argument: %s', $arg1));
-        // }
 
         if ($input->getOption('yaml')) {
             foreach ($this->menu as &$menuItem) {
@@ -91,32 +90,36 @@ class EfInitAdminMenuCommand extends Command
             }
         }
 
+
         if ($input->getOption('static')) {
-            // Create a static menu twig file
-            $filesystem = new Filesystem();
-            $menuTwig = 'templates/admin/static/menu.html.twig';
-
-            $repo = $this->em->getRepository(Menu::class);
-            $root = $repo->childrenHierarchy();
-            $root !== [] ? $menus = $root[0]['__children'] : $menus = [];
-            $html = $this->twig->render('admin/dynamic/menu.html.twig', [
-                'menus' => $menus
-            ]);
-
-            if (!$filesystem->exists($menuTwig)) {
-                try {
-                    $filesystem->touch($menuTwig);
-                } catch (IOExceptionInterface $exception) {
-                    $io->error("An error occurred while creating your directory at " . $exception->getPath());
-                }
-            }
-
-            try {
-                $filesystem->dumpFile($menuTwig, $html);
-            } catch (IOExceptionInterface $exception) {
-                $io->error("An error occurred while dumping your file at " . $exception->getPath());
-            }
+            $this->menuStaticGenerator->generateStaticMenu($io);
         }
+        // if ($input->getOption('static')) {
+        //     // Create a static menu twig file
+        //     $filesystem = new Filesystem();
+        //     $menuTwig = 'templates/admin/static/menu.html.twig';
+
+        //     $repo = $this->em->getRepository(Menu::class);
+        //     $root = $repo->childrenHierarchy();
+        //     $root !== [] ? $menus = $root[0]['__children'] : $menus = [];
+        //     $html = $this->twig->render('admin/dynamic/menu.html.twig', [
+        //         'menus' => $menus
+        //     ]);
+
+        //     if (!$filesystem->exists($menuTwig)) {
+        //         try {
+        //             $filesystem->touch($menuTwig);
+        //         } catch (IOExceptionInterface $exception) {
+        //             $io->error("An error occurred while creating your directory at " . $exception->getPath());
+        //         }
+        //     }
+
+        //     try {
+        //         $filesystem->dumpFile($menuTwig, $html);
+        //     } catch (IOExceptionInterface $exception) {
+        //         $io->error("An error occurred while dumping your file at " . $exception->getPath());
+        //     }
+        // }
 
         // 通过命令行增加菜单
         // if ($input->getOption('add')) {

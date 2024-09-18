@@ -1,12 +1,29 @@
 <?php
 namespace App\Twig;
 
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
 use Twig\TwigTest;
+use Twig\Environment;
+use Twig\TwigFunction;
+use Twig\Extension\AbstractExtension;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 
 class TwigExtension extends AbstractExtension
 {
+    private $session;
+
+    public function __construct(RequestStack $rs)
+    {
+        if (php_sapi_name() === 'cli') {
+            // 在 CLI 环境下不执行会话相关代码
+            return;
+        }
+        
+        $this->session = $rs->getSession();
+        $this->session->set('active', 'active');
+    }
+
     public function getTests() {
         return array(
             new TwigTest('instanceof', array($this, 'isInstanceOf')),
@@ -19,6 +36,7 @@ class TwigExtension extends AbstractExtension
             new TwigFunction('getObjectFields', [$this, 'getObjectFields']),
             new TwigFunction('getStdClassFields', [$this, 'getStdClassFields']),
             new TwigFunction('instanceof', [$this, 'isInstanceof']),
+            new TwigFunction('get_session_id', [$this, 'getSessionId']),
         ];
     }
 
@@ -61,5 +79,11 @@ class TwigExtension extends AbstractExtension
             return false;
         }
         
+    }
+
+    public function getSessionId(): string
+    {
+        /** @var SessionInterface $session */
+        return $this->session->getId();
     }
 }

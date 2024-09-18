@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  $(".ef-switch.ef-switch-type-circle").on("click", function () {
+  $("body").on("click", ".ef-switch.ef-switch-type-circle", function () {
     if ($(this).attr("aria-checked") === "true") {
       $(this).attr("aria-checked", "false");
       $(this).removeClass("ef-switch-checked");

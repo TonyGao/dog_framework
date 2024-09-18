@@ -1,8 +1,9 @@
+{% include 'ui/template/icons.html.twig' %}
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta charset="UTF-8">
-    <meta name="session" session="{{ app.session.getId() }}">
+    <meta name="session" session="{{ get_session_id() }}">
 		<title>
 			{% block title %}Welcome!
 			{% endblock %}
@@ -18,6 +19,7 @@
 			<link rel="stylesheet" type="text/css" href="{{ asset('input.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('select.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('department.css', 'ui') }}">
+			<link rel="stylesheet" type="text/css" href="{{ asset('user.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('switch.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('radio.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('checkbox.css', 'ui') }}">

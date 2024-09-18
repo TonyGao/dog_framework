@@ -8,7 +8,7 @@
 				<div class="side-menu-content">
 					{% macro recursiveMenu(mn) %}
 						{% import _self as self %}
-                        {% set uri = mn.uri %}
+                {% set uri = mn.uri %}
 						{% if mn.__children == [] %}
 							<a class="{{ mn.uri == "/admin/index" ? "side-home" : "" }} link item-menu-content {{"{{'"}}{{uri|trim}}{{"'== app.request.requestUri ? 'current' : '' }}"}}" href="{{ mn.uri }}">
 								<div class="link-icon">

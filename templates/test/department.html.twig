@@ -13,11 +13,6 @@
 	<div class="container" style="padding-left: 20px;">
 		<h3>单部门选择器（UI静态）</h3>
 		<div class="ef-deparment-element" style="margin-bottom: 20px;">
-			<div class="ef-department-selection">
-				<span class="ef-department-selection-span">
-					<ul></ul>
-				</span>
-			</div>
 			<span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search" style="width: 260px;" chosen="false" id="{{ departmentInputId }}" contentid="{{ departmentContentId }}">
 			  <div class="ef-department-selection-container">
 					<div class="ef-department-selection">
@@ -36,7 +31,7 @@
 							</ul>
 						</span>
 					</div>
-					<input class="ef-department-view-input" placeholder="请输入部门名称 ..." mode="single">
+					<input class="ef-department-view-input" placeholder="请输入部门名称 ..." mode="single" chose="false">
         </div>
 
 				<span class="ef-department-view-value ef-department-view-value-hidden"></span>
@@ -49,7 +44,7 @@
 				</span>
 			</span>
 
-			<div class="ef-modal-container" style="z-index: 1001;" inputid="{{ departmentInputId }}">
+			{# <div class="ef-modal-container" style="z-index: 1001;" inputid="{{ departmentInputId }}">
 				<div class="ef-modal-mask"></div>
 				<div class="ef-modal-wrapper ef-modal-wrapper-align-center">
 					<div class="ef-modal" style="width: 784px">
@@ -140,7 +135,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> #}
 		</div>
 		<div class="ef-trigger-popup ef-trigger-position-bl" trigger-placement="bl" style="z-index: 1001; pointer-events: auto; min-width: 260px; width: fit-content" id="{{ departmentContentId }}" parentid="{{ departmentInputId }}">
 			<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
@@ -177,7 +172,7 @@
 				</span>
 			</div>
 			<span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search" style="width: 260px;" chosen="false" id="{{ departmentInputId2 }}" contentid="{{ departmentContentId2 }}">
-				<input class="ef-department-view-input" placeholder="请输入部门名称 ..." mode="multiple">
+				<input class="ef-department-view-input" placeholder="请输入部门名称 ..." mode="multiple" chose="false">
 				<span class="ef-department-view-value ef-department-view-value-hidden"></span>
 				<span class="ef-department-view-suffix">
 					<span class="ef-department-view-icon">

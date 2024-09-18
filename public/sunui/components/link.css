@@ -70,4 +70,5 @@
 
 .ef-department-selection-li-content {
   display: inline-block;
+  min-width: -webkit-fill-available;
 }

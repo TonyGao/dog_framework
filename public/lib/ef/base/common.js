@@ -13,30 +13,39 @@ class Common {
   /**
    *
    * @param {*} item
+   * @param {boolean} useSession - 是否通过 session 读取缓存
    */
-  static async getCache(item) {
-    $.session = $("meta[session]").attr("session");
+  static async getCache(item, useSession = true) {
+    const sessionKey = useSession ? $("meta[session]").attr("session") : "global";
     try {
-      const storage = await localforage.getItem("Ef-" + $.session);
+      const storage = await localforage.getItem("Ef-" + sessionKey);
       let str;
       if (storage === null) {
-        await localforage.setItem("Ef-"+ $.session, {"session":$.session})
+        await localforage.setItem("Ef-"+ sessionKey, {"session": sessionKey})
         return null;
       }
 
       if (storage !== null) {
         str = storage;
-        return str[item]===undefined?null:str[item];
+        return str[item] === undefined ? null : str[item];
       }
     } catch (err) {
       console.error(err);
     }
   }
 
-  static async setCache(item, val) {
+  /**
+   *
+   * @param {*} item
+   * @param {*} val
+   * @param {boolean} useSession - 是否通过 session 写入缓存
+   */
+  static async setCache(item, val, useSession = true) {
+    const sessionKey = useSession ? $("meta[session]").attr("session") : "global";
     let str;
-    str = await localforage.getItem("Ef-" + $.session);
+    str = await localforage.getItem("Ef-" + sessionKey);
+    str = str || {};  // 确保 str 存在
     str[item] = val;
-    await localforage.setItem("Ef-"+ $.session, str)
+    await localforage.setItem("Ef-" + sessionKey, str);
   }
 }

@@ -1,0 +1,112 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'ui/template/ui.html.twig' as ui %}
+
+{% set titleButtonId = random() %}
+{% set titleMenuId = random() %}
+
+{% block stylesheets %}
+	{{ parent() }}
+  <link rel="stylesheet" type="text/css" href="{{ asset('platform/treeLayout.css', 'admin') }}"/>
+	<link rel="stylesheet" type="text/css" href="{{ asset('platform/menu.css', 'admin') }}"/>
+	
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src=" {{ asset('platform/menu.js', 'admin') }} "></script>
+
+{% endblock %}
+
+{% block css %}
+<style>
+.outside-wrapper {
+  padding-top: 0;
+}
+
+.ef-drawer-body .ef-col-24 {
+  margin-bottom: 10px
+}
+</style>
+{% endblock %}
+
+{% block app_content_container %}
+	<div class="org-sturcture-container">
+		<div class="outside-wrapper">
+			<div class="inside-wrapper">
+				<div class="left-tree visible">
+					<div class="left-tree-wrapper">
+					  <div class="ef-menu-left-title">
+						  <span class="ef-menu-left-title-content">Menu</span>
+							<span>
+							  {{ ui.barButton('create') }}
+								{{ ui.barButton('modify') }}
+							</span>
+							<span class="ef-menu-left-title-button">
+							  <button class="btn mini medium icon circle menu-title-button" id="{{ titleButtonId }}" titleMenuId="{{ titleMenuId }}"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+								<div class="ef-trigger-popup ef-trigger-position-bl" trigger-placement="bl" for="所属公司" style="z-index: 1001; pointer-events: auto; min-width: 100px; left: 170px; top: 25px; display: none;" id="{{ titleMenuId }}" parentid="{{ titleButtonId }}">
+									<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+										<div class="ef-trigger-content">
+											<div class="ef-select-dropdown">
+												<div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+													<div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
+														<ul class="ef-select-dropdown-list">
+															<li id="110587992" value="19" class="ef-select-option ">
+															  <i class="fa-regular fa-square-plus"></i>
+																<span class="ef-select-option-content">全部收起</span>
+															</li>
+															<li id="1264061729" value="21" class="ef-select-option ">
+															  <i class="fa-regular fa-square-minus"></i>
+																<span class="ef-select-option-content">全部展开</span>
+															</li>
+															<li id="1693656877" value="22" class="ef-select-option ">
+															  <i class="fa-solid fa-shuffle"></i>
+																<span class="ef-select-option-content">批量移动</span>
+															</li>
+														</ul>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</span>
+						</div>
+						<div class="search-department-wrapper">
+							<span class="ef-input-wrapper">
+								<input class="ef-input ef-input-size-mini text" type="text" clearable="true" placeholder="Search"/>
+								<span class="ef-input-suffix">
+									<i class="fa-solid fa-magnifying-glass"></i>
+								</span>
+							</span>
+						</div>
+						<div class="department-tree-wrapper">
+							{{ menu | raw }}
+						</div>
+					</div>
+					<div class="fold-icon-wrapper collapse" id="collapseCompany">
+						<i class="fa-solid fa-play"></i>
+					</div>
+				</div>
+				<div class="right-content">
+				  <div class="empty-content" id="platform-entity-empty">
+					  <img src="{{ asset('status/empty.png', 'image') }}" width="587px">
+					</div>
+					<div id="platform-entity" class="ef-tabs tabs-container" style="display: none;">
+						<div class="tabs-header tabs-header-plain" style="">
+							<div class="tabs-scroller-left" style="display: none;"><i class="fa-solid fa-angles-left"></i></div>
+							<div class="tabs-scroller-right" style="display: none;"><i class="fa-solid fa-angles-right"></i></div>
+							<div class="tabs-wrap" style="">
+								<ul class="tabs">
+
+								</ul>
+							</div>
+						</div>
+						<div class="tabs-panels" style="">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+

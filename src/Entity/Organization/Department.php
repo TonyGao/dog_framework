@@ -62,6 +62,14 @@ class Department implements GedmoNode
 	private $displayName;
 
 	/**
+	 * 形式：集团简称/公司简称/部门全称1/部门全称2
+	 * 当是部门类型时，这个字段用于存储部门的全路径名称。
+	 * 当做集团名称、公司名称、部门名称调整时，需要更新相应的path字段
+	 */
+	#[ORM\Column(type: 'string', length: 2000, nullable: true)]
+	private $path;
+
+	/**
 	 * 所属公司
 	 * @Groups({"api"})
 	 * @Ef(
@@ -497,5 +505,25 @@ class Department implements GedmoNode
 	public function getBuMenFuZong(): string
 	{
 		return $this->buMenFuZong;
+	}
+
+	/**
+	 * Get the value of path
+	 */ 
+	public function getPath()
+	{
+		return $this->path;
+	}
+
+	/**
+	 * Set the value of path
+	 *
+	 * @return  self
+	 */ 
+	public function setPath($path)
+	{
+		$this->path = $path;
+
+		return $this;
 	}
 }
