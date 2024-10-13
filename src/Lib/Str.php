@@ -101,6 +101,31 @@ class Str
         return $inflector->tableize($name);
     }
 
+    /**
+     * Remove last word from class namespace
+     *
+     * @param string $fullNamespace
+     * @return string
+     */
+    public static function removeLastWord(string $fullNamespace)
+    {
+        $parts = explode('\\', $fullNamespace);
+        array_pop($parts);
+        $result = implode('\\', $parts);
+        return $result;
+    }
+
+    /**
+     * 删除文件名中的扩展名
+     *
+     * @param string $filename
+     * @return string
+     */
+    public static function removeExtension(string $filename): string
+    {
+        return pathinfo($filename, PATHINFO_FILENAME);
+    }
+
     // public static function getGroup($text) {
     //     $group = '';
     //     foreach(preg_split("/((\r?\n)|(\r\n?))/", $text) as $line){

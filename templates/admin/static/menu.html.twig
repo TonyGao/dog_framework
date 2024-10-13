@@ -1,8 +1,13 @@
+{% set sideDisplay = sideMenuState == 'shrunk' ? 'none' : 'flex' %} {% set
+scrollBtnDisplay = sideMenuState == 'shrunk' ? 'flex' : 'none' %}
 <section class="app-side-menu">
-  <aside class="admin-aside-outer">
+  <div class="app-side-menu-scroll-btn" style="display: {{ scrollBtnDisplay }}">
+    <i class="fa-solid fa-angle-right"></i>
+  </div>
+  <aside class="admin-aside-outer" style="display: {{ sideDisplay }};">
     <div class="side-menu-one">
       <div class="side-menu-two">
-        <div class="universe-icon side-scroll-btn">
+        <div class="universe-icon side-scroll-btn system-menu-toggle-btn">
           <i class="fa-solid fa-angles-left"></i>
         </div>
         <div class="side-menu-content">
@@ -179,6 +184,41 @@
             </div>
           </div>
 
+          <div class="parent-menu">
+            <div class="item-menu-content scroll-item">
+              <div class="link-icon">
+                <i class="fa-solid fa-compass-drafting"></i>
+              </div>
+              <div class="link-text">
+                <div class="link-text-content" style="max-width: 83%">
+                  应用程序构建器
+                </div>
+                <i
+                  class="fa-solid fa-chevron-down"
+                  style="transform: rotate(0deg)"
+                ></i>
+              </div>
+            </div>
+            <div
+              class="sub-menu-content"
+              style="{{'#'== app.request.requestUri ? 'display: none;' : '' }}"
+            >
+              <a
+                class=" link item-menu-content {{'/admin/platform/application/form/builder'== app.request.requestUri ? 'current' : '' }}"
+                href="/admin/platform/application/form/builder"
+              >
+                <div class="link-icon">
+                  <i class="fa-solid fa-scroll"></i>
+                </div>
+                <div class="link-text">
+                  <div class="link-text-content" style="max-width: 83%">
+                    表单设计器
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+
           <a
             class=" link item-menu-content {{'/admin/platform/menu/index'== app.request.requestUri ? 'current' : '' }}"
             href="/admin/platform/menu/index"
@@ -187,7 +227,9 @@
               <i class="fa-regular fa-compass"></i>
             </div>
             <div class="link-text">
-              <div class="link-text-content" style="max-width: 83%">Menu</div>
+              <div class="link-text-content" style="max-width: 83%">
+                菜单管理
+              </div>
             </div>
           </a>
         </div>

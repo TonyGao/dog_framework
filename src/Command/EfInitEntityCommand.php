@@ -89,7 +89,9 @@ class EfInitEntityCommand extends Command
 
                 $finder->files();
 
-                foreach ($finder as $file) {
+                $nameSpaceArr = [];
+                $previousGroup = '';
+                foreach ($finder as $file) {    
                     $absolutFilePath = $file->getRealPath();
 
                     $filePath = $absolutFilePath;
@@ -111,6 +113,31 @@ class EfInitEntityCommand extends Command
                             ->setIsCustomized(false)
                             ->setClassName($class->getName())
                             ->setDataTableName($tableName);
+
+                        // 判断命名空间中间的部分是否存在
+                        $previousGroup = $this->isSameNameSpace($entityClass, $nameSpaceArr) ? $previousGroup : $root; // 初始父级设置为 root
+                        $nameSpaceResult = $this->isNamespaceTypeEntityPropertyGroup($entityClass);
+                        
+                        if (is_array($nameSpaceResult) && !empty($nameSpaceResult) && !$this->isSameNameSpace($entityClass, $nameSpaceArr)) {
+                            $nameSpaceArr[] = Str::removeLastWord($entityClass);
+                            foreach ($nameSpaceResult as $index => $namespace) {
+                                $epg[$index] = new EntityPropertyGroup();
+                                $epg[$index]
+                                    ->setName($namespace)
+                                    ->setEntityToken($entityToken)
+                                    ->setLabel($namespace)
+                                    ->setType('namespace')
+                                    ->setParent($previousGroup);
+
+                                // 持久化当前 group
+                                $this->em->persist($epg[$index]);
+                                
+                                // 更新 $previousGroup 为当前 group
+                                $previousGroup = $epg[$index];
+                            }
+                            // 在循环结束后统一调用 flush
+                            $this->em->flush();
+                        }
 
                         $dynamicClass = new $entityClass();
                         $reflectionClass = new ReflectionClass($dynamicClass::class);
@@ -149,6 +176,7 @@ class EfInitEntityCommand extends Command
                                 $fields[$key]['unique'] = null;
                                 $fields[$key]['nullable'] = null;
                                 $fields[$key]['precision'] = null;
+
                                 if (array_key_exists('sourceToTargetKeyColumns', $mappings)) {
                                     $fields[$key]['fieldName'] = key($mappings['sourceToTargetKeyColumns']);
                                     $fields[$key]['targetId'] = $mappings['sourceToTargetKeyColumns'][key($mappings['sourceToTargetKeyColumns'])];
@@ -169,7 +197,7 @@ class EfInitEntityCommand extends Command
                             ->setType('entity')
                             ->setToken($entityToken)
                             ->setFqn($metaData->name)
-                            ->setParent($root);
+                            ->setParent($previousGroup);
 
                         $this->em->persist($entityGroup);
                         $this->em->flush();
@@ -197,7 +225,7 @@ class EfInitEntityCommand extends Command
                          *     3 --> ManyToMany(maybe)
                          *     4 --> OneToMany
                          */
-                        dump($fields);
+                        // dump($fields);
                         foreach ($fields as $key => $field) {
                             $fieldName = $key;
                             $annotationField = $reflectionClass->getProperty($fieldName);
@@ -281,6 +309,7 @@ class EfInitEntityCommand extends Command
                                         $propertyGroup->setName($group)
                                            ->setLabel($group)
                                            ->setType('group')
+                                           ->setEntityToken($entityToken)
                                            ->setParent($entityGroup);
                                         $this->em->persist($propertyGroup);
                                         $this->em->flush();
@@ -293,6 +322,7 @@ class EfInitEntityCommand extends Command
                                     $groupProperty->setName($fieldName)
                                         ->setLabel($fieldName)
                                         ->setType('property')
+                                        ->setEntityToken($entityToken)
                                         ->setToken($propertyToken)
                                         ->setParent($propertyGroup);
 
@@ -314,13 +344,46 @@ class EfInitEntityCommand extends Command
             }
         }
 
-        if ($input->getOption('listPerpertyGroup')) {
-            $repo = $this->em->getRepository(EntityPropertyGroup::class);
-            $tree = $repo->childrenHierarchy();
-        }
+        // if ($input->getOption('listPropertyGroup')) {
+        //     $repo = $this->em->getRepository(EntityPropertyGroup::class);
+        //     $tree = $repo->childrenHierarchy();
+        // }
 
         $io->success('已成功初始化所有Entity文件到数据库');
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * 判断targetEntity是否为命名空间类型的EntityPropertyGroup
+     *
+     * @param string $targetEntity 命名空间全名
+     * @return array
+     */
+    private function isNamespaceTypeEntityPropertyGroup(string $targetEntity): array
+    {
+        // 去掉命名空间前缀
+        $trimmedEntity = str_replace('App\Entity\\', '', $targetEntity);
+        // 使用 \ 分割字符串
+        $entityParts = explode('\\', $trimmedEntity);
+        // 去掉最后一个单词
+        array_pop($entityParts);
+
+        // 只要 $entityParts 有值就返回 true
+        return $entityParts;
+    }
+
+    /**
+     * 判断类是否与存储的命名空间重复了
+     *
+     * @param string $class example 'App\Entity\Organization\Corporation'
+     * @param array $nameSpaces ['App\Entity\Organization']
+     * @return boolean
+     */
+    private function isSameNameSpace(string $class, array $nameSpaces)
+    {
+        // 首先去掉$class的最后一个单词
+        $namespace = Str::removeLastWord($class);
+        return in_array($namespace, $nameSpaces);
     }
 }

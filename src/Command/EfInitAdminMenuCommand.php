@@ -21,7 +21,7 @@ use Twig\Environment;
 
 #[AsCommand(
     name: 'ef:init-admin-menu',
-    description: 'Add a short description for your command',
+    description: 'Generate system menus through the YAML file and staticize it by generating a Twig file.',
 )]
 class EfInitAdminMenuCommand extends Command
 {

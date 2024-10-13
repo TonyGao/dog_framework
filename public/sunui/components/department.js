@@ -105,10 +105,12 @@ $(document).ready(function () {
                   // 清空上边选中的部门
                   selectionUl.html(template);
                   $("#" + contentId).hide();
-                  let input = $('[contentId="'+ contentId +'"]').find('.ef-department-selection-container input');
+                  let input = $('[contentId="'+ contentId +'"]').find('.ef-department-selection-container input.ef-department-view-input');
                   input.attr("chose", "true");
                   input.val("");
                   input.hide();
+                  let inputSubmit = input.siblings('input[type="hidden"]');
+                  inputSubmit.val(id);
                 }
 
                 if (mode === 'multiple') {
@@ -134,7 +136,7 @@ $(document).ready(function () {
                 //departmentInput.find("input").val("");
 
                 // 删除选项
-                $(".close-chose-department").on("click", function () {
+                $("body").on("click", ".close-chose-department", function () {
                   if (mode === 'single') {
                     let input = $(this).parents('.ef-department-selection-container').find('input');
                     input.attr("chose", "false");
@@ -173,17 +175,6 @@ $(document).ready(function () {
       input.val("");
     }
   })
-
-  // function refreshSelectionHover() {
-  //   $(".ef-department-selection-li").hover(
-  //     function () {
-  //       $(this).children().find(".ef-department-view-suffix").show();
-  //     },
-  //     function () {
-  //       $(this).children().find(".ef-department-view-suffix").hide();
-  //     }
-  //   )
-  // }
 
   function refreshSelectionHover() {
     $("body").on("mouseenter", ".ef-department-selection-li", function() {
@@ -274,7 +265,7 @@ $(document).ready(function () {
                   </span>
                 </span>
               </div>
-              <div class="department-tree-wrapper">
+              <div class="department-tree-wrapper single-department">
                 
               </div>
             </div>
@@ -358,8 +349,6 @@ $(document).ready(function () {
           success: async function (data) {
             await Common.setCache("org.singleDepartment", data);
             $(".department-tree-wrapper").html(data);
-            // Common.forceReloadJS('components');
-            // Common.forceReloadJS('admin');
           }
         })
       } else {
@@ -368,15 +357,10 @@ $(document).ready(function () {
     }
   })
 
-  $("body").on("click", ".ef-modal-close-btn", function() {
+  $("body").on("click", ".ef-modal-close-btn", function(event) {
+    event.stopPropagation();
     let inputid = $(this).attr("inputid");
     $(".ef-modal-container[inputid='" + inputid + "']").hide();
-  })
-
-  $("body").on("click", ".ef-department-selection-li-content", function(event) {
-    event.stopPropagation();
-    let input = $(this).parents('.ef-department-selection-container').find('input');
-    input.show().focus();
   })
 
   $("body").on("click", "[type='button'].confirmDepartment", function() {
@@ -408,16 +392,21 @@ $(document).ready(function () {
     }
 
     refreshSelectionHover();
+  })
 
-    // 删除选项
-    $(".close-chose-department").on("click", function () {
-      if (mode === 'single') {
-        let input = $(this).parents('.ef-department-selection-container').find('input');
-        input.attr("chose", "false");
-        input.show();
-        input.focus();
-      }
-      $(this).parents(".ef-department-selection-li").remove();
-    })
+  $("body").on("click", ".ef-department-selection-li-content", function(event) {
+    event.stopPropagation();
+    let input = $(this).parents('.ef-department-selection-container').find('input');
+    input.show().focus();
+  })
+
+  // 删除选项
+  $("body").on("click", ".close-chose-department",function (event) {
+    event.stopPropagation();
+    let input = $(this).parents('.ef-department-selection-container').find('input');
+    input.attr("chose", "false");
+    input.show();
+    input.focus();
+    $(this).parents(".ef-department-selection-li").remove();
   })
 })

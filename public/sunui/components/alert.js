@@ -1,4 +1,4 @@
-(function() {
+(function () {
   class Alert {
     constructor(container) {
       this.container = $(container);
@@ -7,16 +7,17 @@
         return;
       }
     }
-  
-    info(
-      content,
-      percent,
-      title = null,
-      closable = false,
-      showIcon = true,
-      banner = false,
-      speed = "normal"
-    ) {
+
+    info (
+      content, {
+        percent,
+        title = null,
+        closable = false,
+        showIcon = true,
+        banner = false,
+        speed = "normal",
+        callback = null,
+      } = {}) {
       // 定义动画速度
       let animationSpeed;
       switch (speed) {
@@ -32,28 +33,24 @@
         default:
           animationSpeed = 1000;
       }
-  
-      let template = `<div role="alert" class="ef-alert ef-alert-info ${
-        title ? `ef-alert-with-title` : ""
-      }" ${
-        banner ? `ef-alert-banner ef-alert-center` : ""
-      } style="width: ${percent}; position: absolute; top: 50%;left: 50%;    transform: translate(-50%, -50%);">
-      ${
-        showIcon
+
+      let template = `<div role="alert" class="ef-alert ef-alert-info ${title ? `ef-alert-with-title` : ""
+        }" ${banner ? `ef-alert-banner ef-alert-center` : ""
+        } style="width: ${percent}; position: absolute; top: 50%;left: 50%;    transform: translate(-50%, -50%);">
+      ${showIcon
           ? `<div class="ef-alert-icon">
       <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-info-circle-fill" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4 4 12.954 4 24s8.954 20 20 20Zm2-30a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2Zm0 17h1a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1h1v-8a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v11Z" fill="currentColor" stroke="none"></path>
       </svg>
     </div>`
           : ""
-      }
+        }
   
       <div class="ef-alert-body">
         ${title ? `<div class="ef-alert-title">${title}</div>` : ""}
         <div class="ef-alert-content">${content ? `${content}` : ""}</div>
       </div>
-      ${
-        closable
+      ${closable
           ? `
       <div tabindex="-1" role="button" aria-label="Close" class="ef-alert-close-btn">
         <span class="ef-icon-hover">
@@ -63,36 +60,38 @@
         </span>
       </div>`
           : ""
-      }
+        }
     </div>`;
-  
+
       // Append the template to the container with hide animation
       let alertElement = $(template).hide();
       this.container.append(alertElement);
-  
+
       // Apply fadeIn animation
       alertElement.fadeIn(500);
-  
+
       // Apply fadeOut animation if closable is false
       if (!closable) {
         setTimeout(() => {
           alertElement.fadeOut(animationSpeed, function () {
             // After fadeOut animation, remove the alert from DOM
             $(this).remove();
+            if (callback) callback(); // 调用回调
           });
         }, 3000); // Change the duration as per your requirement
       }
     }
-  
-    success(
-      content,
-      percent,
-      title = null,
-      closable = false,
-      showIcon = true,
-      banner = false,
-      speed = "normal"
-    ) {
+
+    success (
+      content, {
+        percent,
+        title = null,
+        closable = false,
+        showIcon = true,
+        banner = false,
+        speed = "normal",
+        callback = null
+      } = {}) {
       // 定义动画速度
       let animationSpeed;
       switch (speed) {
@@ -108,28 +107,24 @@
         default:
           animationSpeed = 1000;
       }
-  
-      let template = `<div role="alert" class="ef-alert ef-alert-success ${
-        title ? `ef-alert-with-title` : ""
-      }" ${
-        banner ? `ef-alert-banner ef-alert-center` : ""
-      } style="width: ${percent}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;">
-      ${
-        showIcon
+
+      let template = `<div role="alert" class="ef-alert ef-alert-success ${title ? `ef-alert-with-title` : ""
+        }" ${banner ? `ef-alert-banner ef-alert-center` : ""
+        } style="width: ${percent}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;">
+      ${showIcon
           ? `<div class="ef-alert-icon">
       <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-check-circle-fill" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4 4 12.954 4 24s8.954 20 20 20Zm10.207-24.379a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0L22 26.172l-4.878-4.88a1 1 0 0 0-1.415 0l-1.414 1.415a1 1 0 0 0 0 1.414l7 7a1 1 0 0 0 1.414 0l11.5-11.5Z" fill="currentColor" stroke="none"></path>
       </svg>
     </div>`
           : ""
-      }
+        }
     
       <div class="ef-alert-body">
         ${title ? `<div class="ef-alert-title">${title}</div>` : ""}
         <div class="ef-alert-content">${content ? `${content}` : ""}</div>
       </div>
-      ${
-        closable
+      ${closable
           ? `
       <div tabindex="-1" role="button" aria-label="Close" class="ef-alert-close-btn">
         <span class="ef-icon-hover">
@@ -139,36 +134,38 @@
         </span>
       </div>`
           : ""
-      }
+        }
     </div>`;
-  
+
       // Append the template to the container with hide animation
       let alertElement = $(template).hide();
       this.container.append(alertElement);
-  
+
       // Apply fadeIn animation
       alertElement.fadeIn(1000);
-  
+
       // Apply fadeOut animation if closable is false
       if (!closable) {
         setTimeout(() => {
           alertElement.fadeOut(animationSpeed, function () {
             // After fadeOut animation, remove the alert from DOM
             $(this).remove();
+            if (callback) callback(); // 调用回调
           });
         }, 3000); // Change the duration as per your requirement
       }
     }
-  
-    warning(
-      content,
-      percent,
-      title = null,
-      closable = false,
-      showIcon = true,
-      banner = false,
-      speed = "normal"
-    ) {
+
+    warning (
+      content, {
+        percent,
+        title = null,
+        closable = false,
+        showIcon = true,
+        banner = false,
+        speed = "normal",
+        callback = null
+      } = {}) {
       // 定义动画速度
       let animationSpeed;
       switch (speed) {
@@ -184,28 +181,24 @@
         default:
           animationSpeed = 1000;
       }
-  
-      let template = `<div role="alert" class="ef-alert ef-alert-warning ${
-        title ? `ef-alert-with-title` : ""
-      }" ${
-        banner ? `ef-alert-banner ef-alert-center` : ""
-      } style="width: ${percent}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;">
-      ${
-        showIcon
+
+      let template = `<div role="alert" class="ef-alert ef-alert-warning ${title ? `ef-alert-with-title` : ""
+        }" ${banner ? `ef-alert-banner ef-alert-center` : ""
+        } style="width: ${percent}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;">
+      ${showIcon
           ? `<div class="ef-alert-icon">
       <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-exclamation-circle-fill" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4 4 12.954 4 24s8.954 20 20 20Zm-2-11a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v2Zm4-18a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V15Z" fill="currentColor" stroke="none"></path>
       </svg>
     </div>`
           : ""
-      }
+        }
     
       <div class="ef-alert-body">
         ${title ? `<div class="ef-alert-title">${title}</div>` : ""}
         <div class="ef-alert-content">${content ? `${content}` : ""}</div>
       </div>
-      ${
-        closable
+      ${closable
           ? `
       <div tabindex="-1" role="button" aria-label="Close" class="ef-alert-close-btn">
         <span class="ef-icon-hover">
@@ -215,36 +208,38 @@
         </span>
       </div>`
           : ""
-      }
+        }
     </div>`;
-  
+
       // Append the template to the container with hide animation
       let alertElement = $(template).hide();
       this.container.append(alertElement);
-  
+
       // Apply fadeIn animation
       alertElement.fadeIn(1000);
-  
+
       // Apply fadeOut animation if closable is false
       if (!closable) {
         setTimeout(() => {
           alertElement.fadeOut(animationSpeed, function () {
             // After fadeOut animation, remove the alert from DOM
             $(this).remove();
+            if (callback) callback(); // 调用回调
           });
         }, 3000); // Change the duration as per your requirement
       }
     }
-  
-    error(
-      content,
-      percent,
-      title = null,
-      closable = false,
-      showIcon = true,
-      banner = false,
-      speed = "normal"
-    ) {
+
+    error (
+      content, {
+        percent,
+        title = null,
+        closable = false,
+        showIcon = true,
+        banner = false,
+        speed = "normal",
+        callback = null,
+      } = {}) {
       // 定义动画速度
       let animationSpeed;
       switch (speed) {
@@ -260,28 +255,24 @@
         default:
           animationSpeed = 1000;
       }
-  
-      let template = `<div role="alert" class="ef-alert ef-alert-error ${
-        title ? `ef-alert-with-title` : ""
-      }" ${
-        banner ? `ef-alert-banner ef-alert-center` : ""
-      } style="width: ${percent}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;">
-      ${
-        showIcon
+
+      let template = `<div role="alert" class="ef-alert ef-alert-error ${title ? `ef-alert-with-title` : ""
+        }" ${banner ? `ef-alert-banner ef-alert-center` : ""
+        } style="width: ${percent}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;">
+      ${showIcon
           ? `<div class="ef-alert-icon">
       <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close-circle-fill" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4 4 12.954 4 24s8.954 20 20 20Zm4.955-27.771-4.95 4.95-4.95-4.95a1 1 0 0 0-1.414 0l-1.414 1.414a1 1 0 0 0 0 1.414l4.95 4.95-4.95 4.95a1 1 0 0 0 0 1.414l1.414 1.414a1 1 0 0 0 1.414 0l4.95-4.95 4.95 4.95a1 1 0 0 0 1.414 0l1.414-1.414a1 1 0 0 0 0-1.414l-4.95-4.95 4.95-4.95a1 1 0 0 0 0-1.414l-1.414-1.414a1 1 0 0 0-1.414 0Z" fill="currentColor" stroke="none"></path>
       </svg>
     </div>`
           : ""
-      }
+        }
     
       <div class="ef-alert-body">
         ${title ? `<div class="ef-alert-title">${title}</div>` : ""}
         <div class="ef-alert-content">${content ? `${content}` : ""}</div>
       </div>
-      ${
-        closable
+      ${closable
           ? `
       <div tabindex="-1" role="button" aria-label="Close" class="ef-alert-close-btn">
         <span class="ef-icon-hover">
@@ -291,36 +282,38 @@
         </span>
       </div>`
           : ""
-      }
+        }
     </div>`;
-  
+
       // Append the template to the container with hide animation
       let alertElement = $(template).hide();
       this.container.append(alertElement);
-  
+
       // Apply fadeIn animation
       alertElement.fadeIn(1000);
-  
+
       // Apply fadeOut animation if closable is false
       if (!closable) {
         setTimeout(() => {
           alertElement.fadeOut(animationSpeed, function () {
             // After fadeOut animation, remove the alert from DOM
             $(this).remove();
+            if (callback) callback(); // 调用回调
           });
         }, 3000); // Change the duration as per your requirement
       }
     }
-  
-    normal(
-      content,
-      percent,
-      title = null,
-      closable = false,
-      showIcon = true,
-      banner = false,
-      speed = "normal"
-    ) {
+
+    normal (
+      content, {
+        percent,
+        title = null,
+        closable = false,
+        showIcon = true,
+        banner = false,
+        speed = "normal",
+        callback = null,
+      }) {
       // 定义动画速度
       let animationSpeed;
       switch (speed) {
@@ -336,28 +329,24 @@
         default:
           animationSpeed = 1000;
       }
-  
-      let template = `<div role="alert" class="ef-alert ef-alert-normal ${
-        title ? `ef-alert-with-title` : ""
-      }" ${
-        banner ? `ef-alert-banner ef-alert-center` : ""
-      } style="width: ${percent}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;">
-      ${
-        showIcon
+
+      let template = `<div role="alert" class="ef-alert ef-alert-normal ${title ? `ef-alert-with-title` : ""
+        }" ${banner ? `ef-alert-banner ef-alert-center` : ""
+        } style="width: ${percent}; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;">
+      ${showIcon
           ? `<div class="ef-alert-icon">
       <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-exclamation-circle-fill" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M24 44c11.046 0 20-8.954 20-20S35.046 4 24 4 4 12.954 4 24s8.954 20 20 20Zm-2-11a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v2Zm4-18a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1V15Z" fill="currentColor" stroke="none"></path>
       </svg>
     </div>`
           : ""
-      }
+        }
     
       <div class="ef-alert-body">
         ${title ? `<div class="ef-alert-title">${title}</div>` : ""}
         <div class="ef-alert-content">${content ? `${content}` : ""}</div>
       </div>
-      ${
-        closable
+      ${closable
           ? `
       <div tabindex="-1" role="button" aria-label="Close" class="ef-alert-close-btn">
         <span class="ef-icon-hover">
@@ -367,25 +356,68 @@
         </span>
       </div>`
           : ""
-      }
+        }
     </div>`;
-  
+
       // Append the template to the container with hide animation
       let alertElement = $(template).hide();
       this.container.append(alertElement);
-  
+
       // Apply fadeIn animation
       alertElement.fadeIn(1000);
-  
+
       // Apply fadeOut animation if closable is false
       if (!closable) {
         setTimeout(() => {
           alertElement.fadeOut(animationSpeed, function () {
             // After fadeOut animation, remove the alert from DOM
             $(this).remove();
+            if (callback) callback(); // 调用回调
           });
         }, 3000); // Change the duration as per your requirement
       }
     }
   }
+
+  // 为关闭按钮添加事件处理
+  $(document).on('click', '.ef-alert-close-btn', function () {
+    let alertElement = $(this).closest('.ef-alert');
+    let animationSpeed = 1000;
+    alertElement.fadeOut(animationSpeed, function () {
+      $(this).remove();
+    });
+  });
+
+
+  window.Alert = Alert;
+
+
+  $(document).ready(function () {
+    // 遍历所有带有 flash- 类型的 <meta> 标签
+    let alert = new Alert("body");
+    $('meta[name^="flash-"]').each(function () {
+      // 获取消息类型（成功、错误等）
+      var type = $(this).attr('name').replace('flash-', '');
+      // 获取消息内容
+      var message = $(this).attr('content');
+
+      switch (type) {
+        case 'success':
+          alert.success(message, { percent: '380px', title: "请求错误"});
+          break;
+        case 'error':
+          alert.error(message, { percent: '380px', title: "请求错误", closable: true });
+          break;
+        case 'warning':
+          alert.warning(message, { percent: '380px', title: "请求错误", closable: true });
+          break;
+        case 'info':
+          alert.info(message, { percent: '380px', title: "请求错误", closable: true });
+          break;
+        default:
+          alert.info(message, { percent: '380px', title: "请求错误", closable: true });
+          break;
+      }
+    });
+  });
 })();

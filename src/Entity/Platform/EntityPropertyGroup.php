@@ -2,14 +2,18 @@
 
 namespace App\Entity\Platform;
 
-use App\Entity\CommonTrait;
+use App\Annotation\Ef;
+use App\Entity\Traits\CommonTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Tree\Node as GedmoNode;
 use App\Repository\Platform\EntityPropertyGroupRepository;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
+use Symfony\Component\Uid\Uuid;
 
 /**
+ * isBusinessEntity
+ * 
  * 实体属性分组，基本概念就是将整个entity和property建立一套树状的结构，如下示意
  * 通过type类型，将这个树状结构分为 root, Entity, Group, Property 几个类型
  * root为唯一的根，Entity为根下的第二层，Group为Entity下的属性分组，分组本身是
@@ -29,37 +33,49 @@ use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 #[ORM\Table(name: "platform_entity_property_group")]
 #[ORM\Index(name: 'entity_property_group_idx', columns: ["type"])]
 #[ORM\Entity(repositoryClass: NestedTreeRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class EntityPropertyGroup implements GedmoNode
 {
     use CommonTrait;
 
-    #[ORM\Column(name: 'id', type: 'integer')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: "AUTO")]
+    #[ORM\Column(name: 'id', type: "uuid", unique: true)]
     private $id;
  
     /**
      * 分组名称
+     * @Ef(
+     *     group="epg_base_info",
+     *     isBF=true
+     * )
      */
     #[ORM\Column('group_name', type: 'string', length: 64, nullable: true)]
     private $name = null;
 
     /**
      * 是否为默认分组，此属性只在 type 为 group 时有意义
+     * @Ef(
+     *     group="epg_base_info",
+     *     isBF=true
+     * )
      */
     #[ORM\Column('is_default', type: 'boolean', nullable: true)]
     private $isDefault = false;
 
     /**
      * 分组标签
+     * @Ef(
+     *     group="epg_base_info",
+     *     isBF=true
+     * )
      */
     #[ORM\Column('group_label', type: 'string', length: 64, nullable: true)]
     private $label = null;
 
     /**
-     * 类型: root, entity, group, property
+     * 类型: root, namespace, entity, group, property
      */
-    #[ORM\Column(type: 'string', length: 20)]
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
     private $type;
 
     /**
@@ -67,6 +83,14 @@ class EntityPropertyGroup implements GedmoNode
      */
     #[ORM\Column(type: 'string', length: 40, nullable: true, unique: true)]
     private $token = null;
+
+    /**
+     * Entity的token
+     *
+     * @var [type]
+     */
+    #[ORM\Column(type: 'string', length: 40, nullable: true)]
+    private $entityToken = null;
 
     /**
      * entity namespace + class name
@@ -99,6 +123,16 @@ class EntityPropertyGroup implements GedmoNode
     #[ORM\OneToMany(targetEntity: "EntityPropertyGroup", mappedBy: "parent")]
     #[ORM\OrderBy(["lft" => "ASC"])]
     private $children;
+
+    public function __toString() {
+        return $this->label ? $this->label : $this->name;
+    }
+
+    public function __construct()
+    {
+        // 自动生成 UUID
+        $this->id = Uuid::v4();
+    }
 
     /**
      * Get the value of id
@@ -356,6 +390,26 @@ class EntityPropertyGroup implements GedmoNode
     public function setIsDefault($isDefault)
     {
         $this->isDefault = $isDefault;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of entityToken
+     */ 
+    public function getEntityToken()
+    {
+        return $this->entityToken;
+    }
+
+    /**
+     * Set the value of entityToken
+     *
+     * @return  self
+     */ 
+    public function setEntityToken($entityToken)
+    {
+        $this->entityToken = $entityToken;
 
         return $this;
     }

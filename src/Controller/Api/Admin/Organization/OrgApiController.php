@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use App\Controller\Api\ApiResponse;
+use App\Entity\Organization\Corporation;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -33,6 +34,10 @@ class OrgApiController extends AbstractController
   )]
   public function batchCreateCompany(Request $request, EntityManagerInterface $em): JsonResponse
   {
+    //Todo 暂时只支持单集团模式
+    $corporationRepo = $em->getRepository(Corporation::class);
+    $corporation = $corporationRepo->findOneBy([]);
+
     $payload = $request->toArray();
     $repo = $em->getRepository(Company::class);
     $root = $repo->findOneBy(['lvl' => 0]);
@@ -40,19 +45,23 @@ class OrgApiController extends AbstractController
       $com = new Company();
       $com->setName($company)
         ->setAlias($company)
+        ->setOwnerCompany($com)
         ->setParent($root);
+      $em->persist($com);
+      $em->flush();
 
       $depRepo = $em->getRepository(Department::class);
       $depRoot = $depRepo->findOneBy(['lvl' => 0]);
       $department = new Department();
       $department->setName($company)
         ->setAlias($company)
+        ->setCompany($com)
         ->setType('company')
-        ->setParent($depRoot);
-      $em->persist($com);
+        ->setParent($depRoot)
+        ->setOwnerCompany($com);
       $em->persist($department);
+      $em->flush();
     }
-    $em->flush();
     $data = ['status' => 'ok'];
 
     return new JsonResponse($data);

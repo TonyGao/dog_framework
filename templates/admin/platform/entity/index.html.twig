@@ -1,4 +1,5 @@
 {% extends 'admin/layout.html.twig' %}
+{% import 'ui/template/ui.html.twig' as ui %}
 
 {% block stylesheets %}
 	{{ parent() }}
@@ -28,6 +29,11 @@
 {% block app_content_container %}
 	<div class="org-sturcture-container">
 		<div class="outside-wrapper">
+			{# 渲染工具栏，并传入按钮配置数组 #}
+			{{ ui.toolBar([
+					{'type': 'create', 'text': '新建模型', 'id': 'createEntity'},
+					{'type': 'create', 'text': '新建文件夹', 'icon': 'fa-solid fa-folder-plus', 'id': 'createFolder'}
+			]) }}
 			<div class="inside-wrapper">
 				<div class="left-tree visible">
 					<div class="left-tree-wrapper">

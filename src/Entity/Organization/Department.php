@@ -3,13 +3,14 @@
 namespace App\Entity\Organization;
 
 use App\Annotation\Ef;
-use App\Entity\CommonTrait;
+use App\Entity\Traits\CommonTrait;
 use App\Repository\Organization\DepartmentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Tree\Node as GedmoNode;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * 部门
@@ -18,14 +19,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[Gedmo\Tree(type: 'nested')]
 #[ORM\Table(name: 'org_department')]
 #[ORM\Entity(repositoryClass: DepartmentRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Department implements GedmoNode
 {
 	use CommonTrait;
 
 	/** @Groups({"api"}) */
 	#[ORM\Id]
-	#[ORM\GeneratedValue]
-	#[ORM\Column(type: 'integer')]
+	#[ORM\Column(type: "uuid", unique: true)]
 	private $id;
 
 	/**
@@ -100,16 +101,6 @@ class Department implements GedmoNode
 	private $manager;
 
 	/**
-	 * 排序号
-	 * @Ef(
-	 *     group="department_base_info",
-	 *     isBF=true
-	 * )
-	 */
-	#[ORM\Column(type: 'integer', nullable: true)]
-	private $orderNum;
-
-	/**
 	 * 编码
 	 * @Groups({"api"})
 	 * @Ef(
@@ -180,9 +171,28 @@ class Department implements GedmoNode
 	private $buMenFuZong;
 
 
-	public function __toString()
+	public function __construct()
 	{
-		return $this->alias;
+			// 自动生成 UUID
+			$this->id = Uuid::v4();
+	}
+
+	#[ORM\PrePersist]
+	#[ORM\PreUpdate]
+	public function updatePath()
+	{
+		$pathComponents = [];
+
+		// 如果有上级部门，添加上级部门的路径
+		if ($this->parent) {
+			$pathComponents[] = $this->parent->getPath();
+		}
+
+		// 添加当前部门的名称
+		$pathComponents[] = $this->name;
+
+		// 生成完整路径
+		$this->path = implode('/', $pathComponents);
 	}
 
 
@@ -294,29 +304,6 @@ class Department implements GedmoNode
 
 		return $this;
 	}
-
-
-	/**
-	 * Get 排序号
-	 */
-	public function getOrderNum()
-	{
-		return $this->orderNum;
-	}
-
-
-	/**
-	 * Set 排序号
-	 *
-	 * @return  self
-	 */
-	public function setOrderNum($orderNum)
-	{
-		$this->orderNum = $orderNum;
-
-		return $this;
-	}
-
 
 	/**
 	 * Get 编码

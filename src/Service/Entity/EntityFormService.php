@@ -3,15 +3,16 @@
 namespace App\Service\Entity;
 
 use App\Lib\Str;
+use Twig\Environment;
+use App\Service\BaseService;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Platform\EntityPropertyGroup;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Doctrine\ORM\EntityManagerInterface;
-use Twig\Environment;
 
-class EntityFormService
+class EntityFormService extends BaseService
 {
   private $formFactory;
   private $twig;

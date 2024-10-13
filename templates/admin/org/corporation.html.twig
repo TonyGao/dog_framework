@@ -34,7 +34,7 @@
       })
 
       // 批量创建公司名称
-      $("#save-company").on("click", function() {
+      $("#save-company").on("click", function(event) {
         let arr = [];
         $(".ef-underline-input.input-company").each(function(val) {
           arr.push($(this).text());
@@ -53,6 +53,12 @@
             location.reload();
           }
         })
+      })
+
+      $(".company").on('paste', '.ef-underline-input.input-company', function(event) {
+        event.preventDefault(); // 阻止默认粘贴行为
+        const text = event.originalEvent.clipboardData.getData('text/plain'); // 获取纯文本
+        document.execCommand('insertText', false, text); // 插入纯文本
       })
     })
 	</script>
@@ -87,7 +93,7 @@
 {% block app_content_container %}
 	<div class="org-sturcture-container">
 		<div class="outside-wrapper">
-			<div class="inside-wrapper" style="border-left: none; border-top:  none;">
+			<div class="inside-wrapper corporation" style="border-left: none; border-top:  none; min-height: 20vh; height: -webkit-fill-available;">
       {% if corporation %}
 				<div class="start">
 					<div class="start-node-wrapper">

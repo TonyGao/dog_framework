@@ -1,11 +1,67 @@
 {# EF标准Twig UI库 #}
 
-{% macro barButton(type = 'create', text = null, classes = 'btn outline primary medium mini round icon') %}
-    {% set icon = icons[type] ?? 'fa-regular fa-question-circle' %}
-    {% set buttonText = text is not null ? text : (label[type]) %}
-    
-    <button class="{{ classes }}" id="{{ type }}">
-        <i class="{{ icon }}"></i> {{ buttonText }}
-    </button>
+{% macro barButton(type = 'create', text = null, classes = 'btn outline primary medium mini round icon', icon = null, id = null) %}
+	{# 判断是否传入了自定义图标，如果没有则根据 type 使用默认的图标 #}
+	{% set finalIcon = icon is not null ? icon : (icons[type] ?? 'fa-regular fa-question-circle') %}
+	{% set buttonText = text is not null ? text : (label[type]) %}
+	{# 如果没有传递 id，则使用 type 作为 id 的值 #}
+	{% set buttonId = id is not null ? id : type %}
+
+	<button class="{{ classes }}" id="{{ buttonId }}">
+		<i class="{{ finalIcon }}"></i>
+		{{ buttonText }}
+	</button>
 {% endmacro %}
 
+{# 定义工具栏宏 #}
+{% macro toolBar(buttons = []) %}
+	<div class="toolbar">
+		<div class="toolbar-box">
+			<div class="toolbar-wrap">
+				<div class="toolbar-content">
+					{% for button in buttons %}
+						{# 使用 barButton 宏来渲染每一个按钮，传入相应的类型、文本和图标等参数 #}
+						{{ _self.barButton(
+                            button.type,
+                            button.text,
+                            'btn outline primary medium mini round icon',
+                            button.icon|default(null),
+                            button.id|default(null)
+                        ) }}
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endmacro %}
+
+{% macro formSubmitButton() %}
+	<div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+		<div class="ef-col ef-col-5 ef-form-item-label-col">
+			<label class="ef-form-item-label"></label>
+		</div>
+		<div class="ef-col ef-col-19 ef-form-item-wrapper-col">
+			<div class="ef-form-item-content-wrapper">
+				<div class="ef-form-item-content ef-form-item-content-flex">
+					<div class="ef-space ef-space-horizontal ef-space-align-center">
+						<div class="ef-space-item" style="margin-right: 8px;">
+							<button class="btn primary medium" type="submit">提交</button>
+						</div>
+						<div class="ef-space-item">
+							<button class="btn primary medium" type="reset" onclick="window.location.reload();">返回</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endmacro %}
+
+{% macro formValid() %}
+<script>
+$(document).ready(function () {
+  let form = $("form");
+  form.formValid();
+})
+</script>
+{% endmacro %}

@@ -4,6 +4,7 @@ namespace App\Service\Platform;
 
 use Twig\Environment;
 use App\Entity\Platform\Menu;
+use App\Service\BaseService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use App\Service\Platform\CodeFormatterService;
@@ -11,7 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 
-class MenuStaticGenerator
+class MenuStaticGenerator extends BaseService
 {
   private $em;
   private $twig;

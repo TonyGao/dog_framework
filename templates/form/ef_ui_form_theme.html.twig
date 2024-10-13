@@ -26,24 +26,47 @@
     {%- if attr is not defined or attr is not iterable -%}
         {%- set attr = {} -%}
     {%- endif -%}
+
+    {# 设置默认的 type 为 'text' #}
     {%- set type = type|default('text') -%}
+
+    {# 处理 range 和 color 类型控件不支持 required 属性的情况 #}
     {%- if type == 'range' or type == 'color' -%}
-        {# Attribute "required" is not supported #}
         {%- set required = false -%}
     {%- endif -%}
+
+    {# 检查是否有传入 readonly  属性，并为 input 元素添加相应的样式类 #}
+    {%- set isReadonly = attr.readonly is defined and attr.readonly -%}
     {%- set class_attr = attr.class is defined ? attr.class : '' %}
+
+    {# 处理 text 类型的输入框，使用自定义的样式 #}
     {%- if type == 'text' -%}
-    <span class="ef-input-wrapper" style="max-width: 320px;">
+    {# <span class="ef-input-wrapper">
       <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" clearable="true" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
-    </span>
+    </span> #}
+        <span class="ef-input-wrapper {% if isReadonly %} ef-input-disabled {% endif %}" >
+            <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" 
+                   clearable="true" 
+                   type="{{ type }}" 
+                   {{ block('widget_attributes') }} 
+                   {% if value is not empty %}value="{{ value }}" {% endif %}
+                   {% if isReadonly %} readonly="readonly" {% endif %}
+                   {% if disabled %} disabled="disabled" {% endif %}/>
+        </span>
     {%- else -%}
-      <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
-      {# <input type="{{ type }}" {{ block('widget_attributes')|merge({class: 'ef-input ef-input-size-medium ' ~ class_attr}) }} {% if value is not empty %}value="{{ value }}" {% endif %}/> #}
+        {# 处理其他类型的输入框 #}
+        <input type="{{ type }}" {{ block('widget_attributes') }} 
+               {% if value is not empty %}value="{{ value }}" {% endif %}
+               {% if isReadonly %} readonly="readonly" {% endif %}
+               {% if isReadonly %} disabled="disabled" {% endif %}/>
+      {# <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/> #}
     {%- endif -%}
 {%- endblock form_widget_simple -%}
 
 {%- block textarea_widget -%}
-  <div class="ef-textarea-wrapper">
+  {%- set isReadonly = attr.readonly is defined and attr.readonly -%}
+  {%- set class_attr = attr.class is defined ? attr.class : '' %}
+  <div class="ef-textarea-wrapper {% if isReadonly %} ef-textarea-disabled {% endif %}/>">
     <textarea {{ block('widget_attributes') }} class="ef-textarea resizeable" min-rows="3" max-rows="10" clearable="true" placeholder="Please enter something">{{ value }}</textarea>
   </div>
 {%- endblock textarea_widget -%}
@@ -90,10 +113,10 @@
 
 {% block form_row -%}
   <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
-    <div class="ef-col ef-col-5 ef-form-item-label-col">
+    <div class="ef-col ef-col-8 ef-form-item-label-col">
       {{- form_label(form) -}}
     </div>
-    <div class="ef-col ef-col-19 ef-form-item-wrapper-col">
+    <div class="ef-col ef-col-16 ef-form-item-wrapper-col">
       <div class="ef-form-item-content-wrapper">
         <div class="ef-form-item-content ef-form-item-content-flex">
           {{- form_widget(form) -}}
@@ -131,7 +154,7 @@
 {%- endblock switch_widget -%}
 
 {%- block integer_widget -%}
-	<span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium" style="max-width: 320px;">
+	<span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium">
     <input role="spinbutton"
       {% if attr.numValuemax is defined %}
         num-valuemax={{ attr.numValuemax }}
@@ -168,7 +191,6 @@
     <input type="hidden" component="select" {{ block('widget_attributes') }} {% if isDefault %} value="{{ value }}" {% endif %}/>
     <span
       class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
-      style="max-width: 320px;"
       chosen="{{ isDefault ? 'true' : 'false' }}"
       for="{{ label }}"
       id="{{ selectInputId }}"

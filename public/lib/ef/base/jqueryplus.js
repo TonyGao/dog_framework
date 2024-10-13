@@ -58,7 +58,7 @@
           $(element)
             .closest(".ef-input-wrapper")
             .removeClass("ef-input-error")
-            .removeAttr("style");
+            // .removeAttr("style");
         }
 
         if ($(element).is("[component='select']")) {

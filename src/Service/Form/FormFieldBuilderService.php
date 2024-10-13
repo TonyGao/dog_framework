@@ -2,14 +2,15 @@
 
 namespace App\Service\Form;
 
-use App\Lib\Str;
 use App\Lib\Arr;
+use App\Lib\Str;
+use App\Service\BaseService;
 use App\Entity\Platform\Entity;
 use App\Entity\Platform\EntityProperty;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class FormFieldBuilderService
+class FormFieldBuilderService extends BaseService
 {
     private $em;
 
@@ -27,7 +28,7 @@ class FormFieldBuilderService
         ]);
 
         $fields = $this->em->getRepository(EntityProperty::class)
-            ->findBy(['entity' => $en], ['id' => 'ASC']);
+            ->findBy(['entity' => $en], ['orderNum' => 'ASC']);
 
         foreach ($fields as $field) {
             $arr = [];
@@ -52,7 +53,12 @@ class FormFieldBuilderService
                 $customOptionsCallback($field, $options);
             }
 
-            $builder->add($field->getPropertyName(), $classType, $options);
+            $property = $field->getPropertyName();
+            $builder->add($property, $classType, $options);
         }
+    }
+
+    public function getEntityManager() {
+        return $this->em;
     }
 }

@@ -718,7 +718,6 @@ body {
   flex-direction: column;
   flex: none;
   width: 240px;
-  min-width: 0;
   height: 100%;
   background-color: #f2f3f5;
   transition: all 0.3s cubic-bezier(0.25, 0.1, 0.05, 1) 70ms;
@@ -728,6 +727,38 @@ body {
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+.app-side-menu.collapsed {
+  position: relative;
+  width: 0px; /* 默认保留 15px 宽度 */
+  transition: width 0.3s ease-in-out;
+}
+
+/* 展开按钮样式 */
+.app-side-menu-scroll-btn {
+  display: none; /* 默认不显示 */
+  justify-content: center;
+  align-items: center;
+  width: 15px;
+  height: 48px; /* 设置按钮高度 */
+  background-color: #3b82f6; /* 设置蓝色背景 */
+  color: #fff; /* 设置字体颜色 */
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  position: absolute;
+  left: 0;
+  top: 50%; /* 垂直居中 */
+  transform: translateY(-50%);
+  z-index: 10;
+
+  /* 使用 clip-path 创建梯形效果 */
+  clip-path: polygon(0 0, 100% 15%, 100% 85%, 0 100%);
+}
+
+.app-side-menu-scroll-btn i {
+  color: #fff; /* 图标颜色 */
+  font-size: 18px;
 }
 
 .side-menu-one {
@@ -756,6 +787,7 @@ body {
   align-items: center;
   width: 48px;
   height: 48px;
+  font-size: medium;
 }
 
 .side-scroll-btn i {

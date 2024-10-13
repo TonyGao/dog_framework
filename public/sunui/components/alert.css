@@ -187,3 +187,19 @@
 .cell-demo {
   margin-bottom: 20px;
 }
+
+.ef-alert-body {
+  width: 100%; /* 使内容区域宽度自适应外层容器 */
+  box-sizing: border-box; /* 确保 padding 不会影响宽度 */
+}
+
+.ef-alert-title {
+  white-space: normal; /* 确保标题部分自动换行 */
+  word-wrap: break-word; /* 处理长单词的换行 */
+}
+
+.ef-alert-content {
+  white-space: normal; /* 允许文本自动换行 */
+  word-break: break-word; /* 保证长单词的换行 */
+  overflow-wrap: break-word; /* 处理长单词在不同浏览器的换行兼容性 */
+}

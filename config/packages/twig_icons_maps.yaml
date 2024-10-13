@@ -5,8 +5,10 @@ twig:
             modify: 'fa-regular fa-pen-to-square'
             delete: 'fa-regular fa-trash'
             save: 'fa-regular fa-save'
+            disable: 'fa-solid fa-ban'
         label:
             create: '新建'
             modify: '修改'
             delete: '删除'
             save: '保存'
+            disable: '停用'

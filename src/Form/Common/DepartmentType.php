@@ -2,21 +2,29 @@
 
 namespace App\Form\Common;
 
-use App\Service\Form\FormFieldBuilderService;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\Organization\Department;
+use App\Form\BaseFormType;
+use App\Service\Form\FormFieldBuilderService;
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\FormBuilderInterface;
+use App\Form\Common\DepartmentTypeTransfer;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EntityType as SymfonyEntityType;
 
-class DepartmentType extends AbstractType
+class DepartmentType extends BaseFormType
 {
+
+  public function __construct(
+    private DepartmentTypeTransfer $departmentTypeTransfer
+  ) {}
+
   /**
    * {@inheritdoc}
    */
   public function buildForm(FormBuilderInterface $builder, array $options)
   {
-    $builder->setData($options['data'] ?? false);
+    $builder->setData($options['data'] ?? false)
+      ->addModelTransformer($this->departmentTypeTransfer);
   }
 
 
@@ -26,7 +34,8 @@ class DepartmentType extends AbstractType
   public function configureOptions(OptionsResolver $resolver)
   {
     $resolver->setDefaults([
-      'class' => Department::class
+      'class' => Department::class,
+      'compound' => false,
     ]);
   }
 
@@ -37,9 +46,4 @@ class DepartmentType extends AbstractType
   {
     return 'department';
   }
-
-  // public function getParent()
-  // {
-  //   return SymfonyEntityType::class;
-  // }
 }
