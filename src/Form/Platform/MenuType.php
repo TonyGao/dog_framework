@@ -3,21 +3,20 @@
 namespace App\Form\Platform;
 
 use App\Entity\Platform\Menu;
+use App\Form\BaseFormType;
 use Symfony\Component\Form\AbstractType;
 use App\Repository\Platform\MenuRepository;
 use App\Service\Form\FormFieldBuilderService;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class MenuType extends AbstractType
+class MenuType extends BaseFormType
 {
   private $formFieldBuilder;
-  private $menuRepo;
 
-  public function __construct(FormFieldBuilderService $formFieldBuilder, MenuRepository $menuRepo)
+  public function __construct(FormFieldBuilderService $formFieldBuilder)
   {
     $this->formFieldBuilder = $formFieldBuilder;
-    $this->menuRepo = $menuRepo;
   }
 
   public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -29,6 +28,9 @@ class MenuType extends AbstractType
   {
       $resolver->setDefaults([
           'data_class' => Menu::class,
+          'attr' => [
+            'style' => 'width: 450px;', // 设置表单宽度
+           ],
       ]);
   }
 }

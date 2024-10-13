@@ -1,12 +1,4 @@
-<section class="app-side-menu">
-	<aside class="admin-aside-outer">
-		<div class="side-menu-one">
-			<div class="side-menu-two">
-				<div class="universe-icon side-scroll-btn">
-					<i class="fa-solid fa-angles-left"></i>
-				</div>
-				<div class="side-menu-content">
-					{% macro recursiveMenu(mn) %}
+{% macro recursiveMenu(mn) %}
 						{% import _self as self %}
                 {% set uri = mn.uri %}
 						{% if mn.__children == [] %}
@@ -42,6 +34,19 @@
 
 					{% from _self import recursiveMenu %}
 
+{{ "{% set sideDisplay = sideMenuState == 'shrunk' ? 'none' : 'flex' %}" }}
+{{ "{% set scrollBtnDisplay = sideMenuState == 'shrunk' ? 'flex' : 'none' %}" }}
+<section class="app-side-menu">
+	<div class="app-side-menu-scroll-btn" style="display: {{ "{{ scrollBtnDisplay }}" }}">
+		<i class="fa-solid fa-angle-right"></i>
+	</div>
+	<aside class="admin-aside-outer" style="display: {{ "{{ sideDisplay }};" }}">
+		<div class="side-menu-one">
+			<div class="side-menu-two">
+				<div class="universe-icon side-scroll-btn system-menu-toggle-btn">
+					<i class="fa-solid fa-angles-left"></i>
+				</div>
+				<div class="side-menu-content">
 					{% if menus %}
 						{% for menu in menus %}
 							{{ recursiveMenu(menu) }}

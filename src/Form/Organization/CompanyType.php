@@ -7,6 +7,7 @@ use App\Lib\Arr;
 use App\Entity\Organization\Company;
 use App\Entity\Platform\Entity;
 use App\Entity\Platform\EntityProperty;
+use App\Form\BaseFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
-class CompanyType extends AbstractType
+class CompanyType extends BaseFormType
 {
     public $em;
     public function __construct(EntityManagerInterface $em)
@@ -30,7 +31,6 @@ class CompanyType extends AbstractType
         $en = $repo->findOneBy([
             'fqn' => $reflectionClass->name,
         ]);
-        //$fields = $en->getProperties();
         $fields = $this->em->getRepository(EntityProperty::class)
           ->findBy(['entity' => $en],['id' => 'ASC']);
         foreach ($fields as $field) {
@@ -60,6 +60,9 @@ class CompanyType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Company::class,
+            'attr' => [
+                'style' => 'width: 450px;', // 设置表单宽度
+            ],
         ]);
     }
 }

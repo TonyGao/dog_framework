@@ -3,13 +3,14 @@
 namespace App\Entity\Organization;
 
 use App\Annotation\Ef;
-use App\Entity\CommonTrait;
+use App\Entity\Traits\CommonTrait;
 use App\Repository\Organization\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 use Gedmo\Tree\Node as GedmoNode;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * 公司, 分组: 公司基本信息, 公司关联信息, 公司管理信息, 公司说明信息
@@ -18,13 +19,13 @@ use Gedmo\Tree\Node as GedmoNode;
 #[Gedmo\Tree(type: 'nested')]
 #[ORM\Table(name: 'org_company')]
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Company implements GedmoNode
 {
 	use CommonTrait;
 
 	#[ORM\Id]
-	#[ORM\GeneratedValue]
-	#[ORM\Column(type: 'integer')]
+	#[ORM\Column(type: "uuid", unique: true)]
 	private $id;
 
 	/**
@@ -34,7 +35,7 @@ class Company implements GedmoNode
 	 *     isBF=true
 	 * )
 	 */
-	#[ORM\Column(type: 'string', length: 180)]
+	#[ORM\Column(type: 'string', length: 180, unique: true)]
 	private $name;
 
 	/**
@@ -66,16 +67,6 @@ class Company implements GedmoNode
 	 */
 	#[ORM\Column(type: 'text', nullable: true)]
 	private $remark;
-
-	/**
-	 * 排序号
-	 * @Ef(
-	 *     group="company_base_info",
-	 *     isBF=true
-	 * )
-	 */
-	#[ORM\Column(type: 'integer', nullable: true)]
-	private $orderNum;
 
 	/**
 	 * 重复排序号处理: 插入、重复
@@ -152,6 +143,7 @@ class Company implements GedmoNode
 	public function __construct()
 	{
 		$this->accessScope = new ArrayCollection();
+		$this->id = Uuid::v4();
 	}
 
 
@@ -260,28 +252,6 @@ class Company implements GedmoNode
 	public function setRemark($remark)
 	{
 		$this->remark = $remark;
-
-		return $this;
-	}
-
-
-	/**
-	 * Get 排序号
-	 */
-	public function getOrderNum()
-	{
-		return $this->orderNum;
-	}
-
-
-	/**
-	 * Set 排序号
-	 *
-	 * @return  self
-	 */
-	public function setOrderNum($orderNum)
-	{
-		$this->orderNum = $orderNum;
 
 		return $this;
 	}

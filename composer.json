@@ -17,6 +17,7 @@
         "nette/php-generator": "^4.0",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.7",
+        "ramsey/uuid": "^4.7",
         "sensio/framework-extra-bundle": "^6.2",
         "stof/doctrine-extensions-bundle": "^1.7",
         "symfony/asset": "6.4.*",
@@ -106,6 +107,7 @@
         }
     },
     "require-dev": {
+        "hautelook/alice-bundle": "^2.1",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "6.4.*",
         "symfony/css-selector": "6.4.*",

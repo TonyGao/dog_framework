@@ -2,10 +2,11 @@
 
 namespace App\Service\Platform;
 
+use App\Service\BaseService;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
-class CodeFormatterService
+class CodeFormatterService extends BaseService
 {
     private array $formatters;
 

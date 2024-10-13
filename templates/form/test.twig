@@ -1,0 +1,55 @@
+{%- block department_widget -%}
+
+{% set departmentInputId = random() %}
+{% set departmentContentId = random() %}
+
+<div class="ef-deparment-element">
+    <span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search" style="width: 260px;" chosen="{{ department is not empty ? 'true' : 'false' }}" id="{{ departmentInputId }}" contentid="{{ departmentContentId }}">
+        <div class="ef-department-selection-container">
+            <div class="ef-department-selection">
+                <span class="ef-department-selection-span">
+                    <ul>
+                        {% if department is not empty %}
+                            <li class="ef-department-selection-li">
+                                <div class="ef-department-selection-li-content">
+                                    <a href="link" class="ef-link" id="{{ department.id }}">{{ department.name }}</a>
+                                    <span class="ef-department-view-suffix close-chose-department" style="display: block;">
+                                        <span class="ef-department-view-icon">
+                                            <i class="fa-regular fa-circle-xmark"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </span>
+            </div>
+            <input class="ef-department-view-input" placeholder="请输入部门名称 ..." mode="single" chose="{{ department is not empty ? 'true' : 'false' }}" style="display: {{ department is not empty ? 'none' : 'block' }};">
+        </div>
+        <span class="ef-department-view-value ef-department-view-value-hidden"></span>
+        <span class="ef-department-view-suffix show-department-modal">
+            <span class="ef-department-view-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-search" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                    <path d="M33.072 33.071c6.248-6.248 6.248-16.379 0-22.627-6.249-6.249-16.38-6.249-22.628 0-6.248 6.248-6.248 16.379 0 22.627 6.248 6.248 16.38 6.248 22.628 0Zm0 0 8.485 8.485"></path>
+                </svg>
+            </span>
+        </span>
+    </span>
+</div>
+<div class="ef-trigger-popup ef-trigger-position-bl" trigger-placement="bl" style="z-index: 1001; pointer-events: auto; min-width: 260px; width: fit-content" id="{{ departmentContentId }}" parentid="{{ departmentInputId }}">
+    <div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+        <div class="ef-trigger-content">
+            <div class="ef-department-dropdown">
+                <div class="ef-scrollbar ef-scrollbar-type-embed">
+                    <div class="ef-scrollbar-container ef-department-dropdown-list-wrapper">
+                        <ul class="ef-department-dropdown-list">
+                            <li id="{{ random() }}" class="ef-department-option"></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{%- endblock department_widget -%}

@@ -2,23 +2,23 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Organization\Corporation;
-use App\Entity\Organization\Company;
-use App\Entity\Organization\Department;
-use App\Form\Organization\CorporationFormType;
-use App\Form\Organization\OrgDepartmentType;
-use App\Form\Organization\CompanyType;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Uid\Uuid;
+use App\Controller\BaseController;
+use App\Entity\Organization\Company;
+use App\Form\Organization\CompanyType;
+use App\Entity\Organization\Department;
+use App\Entity\Organization\Corporation;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Form\Organization\OrgDepartmentType;
+use Symfony\Component\HttpFoundation\Request;
+use App\Form\Organization\CorporationFormType;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * 组织架构管理
  */
-class OrgController extends AbstractController
+class OrgController extends BaseController
 {
 
   /**
@@ -64,6 +64,7 @@ class OrgController extends AbstractController
     if ($form->isSubmitted() && $form->isValid()) {
       $corporation = $form->getData();
       $em->persist($corporation);
+      $em->flush();
 
       // 如果是首次创建集团信息，初始化相关的根公司，再初始化相关的根部门
       if ($isFirstTime) {
@@ -85,9 +86,11 @@ class OrgController extends AbstractController
         $company->setAlias($corporation->getAlias());
       }
       $em->persist($company);
+      $em->flush();
 
       $department->setName($corporation->getName())
-        ->setType('corperations');
+        ->setType('corperations')
+        ->setPath($corporation->getName());
       if ($corporation->getAlias() != null) {
         $department->setAlias($corporation->getAlias());
       }
@@ -106,7 +109,7 @@ class OrgController extends AbstractController
    * 公司编辑页面
    */
   #[Route('/admin/org/company/edit/{id}', name: 'org_company_edit')]
-  public function editCompany(Request $request, EntityManagerInterface $em, int $id): Response
+  public function editCompany(Request $request, EntityManagerInterface $em, string $id): Response
   {
     $repo = $em->getRepository(Company::class);
     $company = $repo->findOneBy(['id' => $id]);
@@ -118,6 +121,7 @@ class OrgController extends AbstractController
     if ($form->isSubmitted() && $form->isValid()) {
       $submitCompany = $form->getData();
       $em->persist($submitCompany);
+      $em->flush();
 
       $depRepo = $em->getRepository(Department::class);
       $department = $depRepo->findOneBy(['name' => $oldName]);
@@ -192,7 +196,7 @@ class OrgController extends AbstractController
               <i class="fa-solid fa-building-user"></i>
 						</div>
 						<div class="org-name">
-							<div class="org-text-content company" type="company">' .
+							<div class="org-text-content company" type="company" id="'.$node['id'].'">' .
             $node['name']
             . '</div>
 						</div>
@@ -341,10 +345,27 @@ class OrgController extends AbstractController
   #[Route('/admin/org/department/new', name: 'org_department_new')]
   public function createDepartment(Request $request, EntityManagerInterface $em): Response
   {
+    // 从 GET 请求中获取参数
+    $parentId = $request->query->get('parent');
+
     $department = new Department();
+
+    // 如果获取到部门 ID，查找对应的上级部门
+    if ($parentId) {
+      $parentDepartment = $em->getRepository(Department::class)->find($parentId);
+      if ($parentDepartment) {
+        if ($parentDepartment->getType() === 'department') {
+          $department->setParent($parentDepartment);
+        }
+        // 预填表单中的上级部门和公司字段
+        $department->setCompany($parentDepartment->getCompany());
+      }
+    }
+
     $form = $this->createForm(OrgDepartmentType::class, $department, [
       'action' => $this->generateUrl('org_department_new')
     ]);
+
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
@@ -357,9 +378,26 @@ class OrgController extends AbstractController
         $parent = $repo->findOneBy(['name' => $company]);
         $departmentPost->setParent($parent);
       }
+
+      // 设置 path 字段
+      $pathComponents = [];
+
+      // 如果有上级部门，添加上级部门的路径
+      if ($departmentPost->getParent()) {
+          $pathComponents[] = $departmentPost->getParent()->getPath();
+      }
+
+      // 添加当前部门的名称
+      $pathComponents[] = $departmentPost->getName();
+
+      // 生成完整路径
+      $departmentPost->setPath(implode('/', $pathComponents));
+
       $em->persist($departmentPost);
       $em->flush();
 
+      // 添加 flash 消息，通知前端缓存需要清理
+      $this->addFlash('org.singleDepartment', 'clear');
       return $this->redirectToRoute('org_department');
     }
 

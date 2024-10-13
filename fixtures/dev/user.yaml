@@ -1,0 +1,9 @@
+App\Entity\OrgUser:
+    user_{1..10}:
+        username: <username()>
+        displayName: <chineseName()>
+        email: <email()>
+        phone: <phoneNumber()>
+        roles: ['ROLE_USER']
+        password: "\\$2y\\$13\\$0TAB4pWcWigo3hleLKKNY.zk4F3see7Xk86/tkMIM3zzTGWBdU27a"
+        isVerified: <boolean()>

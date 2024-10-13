@@ -11,21 +11,27 @@
 
   <script>
 	$(document).ready(function () {
+    let payload = {
+      parent: null,
+    };
+
     $(".org-text-content.company, .org-text-content.department").on("click", function (event) {
       let thisChosen = false;
+      let type = $(this).attr("type");
       if ($(this).hasClass("chosen")) {
         thisChosen = true;
       }
       $(".org-text-content.chosen").removeClass("chosen");
       if (!thisChosen) {
         $(this).addClass("chosen");
+        payload.parent = $(this).attr("id");
       }
     })
 
     $("#create").on("click", function (event) {
       $.ajax({
-        url: "{{ path("org_department_new") }}",
-        method: "GET",
+        url: "{{ path('org_department_new') }}", // 你的路由 URL
+        data: payload, // GET 请求不会发送 JSON 数据，直接传递对象或字符串
         async: false,
         dataType: "html",
         success: function(data) {

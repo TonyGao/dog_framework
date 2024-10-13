@@ -22,8 +22,12 @@ class HeaderStateSubscriber implements EventSubscriberInterface
         // 从 cookie 中获取 headerState, 默认值是 'expanded'
         $headerState = $request->cookies->get('headerState', 'expanded');
 
-        // 将 headerState 传递到 Twig 模板中
+        // 从 cookie 中获取 sideMenuState, 默认值是 'expanded'
+        $sideMenuState = $request->cookies->get('sideMenuState');
+
+        // 将 headerState, sideMenuState 传递到 Twig 模板中
         $this->twig->addGlobal('headerState', $headerState);
+        $this->twig->addGlobal('sideMenuState', $sideMenuState);
     }
 
     public static function getSubscribedEvents()

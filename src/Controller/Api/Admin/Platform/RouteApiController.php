@@ -29,11 +29,19 @@ class RouteApiController extends AbstractController
     $formattedRoutes = [];
     foreach ($routes as $name => $route) {
       // 只返回以 api 开头的路由
-      if (strpos($name, 'api') === 0 || substr($name, -5) === 'cache') {
-          $formattedRoutes[$name] = [
-              'path' => $route->getPath(),
-              'methods' => $route->getMethods(),
-          ];
+      // if (strpos($name, 'api') === 0 || substr($name, -5) === 'cache') {
+      //     $formattedRoutes[$name] = [
+      //         'path' => $route->getPath(),
+      //         'methods' => $route->getMethods(),
+      //     ];
+      // }
+
+      // 暂时全部开放给前端
+      if (strpos($name, '_') !== 0) {
+        $formattedRoutes[$name] = [
+          'path' => $route->getPath(),
+          'methods' => $route->getMethods(),
+        ];
       }
     }
 

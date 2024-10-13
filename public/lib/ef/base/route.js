@@ -71,3 +71,5 @@ class Route {
     return { path, methods };
   }
 }
+
+window.Route = Route;

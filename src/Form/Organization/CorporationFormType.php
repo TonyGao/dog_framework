@@ -4,6 +4,7 @@ namespace App\Form\Organization;
 
 use App\Entity\Organization\Corporation;
 use App\Entity\Platform\Entity;
+use App\Form\BaseFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -12,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
-class CorporationFormType extends AbstractType
+class CorporationFormType extends BaseFormType
 {
     public $em;
     public function __construct(EntityManagerInterface $em)
@@ -33,17 +34,15 @@ class CorporationFormType extends AbstractType
                 'label' => $field->getComment()
             ]);
         }
-        // $builder->add('save', CollectionType::class, [
-        //     'save'
-        // ])
-        // $builder->add('save', SubmitType::class, ['label' => '提交'])
-        //     ->add('return', ButtonType::class, ['label' => '返回']);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Corporation::class,
+            'attr' => [
+                'style' => 'width: 400px;', // 设置表单宽度
+            ],
         ]);
     }
 }

@@ -2,25 +2,25 @@
 
 namespace App\Entity\Platform;
 
-use App\Entity\CommonTrait;
+use App\Entity\Traits\CommonTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use App\Repository\Platform\EntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-
+use Symfony\Component\Uid\Uuid;
 /**
  * 实体模型
  */
 #[ORM\Entity(repositoryClass: EntityRepository::class)]
 #[ORM\Table(name: "platform_entity")]
 #[ORM\Index(name: "entity_idx", columns: ["token"])]
+#[ORM\HasLifecycleCallbacks]
 class Entity
 {
     use CommonTrait;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: "uuid", unique: true)]
     private $id;
 
     /**
@@ -65,11 +65,6 @@ class Entity
     #[ORM\Column(type: "string", length: 80)]
     private $dataTableName;
 
-    public function __toString()
-    {
-        return $this->getName();
-    }
-
     #[ORM\OneToMany(
         targetEntity: EntityProperty::class,
         mappedBy: "entity",
@@ -80,7 +75,14 @@ class Entity
 
     public function __construct() {
         $this->properties = new ArrayCollection();
+        $this->id = Uuid::v4();
     }
+
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
 
     /**
      * Get the value of id

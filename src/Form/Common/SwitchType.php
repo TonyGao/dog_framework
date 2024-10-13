@@ -2,14 +2,14 @@
 
 namespace App\Form\Common;
 
-use Symfony\Component\Form\AbstractType;
+use App\Form\BaseFormType;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class SwitchType extends AbstractType
+class SwitchType extends BaseFormType
 {
   /**
    * {@inheritdoc}

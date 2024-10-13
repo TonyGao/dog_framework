@@ -65,7 +65,8 @@ services:
                 php-cs-fixer: '%kernel.project_dir%/vendor/bin/php-cs-fixer fix'
                 prettier: '%kernel.project_dir%/node_modules/.bin/prettier --write'
                 twigcs: '%kernel.project_dir%/vendor/bin/twigcs'
-
+    App\Lib\DataFixtures\Faker\Provider\ChinseseNameProvider:
+        tags: ['hautelook_alice.provider']
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

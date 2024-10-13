@@ -26,10 +26,19 @@ framework:
                 version: ~
             ui:
                 base_path: 'sunui/components'
+            ui-static:
+                base_path: 'sunui/components'
+                version: ~
             uilib:
                 base_path: 'sunui/lib'
+            uilib-static:
+                base_path: 'sunui/lib'
+                version: ~
             admin:
                 base_path: 'sunui/admin'
+            admin-static:
+                base_path: 'sunui/admin'
+                version: ~
 
 when@test:
     framework:

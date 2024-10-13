@@ -2,10 +2,11 @@
 
 namespace App\Entity\Platform;
 
-use App\Entity\CommonTrait;
+use App\Entity\Traits\CommonTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use App\Repository\Platform\EntityPropertyRepository;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * 实体属性
@@ -18,8 +19,7 @@ class EntityProperty
     use CommonTrait;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: "uuid", unique: true)]
     private $id;
 
     /**
@@ -171,6 +171,12 @@ class EntityProperty
     #[ORM\ManyToOne(targetEntity: EntityPropertyGroup::class)]
     #[ORM\JoinColumn(name: 'group_id', referencedColumnName: 'id')]
     private $group;
+
+    public function __construct()
+    {
+        // 自动生成 UUID
+        $this->id = Uuid::v4();
+    }
 
     /**
      * Get the value of id

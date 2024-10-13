@@ -2,20 +2,21 @@
 
 namespace App\Entity\Platform;
 
-use App\Entity\CommonTrait;
+use App\Entity\Traits\CommonTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use App\Repository\Platform\OptionValueRepository;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: OptionValueRepository::class)]
 #[ORM\Table(name: 'platform_optionvalue')]
+#[ORM\HasLifecycleCallbacks]
 class OptionValue
 {
     use CommonTrait;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(type: "uuid", unique: true)]
     private $id;
 
     /**
@@ -53,6 +54,12 @@ class OptionValue
      */
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $datetime;
+
+    public function __construct()
+    {
+        // 自动生成 UUID
+        $this->id = Uuid::v4();
+    }
 
     /**
      * Get the value of id

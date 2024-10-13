@@ -27,4 +27,23 @@ $(document).ready(async function () {
     $('.hPerson-avatar').toggle();
     $('.app-header').toggleClass('shrunk');
   });
+
+  const $adminAside = $('.admin-aside-outer'); // 获取 admin-aside-outer 容器
+  const $toggleBtn = $('.system-menu-toggle-btn');   // 获取折叠/展开按钮
+
+  // 点击事件：折叠侧边栏
+  $toggleBtn.on('click', function () {
+    $(".admin-aside-outer").hide();
+    $(".app-side-menu").addClass('collapsed');
+    $(".app-side-menu-scroll-btn").css('display', 'flex');
+    document.cookie = "sideMenuState=shrunk" + "; path=/";
+  });
+
+  // 点击事件：展开侧边栏
+  $(".app-side-menu-scroll-btn").on("click", function () {
+    $(".admin-aside-outer").show();
+    $(".app-side-menu").removeClass('collapsed');
+    $(".app-side-menu-scroll-btn").hide();
+    document.cookie = "sideMenuState=expanded" + "; path=/";
+  })
 })

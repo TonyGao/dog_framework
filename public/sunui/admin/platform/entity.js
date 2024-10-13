@@ -9,29 +9,29 @@ $(document).ready(function () {
     "click",
     ".tree-text-content.branch[type=entity]",
     function () {
-      let id = $(this).attr("id");
-      let liId = "tab-" + id;
+      let token = $(this).attr("token");
+      let liId = "tab-" + token;
       let tabName = $(this).text();
       let entityData;
 
       // console.log(tabsIsEmpty["tabsIsEmpty" + id]);
 
       // 如果右侧没有没有任何标签页
-      if (tabsIsEmpty["tabsIsEmpty" + id] === undefined) {
+      if (tabsIsEmpty["tabsIsEmpty" + token] === undefined) {
         // 根据点击的模型的token查询模型数据
         $.ajax({
           url: "/admin/platform/entity/itemtable",
           method: "GET",
           async: false,
           dataType: "html",
-          data: { token: id },
+          data: { token: token },
           success: function (data) {
             entityData = data;
           },
         });
         $(".empty-content").hide();
         $("#platform-entity").show();
-        tabsIsEmpty["tabsIsEmpty" + id] = false;
+        tabsIsEmpty["tabsIsEmpty" + token] = false;
       }
 
       EfTabs.addTab("platform-entity", liId, tabName, "hello", entityData);
@@ -130,9 +130,8 @@ $(document).ready(function () {
     }, 500)
   );
 
-  const route = new Route();
   let somethingWrong = false;
-  $("body").on("click", "#submitFormButton", function (e) {
+  $("body").on("click", "#submitFormButton", async function (e) {
     e.preventDefault(); // 阻止按钮的默认行为
     // $(this).closest(".ef-drawer");
     let token = $(this).closest(".ef-drawer-container").attr("entitytoken");
@@ -159,7 +158,10 @@ $(document).ready(function () {
     console.log(JSON.stringify(payload, null, 2));
 
     // 发送 AJAX 请求
-    let field = route.generate("api_platform_entity_batchfields");
+    let route = new Route();
+    let field = await route.generate("api_platform_entity_batchfields");
+    let uri = await route.generate("platform_entity");
+    let alert = new Alert($(this).closest(".ef-drawer"));
     $.ajax({
       type: field.methods[0],
       url: field.path, // 提交表单的路由路径
@@ -167,13 +169,18 @@ $(document).ready(function () {
       data: JSON.stringify(payload),
       success: function (response) {
         // 在成功响应时执行的操作，可以是重定向、显示消息等
-        console.log("表单提交成功！");
-
+        alert.success('表单提交成功', {
+          percent: '50%',
+          callback: function () {
+            window.location.href = uri.path;
+          }
+        });
         // 如果有必要，在这里可以执行其他操作，比如隐藏模态框
       },
       error: function (xhr, status, error) {
         // 在发生错误时执行的操作
-        console.error("表单提交失败: " + error);
+        console.error("表单提交失败: " + xhr.responseJSON.message);
+        alert.error("表单提交失败: " + xhr.responseJSON.message, { percent: '40%', title: "请求错误", closable: true });
       },
     });
   });
@@ -190,7 +197,7 @@ $(document).ready(function () {
     } else {
       // 如果只剩下一行，给出相应的提示或者不执行任何操作
       let alert = new Alert($(this).closest(".ef-drawer"));
-      alert.warning("至少需要保留一行字段", "40%", "不能再删除了");
+      alert.warning("至少需要保留一行字段", { percent: "40%", title: "不能再删除了" });
     }
   });
 
@@ -319,5 +326,75 @@ $(document).ready(function () {
 
     return formData;
   }
+
+  let createPayload = {
+    type: '',
+    parent: ''
+  };
+  $(".tree-text-content").on("click", function (event) {
+    let thisChosen = false;
+    let type = $(this).attr("type");
+    if ($(this).hasClass("chosen")) {
+      thisChosen = true;
+    }
+    $(".tree-text-content.chosen").removeClass("chosen");
+    if (!thisChosen) {
+      $(this).addClass("chosen");
+      createPayload.parent = $(this).attr("id");
+      createPayload.type = type;
+    }
+  })
+
+  // 监听创建文件夹按钮的点击事件
+  $("#createFolder").on("click", async function (event) {
+    event.preventDefault();
+
+    let route = new Route();
+    let alert = new Alert($('.app-content-container'));
+    let uri = await route.generate("platform_entity_addFolder");
+    $.ajax({
+      url: uri.path,
+      method: "GET",
+      data: createPayload,
+      async: false,
+      dataType: "html",
+      success: function (data) {
+        $(".right-content").html(data);
+        // let form = $("form");
+        // form.formValid();
+      },
+      error: function (xhr, status, error) {
+        // 错误处理，显示错误信息
+        console.error("创建命名空间目录失败:"+ xhr.responseJSON.message);
+        alert.error("表单提交失败: " + xhr.responseJSON.message, { percent: '40%', title: "请求错误", closable: true });
+      }
+    });
+  });
+
+  // 监听创建文件夹按钮的点击事件
+  $("#createEntity").on("click", async function (event) {
+    event.preventDefault();
+
+    let route = new Route();
+    let alert = new Alert($('.app-content-container'));
+    let uri = await route.generate("platform_entity_addEntity");
+    $.ajax({
+      url: uri.path,
+      method: "GET",
+      data: createPayload,
+      async: false,
+      dataType: "html",
+      success: function (data) {
+        $(".right-content").html(data);
+      },
+      error: function (xhr, status, error) {
+        // 错误处理，显示错误信息
+        console.error("创建模型Entity失败:"+ error);
+        alert.error("表单提交失败: " + error, { percent: '40%', title: "请求错误", closable: true });
+      }
+    });
+  });
+
+  $('body')
 
 });

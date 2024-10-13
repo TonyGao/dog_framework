@@ -9,19 +9,21 @@ use App\Entity\CommonTrait;
 use App\Entity\Platform\OptionValue;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Uid\Uuid;
+use App\Entity\Traits\CommonTraitWithoutOrg;
 
 /**
  * isBusinessEntity
  */
 #[ORM\Entity(repositoryClass: CorporationRepository::class)]
 #[ORM\Table(name: 'org_corporation')]
+#[ORM\HasLifecycleCallbacks]
 class Corporation
 {
-	use CommonTrait;
+	use CommonTraitWithoutOrg;
 
 	#[ORM\Id]
-	#[ORM\GeneratedValue]
-	#[ORM\Column(type: 'integer')]
+	#[ORM\Column(type: "uuid", unique: true)]
 	private $id;
 
 	/**
@@ -124,6 +126,12 @@ class Corporation
 	 */
 	#[ORM\Column(type: 'string', length: 180, nullable: true)]
 	private $email;
+
+	public function __construct()
+	{
+			// 自动生成 UUID
+			$this->id = Uuid::v4();
+	}
 
 	/**
 	 * Get the value of id

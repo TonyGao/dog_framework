@@ -3,12 +3,13 @@
 namespace App\Entity\Platform;
 
 use App\Annotation\Ef;
-use App\Entity\CommonTrait;
+use App\Entity\Traits\CommonTrait;
 use App\Repository\Platform\MenuRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Tree\Node as GedmoNode;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * 菜单
@@ -17,13 +18,13 @@ use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 #[Gedmo\Tree(type: 'nested')]
 #[ORM\Table(name: 'admin_menu')]
 #[ORM\Entity(repositoryClass: MenuRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Menu implements GedmoNode
 {
     use CommonTrait;
 
-    #[ORM\Column(name: 'id', type: 'integer')]
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(name: 'id', type: "uuid", unique: true)]
     private $id;
 
     /**
@@ -124,6 +125,12 @@ class Menu implements GedmoNode
     #[ORM\OneToMany(targetEntity: Menu::class, mappedBy: "parent")]
     #[ORM\OrderBy(["lft" => "ASC"])]
     private $children;
+
+    public function __construct()
+    {
+        // 自动生成 UUID
+        $this->id = Uuid::v4();
+    }
 
     /**
      * Get the value of id
