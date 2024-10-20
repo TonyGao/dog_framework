@@ -33,26 +33,28 @@ class EntityApiController extends AbstractController
   )]
   public function batchFields(Request $request, EntityService $eS): ApiResponse
   {
-    $payload = $request->toArray();
-    $eToken = $payload['entity']['entityId'];
-    $fields = $payload['entity']['fields'];
+    try {
+      $payload = $request->toArray();
+      $epgToken = $payload['entity']['epgToken'];
+      $fields = $payload['entity']['fields'];
 
-    // 备份并加载实体
-    $et = $eS->loadByToken($eToken)
-      ->loadEntity();
+      $eToken = $eS->convertEpgTokentoEntityToken($epgToken);
 
-    foreach($fields as $field) {
-      // 如果是 string 类型的字段，这里是临时的判断，为了逐渐增加不同类型的Service
-      if ($field['type']['value'] == 'string') {
-        try {
-          $et->addProperty($field);
-        } catch (\Exception $e) {
-          return ApiResponse::error('', '500', $e->getMessage());
+      // 备份并加载实体
+      $et = $eS->loadByToken($eToken)
+        ->loadEntity();
+
+      foreach($fields as $field) {
+        // 如果是 string 类型的字段，这里是临时的判断，为了逐渐增加不同类型的Service
+        if ($field['type']['value'] == 'string') {
+          try {
+            $et->addProperty($field);
+          } catch (\Exception $e) {
+            return ApiResponse::error('', '500', $e->getMessage());
+          }
         }
       }
-    }
 
-    try {
       $et->save();
     } catch (\Exception $e) {
       return ApiResponse::error('', '500', $e->getMessage());

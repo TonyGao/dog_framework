@@ -35,15 +35,15 @@ class EntityFormService extends BaseService
    * 添加字段的表单字段，其中Group是通过查询EntityPropertyGroup动态获取的这个Entity的分组
    * 每个Entity都有各自的Group
    */
-  public function getFieldView($entityToken, $choosedGroup, $init = true)
+  public function getFieldView($epgToken, $choosedGroup, $init = true)
   {
     $groupRepo = $this->em->getRepository(EntityPropertyGroup::class);
-    $entity = $groupRepo->findOneBy(['token' => $entityToken]);
+    $entity = $groupRepo->findOneBy(['token' => $epgToken]);
     $group = $groupRepo->getChildren($entity, true, 'lft', 'asc');
     $groupArr = [];
     $defaultValue = '';
     foreach ($group as $key => $g) {
-      $id = $g->getId();
+      $id = (string) $g->getId();
       $groupArr[$g->getLabel()] = $id;
 
       /**
@@ -161,9 +161,9 @@ class EntityFormService extends BaseService
     ]);
   }
 
-  public function addField($token, $group = null, $init = true)
+  public function addField($epgToken, $group = null, $init = true)
   {
-    $formView = $this->getFieldView($token, $group, $init);
+    $formView = $this->getFieldView($epgToken, $group, $init);
     $form = $this->twig->render('ui/drawer/addField.html.twig', [
       'formView' => $formView['form']
     ]);

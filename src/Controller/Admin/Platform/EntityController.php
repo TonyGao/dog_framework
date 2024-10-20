@@ -90,19 +90,21 @@ class EntityController extends BaseController
         if ($node['type'] === 'entity') {
           $arrayIcon = !empty($node['__children']) ? '<i class="fa-solid fa-caret-right"></i>' : '';
 
-          return '
+          $id = $node['id'];
+          $token = $node['token'];
+          $name = $node['name'];
+          $entityToken = $node['entityToken'];
+          return <<<html
           <div class="item-content scroll-item">
-            <div class="arrow-icon">' . $arrayIcon . '</div>
+            <div class="arrow-icon">$arrayIcon</div>
 						<div class="org-icon">
               <i class="fa-solid fa-table"></i>
 						</div>
 						<div class="node-name">
-							<div class="tree-text-content branch" type="entity" id="' . $node['id'] . '" token="' . $node['token'] . '">' .
-            $node['name']
-            . '</div>
+							<div class="tree-text-content branch" type="entity" id="$id" token="$token" entityToken="$entityToken">$name</div>
 						</div>
 					</div>
-          ';
+html;
         }
 
         if ($node['type'] === 'group') {
@@ -147,16 +149,20 @@ class EntityController extends BaseController
    * 实体数据表格
    */
   #[Route('/admin/platform/entity/itemtable', name: 'platform_entity_itemtable')]
-  public function item(Request $request, EntityManagerInterface $em): Response
+  public function item(Request $request, EntityManagerInterface $em, EntityService $es): Response
   {
     $repo = $em->getRepository(Entity::class);
-    $token = $request->query->get('token');
-    $entity = $repo->findOneBy(['token' => $token]);
+    $epgToken = $request->query->get('token');
+    $entityToken = $es->convertEpgTokentoEntityToken($epgToken);
+    $entity = $repo->findOneBy(['token' => $entityToken]);
     $repoProperty = $em->getRepository(EntityProperty::class);
     $entityProperties = $repoProperty->findBy(
       ['entity' => $entity],
       ['createdAt' => 'ASC']
     );
+
+    // 初始化表头（列名称）
+    $tableHeaders = ['name', 'comment', 'type', 'length', 'entity', 'group'];
 
     $arr = array();
     foreach ($entityProperties as $entity) {
@@ -170,16 +176,20 @@ class EntityController extends BaseController
       $arr[] = $et;
     }
 
-    $button = '<div class="toolbar-box">
+    $button = <<<html
+    <div class="toolbar-box">
       <div class="toolbar-wrap">
         <div class="toolbar-content">
-          <button class="create btn outline primary medium mini round icon" token="' . $token . '"><i class="fa-regular fa-square-plus"></i>添加自定义字段</button>
-          <button class="group btn outline primary medium mini round icon" token="' . $token . '"><i class="fa-regular fa-object-group"></i>字段分组管理</button>
+          <button class="create btn outline primary medium mini round icon" token="$epgToken" entityEntity="$entityToken"><i class="fa-regular fa-square-plus"></i>添加自定义字段</button>
+          <button class="group btn outline primary medium mini round icon" token="$epgToken" entityEntity="$entityToken"><i class="fa-regular fa-object-group"></i>字段分组管理</button>
         </div>
       </div>
-    </div>';
+    </div>
+html
+    ;
 
     return $this->render('ui/table.html.twig', [
+      'tableHeaders' => $tableHeaders,
       'entities' => $arr,
       'toolbar' => $button,
     ]);
@@ -325,13 +335,12 @@ class EntityController extends BaseController
 
       try {
         $es->addEntity($post);
+        $this->addFlash('success', '添加模型Entity成功');
+        return $this->redirectToRoute('platform_entity');
       } catch (\Exception $e) {
         $this->addFlash('error', sprintf('添加模型Entity失败：%s', $e->getMessage()));
         return $this->redirectToRoute('platform_entity');        
       };
-
-      $this->addFlash('success', '添加模型Entity成功');
-      return $this->redirectToRoute('platform_entity');
     }
 
     return $this->render('admin/platform/entity/folderNew.html.twig', [

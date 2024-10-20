@@ -26,7 +26,7 @@ class Department implements GedmoNode
 
 	/** @Groups({"api"}) */
 	#[ORM\Id]
-	#[ORM\Column(type: "uuid", unique: true)]
+	#[ORM\Column(type: 'uuid', unique: true)]
 	private $id;
 
 	/**
@@ -170,12 +170,17 @@ class Department implements GedmoNode
 	#[ORM\Column(type: 'string', length: 300, nullable: true, unique: true)]
 	private $buMenFuZong;
 
+	/** test */
+	#[ORM\Column(type: 'string', length: 255, nullable: true, unique: true)]
+	private $tEST;
+
 
 	public function __construct()
 	{
-			// 自动生成 UUID
+		// 自动生成 UUID
 			$this->id = Uuid::v4();
 	}
+
 
 	#[ORM\PrePersist]
 	#[ORM\PreUpdate]
@@ -304,6 +309,7 @@ class Department implements GedmoNode
 
 		return $this;
 	}
+
 
 	/**
 	 * Get 编码
@@ -494,23 +500,45 @@ class Department implements GedmoNode
 		return $this->buMenFuZong;
 	}
 
+
 	/**
 	 * Get the value of path
-	 */ 
+	 */
 	public function getPath()
 	{
 		return $this->path;
 	}
 
+
 	/**
 	 * Set the value of path
 	 *
 	 * @return  self
-	 */ 
+	 */
 	public function setPath($path)
 	{
 		$this->path = $path;
 
 		return $this;
+	}
+
+
+	/**
+	 * test Setter
+	 * @return self
+	 */
+	public function setTEST($tEST): Department
+	{
+		$this->tEST = $tEST;
+		return $this;
+	}
+
+
+	/**
+	 * test Getter
+	 */
+	public function getTEST(): string
+	{
+		return $this->tEST;
 	}
 }

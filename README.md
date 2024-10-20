@@ -105,3 +105,5 @@
 * <https://prismjs.com/index.html>
 * <https://cs.symfony.com/>
 * <https://github.com/symfony/panther>
+* [LeaderLine](https://anseki.github.io/leader-line/)
+* [Daterangepicker](https://www.daterangepicker.com/)

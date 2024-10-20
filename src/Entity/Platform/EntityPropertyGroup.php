@@ -20,14 +20,14 @@ use Symfony\Component\Uid\Uuid;
  * 树状结构，Entity的下方可以是Property属性，任何层的分组下方都可以有Property属性。
  *
  *
- *                          /PropertyOne
- *                  /Group1-
- *       /--EntityA-        \PropertyTwo
- *      /           \Group2    /Group5
- * root-                    /--
- *      \           /Group3-   \Group6
- *       \--EntityB-        \--
- *                  \PropertyThree
+ *                                        /PropertyOne
+ *                                 /Group1-
+ *       / --namespaceA -- EntityA-       \PropertyTwo
+ *      /                          \Group2    /Group5
+ * root-                                   /--
+ *      \                         /Group3-    \Group6
+ *       \--namespaceA -- EntityB-                  \--
+ *                                                     \PropertyThree
  */
 #[Gedmo\Tree(type: 'nested')]
 #[ORM\Table(name: "platform_entity_property_group")]

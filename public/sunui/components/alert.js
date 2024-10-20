@@ -419,5 +419,7 @@
           break;
       }
     });
+
+    window.$.alert = new Alert("body");
   });
 })();

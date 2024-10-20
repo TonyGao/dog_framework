@@ -98,6 +98,7 @@ class EfInitEntityCommand extends Command
                     $file = PhpFile::fromCode(file_get_contents($filePath));
                     $key = array_key_first($file->getClasses());
                     $class = $file->getClasses()[$key];
+                    $classNameTab = Str::tableize($class->getName()).'_base_info';
 
                     $isBusinessEntity = Str::isBusinessEntity($class->getComment());
 
@@ -190,12 +191,14 @@ class EfInitEntityCommand extends Command
                         unset($fields['createdBy']);
                         unset($fields['updatedBy']);
 
+                        $propertyToken = Str::generateFieldToken();
                         // 初始化entity类型的属性分组
                         $entityGroup = new EntityPropertyGroup();
                         $entityGroup->setName($class->getName())
                             ->setLabel($class->getName())
                             ->setType('entity')
-                            ->setToken($entityToken)
+                            ->setToken($propertyToken)
+                            ->setEntityToken($entityToken)
                             ->setFqn($metaData->name)
                             ->setParent($previousGroup);
 
@@ -244,7 +247,7 @@ class EfInitEntityCommand extends Command
 
                             if ($isBusinessField) {
                                 $property = new EntityProperty();
-                                $propertyToken = sha1(random_bytes(10));
+                                $propertyToken = Str::generateFieldToken();
 
                                 $comment = Str::getComment($class->getProperties()[$fieldName]->getComment());
                                 // if (!array_key_exists('columnName', $field)) {
@@ -311,6 +314,9 @@ class EfInitEntityCommand extends Command
                                            ->setType('group')
                                            ->setEntityToken($entityToken)
                                            ->setParent($entityGroup);
+                                        if ($group === $classNameTab) {
+                                            $propertyGroup->setIsDefault(true);
+                                        }
                                         $this->em->persist($propertyGroup);
                                         $this->em->flush();
 

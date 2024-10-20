@@ -66,8 +66,8 @@
 {%- block textarea_widget -%}
   {%- set isReadonly = attr.readonly is defined and attr.readonly -%}
   {%- set class_attr = attr.class is defined ? attr.class : '' %}
-  <div class="ef-textarea-wrapper {% if isReadonly %} ef-textarea-disabled {% endif %}/>">
-    <textarea {{ block('widget_attributes') }} class="ef-textarea resizeable" min-rows="3" max-rows="10" clearable="true" placeholder="Please enter something">{{ value }}</textarea>
+  <div class="ef-textarea-wrapper{% if isReadonly %} ef-textarea-disabled {% endif %}">
+    <textarea component="textarea" {{ block('widget_attributes') }} class="ef-textarea resizeable" min-rows="3" max-rows="10" clearable="true" placeholder="Please enter something">{{ value }}</textarea>
   </div>
 {%- endblock textarea_widget -%}
 

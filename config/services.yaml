@@ -1,5 +1,19 @@
 parameters:
     page_limit: 12
+    entity_gen_stuff:
+        use_imports:
+            - 'App\Entity\Traits\CommonTrait'
+            - 'Doctrine\ORM\Mapping as ORM'
+            - 'Symfony\Component\Uid\Uuid'
+            - 'Gedmo\Mapping\Annotation as Gedmo'
+        base:
+            entity: 'Doctrine\ORM\Mapping\Entity'
+            table: 'Doctrine\ORM\Mapping\Table'
+            lifecircle: 'Doctrine\ORM\Mapping\HasLifecycleCallbacks'
+            commonTrait: 'App\Entity\Traits\CommonTrait'
+            generatedId: 'Doctrine\ORM\Mapping\Id'
+            ID: 'Doctrine\ORM\Mapping\Column(type: "uuid", unique: true)'
+
 
 services:
     # default configuration for services in *this* file
@@ -67,6 +81,9 @@ services:
                 twigcs: '%kernel.project_dir%/vendor/bin/twigcs'
     App\Lib\DataFixtures\Faker\Provider\ChinseseNameProvider:
         tags: ['hautelook_alice.provider']
+    App\Service\Platform\ParameterService:
+        arguments:
+            $parameterBag: '@parameter_bag'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

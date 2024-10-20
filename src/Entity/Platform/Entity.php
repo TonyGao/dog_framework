@@ -60,6 +60,14 @@ class Entity
     private $className;
 
     /**
+     * 描述，将用于动态模型的类注释
+     *
+     * @var [type]
+     */
+    #[ORM\Column(type: "text", nullable: true)]
+    private $description;
+
+    /**
      * 数据库表名称
      */
     #[ORM\Column(type: "string", length: 80)]
@@ -258,6 +266,18 @@ class Entity
     public function setFqn($fqn)
     {
         $this->fqn = $fqn;
+
+        return $this;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
 
         return $this;
     }

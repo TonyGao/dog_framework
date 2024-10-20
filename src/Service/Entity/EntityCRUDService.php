@@ -22,8 +22,9 @@ class EntityCRUDService extends BaseService
      *
      * @param object $entity
      * @param array $data
+     * @return object
      */
-    public function save(object $entity, array $data)
+    public function save(object $entity, array $data): object
     {
         // 动态设置属性
         $entity = $this->setEntityProperties($entity, $data);
@@ -34,6 +35,9 @@ class EntityCRUDService extends BaseService
         } catch (\Exception $e) {
             throw $e;
         }
+
+        // 返回保存后的实体对象
+        return $entity;
     }
 
     /**
