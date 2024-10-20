@@ -54,6 +54,10 @@ class EntityModelType extends BaseFormType
           'readonly' => true,
         ]
       ])
+      ->add('description', TextareaType::class, [
+        'label' => '注释',
+        'required' => true,
+      ])
       ->add('code', null, ['label' => '编号'])
       ->add('token', TextareaType::class, ['attr' => [
         'readonly' => true,

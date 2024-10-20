@@ -150,7 +150,7 @@ $(document).ready(function () {
 
     let payload = {
       entity: {
-        entityId: $(this).closest(".ef-drawer-container").attr("entitytoken"),
+        epgToken: $(this).closest(".ef-drawer-container").attr("entitytoken"),
         fields: groupedData
       }
     };
@@ -178,9 +178,10 @@ $(document).ready(function () {
         // 如果有必要，在这里可以执行其他操作，比如隐藏模态框
       },
       error: function (xhr, status, error) {
+        let errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : error;
         // 在发生错误时执行的操作
-        console.error("表单提交失败: " + xhr.responseJSON.message);
-        alert.error("表单提交失败: " + xhr.responseJSON.message, { percent: '40%', title: "请求错误", closable: true });
+        console.error("表单提交失败: " + errorMessage);
+        alert.error("表单提交失败: " + errorMessage, { percent: '40%', title: "请求错误", closable: true });
       },
     });
   });

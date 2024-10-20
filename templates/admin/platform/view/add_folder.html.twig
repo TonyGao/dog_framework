@@ -1,0 +1,6 @@
+ {% import 'ui/template/ui.html.twig' as ui %}
+    {{ form_start(form) }}
+      {{ form_widget(form) }}
+      {{ ui.formSubmitButton() }}
+    {{ form_end(form) }}
+    {{ ui.formValid() }}

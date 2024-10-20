@@ -45,8 +45,8 @@
   justify-content: flex-start;
   z-index: 1000;
   position: inherit;
-  min-width: fit-content;
-  margin-left: 20px;
+  min-width: 200px;
+  padding-left: 20px;
   padding-top: 20px;
   border-right: 1px #dfdfdf solid;
   padding-right: 20px;
@@ -76,6 +76,10 @@
 }
 
 .department-tree-wrapper {
+  margin-top: 10px;
+}
+
+.common-tree-wrapper {
   margin-top: 10px;
 }
 

@@ -1,66 +1,64 @@
-{% set temp = entities|first %}
-{% set fields = getStdClassFields(temp) %}
-<div class="ef-table ef-table-size-large ef-table-border ef-table-hover" style="width: fit-content;">
-	{% if toolbar %}
-	    {{ toolbar|raw }}
-	{% endif %}
-	<div class="ef-spin">
-		<div class="ef-table-container">
-			<div class="ef-scrollbar ef-scrollbar-type-embed" style="height: 100%;">
-				<div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x">
-					<table class="ef-table-element" cellpadding="0" cellspacing="0">
-						<colgroup><col><col><col><col></colgroup>
-						<thead>
-							<tr class="ef-table-tr">
-                {% for property_title in fields %}
-                  <th class="ef-table-th">
-                    <span class="ef-table-cell ef-table-cell-align-left">
-                      <span class="ef-table-th-title">{{ property_title }}</span>
-                    </span>
-                  </th>
-                {% endfor %}
-							</tr>
-						</thead>
-						<tbody>
-              {% for item in entities %}
-                <tr class="ef-table-tr">
-                  {% for field in fields %}
-                    <td class="ef-table-td">
-                      <span class="ef-table-cell ef-table-cell-align-left">
-											{% if instanceof(attribute(item, field), 'DateTime') %}
-                        <span class="ef-table-td-content">
-                          {{ attribute(item, field).format('Y-m-d H:i:s') }}</span>
-                        </span>
-											{% else %}
-                        <span class="ef-table-td-content">
-                          {{ attribute(item, field) }}</span>
-                        </span>
-											{% endif %}
-                    </td>
-                  {% endfor %}
-                </tr>
-              {% endfor %}
-						</tbody>
-					</table>
-				</div>
-      </div>
-		</div>
-		{# <div class="ef-table-pagination ef-table-pagination-right">
-			<div class="ef-pagination ef-pagination-size-medium">
-				<ul class="ef-pagination-list">
-					<span class="ef-pagination-item ef-pagination-item-previous ef-pagination-item-disabled">
-						<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-left" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
-							<path d="M32 8.4 16.444 23.956 32 39.513"></path>
-						</svg>
-					</span>
-					<li class="ef-pagination-item ef-pagination-item-active" pages="1">1</li>
-					<span class="ef-pagination-item ef-pagination-item-next ef-pagination-item-disabled">
-						<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-right" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
-							<path d="m16 39.513 15.556-15.557L16 8.4"></path>
-						</svg>
-					</span>
-				</ul>
-			</div>
-		</div> #}
-	</div>
+<div class="ef-table ef-table-size-large ef-table-border ef-table-hover" style="width: fit-content; min-width: 600px;">
+    {% if toolbar %}
+        {{ toolbar|raw }}
+    {% endif %}
+    <div class="ef-spin">
+        <div class="ef-table-container">
+            <div class="ef-scrollbar ef-scrollbar-type-embed" style="height: 100%;">
+                <div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x">
+                    <table class="ef-table-element" cellpadding="0" cellspacing="0">
+                        <colgroup>
+                            {% for header in tableHeaders %}
+                                <col>
+                            {% endfor %}
+                        </colgroup>
+                        <thead>
+                            <tr class="ef-table-tr">
+                                {% for header in tableHeaders %}
+                                    <th class="ef-table-th">
+                                        <span class="ef-table-cell ef-table-cell-align-left">
+                                            <span class="ef-table-th-title">{{ header }}</span>
+                                        </span>
+                                    </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+																{% if entities is empty %}
+																		<tr>
+																				<td colspan="{{ tableHeaders|length }}" class="ef-table-td ef-table-td-empty">
+																						<div class="empty-state" style="text-align: center; padding: 40px 0; background-color: #f9fafb; border-radius: 8px;">
+																								<i class="fa-solid fa-inbox" style="font-size: 48px; color: #a3a3a3; margin-bottom: 16px;"></i>
+																								<p style="color: #6b7280; font-size: 16px; margin: 8px 0;">没有数据可显示</p>
+																								<p style="color: #9ca3af; font-size: 14px;">添加新数据后会显示在此处</p>
+																						</div>
+																				</td>
+																		</tr>
+																{% else %}
+                                {% for item in entities %}
+                                    <tr class="ef-table-tr">
+                                        {% for header in tableHeaders %}
+                                            <td class="ef-table-td">
+                                                <span class="ef-table-cell ef-table-cell-align-left">
+                                                    {% if instanceof(attribute(item, header), 'DateTime') %}
+                                                        <span class="ef-table-td-content">
+                                                            {{ attribute(item, header).format('Y-m-d H:i:s') }}
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="ef-table-td-content">
+                                                            {{ attribute(item, header) }}
+                                                        </span>
+                                                    {% endif %}
+                                                </span>
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

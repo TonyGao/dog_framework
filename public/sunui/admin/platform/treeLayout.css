@@ -50,7 +50,7 @@
   z-index: 1000;
   position: inherit;
   min-width: fit-content;
-  margin-left: 20px;
+  padding-left: 20px;
   padding-top: 20px;
   border-right: 1px #dfdfdf solid;
   padding-right: 20px;

@@ -1,0 +1,58 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'ui/template/ui.html.twig' as ui %}
+
+{% block stylesheets %}
+  {{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('platform/view.css', 'admin') }}"/>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src=" {{ asset('platform/view.js', 'admin') }} "></script>
+{% endblock %}
+
+{% block app_content_container %}
+	<div class="org-sturcture-container">
+		<div class="outside-wrapper">
+			{# 渲染工具栏，并传入按钮配置数组 #}
+			{{ ui.toolBar([
+					{'type': 'create', 'text': '新建视图', 'id': 'createView'},
+					{'type': 'modify', 'text': '编辑视图', 'id': 'modifyView'},
+					{'type': 'create', 'text': '新建文件夹', 'icon': 'fa-solid fa-folder-plus', 'id': 'createFolder'}
+			]) }}
+			<div class="inside-wrapper">
+				<div class="left-tree visible {% if not views  %} no-data {% endif %}">
+					<div class="left-tree-wrapper {% if not views  %} no-data {% endif %}">
+					  {% if views %}
+							<div class="search-wrapper">
+								<span class="ef-input-wrapper">
+									<input class="ef-input ef-input-size-mini text" type="text" clearable="true" placeholder="请输入视图名称"/>
+									<span class="ef-input-suffix">
+										<i class="fa-solid fa-magnifying-glass"></i>
+									</span>
+								</span>
+							</div>
+							<div class="common-tree-wrapper">
+								{{ views | raw }}
+							</div>
+						{% else %}
+							<div class="empty-tree-placeholder">
+									<i class="fa-solid fa-folder-open"></i>
+									<p>No data available</p>
+							</div>
+						{% endif %}
+					</div>
+					<div class="fold-icon-wrapper collapse" id="collapseCompany">
+						<i class="fa-solid fa-play"></i>
+					</div>
+				</div>
+				<div class="right-content">
+				  <div class="empty-content">
+					  <img src="{{ asset('status/empty.png', 'image') }}" width="587px">
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

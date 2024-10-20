@@ -1,0 +1,64 @@
+/* Wrapper and layout styling */
+.inside-wrapper {
+  display: flex;
+}
+
+.left-tree.no-data {
+  width: 250px;
+  background-color: #f7f7f7;
+  padding: 15px;
+  border-right: 1px solid #ddd;
+  position: relative;
+}
+
+/* Placeholder styling for when there is no data */
+.left-tree-wrapper.no-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.empty-tree-placeholder {
+  text-align: center;
+  color: #a1a1a1;
+  font-family: Arial, sans-serif;
+}
+
+.empty-tree-placeholder i {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.empty-tree-placeholder p {
+  font-size: 16px;
+  color: #888;
+}
+
+/* Fold icon styling */
+.fold-icon-wrapper {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;  /* 将图标定位到右侧 */
+  cursor: pointer;
+}
+
+.fold-icon-wrapper i {
+  color: #333;
+}
+
+.right-content {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+.empty-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.tree-text-content:hover {
+  cursor: pointer;
+}

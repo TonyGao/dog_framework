@@ -24,7 +24,7 @@ class Route {
       if (!response.ok) {
         throw new Error("Failed to fetch routes");
       }
-      const routes = await response.json();
+      let routes = await response.json();
 
       // Cache routes using Common class
       if (routes && routes.data) {

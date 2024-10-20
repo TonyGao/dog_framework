@@ -56,18 +56,27 @@ class TwigExtension extends AbstractExtension
         return $fields;
     }
 
+    // public function getStdClassFields($object): array
+    // {
+    //     // 获取对象的所有属性
+    //     $properties = get_object_vars($object);
+    //     $fields = [];
+
+    //     // 获取属性名（字段名）
+    //     foreach ($properties as $key => $value) {
+    //         $fields[] = $key;
+    //     }
+
+    //     return $fields;
+    // }
     public function getStdClassFields($object): array
     {
-        // 获取对象的所有属性
-        $properties = get_object_vars($object);
-        $fields = [];
-
-        // 获取属性名（字段名）
-        foreach ($properties as $key => $value) {
-            $fields[] = $key;
+        if (!is_object($object)) {
+            throw new \InvalidArgumentException('Argument must be an object.');
         }
 
-        return $fields;
+        // 直接获取对象的属性名称并返回
+        return array_keys(get_object_vars($object));
     }
 
     public function isInstanceof($object, $class)

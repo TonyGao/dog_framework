@@ -30,6 +30,12 @@ parameters:
       ]
     - ["应用程序构建器", "fa-solid fa-compass-drafting", "#", "root"]
     - [
+        "视图设计器",
+        "fa-solid fa-eye",
+        "/admin/platform/view/index",
+        "应用程序构建器"
+      ]
+    - [
         "表单设计器",
         "fa-solid fa-scroll",
         "/admin/platform/application/form/builder",

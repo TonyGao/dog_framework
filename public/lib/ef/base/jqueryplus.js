@@ -49,6 +49,10 @@
         if ($(element).is("[component='select']")) {
           $(element).next(".ef-select").addClass("ef-select-error");
         }
+
+        if ($(element).is("[component='textarea']")) {
+          $(element).closest(".ef-textarea-wrapper").addClass("ef-textarea-error");
+        }
       },
       unhighlight: function (element) {
         if ($(element).is("[component='input']")) {
@@ -64,6 +68,12 @@
         if ($(element).is("[component='select']")) {
           $(element).next(".ef-select").removeClass("ef-select-error");
         }
+
+        if ($(element).is("[component='textarea']")) {
+          $(element)
+          .closest(".ef-textarea-wrapper")
+          .removeClass("ef-textarea-error")
+        }
       },
       invalidHandler: function (event, validator) {
         // Handle invalid form
@@ -75,6 +85,10 @@
               $(error.element)
                 .closest(".ef-input-wrapper")
                 .addClass("ef-input-error");
+            }
+
+            if ($(error.element).is("[component='textarea']")) {
+              $(error.element).closest(".ef-textarea-wrapper").addClass("ef-textarea-error");
             }
           });
         }
