@@ -5,6 +5,7 @@ namespace App\Controller\Admin\Platform;
 use App\Entity\Platform\View;
 use App\Controller\BaseController;
 use App\Form\Platform\ViewFolderType;
+use App\Form\Platform\ViewType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -150,6 +151,63 @@ class ViewDesignerController extends BaseController
     }
 
     return $this->render('admin/platform/view/add_folder.html.twig', [
+      'form' => $form->createView(),
+    ]);
+  }
+
+  /**
+   * 新建视图的表单
+   * 
+   * @param Request $request
+   * @param EntityManagerInterface $em
+   * @return Response
+   */
+  #[Route('/admin/platform/view/addView', name: 'platform_view_add_view')]
+  public function addView(Request $request, EntityManagerInterface $em): Response
+  {
+    $parentId = $request->query->get('parent');
+    $view = new View();
+    $view->setType('view'); // 新建的类型为视图
+
+    // 处理上级目录的逻辑
+    if ($parentId) {
+      $parent = $em->getRepository(View::class)->find($parentId);
+      if ($parent && ($parent->getType() === 'folder' || $parent->getType() === 'root')) {
+        $view->setParent($parent);
+      } else {
+        return new JsonResponse(['error' => '上级目录无效或不是文件夹'], 400);
+      }
+    } else {
+      // 如果没有父目录，创建根目录
+      $root = $em->getRepository(View::class)->findOneBy(['name' => 'root']);
+      if ($root === null) {
+        $root = new View();
+        $root->setName('root');
+        $root->setLabel('Root');
+        $root->setType('root');
+        $em->persist($root);
+        $em->flush();
+        $view->setParent($root);
+      } else {
+        $view->setParent($root);
+      }
+    }
+
+    // 创建表单并处理请求
+    $form = $this->createForm(ViewType::class, $view, [
+      'action' => $this->generateUrl('platform_view_add_view')
+    ]);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+      $em->persist($view);
+      $em->flush();
+
+      $this->addFlash('success', '视图创建成功');
+      return $this->redirectToRoute('platform_view'); // 重定向到视图管理页面
+    }
+
+    return $this->render('admin/platform/view/add_view.html.twig', [
       'form' => $form->createView(),
     ]);
   }

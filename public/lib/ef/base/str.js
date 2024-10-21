@@ -78,15 +78,16 @@ class Str {
   }
 
   /**
-   * 将驼峰命名的实体类名称转换为数据库表名格式。
-   * @param {string} className - 实体类名称，如 "HelloWorld"。
-   * @returns {string} - 转换后的数据库表名，如 "hello_world"。
+   * 将驼峰命名或包含空格的字符串转换为数据库表名格式。
+   * @param {string} className - 如 "HelloWorld" 或 "Hello world"。
+   * @returns {string} - 转换后的表名，如 "hello_world"。
    */
   static tableize(className) {
-    // 匹配驼峰命名中的大写字母，并在前面插入下划线，再将整个字符串转换为小写
     return className
-      .replace(/([a-z])([A-Z])/g, '$1_$2')  // 在小写字母和大写字母之间插入下划线
-      .replace(/([A-Z])([A-Z][a-z])/g, '$1_$2')  // 处理连续大写字母的分隔，如 "FOOBar" -> "foo_bar"
-      .toLowerCase();  // 转换为小写
+      .trim() // 去除首尾空格
+      .replace(/\s+/g, '_') // 将所有空格替换为下划线
+      .replace(/([a-z\d])([A-Z])/g, '$1_$2') // 在小写或数字与大写字母间加下划线
+      .replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2') // 处理连续大写字母的分隔
+      .toLowerCase(); // 转换为小写
   }
 }
