@@ -1,0 +1,12 @@
+# config/packages/alimt.yaml
+parameters:
+  alimt: 
+    clients:
+      translation:
+        access_key_id: '%env(ALIBABA_CLOUD_TRANSLATION_ACCESS_KEY_ID)%'
+        access_key_secret: '%env(ALIBABA_CLOUD_TRANSLATION_ACCESS_KEY_SECRET)%'
+        endpoint: 'mt.cn-hangzhou.aliyuncs.com'
+      # oss:
+      #   access_key_id: '%env(ALIBABA_CLOUD_OSS_ACCESS_KEY_ID)%'
+      #   access_key_secret: '%env(ALIBABA_CLOUD_OSS_ACCESS_KEY_SECRET)%'
+      #   endpoint: 'oss-cn-hangzhou.aliyuncs.com'

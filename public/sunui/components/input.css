@@ -6,6 +6,7 @@ input {
   display: inline-flex;
   box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
   padding-right: 12px;
   padding-left: 12px;
   color: var(--color-text-1);
@@ -39,7 +40,12 @@ input {
 }
 
 .ef-input-wrapper .ef-input {
+  display: block;
   width: 100%;
+  max-width: 100%;
+  word-break: break-word; /* 长单词换行 */
+  overflow-wrap: break-word; /* 避免长字符串撑破布局 */
+  white-space: pre-wrap; /* 保留空格和换行 */
   padding-right: 0;
   padding-left: 0;
   color: inherit;

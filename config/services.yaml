@@ -48,6 +48,9 @@ services:
         tags: ['twig.extension']
     #     arguments:
     #         $sessionFactory: '@session.factory'
+    App\Service\Utils\AlimtTranslationService:
+        arguments:
+            $alimtConfig: '%alimt%'
     App\Service\FileResolver:
         arguments:
             $projectDir: '%kernel.project_dir%'

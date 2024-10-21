@@ -38,4 +38,26 @@ $(document).ready(function () {
       }
     });
   });
+
+  $("#createView").on("click", async function (event) {
+    event.preventDefault();
+
+    let route = new Route();
+    let uri = await route.generate("platform_view_add_view");
+    ajax({
+      url: uri.path,
+      method: "GET",
+      data: createPayload,
+      async: false,
+      dataType: "html",
+      success: function (data) {
+        $(".right-content").html(data);
+      },
+      error: function (xhr, status, error) {
+        // 错误处理，显示错误信息
+        console.error("创建视图失败:"+ xhr.responseJSON.message);
+        alert.error("表单视图失败: " + xhr.responseJSON.message, { percent: '40%', title: "请求错误", closable: true });
+      }
+    });
+  })
 })
