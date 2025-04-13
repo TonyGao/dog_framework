@@ -113,6 +113,10 @@ br {
   margin: 0 6px;
 }
 
+.toolbar .btn.icon:not([class*="circle"]) i {
+  margin: 0px;
+}
+
 .btn.circle {
   width: 32px;
   height: 32px;
@@ -138,6 +142,10 @@ br {
   padding: 0 11px;
   font-size: 12px;
   border-radius: 2px;
+}
+
+.toolbar .btn.mini {
+  padding: 0 6px;
 }
 
 .btn.small {

@@ -1,0 +1,523 @@
+.ef-table-cell-with-sorter {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.ef-table-th-sort {
+  display: inline-block;
+  margin-left: 8px;
+  vertical-align: -3px;
+}
+
+.ef-table-th-sort-icon {
+  position: relative;
+  overflow: hidden;
+}
+
+/* pagination 的样式 */
+
+.ef-pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+.ef-pagination-left, .ef-pagination-right {
+  display: flex;
+  align-items: center;
+}
+
+.ef-pagination-bar .ef-page-size {
+  padding: 4px;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #fff;
+  color: #333;
+}
+
+.ef-pagination-bar .separator {
+  margin: 0 8px;
+  color: #aaa;
+}
+
+.ef-pagination-bar button, .refresh {
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: rgb(29,33,41);
+  transition: color 0.3s ease;
+}
+
+.ef-pagination-bar button i, .refresh i {
+  font-size: 14px;
+}
+
+.ef-pagination-bar button:hover, .refresh:hover {
+  color: #0056b3;
+}
+
+.ef-pagination-bar input.current-page {
+  width: 40px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 0 4px;
+  padding: 4px;
+  font-size: 14px;
+  -webkit-appearance: none; /* Chrome, Safari, Edge */
+  -moz-appearance: textfield; /* Firefox */
+  appearance: none;
+}
+
+.ef-pagination-bar .total-pages {
+  font-weight: bold;
+  color: #333;
+}
+
+.ef-pagination-bar .total-items, .item-range {
+  font-size: 14px;
+  color: #333;
+}
+
+.ef-pagination-bar .pagination-right .total-items {
+  margin-right: 8px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.ef-classic-table .ef-table-tr .ef-table-th {
+  border-bottom: 0;
+  border-width: 0 1px 1px 0;
+  border-style: dotted;
+}
+
+.ef-classic-table .ef-table-td {
+  border-bottom: 0;
+  border-width: 0 1px 1px 0;
+  border-style: dotted;
+}
+
+/* 这里是针对过滤器的样式 */
+
+/* 过滤器弹窗专用样式 */
+
+/* 通用基础样式 */
+:root {
+  --ef-primary-color: #165dff; /* 主色 */
+  --ef-secondary-color: #f4f6fb; /* 背景色 */
+  --ef-border-color: #e0e6ed; /* 边框色 */
+  --ef-separator-color: #d6d9de; /* 列分隔线颜色 */
+  --ef-font-color: #333; /* 主字体颜色 */
+  --ef-font-color-secondary: #6e7783; /* 次要字体颜色 */
+  --ef-highlight-color: #165dff; /* 高亮色 */
+  --ef-border-radius: 8px; /* 圆角 */
+  --ef-shadow: 0px 6px 12px rgba(0, 0, 0, 0.08); /* 阴影 */
+}
+
+/* 容器 */
+.ef-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* background: var(--ef-secondary-color); */
+  box-shadow: var(--ef-shadow);
+  font-family: Arial, sans-serif;
+  color: var(--ef-font-color);
+}
+
+.ef-filter .ef-entity-column {
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 0 10px;
+}
+
+/* 标题 */
+.ef-filter .ef-filter-entity-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* 字段列 */
+.ef-filter .ef-filter-entity-column {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap; /* 防止换行 */
+  gap: 12px;
+  overflow-x: auto; /* 当字段过多时支持横向滚动 */
+}
+
+.ef-filter .ef-filter-entity-field {
+  flex: 0 0 100%; /* 每个字段占 50% 宽度，减去间距 */
+  box-sizing: border-box; /* 包括内边距和边框 */
+  padding: 2px;
+  border: 1px dashed var(--ef-border-color);
+  border-radius: var(--ef-border-radius);
+  background-color: #fff;
+  color: var(--ef-font-color);
+  text-align: center; /* 文本居中 */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ef-filter .ef-filter-entity-field:hover {
+  background-color: var(--ef-primary-color);
+  color: #fff;
+}
+
+/* 响应式：字段在小屏幕时变为一列 */
+@media (max-width: 768px) {
+  .ef-filter-entity-field {
+    flex: 0 0 100%; /* 占满一行 */
+  }
+}
+
+/* 分隔线 */
+.ef-filter .ef-filter-operator-column {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px;
+  border-left: 1px solid var(--ef-separator-color);
+  min-height: 400px;
+  align-items: baseline
+}
+
+.ef-filter .ef-filter-condition-editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: #fff;
+  min-height: 400px;
+  border: 1px solid var(--ef-border-color);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ef-font-color);
+}
+
+.ef-filter .ef-filter-condition-editor:focus {
+  outline: none;
+  border-color: var(--ef-primary-color);
+  box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+}
+
+.ef-filter .ef-filter-condition-editor .tox-tinymce-inline {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.ef-filter .ef-filter-condition-editor .tox-toolbar {
+  background: #f9fafc !important;
+  border: 1px solid var(--ef-border-color) !important;
+  border-radius: var(--ef-border-radius) !important;
+}
+
+.ef-filter .ef-filter-entity-operator {
+  cursor: pointer;
+  padding: 3px 8px;
+  border: 1px solid var(--ef-border-color);
+  border-radius: var(--ef-border-radius);
+  background-color: #fff;
+  color: var(--ef-font-color-secondary);
+  transition: all 0.3s ease;
+}
+
+.ef-filter .ef-filter-entity-operator:hover {
+  background: var(--ef-highlight-color);
+  color: #fff;
+  border-color: var(--ef-highlight-color);
+}
+
+/* 条件编辑器字段、值、操作符 */
+.ef-filter .ef-filter-condition-editor span {
+  /* padding: 6px 12px;
+  border: 1px solid var(--ef-border-color);
+  border-radius: var(--ef-border-radius);
+  background-color: #f9fafc;
+  color: var(--ef-font-color);
+  font-weight: 500;
+  display: inline-block;
+  transition: background-color 0.2s ease, border-color 0.2s ease; */
+}
+
+.ef-filter .ef-filter-editor-field {
+  padding: 3px 8px;
+  border: 1px solid var(--ef-primary-color);
+  border-radius: var(--ef-border-radius);
+  color: var(--ef-primary-color);
+  font-weight: 500;
+  display: inline-block;
+  transition: background-color 0.2s ease, border-color 0.2s
+}
+
+.ef-filter .ef-filter-condition-editor span:hover {
+  background-color: var(--ef-highlight-color);
+  color: #fff;
+  border-color: var(--ef-highlight-color);
+}
+
+.ef-filter .ef-filter-editor-value {
+  color: var(--ef-primary-color);
+}
+
+.ef-filter .ef-filter-editor-field:hover,
+.ef-filter .ef-filter-editor-value:hover {
+  background-color: var(--ef-primary-color);
+  color: #fff;
+}
+
+.ef-filter .ef-filter-editor-logic {
+  font-weight: bold;
+  color: var(--ef-font-color-secondary);
+}
+
+.ef-filter ef-filter-operator-column {
+  min-height: 400px;
+  align-items: baseline;
+}
+
+.ef-filter .ef-filter-operator-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-modal-wrapper .ef-modal-body {
+  padding: 0;
+}
+
+.ef-filter .ef-filter-entity-fields {
+  display: flex;
+  flex-wrap: wrap; /* 自动换行 */
+  gap: 8px; /* 字段间距 */
+}
+
+.modal-leader-line {
+  z-index: 2001 !important;
+}
+
+.ef-filter-editor-field.yellow {
+  border: 1px solid rgb(255, 225, 0, 0.7);
+  background-color: rgb(255, 225, 0, 0.7);
+  color: black;
+  min-height: 22px;
+  min-width: 20px;
+}
+
+.ef-filter-editor-operator {
+  min-height: 22px;
+  min-width: 20px; 
+}
+
+.ef-filter-editor-value {
+  min-height: 22px;
+  min-width: 20px;
+}
+
+.ef-filter-editor-wrapper {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* .ef-filter-editor-wrapper span {
+  margin: 0 5px;
+  min-width: 20px;
+  min-height: 22px;
+} */
+
+.ef-filter-editor-wrapper span {
+  padding: 3px 8px;
+  border-radius: 5px;
+  margin: 2px;
+  position: relative; /* 为伪元素定位 */
+}
+
+.ef-filter-editor-wrapper span.ef-filter-editor-parenthesis {
+  padding: 3px 0px;
+}
+
+.ef-filter-editor-wrapper span::after {
+  content: '';
+  position: absolute;
+  top: 0px;  /* 扩展上方 margin */
+  bottom: 0px;  /* 扩展下方 margin */
+  left: 0px;   /* 扩展左侧 margin */
+  right: 0px;  /* 扩展右侧 margin */
+  background: rgba(0, 0, 0, 0);  /* 透明 */
+  z-index: -1;  /* 确保点击区域在span后面 */
+}
+
+.ef-filter-editor-logic-div {
+  position: relative;
+  padding-right: 10px; /* 给加号按钮预留空间 */
+  display: flex;
+  align-items: center;
+}
+
+.ef-filter-editor-logic-div.parenthesis {
+  padding-right: 0;
+}
+
+.ef-filter-editor-logic-div .add-button {
+  display: none;
+  position: absolute;
+  right: 44px;
+  top: 120%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  font-size: 14px;
+  padding: 3px;
+  z-index: 999999;
+}
+
+/* 在datagrid.css中添加删除按钮样式 */
+.ef-filter-editor-logic-div .delete-button {
+  display: none;
+  position: absolute;
+  right: 15px;
+  top: 120%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  background-color: #ff4444;
+  color: #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  font-size: 14px;
+  padding: 3px;
+  z-index: 999999;
+}
+
+.ef-filter-editor-logic-div .transition-button {
+  display: none;
+  position: absolute;
+  right: -14px;
+  top: 120%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  font-size: 14px;
+  padding: 3px;
+  z-index: 999999;
+}
+
+/* 括号元素样式 */
+.ef-filter-editor-parenthesis {
+  font-size: 18px;
+  font-weight: bold;
+  padding: 3px 8px;
+  color: var(--ef-primary-color);
+  min-height: 22px;
+  min-width: 10px;
+  cursor: pointer;
+  color: #000000;
+  border-radius: 50%;
+  width: 10px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  font-size: 14px;
+  padding: 3px;
+  z-index: 999999;
+  display: inline-block;
+  position: relative;
+}
+
+.ef-filter-editor-parenthesis.hover,
+.ef-filter-editor-parenthesis.active {
+  background-color: var(--ef-highlight-color);
+  color: #fff;
+  border-color: var(--ef-highlight-color);
+}
+
+.before-parenthesis {
+  padding-right: 0px;
+}
+
+.ef-filter-editor-logic-div:hover .delete-button,
+.ef-filter-editor-logic-div .ef-filter-editor-parenthesis.active ~ .delete-button,
+.ef-filter-editor-logic-div.active .delete-button {
+  display: block;
+}
+
+.ef-filter-editor-logic-div:hover .add-button,
+.ef-filter-editor-logic-div .ef-filter-editor-parenthesis.active ~ .add-button,
+.ef-filter-editor-logic-div.active .add-button {
+  display: block;
+}
+.ef-filter-editor-logic-div:hover .transition-button,
+.ef-filter-editor-logic-div.active .transition-button {
+  display: block;
+}
+
+.ef-filter-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    text-align: center;
+}
+
+.ef-filter-empty-text {
+    color: #999;
+    margin-bottom: 15px;
+}
+
+.ef-filter-add-first-condition {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.ef-filter-add-first-condition i {
+    margin-right: 5px;
+}
+
+.ef-filter-add-first-condition:hover {
+    background-color: #1669d9;
+}
+/* 过滤器样式 结束 */

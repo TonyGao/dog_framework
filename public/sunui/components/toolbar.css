@@ -1,0 +1,37 @@
+/* toolbar 样式 */
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  background: rgb(242, 243, 245);
+}
+
+.toolbar-box {
+  display: flex;
+  flex-wrap: wrap;
+  min-height: 40px;
+}
+
+.toolbar-wrap {
+  padding: 5px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  cursor: move;
+  margin-right: 5px;
+}
+
+.toolbar-wrap:hover {
+  background-color: #ffffff; /* 背景色反转 */
+}
+
+.sortable-placeholder {
+  border: 1px dashed #ccc;
+  background-color: #f4f4f4;
+  height: 50px;  /* 根据实际需要设置高度 */
+}
+
+/* 设置正在拖拽时的样式 */
+.dragging {
+  opacity: 0.5;  /* 拖拽中的元素半透明 */
+}

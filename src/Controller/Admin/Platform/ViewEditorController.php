@@ -6,13 +6,14 @@ use App\Entity\Platform\View;
 use App\Controller\BaseController;
 use App\Form\Platform\ViewFolderType;
 use App\Form\Platform\ViewType;
+use App\Lib\Str;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ViewDesignerController extends BaseController
+class ViewEditorController extends BaseController
 {
   /**
    * 视图管理界面
@@ -31,7 +32,7 @@ class ViewDesignerController extends BaseController
         }
 
         if ($tree[0]['type'] === 'view') {
-          return '<span class="tree-indent" style="display: none;"></span><ol class="sub-tree-content" style="display: none;">';
+          return '<span class="tree-indent" style=""></span><ol class="sub-tree-content" style="">';
         }
 
         return '<span class="tree-indent"></span><ol class="sub-tree-content">';
@@ -86,7 +87,8 @@ class ViewDesignerController extends BaseController
                 <i class="fa-solid fa-o"></i>
               </div>
               <div class="node-name">
-                <div class="tree-text-content branch" type="property">' . $node['label'] . '</div>
+                <div class="tree-text-content branch" type="view">' . $node['name'] . '</div>
+                <div class="postscript">'. $node['label'] .'</div>
               </div>
             </div>
             ';
@@ -211,4 +213,30 @@ class ViewDesignerController extends BaseController
       'form' => $form->createView(),
     ]);
   }
+
+  #[Route(
+    '/admin/platform/view/editor/{id}',
+    name: 'platform_view_editor'
+  )]
+  public function editor(string $id): Response
+  {
+    $components = [
+      ['icon' => 'fa-solid fa-border-none', 'name' => '布局', 'componentType' => 'layout'],
+      ['icon' => 'fa-solid fa-text-height', 'name' => '文本', 'componentType' => 'text'],
+      ['icon' => 'fa-solid fa-image', 'name' => '图片', 'componentType' => 'image'],
+      ['icon' => 'fa-regular fa-newspaper', 'name' => '富文本', 'componentType' => 'rich_text'],
+      ['icon' => 'fa-solid fa-video', 'name' => '视频', 'componentType' => 'video'],
+      ['icon' => 'fa-solid fa-mattress-pillow', 'name' => '按钮', 'componentType' => 'button'],
+      ['icon' => 'fa-solid fa-divide', 'name' => 'Divider', 'componentType' => 'divider'],
+      ['icon' => 'fa-solid fa-arrows-up-to-line', 'name' => 'Spacer', 'componentType' => 'spacer'],
+      ['icon' => 'fa-solid fa-map-location-dot', 'name' => '地图', 'componentType' => 'map'],
+      ['icon' => 'fa-solid fa-map', 'name' => 'Icon', 'componentType' => 'icon'],
+      ['icon' => 'fa-solid fa-map', 'name' => '相册', 'componentType' => 'gallery'],
+    ];
+  
+    return $this->render('admin/platform/view/editor.html.twig', [
+      'components' => $components,
+    ]);
+  }
+  
 }

@@ -1,4 +1,5 @@
 {% extends 'admin/layout.html.twig' %}
+{% import 'ui/template/ui.html.twig' as ui %}
 
 {% block stylesheets %}
 	{{ parent() }}
@@ -40,6 +41,29 @@
       })
     })
 
+    $("#modify").on("click", function (event) {
+      const departmentId = $(".org-text-content.department.chosen").attr('id'); // 获取部门 ID
+      const payload = {
+        // 此处填充你需要发送的表单数据
+        name: $("#name").val(),
+        type: $("#type").val(),
+        // 其它字段...
+      };
+
+      ajax({
+        url: "{{ path('org_department_edit', { id: 'departmentId' }) }}".replace('departmentId', departmentId), // 动态 URL，包含部门 ID
+        data: payload,
+        dataType: "html",
+        async: false,
+        success: function(response) {
+          $(".right-content").html(response); // 更新页面内容
+        },
+        error: (xhr, _, msg) => {
+          $.alert.error(`修改失败: ${msg}`);
+        }
+      });
+    });
+
     $("#collapseCompany").on("click", function () {
       let leftTree = $(".left-tree");
       if (leftTree.hasClass("visible")) {
@@ -64,7 +88,12 @@
 {% block app_content_container %}
 	<div class="org-sturcture-container">
 		<div class="outside-wrapper">
-      <div class="toolbar">
+			{{ ui.toolBar([
+					{'type': 'create', 'text': '新建', 'id': 'create'},
+					{'type': 'modify', 'text': '修改', 'id': 'modify'},
+          {'type':'disable', 'text': '停用', 'id':'disable'},
+			]) }}
+      {# <div class="toolbar">
         <div class="toolbar-box">
           <div class="toolbar-wrap">
             <div class="toolbar-content">
@@ -74,7 +103,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> #}
 			<div class="inside-wrapper">
 				<div class="left-tree visible">
 					<div class="left-tree-wrapper">

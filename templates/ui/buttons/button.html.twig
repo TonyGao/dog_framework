@@ -1,0 +1,7 @@
+{# templates/ui/buttons/button.html.twig #}
+<button class="btn {{ type }} {{ size }} {{ state }} {{ shape }} {{ extraClass|default('') }}">
+    {% if icon %}
+        <i class="{{ icon }}"></i>
+    {% endif %}
+    {{ label|default('') }}
+</button>

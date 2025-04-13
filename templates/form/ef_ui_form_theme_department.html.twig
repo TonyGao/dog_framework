@@ -5,7 +5,7 @@
 {% set department = form.vars.value %} {# 获取表单当前值 #}
 
 <div class="ef-deparment-element">
-    <span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search" style="width: 260px;" chosen="{{ department is not empty ? 'true' : 'false' }}" id="{{ departmentInputId }}" contentid="{{ departmentContentId }}">
+    <span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search" style="width: 260px; text-align: left;" chosen="{{ department is not empty ? 'true' : 'false' }}" id="{{ departmentInputId }}" contentid="{{ departmentContentId }}">
         <div class="ef-department-selection-container">
             <div class="ef-department-selection">
                 <span class="ef-department-selection-span">

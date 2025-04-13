@@ -1,38 +1,105 @@
 {# EF标准Twig UI库 #}
 
-{% macro barButton(type = 'create', text = null, classes = 'btn outline primary medium mini round icon', icon = null, id = null) %}
-	{# 判断是否传入了自定义图标，如果没有则根据 type 使用默认的图标 #}
-	{% set finalIcon = icon is not null ? icon : (icons[type] ?? 'fa-regular fa-question-circle') %}
-	{% set buttonText = text is not null ? text : (label[type]) %}
-	{# 如果没有传递 id，则使用 type 作为 id 的值 #}
-	{% set buttonId = id is not null ? id : type %}
+{# {% macro barButton(type = 'create', text = null, classes = 'btn outline primary medium mini round icon', icon = null, id = null, attributes = {}) %}
+    {# 判断是否传入了自定义图标，如果没有则根据 type 使用默认的图标
+    {% set finalIcon = icon is not null ? icon : (icons[type] ?? 'fa-regular fa-question-circle') %}
+    {% set buttonText = text is not null ? text : (label[type]) %}
+    {# 如果没有传递 id，则使用 type 作为 id 的值
+    {% set buttonId = id is not null ? id : type %}
 
-	<button class="{{ classes }}" id="{{ buttonId }}">
-		<i class="{{ finalIcon }}"></i>
-		{{ buttonText }}
-	</button>
+    <button class="{{ classes }}" id="{{ buttonId }}" {% for attr, value in attributes %}{{ attr }}="{{ value }}" {% endfor %}>
+        <i class="{{ finalIcon }}"></i>
+        {{ buttonText }}
+    </button>
+{% endmacro %} #}
+
+{% macro barButton(type = 'create', text = null, classes = 'btn outline primary medium mini round icon', icon = null, id = null, attributes = {}, extraClasses = []) %}
+    {# 判断是否传入了自定义图标，如果没有则根据 type 使用默认的图标 #}
+    {% set finalIcon = icon is not null ? icon : (icons[type] ?? 'fa-regular fa-question-circle') %}
+    {% set buttonText = text is not null ? text : (label[type]) %}
+    {# 如果没有传递 id，则使用 type 作为 id 的值 #}
+    {% set buttonId = id is not null ? id : type %}
+    {# 动态拼接 classes 和 extraClasses #}
+    {% set finalClasses = classes ~ ' ' ~ extraClasses|join(' ') %}
+    
+    <button class="{{ finalClasses|trim }}" id="{{ buttonId }}"
+        {% for attr, value in attributes %}
+            {{ attr }}="{{ value }}"
+        {% endfor %}
+    >
+        <i class="{{ finalIcon }}"></i>
+        {{ buttonText }}
+    </button>
 {% endmacro %}
 
-{# 定义工具栏宏 #}
-{% macro toolBar(buttons = []) %}
-	<div class="toolbar">
-		<div class="toolbar-box">
-			<div class="toolbar-wrap">
-				<div class="toolbar-content">
-					{% for button in buttons %}
-						{# 使用 barButton 宏来渲染每一个按钮，传入相应的类型、文本和图标等参数 #}
-						{{ _self.barButton(
+
+{# 单个复选框组件 #}
+{#  使用方法：
+   {{ ui.checkbox('checkbox1', 'Option 1', '0') }}
+   {{ ui.checkbox('checkbox2', 'Option 2', '0', true) }}
+   {{ ui.checkbox('checkbox3', 'Option 3', '0', false, 'custom-class') }} 
+#}
+{% macro checkbox(id, label, value, checked=false, className='') %}
+    <label class="ef-checkbox {{ className }}">
+        <input type="checkbox" class="ef-checkbox-target" id="{{ id }}" value="{{ value }}" {% if checked %}checked{% endif %}>
+        <span class="ef-icon-hover ef-checkbox-icon-hover">
+            <div class="ef-checkbox-icon"></div>
+        </span>
+        <span class="ef-checkbox-label">{{ label }}</span>
+    </label>
+{% endmacro %}
+
+{# 横向复选框组组件 #}
+{% macro checkbox_group_horizontal(checkboxes) %}
+    <span class="ef-checkbox-group ef-checkbox-group-direction-horizontal">
+        {% for checkbox in checkboxes %}
+            {{ _self.checkbox(checkbox.id, checkbox.label, checkbox.value, checkbox.checked) }}
+        {% endfor %}
+    </span>
+{% endmacro %}
+
+{# 纵向复选框组组件 #}
+{% macro checkbox_group_vertical(checkboxes) %}
+    <span class="ef-checkbox-group ef-checkbox-group-direction-vertical">
+        {% for checkbox in checkboxes %}
+            {{ _self.checkbox(checkbox.id, checkbox.label, checkbox.value, checkbox.checked) }}
+        {% endfor %}
+    </span>
+{% endmacro %}
+
+
+{# 定义工具栏宏，下边是示例代码 #}
+	{# {{ ui.toolBar([
+		{ type: 'create', text: '新增', icon: 'fa-solid fa-plus-circle', id: 'add-button' },
+		{ type: 'delete', text: '删除', icon: 'fa-solid fa-minus-circle', id: 'delete-button' },
+		{ type: 'edit', text: '编辑', icon: 'fa-solid fa-edit', id: 'edit-button' },
+		{ type: 'update', text: '修改', icon: 'fa-solid fa-pencil-alt', id: 'update-button' },
+		{ type: 'filter', text: '搜索', icon: 'fa-solid fa-filter', id: 'filter-button'~uniqueId }
+	], { 'parentId': gridId }) }} #}
+{% macro toolBar(buttons = [], defaultAttributes = {}, defaultClasses = 'btn outline primary medium mini round icon') %}
+    <div class="toolbar">
+        <div class="toolbar-box sortable-toolbar-box">
+            <div class="toolbar-wrap sortable-toolbar-wrap">
+                <div class="toolbar-content">
+                    {% for button in buttons %}
+                        {# 合并默认属性与按钮的属性，覆盖优先 #}
+                        {% set mergedAttributes = defaultAttributes|merge(button.attributes|default({})) %}
+                        {# 合并默认类与按钮的类，优先使用按钮类 #}
+                        {% set finalClasses = (defaultClasses ~ ' ' ~ button.classes|default(''))|trim %}
+                        
+                        {{ _self.barButton(
                             button.type,
                             button.text,
-                            'btn outline primary medium mini round icon',
+                            finalClasses,
                             button.icon|default(null),
-                            button.id|default(null)
+                            button.id|default(null),
+                            mergedAttributes
                         ) }}
-					{% endfor %}
-				</div>
-			</div>
-		</div>
-	</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endmacro %}
 
 {% macro formSubmitButton() %}
@@ -55,6 +122,38 @@
 			</div>
 		</div>
 	</div>
+{% endmacro %}
+
+{# 定义模态框宏 #}
+{% macro modal(id, title, body, footer, options = {}) %}
+<div class="ef-modal-container" id="{{ id }}" style="z-index: {{ options.zIndex | default(1001) }};">
+    <div class="ef-modal-mask"></div>
+    <div class="ef-modal-wrapper {{ options.wrapperClass | default('ef-modal-wrapper-align-center') }}">
+        <div class="ef-modal" style="width:{{ options.width | default('fit-content') }}">
+            <!-- Header -->
+            <div class="ef-modal-header">
+                <div class="ef-modal-title {{ options.titleAlignClass | default('ef-modal-title-align-left') }}">
+                    {{ title }}
+                </div>
+                <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="{{ options.onClose | default('') }}">
+                    <span class="ef-icon-hover">
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                            <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <!-- Body -->
+            <div class="ef-modal-body">
+                {{ body|raw }}
+            </div>
+            <!-- Footer -->
+            <div class="ef-modal-footer">
+                {{ footer|raw }}
+            </div>
+        </div>
+    </div>
+</div>
 {% endmacro %}
 
 {% macro formValid() %}

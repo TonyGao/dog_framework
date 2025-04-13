@@ -45,7 +45,7 @@
   justify-content: flex-start;
   z-index: 1000;
   position: inherit;
-  min-width: 200px;
+  min-width: fit-content;
   padding-left: 20px;
   padding-top: 20px;
   border-right: 1px #dfdfdf solid;

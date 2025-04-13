@@ -10,20 +10,19 @@
   align-items: flex-start;
   justify-content: flex-start;
   width: 100%;
-  margin-bottom: 20px;
 }
 
-.ef-row {
+.ef-form .ef-row {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
 }
 
-.ef-row-align-start {
+.ef-form .ef-row-align-start {
   align-items: center;
 }
 
-.ef-row-justify-start {
+.ef-form .ef-row-justify-start {
   justify-content: flex-start;
 }
 

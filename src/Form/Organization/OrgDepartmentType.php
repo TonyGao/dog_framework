@@ -7,22 +7,19 @@ use App\Entity\Organization\Department;
 use App\Entity\Organization\Company;
 use App\Form\BaseFormType;
 use App\Repository\Organization\CompanyRepository;
+use App\Repository\Organization\UserRepository;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Form\Common\DepartmentTypeTransfer;
 
 class OrgDepartmentType extends BaseFormType
 {
-  private $formFieldBuilder;
-  private $companyRepo;
-
   public function __construct(
-    FormFieldBuilderService $formFieldBuilder,
-    CompanyRepository $comRepo,
+    private FormFieldBuilderService $formFieldBuilder,
+    private CompanyRepository $companyRepo,
+    private UserRepository $userRepo,
     private DepartmentTypeTransfer $departmentTypeTransfer
   ) {
-    $this->formFieldBuilder = $formFieldBuilder;
-    $this->companyRepo = $comRepo;
   }
   
   public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -31,6 +28,10 @@ class OrgDepartmentType extends BaseFormType
           if ($field->getTargetEntity() === Company::class) {
               $fieldOptions['choices'] = $this->companyRepo->allCompany();
               $fieldOptions['choice_label'] = 'alias';
+          }
+
+          if ($field->getPropertyName() === 'manager') {
+              $fieldOptions['multiple'] = true;
           }
       });
   }
