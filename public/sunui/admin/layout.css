@@ -120,6 +120,16 @@ a {
   text-decoration: none !important;
 }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 body {
   min-height: 100%;
   width: 100%;
@@ -992,34 +1002,4 @@ body {
 .warning-content button {
   width: fit-content;
   align-self: center;
-}
-
-.toolbar-box {
-  overflow: hidden;
-  border-top-width: 0px;
-  border-bottom-width: 0px;
-  border-left-width: 0px;
-  border-right-width: 0px;
-  border-color: #b6b6b6;
-  border-style: solid;
-  background: #f0f0f0;
-  font-size: 12px;
-  height: 35px;
-  padding-top: 5px;
-  zoom: 1;
-  display: block;
-}
-
-.toolbar-wrap {
-  overflow: hidden;
-  width: auto;
-  float: left;
-}
-
-.toolbar-content {
-  height: 30px;
-  white-space: nowrap;
-  width: auto;
-  margin-left: 0px;
-  padding-left: 15px;
 }

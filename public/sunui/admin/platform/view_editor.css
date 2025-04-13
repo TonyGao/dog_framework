@@ -1,0 +1,345 @@
+/* 侧边栏内容容器 */
+.side-menu-content {
+  padding: 16px;
+}
+
+/* 标题样式 */
+.library-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
+  color: #333;
+}
+
+/* 网格布局：一行两列 */
+.component-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 每行两列 */
+  gap: 12px; /* 控制元素间距 */
+}
+
+/* 组件项样式 */
+.component-item {
+  background-color: #fdfdfd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70px; /* 高度调整为较小的值 */
+  padding: 8px; /* 减少内边距 */
+  cursor: grab;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* 鼠标按下时效果 */
+.component-item:active {
+  cursor: grabbing;
+}
+
+/* 悬停效果 */
+.component-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.12);
+}
+
+/* 图标样式 */
+.component-icon {
+  font-size: 24px;
+  color: #6c757d;
+  margin-bottom: 4px;
+}
+
+/* 名称样式 */
+.component-name {
+  font-size: 14px;
+  color: #495057;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* 响应式调整（窄屏时一列布局） */
+@media (max-width: 600px) {
+  .component-grid {
+    grid-template-columns: 1fr; /* 小屏幕一列 */
+  }
+}
+
+/*
+ * view editor main style
+ */
+
+/* 整体容器 */
+.editor-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f4f4f9; /* 轻柔的背景色 */
+  font-family: 'Arial', sans-serif; /* 使用干净的字体 */
+}
+
+/* 画布区域 */
+.canvas {
+  flex: 1;
+  border: 1px solid #e1e4e8;
+  background-color: #ffffff; /* 纯白背景 */
+  padding: 10px;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 10px; /* 圆角 */
+  transition: all 0.3s ease; /* 平滑过渡 */
+}
+
+/* Section 样式 */
+.section {
+  margin: 0;
+  position: relative;
+  background-color: #f0f8ff;
+  overflow: hidden;
+  padding: 0;
+}
+
+.section.active {
+  border: 1px solid #007bff;
+}
+
+.section-content {
+  background-color: #f0f8ff;
+  min-height: 200px; /* 保证 Section 有一定的高度 */
+  height: 100%; /* 确保占满父容器 */
+  display: flex;
+  justify-content: center;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+.section:hover {
+  box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3); /* 悬停时阴影 */
+}
+
+.section-header {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 86px;
+  height: 22px;
+  background-color: #007bff;
+  border: 2px solid #007bff;
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* 小图标样式 */
+.section-header button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.75em; /* 特别小的图标 */
+  padding: 2px;
+}
+
+.section-header button:hover {
+  background-color: rgba(0, 123, 255, 0.1); /* 淡蓝色半透明背景 */
+  color: #fff;
+  border-color: #0056b3; /* 深蓝色边框 */
+  transform: scale(1.2); /* 略微放大效果 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* 添加阴影，突出效果 */
+  transition: all 0.3s ease; /* 平滑过渡 */
+}
+
+/* 添加新 Section 按钮 */
+.add-section-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #3370ff;
+  color: white;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: all 0.3s;
+  z-index: 10;
+}
+
+.add-section-button:hover {
+  background-color: #3370ff;
+  transform: scale(1.1);
+}
+
+/* 属性面板 */
+.properties-panel {
+  width: 300px;
+  height: 100%; /* 占满容器高度 */
+  background-color: #f8f9fa;
+  right: 0;
+  transition: transform 0.3s ease;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 隐藏时移动面板到屏幕右侧外 */
+.properties-panel.hidden {
+  transform: translateX(100%);
+  width: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* toggle按钮默认样式：向右的梯形 */
+.toggle-properties {
+  position: absolute;
+  top: 50%;
+  right: 286px;
+  width: 15px;
+  height: 48px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  clip-path: polygon(0 0, 100% 15%, 100% 85%, 0 100%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+  font-size: 18px;
+}
+
+/* 反向梯形：向左 */
+.toggle-properties.reverse {
+  clip-path: polygon(0 15%, 100% 0%, 100% 100%, 0 85%);
+  right: 0;
+}
+
+.toggle-properties:hover {
+  background-color: #0056b3;
+}
+
+/* 其他文本样式 */
+h1, h2, h3 {
+  color: #333; /* 深色文本 */
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal {
+  background: white;
+  padding: 30px 60px 60px 60px;
+  border-radius: 8px;
+  width: 1000px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.ef-row {
+  flex-flow: row;
+}
+
+.modal .ef-row {
+  display: flex;
+  flex-flow: row;
+  gap: 20px;
+  max-width: 90%;
+}
+
+.close-icon {
+  position: relative;
+  text-align: right;
+  font-size: large;
+  top: 0px;
+  right: -30px;
+  color: darkgray;
+}
+
+.close-icon i {
+  cursor: pointer;
+}
+
+.modal .ef-col-item {
+  cursor: pointer;
+}
+
+.dragging-placeholder {
+  border: 2px dashed #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
+  pointer-events: none;
+}
+
+[contenteditable="true"] {
+  /* border: 1px dashed #ccc; */
+  padding: 4px;
+  cursor: text;
+}
+
+.editable:empty:before {
+  content: attr(data-placeholder);
+  color: #888;
+  pointer-events: none;
+}
+
+.canvas, .canvas h1, h2, h3 {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 700;
+}
+
+[contenteditable]:focus {
+  outline: none;
+}
+
+.item-block {
+  position: relative;
+}
+
+.item-block .ef-component {
+  position: relative;
+  border: none;
+}
+
+.ef-component-labels.label-top {
+  left: 0px;
+  top: 0px;
+  margin-left: -1px;
+  font-size: 12px;
+  position: absolute;
+  white-space: nowrap;
+  cursor: default;
+  display: inline-flex;
+}
+
+.ef-component-labels .ef-label-comp-type {
+  color: #fff;
+  background-color: #116dff;
+  cursor: move;
+  line-height: 16px;
+  user-select: none;
+  display: inline-flex;
+  height: 16px;
+  padding: 0 6px;
+  font-size: 12px;
+}

@@ -410,12 +410,11 @@ class OrgController extends BaseController
    * 返回部门表单
    */
   #[Route('/admin/org/department/edit/{id}', name: 'org_department_edit')]
-  public function departmentForm(Request $request, EntityManagerInterface $em, int $id): Response
+  public function departmentForm(Request $request, EntityManagerInterface $em, Department $department): Response
   {
-    $repo = $em->getRepository(Department::class);
-    $deparment = $repo->findOneBy(['id' => $id]);
-
-    $form = $this->createForm(OrgDepartmentType::class, $deparment);
+    $form = $this->createForm(OrgDepartmentType::class, $department, [
+      'action' => $this->generateUrl('org_department_edit', ['id' => $department->getId()])
+    ]);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
@@ -426,7 +425,7 @@ class OrgController extends BaseController
       return $this->redirectToRoute('org_department');
     }
 
-    return $this->render('admin/org/departmentEdit.html.twig', [
+    return $this->render('admin/platform/form_render.html.twig', [
       'form' => $form->createView(),
     ]);
   }

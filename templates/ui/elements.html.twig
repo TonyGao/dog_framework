@@ -1,0 +1,31 @@
+{# templates/ui/ui.html.twig #}
+{% macro button(type, size, label, icon = null, state = '', shape = '', extraClass = '') %}
+    {% include 'ui/buttons/button.html.twig' with {
+        type: type,
+        size: size,
+        label: label,
+        icon: icon,
+        state: state,
+        shape: shape,
+        extraClass: extraClass
+    } %}
+{% endmacro %}
+
+{% macro icon_button(type, size, icon, label = '', state = '', shape = '', extraClass = '') %}
+    {% include 'ui/buttons/icon_button.html.twig' with {
+        type: type,
+        size: size,
+        icon: icon,
+        label: label,
+        state: state,
+        shape: shape,
+        extraClass: extraClass
+    } %}
+{% endmacro %}
+
+{% macro button_group(buttons = [], extraClass = '') %}
+    {% include 'ui/buttons/button_group.html.twig' with {
+        buttons: buttons,
+        extraClass: extraClass
+    } %}
+{% endmacro %}

@@ -1,0 +1,29 @@
+{% set sideDisplay = sideMenuState == 'shrunk' ? 'none' : 'flex' %} {% set
+scrollBtnDisplay = sideMenuState == 'shrunk' ? 'flex' : 'none' %}
+<section class="app-side-menu">
+  <div class="app-side-menu-scroll-btn" style="display: {{ scrollBtnDisplay }}">
+    <i class="fa-solid fa-angle-right"></i>
+  </div>
+  <aside class="admin-aside-outer" style="display: {{ sideDisplay }};">
+    <div class="side-menu-one">
+      <div class="side-menu-two">
+        <div class="universe-icon side-scroll-btn system-menu-toggle-btn">
+          <i class="fa-solid fa-angles-left"></i>
+        </div>
+        <div class="side-menu-content">
+          <h3 class="library-title">组件库</h3>
+          <div class="component-grid">
+            {% for component in components %}
+              <div class="component-item" draggable="true" componentType="{{ component.componentType }}">
+                <div class="component-icon">
+                  <i class="{{ component.icon }}"></i>
+                </div>
+                <div class="component-name">{{ component.name }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</section>

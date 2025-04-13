@@ -30,11 +30,15 @@
 		</div>
 		<div class="ef-drawer-body">
 		<form action="{{ path('api_platform_entity_batchfields') }}" method="post" id="submitFields">
-			<div class="ef-col-24" id="ef-drawer-body-form">
-				{{ drawerContent|raw }}
-			</div>
-			<div class="ef-col-24" style="padding: 0 10px;">
-				<button class="btn primary medium long" id="addField">新增字段</button>
+		  <div class="ef-row ef-row-align-start ef-row-justify-start">
+				<div class="ef-col-24 repetitive-row" id="ef-drawer-body-form">
+					{{ drawerContent|raw }}
+				</div>
+		  </div>
+			<div class="ef-row ef-row-align-start ef-row-justify-start">
+				<div class="ef-col-24" style="padding: 0 10px;">
+					<button class="btn primary medium long" id="addField">新增字段</button>
+				</div>
 			</div>
 		</form>
 		</div>

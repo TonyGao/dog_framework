@@ -80,9 +80,14 @@
   flex: 1;
   box-sizing: border-box;
   height: 100%;
-  padding: 12px 16px;
+  padding: 12px 0px;
   overflow: auto;
-  color: rgb(29,33,41);
+  color: rgb(29, 33, 41);
+  width: 100%;
+
+  /* 以下两行实现水平和垂直居中 */
+  align-self: center;
+  justify-self: center;
 }
 
 .ef-drawer-footer {

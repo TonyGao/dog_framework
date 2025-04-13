@@ -26,7 +26,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 #[ORM\HasLifecycleCallbacks]
 class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
-	
+
 	use CommonTrait;
 
 	#[ORM\Id]
@@ -196,7 +196,6 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
 	{
 		return null;
 	}
-
 
 	/**
 	 * @see UserInterface

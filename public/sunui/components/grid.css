@@ -1,3 +1,7 @@
+:root {
+  --grid-columns: 24; /* 总列数 */
+}
+
 .ef-row-align-start {
   align-items: flex-start;
 }
@@ -9,126 +13,277 @@
 .ef-row {
   display: flex;
   flex-flow: row wrap;
+  width: 100%;
+}
+
+.ef-col {
+  box-sizing: border-box;
+  padding: 10px;
+  display: flex; /* 添加 display: flex */
+  align-items: center; /* 垂直居中内容 */
+  justify-content: center; /* 如果需要水平居中也可以添加 */
+  text-align: center; /* 文字居中 */
+  box-sizing: border-box;
+}
+
+.ef-col-auto {
+  flex: 1 1 calc(100% / var(--columns));
+  max-width: calc(100% / var(--columns));
+  display: flex;
+  justify-content: center; /* 水平居中内容 */
+  align-items: center;     /* 垂直居中内容 */
+  text-align: center;      /* 文字居中 */
 }
 
 .ef-col-1 {
   flex: 0 0 4.16666667%;
   width: 4.16666667%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .ef-col-2 {
   flex: 0 0 8.33333333%;
   width: 8.33333333%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .ef-col-3 {
   flex: 0 0 12.5%;
   width: 12.5%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .ef-col-4 {
   flex: 0 0 16.66666667%;
   width: 16.66666667%;
+  display: flex; /* 添加 display: flex */
+  align-items: center; /* 垂直居中内容 */
+  justify-content: center; /* 如果需要水平居中也可以添加 */
+  text-align: center; /* 文字居中 */
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-5 {
   flex: 0 0 20.83333333%;
   width: 20.83333333%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-6 {
   flex: 0 0 25%;
   width: 25%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-7 {
   flex: 0 0 29.16666667%;
   width: 29.16666667%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-8 {
   flex: 0 0 33.33333333%;
   width: 33.33333333%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-9 {
   flex: 0 0 37.5%;
   width: 37.5%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-10 {
   flex: 0 0 41.66666667%;
   width: 41.66666667%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-11 {
   flex: 0 0 45.83333333%;
   width: 45.83333333%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-12 {
   flex: 0 0 50%;
   width: 50%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-13 {
   flex: 0 0 54.16666667%;
   width: 54.16666667%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-14 {
   flex: 0 0 58.33333333%;
   width: 58.33333333%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-15 {
   flex: 0 0 62.5%;
   width: 62.5%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-16 {
   flex: 0 0 66.66666667%;
   width: 66.66666667%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .ef-col-17 {
   flex: 0 0 70.83333333%;
   width: 70.83333333%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-18 {
   flex: 0 0 75%;
   width: 75%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-19 {
   flex: 0 0 79.16666667%;
   width: 79.16666667%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-20 {
   flex: 0 0 83.33333333%;
   width: 83.33333333%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .ef-col-21 {
   flex: 0 0 87.5%;
   width: 87.5%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-22 {
   flex: 0 0 91.66666667%;
   width: 91.66666667%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .ef-col-23 {
   flex: 0 0 95.83333333%;
   width: 95.83333333%;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-24 {
   flex: 0 0 100%;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* padding-left: 16px;
+  padding-right: 16px; */
+  box-sizing: border-box;
 }
 
 .ef-col-offset-8 {
@@ -137,4 +292,14 @@
 
 .ef-col-offset-4 {
   margin-left: 16.66666667%;
+}
+
+.repetitive-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.ef-logic-row {
+  margin-bottom: 16px;
+  width: 100%;
 }

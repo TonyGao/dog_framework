@@ -213,3 +213,7 @@ tr, th {
 .ef-table-hover:not(.ef-table-dragging) .ef-table-tr:not(.ef-table-tr-empty):not(.ef-table-tr-summary):hover .ef-table-td:not(.ef-table-col-fixed-left):not(.ef-table-col-fixed-right), .ef-table-hover .ef-table-tr-drag .ef-table-td:not(.ef-table-col-fixed-left):not(.ef-table-col-fixed-right) {
   background-color: rgb(247,248,250);
 }
+
+.ef-table-cell.ef-table-cell-align-center {
+  justify-content: left;
+}

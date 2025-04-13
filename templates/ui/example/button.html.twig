@@ -1,0 +1,32 @@
+{% extends "base.html.twig" %}
+{% import 'ui/elements.html.twig' as ui %}
+
+{% block body %}
+    {{ ui.button(type='primary', size='medium', label='审批通过') }}
+    {{ ui.button(type='secondary', size='medium', label='驳回') }}
+    {{ ui.button(type='outline', size='medium', label='同意') }}
+
+    {{ ui.icon_button(type='primary', size='medium', icon='fa-solid fa-trash-can', label='删除') }}
+    {{ ui.icon_button(type='primary', size='medium', icon='fa-solid fa-trash-can', shape='circle') }}
+
+    {{ ui.button(type='green', size='medium', label='成功') }}
+    {{ ui.button(type='orange', size='medium', label='警告') }}
+    {{ ui.button(type='red', size='medium', label='危险') }}
+
+    <br>
+
+    {{ ui.button(type='primary', size='medium', label='审批通过', state='disabled') }}
+    {{ ui.icon_button(type='secondary', size='medium', icon='fa-solid fa-circle-notch icon-loading', label='Loading', state='disabled') }}
+
+    <br>
+
+    {{ ui.button_group(buttons=[
+        { type: 'secondary', size: 'medium', label: 'Cancel' },
+        { type: 'green', size: 'medium', label: 'Save' }
+    ]) }}
+
+    {{ ui.button_group(buttons=[
+        { type: 'primary', size: 'medium', icon: 'fa-solid fa-angle-left', label: 'Prev' },
+        { type: 'primary', size: 'medium', icon: 'fa-solid fa-angle-right', label: 'Next' }
+    ]) }}
+{% endblock %}

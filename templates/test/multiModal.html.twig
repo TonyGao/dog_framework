@@ -1,0 +1,105 @@
+{% extends "base.html.twig" %}
+
+{% block javascripts %}
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	<div style="height: 100vh; width: 100%; padding: 20px;">
+		<!-- 控制按钮 -->
+		<div style="margin-bottom: 20px;">
+			<button class="btn primary" type="button" onclick="openModal('modal1')">打开模态窗口1</button>
+			<button class="btn secondary" type="button" onclick="closeModal()">关闭所有窗口</button>
+		</div>
+
+		<!-- 模态窗口1 -->
+		<div class="ef-modal-container" id="modal1" style="z-index: 1001; display: none;">
+			<div class="ef-modal-mask"></div>
+			<div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+				<div class="ef-modal">
+					<div class="ef-modal-header">
+						<div class="ef-modal-title ef-modal-title-align-left">
+							模态窗口1
+						</div>
+						<div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="closeModal('modal1')">
+							<span class="ef-icon-hover">
+								<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+									<path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+								</svg>
+							</span>
+						</div>
+					</div>
+					<div class="ef-modal-body">
+						<div>这是模态窗口1的内容。您可以关闭此窗口而不影响其他窗口。</div>
+						<div style="margin-top: 15px;">
+							<button class="btn primary" type="button" onclick="openModal('modal2')">打开模态窗口2</button>
+						</div>
+					</div>
+					<div class="ef-modal-footer">
+						<button class="btn secondary small" type="button" onclick="closeModal('modal1')">关闭</button>
+						<button class="btn primary small" type="button">确定</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 模态窗口2 -->
+		<div class="ef-modal-container" id="modal2" style="z-index: 1002; display: none;">
+			<div class="ef-modal-mask"></div>
+			<div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+				<div class="ef-modal">
+					<div class="ef-modal-header">
+						<div class="ef-modal-title ef-modal-title-align-left">
+							模态窗口2
+						</div>
+						<div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="closeModal('modal2')">
+							<span class="ef-icon-hover">
+								<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+									<path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+								</svg>
+							</span>
+						</div>
+					</div>
+					<div class="ef-modal-body">
+						<div>这是模态窗口2的内容。您可以同时打开多个模态窗口并独立控制它们。</div>
+						<div style="margin-top: 15px;">
+							<button class="btn primary" type="button" onclick="openModal('modal3')">打开模态窗口3</button>
+						</div>
+					</div>
+					<div class="ef-modal-footer">
+						<button class="btn secondary small" type="button" onclick="closeModal('modal2')">关闭</button>
+						<button class="btn primary small" type="button">确定</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 模态窗口3 -->
+		<div class="ef-modal-container" id="modal3" style="z-index: 1003; display: none;">
+			<div class="ef-modal-mask"></div>
+			<div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+				<div class="ef-modal">
+					<div class="ef-modal-header">
+						<div class="ef-modal-title ef-modal-title-align-left">
+							模态窗口3
+						</div>
+						<div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="closeModal('modal3')">
+							<span class="ef-icon-hover">
+								<svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+									<path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+								</svg>
+							</span>
+						</div>
+					</div>
+					<div class="ef-modal-body">
+						<div>这是模态窗口3的内容。每个模态窗口都有唯一的ID，可以通过ID来控制打开和关闭。</div>
+					</div>
+					<div class="ef-modal-footer">
+						<button class="btn secondary small" type="button" onclick="closeModal('modal3')">关闭</button>
+						<button class="btn primary small" type="button">确定</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

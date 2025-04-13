@@ -1,0 +1,213 @@
+{% extends "admin/view_editor_layout.html.twig" %}
+{% import 'ui/template/ui.html.twig' as ui %}
+{% set sectionId = random() %}
+
+{% block app_content_container %}
+	<div class="editor-container">
+		<div class="canvas" id="canvas">
+			<button class="add-section-button">
+				<i class="fa-solid fa-plus"></i>
+			</button>
+			<div class="section active" id="{{sectionId}}">
+				<div class="section-header">
+					<button class="btn-add">
+						<i class="fa-solid fa-plus" style="font-size: 1em;"></i>
+					</button>
+					<button class="btn-layout">
+						<i class="fa-solid fa-grip" style="font-size: 1em;"></i>
+					</button>
+					<button class="btn-close">
+						<i class="fa-solid fa-times" style="font-size: 1em;"></i>
+					</button>
+				</div>
+				<div class="section-content"></div>
+			</div>
+		</div>
+
+		<div class="modal-overlay structureModal" id="structureModal" style="display: none;">
+			<div class="modal">
+                <div class="close-icon"><i class="fa-solid fa-xmark"></i></div>
+				<h3 style="font-family: sans-serif;font-size: x-large;margin: 0 0 60px 0;font-weight: 400; color: #4d4d4d;">SELECT YOUR STRUCTURE</h3>
+				<div class="ef-row ef-row-align-start ef-row-justify-start" style="margin-bottom: 60px;">
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;" id="full-24">
+						<div class="ef-col-24" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;">
+						</div>
+					</div>
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;" id="half-and-half">
+                        <div class="ef-col-12" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                        </div>
+                        <div class="ef-col-12" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;">
+                        </div>
+					</div>
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;" id="trisect">
+                        <div class="ef-col-8" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                        </div>
+                        <div class="ef-col-8" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                        </div>
+                        <div class="ef-col-8" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;">
+                        </div>
+					</div>
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;" id="four-equal-parts">
+                        <div class="ef-col-6" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                            {# <div>6 - 25%</div> #}
+                        </div>
+                        <div class="ef-col-6" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                            {# <div>6 - 25%</div> #}
+                        </div>
+                        <div class="ef-col-6" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                            {# <div>6 - 25%</div> #}
+                        </div>
+                        <div class="ef-col-6" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;">
+                            {# <div>6 - 25%</div> #}
+                        </div>
+					</div>
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;" id="eight-sixteen">
+                        <div class="ef-col-8" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                            {# <div>8 - 33.33%</div> #}
+                        </div>
+                        <div class="ef-col-16" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;">
+                            {# <div>8 - 33.33%</div> #}
+                        </div>
+					</div>
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;" id="sixteen-eight">
+                        <div class="ef-col-16" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                            {# <div>8 - 33.33%</div> #}
+                        </div>
+                        <div class="ef-col-8" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;">
+                            {# <div>8 - 33.33%</div> #}
+                        </div>
+					</div>
+				</div>
+				<div class="ef-row ef-row-align-start ef-row-justify-start">
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;" id="six-six-twelve">
+						<div class="ef-col-6" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px">
+							{# <div>24 - 100%</div> #}
+						</div>
+						<div class="ef-col-6" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px">
+							{# <div>24 - 100%</div> #}
+						</div>
+						<div class="ef-col-12" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;">
+							{# <div>24 - 100%</div> #}
+						</div>
+					</div>
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;" id="twelve-six-six">
+                        <div class="ef-col-12 item-block" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                            {# <div>12 - 50%</div> #}
+                        </div>
+                        <div class="ef-col-6 item-block" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                            {# <div>12 - 50%</div> #}
+                        </div>
+                        <div class="ef-col-6 item-block" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;">
+                            {# <div>12 - 50%</div> #}
+                        </div>
+					</div>
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;" id="six-twelve-six">
+                        <div class="ef-col-6" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                            {# <div>8 - 33.33%</div> #}
+                        </div>
+                        <div class="ef-col-12" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;">
+                            {# <div>8 - 33.33%</div> #}
+                        </div>
+                        <div class="ef-col-6" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;">
+                            {# <div>8 - 33.33%</div> #}
+                        </div>
+					</div>
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;--columns: 5;" id="five-equal-parts">
+                        <div class="ef-col ef-col-auto" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+                        <div class="ef-col ef-col-auto" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+                        <div class="ef-col ef-col-auto" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+                        <div class="ef-col ef-col-auto" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+                        <div class="ef-col ef-col-auto" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+					</div>
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;" id="six-equal-parts">
+                        <div class="ef-col-4" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+                        <div class="ef-col-4" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+                        <div class="ef-col-4" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+                        <div class="ef-col-4" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+                        <div class="ef-col-4" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+                        <div class="ef-col-4" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;"></div>
+					</div>
+					<div class="ef-col-4 ef-col-item" style="height: 68px; line-height: 68px; color: white; text-align: center;" id="four-sixteen-four">
+                        <div class="ef-col-4" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+                        <div class="ef-col-16" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center; margin-right: 2px;"></div>
+                        <div class="ef-col-4" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;"></div>
+					</div>
+				</div>
+				{# <div class="structure-grid">
+									<!-- 第一行结构选项 -->
+									<div class="structure-option">
+										<div class="col col-24"></div>
+									</div>
+									<div class="structure-option">
+										<div class="col col-12"></div>
+										<div class="col col-12"></div>
+									</div>
+									<div class="structure-option">
+										<div class="col col-8"></div>
+										<div class="col col-8"></div>
+										<div class="col col-8"></div>
+									</div>
+									<div class="structure-option">
+										<div class="col col-6"></div>
+										<div class="col col-6"></div>
+										<div class="col col-6"></div>
+										<div class="col col-6"></div>
+									</div>
+									<div class="structure-option">
+										<div class="col col-9"></div>
+										<div class="col col-15"></div>
+									</div>
+									<div class="structure-option">
+										<div class="col col-15"></div>
+										<div class="col col-9"></div>
+									</div>
+				
+									<!-- 第二行结构选项 -->
+									<div class="structure-option">
+										<div class="col col-6"></div>
+										<div class="col col-6"></div>
+										<div class="col col-12"></div>
+									</div>
+									<div class="structure-option">
+										<div class="col col-12"></div>
+										<div class="col col-6"></div>
+										<div class="col col-6"></div>
+									</div>
+									<div class="structure-option">
+										<div class="col col-6"></div>
+										<div class="col col-12"></div>
+										<div class="col col-6"></div>
+									</div>
+									<div class="structure-option">
+										<div class="col col-5"></div>
+										<div class="col col-5"></div>
+										<div class="col col-5"></div>
+										<div class="col col-5"></div>
+										<div class="col col-5"></div>
+									</div>
+									<div class="structure-option">
+										<div class="col col-4"></div>
+										<div class="col col-4"></div>
+										<div class="col col-4"></div>
+										<div class="col col-4"></div>
+										<div class="col col-4"></div>
+										<div class="col col-4"></div>
+									</div>
+									<div class="structure-option">
+										<div class="col col-4"></div>
+										<div class="col col-16"></div>
+										<div class="col col-4"></div>
+									</div>
+								</div> #}
+			</div>
+		</div>
+
+
+		<div class="properties-panel" id="properties-panel">
+			<h3>属性面板</h3>
+		</div>
+		<button class="toggle-properties" id="toggle-button">
+			<i class="fa-solid fa-angle-right"></i>
+		</button>
+	</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html.twig" %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" type="text/css" href="{{ asset('view_editor_layout.css', 'admin') }}">
+  <link rel="stylesheet" type="text/css" href="{{ asset('platform/view_editor.css', 'admin') }}">
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('layout.js', 'admin') }}"></script>
+  <script src="{{ asset('platform/view_editor.js', 'admin') }}"></script>
+	<script>
+  // 初始化 localforage 数据库名
+  localforage.config({
+    name: 'EnterpriseFramework'
+  });
+	</script>
+{% endblock %}
+
+{% block body %}
+  
+	<div id="app">
+		<section class="layout-container">
+			<header class="app-header {{ headerState == 'shrunk' ? 'shrunk' : '' }}">
+				<div class="admin-left-logo">
+					<div class="admin-left-logo-container">
+						<div class="admin-logo {{ headerState == 'shrunk' ? 'shrunk' : '' }}">
+							<a href="/admin/index">
+								<div class="logo-image {{ headerState == 'shrunk' ? 'shrunk' : '' }}">Dog View Editor</div>
+							</a>
+						</div>
+					</div>
+				</div>
+				<div class="admin-header-right">
+					<div class="header-helper">
+						<a href="" class="admin-help-link">
+							<div>
+								{# <span class="universe-icon helper">
+									<i class="fa-regular fa-circle-question"></i>
+								</span> #}
+							</div>
+						</a>
+					</div>
+					<div class="hSeperater"></div>
+					<span>
+						<div class="module-container">
+							<div class="module-icon-container {{ headerState == 'shrunk' ? 'shrunk' : '' }}">
+								{# <span class="universe-icon">
+									<a class="fa-brands fa-symfony" href="/_profiler/empty/search/results?limit=20" target="_blank"></a>
+								</span> #}
+							</div>
+						</div>
+					</span>
+				</div>
+				<div class="header-toggle">
+						<button id="toggle-header-button">
+								<i class="fa-solid fa-angle-up"></i> <!-- 向上箭头图标 -->
+						</button>
+				</div>
+			</header>
+			<section class="app-body">
+				{% include "admin/platform/view/editor_components.html.twig" %}
+				<section class="app-content-container">
+        {% block app_content_container %}{% endblock %}
+        </section>
+			</section>
+		</section>
+	</div>
+{% endblock %}

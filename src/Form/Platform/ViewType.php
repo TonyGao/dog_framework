@@ -17,6 +17,7 @@ class ViewType extends BaseFormType
         "view_name" => [
           "callback" => [
             "translate" => [],
+            "removePunctuation" => true,
             "tableize" => true
           ],
         ]

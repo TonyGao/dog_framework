@@ -1,6 +1,6 @@
 ## 狗狗框架
 
-<img src="/documents/conceptions/assets/dog.jpg"  width="60%">
+![狗狗框架图片](/documents/conceptions/assets/dog215.png)
 
 ### 功能概述
 

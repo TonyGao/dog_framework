@@ -1,0 +1,89 @@
+/* 声明 Noto Sans HK 字体 适合繁体字 */
+@font-face {
+  font-family: 'Noto Sans HK';
+  src: url('../fonts/google_fonts/Noto_Sans_HK/NotoSansHK-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 声明 Noto Sans SC 字体 适合简体字 */
+@font-face {
+  font-family: 'Noto Sans HK';
+  src: url('../fonts/google_fonts/Noto_Sans_SC/NotoSansSC-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 声明 Noto Sans SC 字体 适合日文 */
+@font-face {
+  font-family: 'Noto Sans JP';
+  src: url('../fonts/google_fonts/Noto_Sans_JP/NotoSansJP-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 声明 Noto Sans SC 字体 适合韓文 */
+@font-face {
+  font-family: 'Noto Sans KR';
+  src: url('../fonts/google_fonts/Noto_Sans_KR/NotoSansKR-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-style: normal;
+  font-display: swap;
+}
+
+/** Noto Sans Mono 英文 **/
+@font-face {
+  font-family: 'Noto Sans Mono';
+  src: url('../fonts/google_fonts/Noto_Sans_Mono/NotoSansMono-VariableFont_wdth_wght.ttf') format('truetype-variations');
+  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-style: normal;
+  font-display: swap;
+}
+
+/** Noto Sans Mono CJK SC 简体中文 **/
+@font-face {
+  font-family: 'Noto Sans Mono CJK SC';
+  src: url('../fonts/google_fonts/NotoSansMonoCJK-VF/NotoSansMonoCJKsc-VF.ttf') format('truetype-variations');
+  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 为繁体中文定义字体 */
+@font-face {
+  font-family: 'Noto Sans Mono CJK TC';
+  src: url('../fonts/google_fonts/NotoSansMonoCJK-VF/NotoSansMonoCJKtc-VF.ttf') format('truetype-variations');
+  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 为日文定义字体 */
+@font-face {
+  font-family: 'Noto Sans Mono CJK JP';
+  src: url('../fonts/google_fonts/NotoSansMonoCJK-VF/NotoSansMonoCJKjp-VF.ttf') format('truetype-variations');
+  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 为韩文定义字体 */
+@font-face {
+  font-family: 'Noto Sans Mono CJK KR';
+  src: url('../fonts/google_fonts/NotoSansMonoCJK-VF/NotoSansMonoCJKkr-VF.ttf') format('truetype-variations');
+  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 为香港中文定义字体 */
+@font-face {
+  font-family: 'Noto Sans Mono CJK HK';
+  src: url('../fonts/google_fonts/NotoSansMonoCJK-VF/NotoSansMonoCJKhk-VF.ttf') format('truetype-variations');
+  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-style: normal;
+  font-display: swap;
+}

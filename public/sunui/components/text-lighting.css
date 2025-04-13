@@ -1,0 +1,101 @@
+/* 公共样式部分 */
+.ef-text-lighting {
+  position: relative;
+  display: inline-block;
+  font-weight: bold;
+  font-size: 24px;
+  color: black;
+  padding: 0.1em 0.4em;
+  border-radius: 0.8em 0.3em;
+  background: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* 颜色类定义 */
+.ef-text-lighting.yellow {
+  background-image: linear-gradient(
+    to right,
+    rgba(255, 225, 0, 0.1),
+    rgba(255, 225, 0, 0.7) 4%,
+    rgba(255, 225, 0, 0.3)
+  );
+}
+
+.ef-text-lighting.blue {
+  background-image: linear-gradient(
+    to right,
+    rgba(0, 123, 255, 0.1),
+    rgba(0, 123, 255, 0.7) 4%,
+    rgba(0, 123, 255, 0.3)
+  );
+}
+
+.ef-text-lighting.red {
+  background-image: linear-gradient(
+    to right,
+    rgba(255, 0, 0, 0.1),
+    rgba(255, 0, 0, 0.7) 4%,
+    rgba(255, 0, 0, 0.3)
+  );
+}
+
+.ef-text-lighting.green {
+  background-image: linear-gradient(
+    to right,
+    rgba(0, 255, 0, 0.1),
+    rgba(0, 255, 0, 0.7) 4%,
+    rgba(0, 255, 0, 0.3)
+  );
+}
+
+.ef-text-lighting.purple {
+  background-image: linear-gradient(
+    to right,
+    rgba(138, 43, 226, 0.1),
+    rgba(138, 43, 226, 0.7) 4%,
+    rgba(138, 43, 226, 0.3)
+  );
+}
+
+.ef-text-lighting.pink {
+  background-image: linear-gradient(
+    to right,
+    rgba(255, 105, 180, 0.1),
+    rgba(255, 105, 180, 0.7) 4%,
+    rgba(255, 105, 180, 0.3)
+  );
+}
+
+.ef-text-lighting.orange {
+  background-image: linear-gradient(
+    to right,
+    rgba(255, 165, 0, 0.1),
+    rgba(255, 165, 0, 0.7) 4%,
+    rgba(255, 165, 0, 0.3)
+  );
+}
+
+.ef-text-lighting.rainbow {
+  background-image: linear-gradient(
+    to right,
+    rgba(255, 0, 0, 0.1),
+    rgba(255, 165, 0, 0.3),
+    rgba(255, 255, 0, 0.5),
+    rgba(0, 255, 0, 0.7),
+    rgba(0, 0, 255, 0.5),
+    rgba(75, 0, 130, 0.3)
+  );
+}
+
+
+.ef-text-lighting-style2-green {
+  font-weight: bolder;
+  background: linear-gradient(104deg, rgba(130, 255, 173,0) 0.9%, rgba(130, 255, 173,1.25) 2.4%, rgba(130, 255, 173,0.5) 5.8%, rgba(130, 255, 173,0.1) 93%, rgba(130, 255, 173,0.7) 96%, rgba(130, 255, 1732,0) 98%), linear-gradient(183deg, rgba(130, 255, 173,0) 0%, rgba(130, 255, 173,0.3) 7.9%, rgba(130, 255, 173,0) 15%);
+  padding: 0.6em 13.7px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  margin: 0;
+  border-radius: 7.5px;
+  text-shadow: -12px 12px 9.8px rgba(130, 255, 173,0.7), 21px -18.1px 7.3px rgba(255, 255, 255,1), -18.1px -27.3px 30px rgba(255, 255, 255,1);
+}

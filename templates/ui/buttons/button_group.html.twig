@@ -1,0 +1,6 @@
+{# templates/ui/buttons/button_group.html.twig #}
+<div class="ef buttons {{ extraClass|default('') }}">
+    {% for button in buttons %}
+        {{ include('ui/buttons/button.html.twig') with button }}
+    {% endfor %}
+</div>

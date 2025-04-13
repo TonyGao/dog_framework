@@ -100,6 +100,12 @@ function tableize($target, value) {
   return Str.tableize(value);
 }
 
+/**
+ * 调用接口进行翻译
+ * @param {*} $target 
+ * @param {*} value 
+ * @returns 
+ */
 function translate($target, value) {
   let translatedValue = value; // 默认返回原值
 
@@ -122,6 +128,17 @@ function translate($target, value) {
   });
 
   return translatedValue;
+}
+
+/**
+ * 删除value里的所有标点符号
+ * @param {} value 
+ * @returns 
+ */
+function removePunctuation($target, value) {
+  console.log(value);
+  // 使用正则表达式匹配所有标点符号，并替换为空字符串
+  return value.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"'[\]\\|<>@+]/g, "");
 }
 
 

@@ -1,0 +1,629 @@
+{% extends "base.html.twig" %}
+{% import 'ui/template/ui.html.twig' as ui %}
+{% set uniqueId = random() %}
+{% set gridId = uniqueId %}
+{% set checkAllId = 'check-all-' ~ uniqueId %}
+{% set modalId = 'modal' ~ gridId %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+
+	</script>
+{% endblock %}
+
+{% block body %}
+	<div class="container" style="width: 800px">
+		<div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id={{gridId}}>
+			{{ ui.toolBar([
+					{ type: 'create', text: '新增', icon: 'fa-solid fa-plus-circle', id: 'add-button' },
+					{ type: 'delete', text: '删除', icon: 'fa-solid fa-minus-circle', id: 'delete-button' },
+					{ type: 'edit', text: '编辑', icon: 'fa-solid fa-edit', id: 'edit-button' },
+					{ type: 'update', text: '修改', icon: 'fa-solid fa-pencil-alt', id: 'update-button' },
+					{ type: 'filter', text: '搜索', icon: 'fa-solid fa-filter', id: 'filter-button'~uniqueId, classes: 'search' }
+			], { 'parentId': gridId }) }}
+			<div class="ef-spin">
+				<div class="ef-table-container">
+					<div class="ef-scrollbar ef-scrollbar-type-embed" style="height: 100%;">
+						<div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x">
+							<table class="ef-table-element" cellpadding="0" cellspacing="0">
+								<colgroup><col><col><col><col></colgroup>
+								<thead>
+									<tr class="ef-table-tr">
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center">#</span>
+										</th>
+										<th class="ef-table-th">
+											{{ ui.checkbox(checkAllId, '', '0', false, 'check-all') }}
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center ef-table-cell-with-sorter">
+												<span class="ef-table-th-title">Name</span>
+												<span class="ef-table-th-sort">
+													<div class="ef-table-th-sort-icon">
+														<i class="fa-solid fa-sort"></i>
+													</div>
+												</span>
+											</span>
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center ef-table-cell-with-sorter">
+												<span class="ef-table-th-title">Salary</span>
+												<span class="ef-table-th-sort">
+													<div class="ef-table-th-sort-icon">
+														<i class="fa-solid fa-sort"></i>
+													</div>
+												</span>
+											</span>
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center">
+												<span class="ef-table-th-title">Address</span>
+											</span>
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center">
+												<span class="ef-table-th-title">Email</span>
+											</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="ef-table-tr">
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">1</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											{{ ui.checkbox('checkbox1', '', '0') }}
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">Jane Doe</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">23000</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">32 Park Road, London</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">jane.doe@example.com</span>
+											</span>
+										</td>
+									</tr>
+									<tr class="ef-table-tr">
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">2</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											{{ ui.checkbox('checkbox2', '', '0') }}
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">Alisa Ross</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">25000</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">35 Park Road, London</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">alisa.ross@example.com</span>
+											</span>
+										</td>
+									</tr>
+									<tr class="ef-table-tr">
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">3</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											{{ ui.checkbox('checkbox3', '', '0') }}
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">Kevin Sandra</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">22000</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">31 Park Road, London</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">kevin.sandra@example.com</span>
+											</span>
+										</td>
+									</tr>
+									<tr class="ef-table-tr">
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">4</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											{{ ui.checkbox('checkbox4', '', '0') }}
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">Ed Hellen</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">17000</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">42 Park Road, London</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">ed.hellen@example.com</span>
+											</span>
+										</td>
+									</tr>
+									<tr class="ef-table-tr">
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">5</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											{{ ui.checkbox('checkbox5', '', '0') }}
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">William Smith</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">27000</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">62 Park Road, London</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">william.smith@example.com</span>
+											</span>
+										</td>
+									</tr>
+								</tbody>
+
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="ef-pagination-bar">
+				<div class="ef-pagination-left">
+					<select class="ef-page-size">
+						<option value="10">10</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+						<option value="500">500</option>
+						<option value="1000">1000</option>
+					</select>
+					<span class="separator">|</span>
+					<button class="first-page">
+						<i class="fa-solid fa-backward-step"></i>
+					</button>
+					<button class="prev-page">
+						<i class="fa-solid fa-caret-left" style="font-size: 16px"></i>
+					</button>
+					<span class="separator">|</span>
+					<input type="number" class="current-page" value="1" min="1"/>
+					<span>/</span>
+					<span class="total-pages">10</span>
+					<span class="separator">|</span>
+					<button class="next-page">
+						<i class="fa-solid fa-caret-right" style="font-size: 16px"></i>
+					</button>
+					<button class="last-page">
+						<i class="fa-solid fa-forward-step"></i>
+					</button>
+					<span class="separator">|</span>
+					<button class="refresh">
+						<i class="fa-solid fa-rotate-right"></i>
+					</button>
+				</div>
+				<div class="ef-pagination-right">
+					<span class="total-items">Total: 1000 items</span>
+					<span class="separator">|</span>
+					<span class="item-range">1-10 items</span>
+				</div>
+			</div>
+		</div>
+
+		<br>
+
+		<div class="ef-table ef-table-size-large ef-table-border ef-table-hover ef-classic-table">
+			{{ ui.toolBar([
+        { type: 'create', text: '新增', icon: 'fa-solid fa-plus-circle', id: 'add-button' },
+        { type: 'delete', text: '删除', icon: 'fa-solid fa-minus-circle', id: 'delete-button' },
+        { type: 'edit', text: '编辑', icon: 'fa-solid fa-edit', id: 'edit-button' },
+        { type: 'update', text: '修改', icon: 'fa-solid fa-pencil-alt', id: 'update-button' }
+    ]) }}
+			<div class="ef-spin">
+				<div class="ef-table-container">
+					<div class="ef-scrollbar ef-scrollbar-type-embed" style="height: 100%;">
+						<div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x">
+							<table class="ef-table-element" cellpadding="0" cellspacing="0">
+								<colgroup><col><col><col><col></colgroup>
+								<thead>
+									<tr class="ef-table-tr">
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center">#</span>
+										</th>
+										<th class="ef-table-th">
+											{{ ui.checkbox(checkAllId, '', '0', false, 'check-all') }}
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center ef-table-cell-with-sorter">
+												<span class="ef-table-th-title">Name</span>
+												<span class="ef-table-th-sort">
+													<div class="ef-table-th-sort-icon">
+														<i class="fa-solid fa-sort"></i>
+													</div>
+												</span>
+											</span>
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center ef-table-cell-with-sorter">
+												<span class="ef-table-th-title">Salary</span>
+												<span class="ef-table-th-sort">
+													<div class="ef-table-th-sort-icon">
+														<i class="fa-solid fa-sort"></i>
+													</div>
+												</span>
+											</span>
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center">
+												<span class="ef-table-th-title">Address</span>
+											</span>
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center">
+												<span class="ef-table-th-title">Email</span>
+											</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="ef-table-tr">
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">1</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											{{ ui.checkbox('checkbox1', '', '0') }}
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">Jane Doe</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">23000</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">32 Park Road, London</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">jane.doe@example.com</span>
+											</span>
+										</td>
+									</tr>
+									<tr class="ef-table-tr">
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">2</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											{{ ui.checkbox('checkbox2', '', '0') }}
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">Alisa Ross</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">25000</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">35 Park Road, London</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">alisa.ross@example.com</span>
+											</span>
+										</td>
+									</tr>
+									<tr class="ef-table-tr">
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">3</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											{{ ui.checkbox('checkbox3', '', '0') }}
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">Kevin Sandra</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">22000</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">31 Park Road, London</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">kevin.sandra@example.com</span>
+											</span>
+										</td>
+									</tr>
+									<tr class="ef-table-tr">
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">4</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											{{ ui.checkbox('checkbox4', '', '0') }}
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">Ed Hellen</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">17000</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">42 Park Road, London</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">ed.hellen@example.com</span>
+											</span>
+										</td>
+									</tr>
+									<tr class="ef-table-tr">
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">5</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											{{ ui.checkbox('checkbox5', '', '0') }}
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">William Smith</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">27000</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">62 Park Road, London</span>
+											</span>
+										</td>
+										<td class="ef-table-td">
+											<span class="ef-table-cell ef-table-cell-align-left">
+												<span class="ef-table-td-content">william.smith@example.com</span>
+											</span>
+										</td>
+									</tr>
+								</tbody>
+
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="ef-pagination-bar">
+				<div class="ef-pagination-left">
+					<select class="ef-page-size">
+						<option value="10">10</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+						<option value="500">500</option>
+						<option value="1000">1000</option>
+					</select>
+					<span class="separator">|</span>
+					<button class="first-page">
+						<i class="fa-solid fa-backward-step"></i>
+					</button>
+					<button class="prev-page">
+						<i class="fa-solid fa-caret-left" style="font-size: 16px"></i>
+					</button>
+					<span class="separator">|</span>
+					<input type="number" class="current-page" value="1" min="1"/>
+					<span>/</span>
+					<span class="total-pages">10</span>
+					<span class="separator">|</span>
+					<button class="next-page">
+						<i class="fa-solid fa-caret-right" style="font-size: 16px"></i>
+					</button>
+					<button class="last-page">
+						<i class="fa-solid fa-forward-step"></i>
+					</button>
+					<span class="separator">|</span>
+					<button class="refresh">
+						<i class="fa-solid fa-rotate-right"></i>
+					</button>
+				</div>
+				<div class="ef-pagination-right">
+					<span class="total-items">Total: 1000 items</span>
+					<span class="separator">|</span>
+					<span class="item-range">1-10 items</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% macro filterBodyContent() %}
+		<div class="ef-filter">
+			<div class="ef-row ef-row-align-start ef-row-justify-start">
+				<div class="ef-col-4 ef-entity-column">
+					<div class="ef-filter-entity">
+						<div class="ef-filter-entity-title ef-text-lighting yellow">User</div>
+						<div class="ef-filter-entity-fields">
+							<div class="ef-filter-entity-field" data-field="displayName" entity-id="240e3bc7-55fb-4524-8bfa-fe5988e8e438" id="3897e3b9-2c38-4293-a848-9fecd050be5a">姓名</div>
+							<div class="ef-filter-entity-field" data-field="department" entity-id="240e3bc7-55fb-4524-8bfa-fe5988e8e438" id="departmentxxx">部门</div>
+							<div class="ef-filter-entity-field" data-field="company" entity-id="240e3bc7-55fb-4524-8bfa-fe5988e8e438" id ="companyxxx">公司</div>
+							<div class="ef-filter-entity-field" data-field="age" entity-id="240e3bc7-55fb-4524-8bfa-fe5988e8e438" >年龄</div>
+							<div class="ef-filter-entity-field" data-field="joining_date" entity-id="240e3bc7-55fb-4524-8bfa-fe5988e8e438">入职时间</div>
+						</div>
+					</div>
+					<div class="ef-filter-entity">
+						<div class="ef-filter-entity-title ef-text-lighting blue">Department</div>
+							<div class="ef-filter-entity-fields">
+								<div class="ef-filter-entity-field" data-field="short_department">部门简称</div>
+								<div class="ef-filter-entity-field" data-field="department_head">部门负责人</div>
+						  </div>
+					  </div>
+					</div>
+				<div class="ef-col-8 ef-filter-operator-column">
+					  <div class="ef-filter-operator-wrapper">
+					    <div class="ef-filter-entity-operator" data-operator="left_parenthesis">(</div>
+					    <div class="ef-filter-entity-operator" data-operator="right_parenthesis">)</div>
+							<div class="ef-filter-entity-operator" data-operator="and">AND</div>
+					    <div class="ef-filter-entity-operator" data-operator="or">OR</div>
+					    <div class="ef-filter-entity-operator" data-operator="equals">=</div>
+							<div class="ef-filter-entity-operator" data-operator="not_equals=">!=</div>
+							<div class="ef-filter-entity-operator" data-operator="less_than"><</div>
+							<div class="ef-filter-entity-operator" data-operator="less_than_or_equal"><=</div>
+							<div class="ef-filter-entity-operator" data-operator="greater_than">></div>
+							<div class="ef-filter-entity-operator" data-operator="greater_than_or_equal">>=</div>
+							<div class="ef-filter-entity-operator" data-operator="contains">包含</div>
+							<div class="ef-filter-entity-operator" data-operator="not_contains">不包含</div>
+							<div class="ef-filter-entity-operator" data-operator="begins_with">begins with</div>
+							<div class="ef-filter-entity-operator" data-operator="begins_without">begins without</div>
+							<div class="ef-filter-entity-operator" data-operator="ends_with">ends with</div>
+							<div class="ef-filter-entity-operator" data-operator="ends_without">ends without</div>
+							<div class="ef-filter-entity-operator" data-operator="is_null">是空的</div>
+							<div class="ef-filter-entity-operator" data-operator="is_not_null">不是空的</div>
+							<div class="ef-filter-entity-operator" data-operator="between">介于</div>
+							<div class="ef-filter-entity-operator" data-operator="not_between">不介于</div>
+					  </div>
+				</div>
+				<div class="ef-col-12 ef-filter-condition-editor" contenteditable="true">
+					<div class="ef-filter-editor-wrapper">
+						<div class="ef-filter-editor-logic-div">
+							<span class="ef-filter-editor-field yellow" entity-id="240e3bc7-55fb-4524-8bfa-fe5988e8e438" id="departmentxxx" type="field" field-type="department">部门</span>
+							<span class="ef-filter-editor-operator" type="operator" operator-name="equal">=</span>
+							<span class="ef-filter-editor-value" type="value" value-field-type="department" value="idxxxxx001">人力资源部</span>
+							<span class="add-button" contenteditable="false">+</span>
+							<span class="delete-button" contenteditable="false">×</span>
+						</div>
+						<div class="ef-filter-editor-logic-div">
+							<span class="ef-filter-editor-logic" contenteditable="false">AND</span>
+							<span class="add-button" contenteditable="false">+</span>
+							<span class="delete-button" contenteditable="false">×</span>
+							<span class="transition-button" contenteditable="false"><i class="fa-solid fa-shuffle"></i></span>
+						</div>
+						<div class="ef-filter-editor-logic-div">
+							<span class="ef-filter-editor-field yellow">年龄</span>
+							<span class="ef-filter-editor-operator">>=</span>
+							<span class="ef-filter-editor-value">35</span>
+							<span class="add-button" contenteditable="false">+</span>
+							<span class="delete-button" contenteditable="false">×</span>
+						</div>
+						<div class="ef-filter-editor-logic-div">
+							<span class="ef-filter-editor-logic">OR</span>
+							<span class="add-button" contenteditable="false">+</span>
+							<span class="delete-button" contenteditable="false">×</span>
+							<span class="transition-button" contenteditable="false"><i class="fa-solid fa-shuffle"></i></span>
+						</div>
+						<div class="ef-filter-editor-logic-div">
+							<span class="ef-filter-editor-field yellow">入职时间</span>
+							<span class="ef-filter-editor-operator">在</span>
+							<span class="ef-filter-editor-value">2020-01-01</span>
+							<span class="ef-filter-editor-operator">和</span>
+							<span class="ef-filter-editor-value">2024-01-01</span>
+							<span class="ef-filter-editor-operator">之间</span>
+							<span class="add-button" contenteditable="false">+</span>
+							<span class="delete-button" contenteditable="false">×</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% endmacro %}
+
+	{% set modalContent = _self.filterBodyContent() %}
+	{% set modalFooter = '<button class="btn secondary small" type="button" onclick="closeModal()">取消</button>
+                      <button class="btn primary small" type="button" onclick="submitModal()">确定</button>' %}
+	{% set modalOptions = {
+    zIndex: 2000,
+    wrapperClass: 'filter-modal-wrapper',
+		width: '1000px',
+    onClose: 'closeModal()'
+  } %}
+
+	{{ ui.modal(
+    modalId,
+    '示例模态框标题',
+    modalContent,
+    modalFooter,
+    modalOptions
+) }}
+{% endblock %}
