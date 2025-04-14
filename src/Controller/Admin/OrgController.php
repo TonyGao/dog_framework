@@ -167,7 +167,7 @@ class OrgController extends BaseController
       },
       'childOpen' => '<li>',
       'childClose' => '</li>',
-      'nodeDecorator' => static function (array $node) use (&$controller): ?string {
+      'nodeDecorator' => static function (array $node) use (&$controller) {
         if ($node['type'] === 'corperations') {
           return '
           <div class="item-content scroll-item">
@@ -228,17 +228,17 @@ class OrgController extends BaseController
     ]);
   }
 
-  private function buildDepartmentPath(array $node, array $repo): string
-  {
-    // 递归构建路径，如果有父节点则加上父节点的路径
-    if (!empty($node['parent'])) {
-      $parentNode = $repo->find($node['parent']['id']);
-      return $this->buildDepartmentPath($parentNode, $repo) . '/' . $node['name'];
-    }
+  // private function buildDepartmentPath(array $node, array $repo): string
+  // {
+  //   // 递归构建路径，如果有父节点则加上父节点的路径
+  //   if (!empty($node['parent'])) {
+  //     $parentNode = $repo->find($node['parent']['id']);
+  //     return $this->buildDepartmentPath($parentNode, $repo) . '/' . $node['name'];
+  //   }
 
-    // 如果没有父节点，则返回当前节点名称
-    return $node['name'];
-  }
+  //   // 如果没有父节点，则返回当前节点名称
+  //   return $node['name'];
+  // }
 
   /**
    * 组织架构-部门选择器（单部门选择）
@@ -270,7 +270,7 @@ class OrgController extends BaseController
       },
       'childOpen' => '<li>',
       'childClose' => '</li>',
-      'nodeDecorator' => static function (array $node) use (&$controller, $departmentInputId): ?string {
+      'nodeDecorator' => static function (array $node) use (&$controller, $departmentInputId) {
         if ($node['type'] === 'corperations') {
           return '
           <div class="item-content scroll-item">
@@ -430,11 +430,11 @@ class OrgController extends BaseController
     ]);
   }
 
-    /**
+  /**
    * 用来返回部门弹窗的html
    */
   #[Route('/admin/org/department/modal', name: 'api_org_department_modal', methods: ['POST'])]
-  public function departmentModal(Request $request, EntityManagerInterface $em): Response
+  public function departmentModal(Request $request, EntityManagerInterface $em)
   {
     $payload = $request->toArray();
     $type = $payload['departmentType'];

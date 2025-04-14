@@ -100,10 +100,11 @@ $(document).ready(function () {
     // 点击搜索按钮
     $("body").on("click", ".ef-table .search", function () {
         const id = $(this).attr("parentid");
-        $('#modal' + id).show();
+        const $modal = $('#modal' + id);
+        $modal.show();
         
         // 检查过滤器编辑器是否为空，如果为空则初始化
-        const $filterEditor = $('#modal' + id).find('.ef-filter-condition-editor');
+        const $filterEditor = $modal.find('.ef-filter-condition-editor');
         if ($filterEditor.find('.ef-filter-editor-logic-div').length === 0 && 
             $filterEditor.find('.ef-filter-empty-state').length === 0) {
             initEmptyFilterEditor($filterEditor);
@@ -125,6 +126,14 @@ $(document).ready(function () {
 
         // 添加自定义class到最后一个leader-line元素
         $('.leader-line:last').addClass('modal-leader-line');
+
+        // 在模态窗口关闭时销毁LeaderLine实例
+        $modal.on('hide', function() {
+            if (line) {
+                line.remove();
+                line = null;
+            }
+        });
     });
     
     // 初始化空的过滤器编辑器

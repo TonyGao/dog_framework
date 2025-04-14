@@ -5,7 +5,11 @@
 {% endblock %}
 
 {% block body %}
-	<div style="height: 100vh; width: 100%;">
+	<div style="height: 100vh; width: 100%; padding: 20px;">
+		<!-- 控制按钮 -->
+		<div style="margin-bottom: 20px;">
+			<button class="btn primary" type="button" onclick="openModal('testModal')">打开模态窗口</button>
+		</div>
 		<div class="ef-modal-container" id="testModal" style="z-index: 1001;">
 			<div class="ef-modal-mask"></div>
 			<div class="ef-modal-wrapper ef-modal-wrapper-align-center">
