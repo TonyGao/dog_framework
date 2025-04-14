@@ -12,12 +12,16 @@ function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
       modal.style.display = 'none';
+      // 触发hide事件
+      $(modal).trigger('hide');
     }
   } else {
     // Close all modals if no ID is provided
     const modals = document.querySelectorAll('.ef-modal-container');
     modals.forEach(modal => {
       modal.style.display = 'none';
+      // 触发每个模态窗口的hide事件
+      $(modal).trigger('hide');
     });
   }
 }

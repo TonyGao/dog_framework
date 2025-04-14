@@ -16,7 +16,7 @@
   * 接口管理
 * 应用程序构建器
   * 表单设计器
-  * [菜单管理](/documents/features/Menu.md)
+  * [菜单管理](/documents/features/menu/Menu.md)
 
 ### Todo List
 
