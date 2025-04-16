@@ -1,0 +1,46 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'components/datagrid.html.twig' as grid %}
+
+{% block title %}岗位管理
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('sunui/components/datagrid.js') }}"></script>
+{% endblock %}
+
+{% block app_content_container %}
+	<div class="org-structure-container">
+		<div class="outside-wrapper">
+			{{ grid.dataGrid(
+                    tableData,
+                    columns,
+                    {
+                        createUrl: path('org_position_new'),
+                        editUrlPrefix: path('org_position_edit', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                        viewUrlPrefix: path('org_position_view', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                        deleteUrlPrefix: path('org_position_delete', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                        toolbarButtons: [
+                            { type: 'create', text: '新增岗位', icon: 'fa-solid fa-plus-circle', id: 'add-position-button' },
+                            { type: 'delete', text: '批量删除', icon: 'fa-solid fa-minus-circle', id: 'batch-delete-button' },
+                            { type: 'filter', text: '高级搜索', icon: 'fa-solid fa-filter', id: 'filter-button', classes: 'search' }
+                        ],
+                        extraButtons: [
+                            { text: '岗位级别管理', icon: 'fa-solid fa-layer-group', id: 'position-level-button', classes: 'ef-button-info', onclick: "window.location.href='" ~ path('org_position_level') ~ "'" }
+                        ],
+                        actionButtons: [
+                            { type: 'view', text: '查看', icon: 'fa-solid fa-eye', classes: 'view-button' },
+                            { type: 'edit', text: '编辑', icon: 'fa-solid fa-edit', classes: 'edit-button' },
+                            { type: 'delete', text: '删除', icon: 'fa-solid fa-trash', classes: 'delete-button' }
+                        ],
+                        emptyText: '暂无岗位数据',
+                        sortable: true
+                    }
+                ) }}
+		</div>
+	</div>
+{% endblock %}

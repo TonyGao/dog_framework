@@ -1,14 +1,14 @@
-.org-sturcture-container {
+.org-structure-container {
   overflow: auto;
   height: 100vh;
 }
 
-.org-sturcture-container ol {
+.org-structure-container ol {
   list-style: none;
   display: inline-block;
 }
 
-.org-sturcture-container.outside-wrapper {
+.org-structure-container.outside-wrapper {
   height: 100vh;
   position: inherit;
   overflow: auto;
@@ -29,7 +29,7 @@
   margin-bottom: 20px;
 }
 
-.org-sturcture-container .inside-wrapper {
+.org-structure-container .inside-wrapper {
   height: 100vh;
   display: flex;
   position: relative;

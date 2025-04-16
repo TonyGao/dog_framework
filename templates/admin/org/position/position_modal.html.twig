@@ -1,0 +1,125 @@
+<div class="ef-modal" id="position-selector-modal">
+    <div class="ef-modal-mask"></div>
+    <div class="ef-modal-wrapper">
+        <div class="ef-modal-container">
+            <div class="ef-modal-header">
+                <div class="ef-modal-title">选择岗位</div>
+                <button class="ef-modal-close" id="position-modal-close">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            <div class="ef-modal-body">
+                <div class="ef-search-box mb-3">
+                    <input type="text" class="ef-input" id="position-search-input" placeholder="搜索岗位名称">
+                    <button class="ef-button ef-button-primary" id="position-search-button">
+                        <i class="fa-solid fa-search"></i>
+                    </button>
+                </div>
+                
+                <div class="ef-table ef-table-size-medium ef-table-border ef-table-hover">
+                    <div class="ef-table-container" style="max-height: 400px; overflow-y: auto;">
+                        <table class="ef-table-element">
+                            <thead>
+                                <tr class="ef-table-tr">
+                                    <th class="ef-table-th" style="width: 60px;"></th>
+                                    <th class="ef-table-th">岗位名称</th>
+                                    <th class="ef-table-th">所属部门</th>
+                                    <th class="ef-table-th">岗位级别</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for position in positions %}
+                                    <tr class="ef-table-tr position-item" data-id="{{ position.id }}" data-name="{{ position.name }}">
+                                        <td class="ef-table-td">
+                                            <label class="ef-radio" radioId="{{ positionInputId }}">
+                                                <input type="radio" class="ef-radio-target" name="position" value="{{ position.id }}">
+                                                <span class="ef-icon-hover ef-radio-icon-hover">
+                                                    <span class="ef-radio-icon"></span>
+                                                </span>
+                                            </label>
+                                        </td>
+                                        <td class="ef-table-td">{{ position.name }}</td>
+                                        <td class="ef-table-td">{{ position.department ? position.department.name : '' }}</td>
+                                        <td class="ef-table-td">{{ position.level ? position.level.name : '' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="ef-modal-footer">
+                <button class="ef-button ef-button-default" id="position-cancel-button">取消</button>
+                <button class="ef-button ef-button-primary" id="position-confirm-button">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 关闭模态框
+    document.getElementById('position-modal-close').addEventListener('click', function() {
+        document.getElementById('position-selector-modal').remove();
+    });
+    
+    document.getElementById('position-cancel-button').addEventListener('click', function() {
+        document.getElementById('position-selector-modal').remove();
+    });
+    
+    // 搜索功能
+    document.getElementById('position-search-button').addEventListener('click', function() {
+        const searchText = document.getElementById('position-search-input').value.toLowerCase();
+        const rows = document.querySelectorAll('.position-item');
+        
+        rows.forEach(function(row) {
+            const positionName = row.getAttribute('data-name').toLowerCase();
+            if (positionName.includes(searchText)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // 搜索框回车事件
+    document.getElementById('position-search-input').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            document.getElementById('position-search-button').click();
+        }
+    });
+    
+    // 确认选择
+    document.getElementById('position-confirm-button').addEventListener('click', function() {
+        const selectedRadio = document.querySelector('input[name="position"]:checked');
+        if (!selectedRadio) {
+            alert('请选择一个岗位');
+            return;
+        }
+        
+        const positionId = selectedRadio.value;
+        const positionRow = document.querySelector(`.position-item[data-id="${positionId}"]`);
+        const positionName = positionRow.getAttribute('data-name');
+        
+        // 将选中的岗位ID和名称传递给调用者
+        if (window.positionSelectorCallback) {
+            window.positionSelectorCallback(positionId, positionName);
+        }
+        
+        // 关闭模态框
+        document.getElementById('position-selector-modal').remove();
+    });
+    
+    // 双击行选择
+    const rows = document.querySelectorAll('.position-item');
+    rows.forEach(function(row) {
+        row.addEventListener('dblclick', function() {
+            const positionId = this.getAttribute('data-id');
+            const radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+            
+            document.getElementById('position-confirm-button').click();
+        });
+    });
+});
+</script>

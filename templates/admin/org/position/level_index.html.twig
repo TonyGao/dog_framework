@@ -1,0 +1,73 @@
+{% extends "admin/base.html.twig" %}
+{% import 'components/datagrid.html.twig' as grid %}
+
+{% block title %}岗位级别管理{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('sunui/components/datagrid.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('sunui/components/datagrid.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="ef-page-header">
+        <div class="ef-page-title">
+            <h1>岗位级别管理</h1>
+        </div>
+        <div class="ef-page-breadcrumb">
+            <ol class="ef-breadcrumb">
+                <li class="ef-breadcrumb-item"><a href="{{ path('admin_dashboard') }}">首页</a></li>
+                <li class="ef-breadcrumb-item"><a href="{{ path('org_corporation') }}">组织架构</a></li>
+                <li class="ef-breadcrumb-item"><a href="{{ path('org_position') }}">岗位管理</a></li>
+                <li class="ef-breadcrumb-item active">岗位级别管理</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="ef-page-content">
+        <div class="ef-card">
+            <div class="ef-card-body">
+                {{ grid.dataGrid(
+                    tableData,
+                    columns,
+                    {
+                        createUrl: '#', {# 这里需要替换为实际的创建岗位级别的URL #}
+                        editUrlPrefix: '#', {# 这里需要替换为实际的编辑岗位级别的URL前缀 #}
+                        viewUrlPrefix: '#', {# 这里需要替换为实际的查看岗位级别的URL前缀 #}
+                        deleteUrlPrefix: '#', {# 这里需要替换为实际的删除岗位级别的URL前缀 #}
+                        toolbarButtons: [
+                            { type: 'create', text: '新增级别', icon: 'fa-solid fa-plus-circle', id: 'add-level-button' },
+                            { type: 'delete', text: '批量删除', icon: 'fa-solid fa-minus-circle', id: 'batch-delete-button' },
+                            { type: 'filter', text: '高级搜索', icon: 'fa-solid fa-filter', id: 'filter-button', classes: 'search' }
+                        ],
+                        extraButtons: [
+                            { text: '返回岗位管理', icon: 'fa-solid fa-arrow-left', id: 'back-button', classes: 'ef-button-default', onclick: "window.location.href='" ~ path('org_position') ~ "'" }
+                        ],
+                        actionButtons: [
+                            { type: 'edit', text: '编辑', icon: 'fa-solid fa-edit', classes: 'edit-button' },
+                            { type: 'delete', text: '删除', icon: 'fa-solid fa-trash', classes: 'delete-button' }
+                        ],
+                        emptyText: '暂无岗位级别数据',
+                        sortable: true
+                    }
+                ) }}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 返回岗位管理按钮点击事件
+            const backBtn = document.getElementById('back-button');
+            if (backBtn) {
+                backBtn.addEventListener('click', function() {
+                    window.location.href = '{{ path('org_position') }}';
+                });
+            }
+        });
+    </script>
+{% endblock %}

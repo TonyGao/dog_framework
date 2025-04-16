@@ -1,9 +1,9 @@
-.org-sturcture-container {
+.org-structure-container {
   overflow: auto;
   height: 100vh;
 }
 
-.org-sturcture-container ol {
+.org-structure-container ol {
   list-style: none;
   display: inline-block;
 }

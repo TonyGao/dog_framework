@@ -11,7 +11,7 @@ parameters:
         "/admin/org/department",
         "组织架构",
       ]
-    - ["岗位管理", "fa-solid fa-user-tie", "/admin/org/title", "组织架构"]
+    - ["岗位管理", "fa-solid fa-user-tie", "/admin/org/position", "组织架构"]
     - ["职级管理", "fa-solid fa-layer-group", "/admin/org/grade", "组织架构"]
     - ["人员管理", "fa-solid fa-people-group", "#", "组织架构"]
     - ["人员信息", "fa-solid fa-address-card", "/admin/hr/employee", "人员管理"]
