@@ -1,0 +1,90 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'components/breadcrumb.html.twig' as breadcrumb %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+    <div class="ef-page-header">
+        <div class="ef-page-title">
+            <h1>{{ title }}</h1>
+        </div>
+        {{ breadcrumb.breadcrumb([
+            {'label': '组织架构', 'url': path('org_corporation')},
+            {'label': '岗位管理', 'url': path('org_position')},
+            {'label': title}
+        ]) }}
+    </div>
+
+    <div class="ef-page-content">
+        <div class="ef-card">
+            <div class="ef-card-body">
+                {{ form_start(form, {'attr': {'class': 'ef-form'}}) }}
+                    <div class="ef-form-section">
+                        <div class="ef-form-section-title">基本信息</div>
+                        <div class="ef-form-row">
+                            <div class="ef-form-col">
+                                {{ form_row(form.name) }}
+                            </div>
+                            <div class="ef-form-col">
+                                {{ form_row(form.code) }}
+                            </div>
+                        </div>
+                        <div class="ef-form-row">
+                            <div class="ef-form-col">
+                                {{ form_row(form.department) }}
+                            </div>
+                            <div class="ef-form-col">
+                                {{ form_row(form.type) }}
+                            </div>
+                        </div>
+                        <div class="ef-form-row">
+                            <div class="ef-form-col">
+                                {{ form_row(form.level) }}
+                            </div>
+                            <div class="ef-form-col">
+                                {{ form_row(form.parent) }}
+                            </div>
+                        </div>
+                        <div class="ef-form-row">
+                            <div class="ef-form-col">
+                                {{ form_row(form.headcount) }}
+                            </div>
+                            <div class="ef-form-col">
+                                {{ form_row(form.sortOrder) }}
+                            </div>
+                        </div>
+                        <div class="ef-form-row">
+                            <div class="ef-form-col">
+                                {{ form_row(form.state) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ef-form-section">
+                        <div class="ef-form-section-title">详细信息</div>
+                        <div class="ef-form-row">
+                            <div class="ef-form-col">
+                                {{ form_row(form.responsibility) }}
+                            </div>
+                        </div>
+                        <div class="ef-form-row">
+                            <div class="ef-form-col">
+                                {{ form_row(form.requirement) }}
+                            </div>
+                        </div>
+                        <div class="ef-form-row">
+                            <div class="ef-form-col">
+                                {{ form_row(form.remark) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ef-form-actions">
+                        <button type="submit" class="ef-button ef-button-primary">保存</button>
+                        <a href="{{ path('org_position') }}" class="ef-button ef-button-default">取消</a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

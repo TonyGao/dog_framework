@@ -1,0 +1,71 @@
+{# 面包屑导航组件 #}
+{% macro breadcrumb(items, homeUrl = '/admin/index', homeLabel = '首页') %}
+    <div class="ef-page-breadcrumb">
+        <ol class="ef-breadcrumb">
+            <li class="ef-breadcrumb-item"><a href="{{ homeUrl }}">{{ homeLabel }}</a></li>
+            {% for item in items %}
+                {% if loop.last %}
+                    <li class="ef-breadcrumb-item active">{{ item.label }}</li>
+                {% else %}
+                    <li class="ef-breadcrumb-item">
+                        {% if item.url is defined and item.url %}
+                            <a href="{{ item.url }}">{{ item.label }}</a>
+                        {% else %}
+                            {{ item.label }}
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+    </div>
+{% endmacro %}
+
+{# 根据当前路由自动生成面包屑 #}
+{% macro autoBreadcrumb(currentRoute, currentLabel, menuRepository) %}
+    {% set breadcrumbItems = [] %}
+    {% set currentMenu = menuRepository.findOneBy({'routeName': currentRoute}) %}
+    
+    {# 如果找到当前菜单，则构建面包屑路径 #}
+    {% if currentMenu %}
+        {% set parentMenu = currentMenu.parent %}
+        {% set breadcrumbItems = [{label: currentMenu.label}] %}
+        
+        {# 递归查找所有父级菜单 #}
+        {% set keepGoing = true %}
+        {% if parentMenu and parentMenu.label != 'root' %}
+            {% set breadcrumbItems = [{
+                label: parentMenu.label,
+                url: parentMenu.uri starts with '/' ? parentMenu.uri : (parentMenu.routeName ? path(parentMenu.routeName) : '#')
+            }]|merge(breadcrumbItems) %}
+            
+            {% set parentMenu = parentMenu.parent %}
+            
+            {# 继续查找更上层的父级菜单 #}
+            {% if parentMenu and parentMenu.label != 'root' %}
+                {% set breadcrumbItems = [{
+                    label: parentMenu.label,
+                    url: parentMenu.uri starts with '/' ? parentMenu.uri : (parentMenu.routeName ? path(parentMenu.routeName) : '#')
+                }]|merge(breadcrumbItems) %}
+                
+                {% set parentMenu = parentMenu.parent %}
+                
+                {# 继续查找更上层的父级菜单 #}
+                {% if parentMenu and parentMenu.label != 'root' %}
+                    {% set breadcrumbItems = [{
+                        label: parentMenu.label,
+                        url: parentMenu.uri starts with '/' ? parentMenu.uri : (parentMenu.routeName ? path(parentMenu.routeName) : '#')
+                    }]|merge(breadcrumbItems) %}
+                    
+                    {% set parentMenu = parentMenu.parent %}
+                    
+                    {# 如果还有更多层级，可以继续添加类似的代码块 #}
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    {% else %}
+        {# 如果没有找到菜单项，则只显示当前页面标题 #}
+        {% set breadcrumbItems = [{label: currentLabel}] %}
+    {% endif %}
+    
+    {{ _self.breadcrumb(breadcrumbItems) }}
+{% endmacro %}

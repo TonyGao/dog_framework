@@ -8,8 +8,11 @@ use App\Entity\Organization\Company;
 use App\Form\Organization\CompanyType;
 use App\Entity\Organization\Department;
 use App\Entity\Organization\Corporation;
+use App\Entity\Organization\Position;
+use App\Entity\Organization\PositionLevel;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Form\Organization\OrgDepartmentType;
+use App\Form\Organization\PositionType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\Organization\CorporationFormType;
 use Symfony\Component\HttpFoundation\Response;
@@ -196,7 +199,7 @@ class OrgController extends BaseController
               <i class="fa-solid fa-building-user"></i>
 						</div>
 						<div class="org-name">
-							<div class="org-text-content company" type="company" id="'.$node['id'].'">' .
+							<div class="org-text-content company" type="company" id="' . $node['id'] . '">' .
             $node['name']
             . '</div>
 						</div>
@@ -214,7 +217,7 @@ class OrgController extends BaseController
               <i class="fa-solid fa-user-group"></i>
 						</div>
 						<div class="org-name">
-							<div class="org-text-content department" type="department" path="'. $node['path'] .'" id="'. $node['id'] .'">' .
+							<div class="org-text-content department" type="department" path="' . $node['path'] . '" id="' . $node['id'] . '">' .
             $node['name']
             . '</div>
 						</div>
@@ -323,7 +326,7 @@ class OrgController extends BaseController
                 <i class="fa-solid fa-user-group"></i>
               </div>
               <div class="org-name">
-                <div class="org-text-content department" type="department" path="'. $node['path'] .'" id="'. $node['id'] .'">' .
+                <div class="org-text-content department" type="department" path="' . $node['path'] . '" id="' . $node['id'] . '">' .
             $node['name']
             . '</div>
               </div>
@@ -384,7 +387,7 @@ class OrgController extends BaseController
 
       // 如果有上级部门，添加上级部门的路径
       if ($departmentPost->getParent()) {
-          $pathComponents[] = $departmentPost->getParent()->getPath();
+        $pathComponents[] = $departmentPost->getParent()->getPath();
       }
 
       // 添加当前部门的名称
@@ -427,6 +430,252 @@ class OrgController extends BaseController
 
     return $this->render('admin/platform/form_render.html.twig', [
       'form' => $form->createView(),
+    ]);
+  }
+
+
+
+
+
+  /**
+   * 岗位管理列表页
+   */
+  #[Route('/admin/org/position', name: 'org_position')]
+  public function positionList(Request $request, EntityManagerInterface $em): Response
+  {
+    $positions = $em->getRepository(Position::class)->findAll();
+    $positionLevels = $em->getRepository(PositionLevel::class)->findAll();
+
+    // 准备表格数据
+    $tableData = [];
+    foreach ($positions as $position) {
+      $tableData[] = [
+        'id' => $position->getId(),
+        'name' => $position->getName(),
+        'code' => $position->getCode(),
+        'department' => $position->getDepartment() ? $position->getDepartment()->getName() : '',
+        'level' => $position->getLevel() ? $position->getLevel()->getName() : '',
+        'parent' => $position->getParent() ? $position->getParent()->getName() : '',
+        'headcount' => $position->getHeadcount(),
+        'state' => $position->getState() ? '启用' : '停用',
+      ];
+    }
+
+    // 定义表格列配置
+    $columns = [
+      ['field' => 'name', 'label' => '岗位名称'],
+      ['field' => 'code', 'label' => '岗位编码'],
+      ['field' => 'department', 'label' => '所属部门'],
+      ['field' => 'level', 'label' => '岗位级别'],
+      ['field' => 'parent', 'label' => '上级岗位'],
+      ['field' => 'headcount', 'label' => '编制人数'],
+      ['field' => 'state', 'label' => '状态'],
+    ];
+
+    return $this->render('admin/org/position/index.html.twig', [
+      'tableData' => $tableData,
+      'columns' => $columns,
+      'positionLevels' => $positionLevels
+    ]);
+  }
+
+  /**
+   * 新建岗位
+   */
+  #[Route('/admin/org/position/new', name: 'org_position_new')]
+  public function createPosition(Request $request, EntityManagerInterface $em): Response
+  {
+    $position = new Position();
+
+    // 从请求中获取部门ID参数
+    $departmentId = $request->query->get('department');
+    if ($departmentId) {
+      $department = $em->getRepository(Department::class)->find($departmentId);
+      if ($department) {
+        $position->setDepartment($department);
+      }
+    }
+
+    // 从请求中获取上级岗位ID参数
+    $parentId = $request->query->get('parent');
+    if ($parentId) {
+      $parent = $em->getRepository(Position::class)->find($parentId);
+      if ($parent) {
+        $position->setParent($parent);
+        // 如果有上级岗位，默认使用上级岗位的部门
+        if (!$position->getDepartment() && $parent->getDepartment()) {
+          $position->setDepartment($parent->getDepartment());
+        }
+      }
+    }
+
+    $form = $this->createForm(PositionType::class, $position, [
+      'action' => $this->generateUrl('org_position_new')
+    ]);
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+      $position = $form->getData();
+      $em->persist($position);
+      $em->flush();
+
+      $this->addFlash('success', '岗位创建成功');
+      return $this->redirectToRoute('org_position');
+    }
+
+    return $this->render('admin/org/position/form.html.twig', [
+      'form' => $form->createView(),
+      'title' => '新建岗位'
+    ]);
+  }
+
+  /**
+   * 编辑岗位
+   */
+  #[Route('/admin/org/position/edit/{id}', name: 'org_position_edit')]
+  public function editPosition(Request $request, EntityManagerInterface $em, string $id): Response
+  {
+    $position = $em->getRepository(Position::class)->find($id);
+
+    if (!$position) {
+      throw $this->createNotFoundException('岗位不存在');
+    }
+
+    $form = $this->createForm(PositionType::class, $position, [
+      'action' => $this->generateUrl('org_position_edit', ['id' => $id])
+    ]);
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+      $position = $form->getData();
+      $em->persist($position);
+      $em->flush();
+
+      $this->addFlash('success', '岗位更新成功');
+      return $this->redirectToRoute('org_position');
+    }
+
+    return $this->render('admin/org/position/form.html.twig', [
+      'form' => $form->createView(),
+      'title' => '编辑岗位',
+      'position' => $position
+    ]);
+  }
+
+  /**
+   * 删除岗位
+   */
+  #[Route('/admin/org/position/delete/{id}', name: 'org_position_delete', methods: ['POST'])]
+  public function deletePosition(Request $request, EntityManagerInterface $em, string $id): Response
+  {
+    $position = $em->getRepository(Position::class)->find($id);
+
+    if (!$position) {
+      throw $this->createNotFoundException('岗位不存在');
+    }
+
+    // 检查是否有下级岗位
+    $hasChildren = $em->getRepository(Position::class)->findBy(['parent' => $position]);
+    if (count($hasChildren) > 0) {
+      $this->addFlash('error', '该岗位存在下级岗位，无法删除');
+      return $this->redirectToRoute('org_position');
+    }
+
+    // 检查是否有员工关联
+    $hasEmployees = $em->getRepository('App\Entity\Organization\Employee')->findBy(['position' => $position]);
+    if (count($hasEmployees) > 0) {
+      $this->addFlash('error', '该岗位已有员工关联，无法删除');
+      return $this->redirectToRoute('org_position');
+    }
+
+    $em->remove($position);
+    $em->flush();
+
+    $this->addFlash('success', '岗位删除成功');
+    return $this->redirectToRoute('org_position');
+  }
+
+  /**
+   * 岗位详情
+   */
+  #[Route('/admin/org/position/view/{id}', name: 'org_position_view')]
+  public function viewPosition(Request $request, EntityManagerInterface $em, string $id): Response
+  {
+    $position = $em->getRepository(Position::class)->find($id);
+
+    if (!$position) {
+      throw $this->createNotFoundException('岗位不存在');
+    }
+
+    // 获取该岗位下的员工
+    $employees = $em->getRepository('App\Entity\Organization\Employee')->findBy(['position' => $position]);
+
+    return $this->render('admin/org/position/view.html.twig', [
+      'position' => $position,
+      'employees' => $employees
+    ]);
+  }
+
+  /**
+   * 岗位级别管理
+   */
+  #[Route('/admin/org/position/level', name: 'org_position_level')]
+  public function positionLevelList(Request $request, EntityManagerInterface $em): Response
+  {
+    $positionLevels = $em->getRepository(PositionLevel::class)->findBy([], ['levelOrder' => 'ASC']);
+
+    // 准备表格数据
+    $tableData = [];
+    foreach ($positionLevels as $level) {
+      $tableData[] = [
+        'id' => $level->getId(),
+        'name' => $level->getName(),
+        'code' => $level->getCode(),
+        'levelOrder' => $level->getLevelOrder(),
+        'salaryRange' => ($level->getSalaryMin() ? $level->getSalaryMin() : '0') . ' - ' . ($level->getSalaryMax() ? $level->getSalaryMax() : '0'),
+        'state' => $level->getState() ? '启用' : '停用',
+      ];
+    }
+
+    // 定义表格列配置
+    $columns = [
+      ['field' => 'name', 'label' => '级别名称'],
+      ['field' => 'code', 'label' => '级别编码'],
+      ['field' => 'levelOrder', 'label' => '级别序号'],
+      ['field' => 'salaryRange', 'label' => '薪资范围'],
+      ['field' => 'state', 'label' => '状态'],
+    ];
+
+    return $this->render('admin/org/position/level_index.html.twig', [
+      'tableData' => $tableData,
+      'columns' => $columns
+    ]);
+  }
+
+  /**
+   * 用来返回岗位选择器弹窗的html
+   */
+  #[Route('/admin/org/position/modal', name: 'api_org_position_modal', methods: ['POST'])]
+  public function positionModal(Request $request, EntityManagerInterface $em)
+  {
+    $payload = $request->toArray();
+    $type = $payload['positionType'] ?? 'single';
+    $positionInputId = $payload['positionInputId'] ?? Uuid::v1();
+
+    $positions = $em->getRepository(Position::class)->findBy(['state' => true]);
+
+    if ($type == 'single') {
+      return $this->render('admin/org/position/position_modal.html.twig', [
+        'positionInputId' => $positionInputId,
+        'positions' => $positions
+      ]);
+    }
+
+    return $this->render('admin/org/position/position_multi_modal.html.twig', [
+      'positionInputId' => $positionInputId,
+      'positions' => $positions
     ]);
   }
 

@@ -1,0 +1,209 @@
+<div class="ef-modal" id="position-multi-selector-modal">
+    <div class="ef-modal-mask"></div>
+    <div class="ef-modal-wrapper">
+        <div class="ef-modal-container">
+            <div class="ef-modal-header">
+                <div class="ef-modal-title">选择岗位</div>
+                <button class="ef-modal-close" id="position-multi-modal-close">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+            <div class="ef-modal-body">
+                <div class="ef-search-box mb-3">
+                    <input type="text" class="ef-input" id="position-multi-search-input" placeholder="搜索岗位名称">
+                    <button class="ef-button ef-button-primary" id="position-multi-search-button">
+                        <i class="fa-solid fa-search"></i>
+                    </button>
+                </div>
+                
+                <div class="ef-table ef-table-size-medium ef-table-border ef-table-hover">
+                    <div class="ef-table-container" style="max-height: 400px; overflow-y: auto;">
+                        <table class="ef-table-element">
+                            <thead>
+                                <tr class="ef-table-tr">
+                                    <th class="ef-table-th" style="width: 60px;">
+                                        <label class="ef-checkbox" checkboxId="check-all-positions">
+                                            <input type="checkbox" class="ef-checkbox-target" id="check-all-positions">
+                                            <span class="ef-icon-hover ef-checkbox-icon-hover">
+                                                <span class="ef-checkbox-icon"></span>
+                                            </span>
+                                        </label>
+                                    </th>
+                                    <th class="ef-table-th">岗位名称</th>
+                                    <th class="ef-table-th">所属部门</th>
+                                    <th class="ef-table-th">岗位级别</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for position in positions %}
+                                    <tr class="ef-table-tr position-multi-item" data-id="{{ position.id }}" data-name="{{ position.name }}">
+                                        <td class="ef-table-td">
+                                            <label class="ef-checkbox" checkboxId="position-{{ position.id }}">
+                                                <input type="checkbox" class="ef-checkbox-target position-checkbox" id="position-{{ position.id }}" value="{{ position.id }}">
+                                                <span class="ef-icon-hover ef-checkbox-icon-hover">
+                                                    <span class="ef-checkbox-icon"></span>
+                                                </span>
+                                            </label>
+                                        </td>
+                                        <td class="ef-table-td">{{ position.name }}</td>
+                                        <td class="ef-table-td">{{ position.department ? position.department.name : '' }}</td>
+                                        <td class="ef-table-td">{{ position.level ? position.level.name : '' }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="ef-selected-items mt-3">
+                    <div class="ef-selected-title">已选岗位：<span id="selected-count">0</span>个</div>
+                    <div class="ef-selected-list" id="selected-positions-list"></div>
+                </div>
+            </div>
+            <div class="ef-modal-footer">
+                <button class="ef-button ef-button-default" id="position-multi-cancel-button">取消</button>
+                <button class="ef-button ef-button-primary" id="position-multi-confirm-button">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 关闭模态框
+    document.getElementById('position-multi-modal-close').addEventListener('click', function() {
+        document.getElementById('position-multi-selector-modal').remove();
+    });
+    
+    document.getElementById('position-multi-cancel-button').addEventListener('click', function() {
+        document.getElementById('position-multi-selector-modal').remove();
+    });
+    
+    // 搜索功能
+    document.getElementById('position-multi-search-button').addEventListener('click', function() {
+        const searchText = document.getElementById('position-multi-search-input').value.toLowerCase();
+        const rows = document.querySelectorAll('.position-multi-item');
+        
+        rows.forEach(function(row) {
+            const positionName = row.getAttribute('data-name').toLowerCase();
+            if (positionName.includes(searchText)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // 搜索框回车事件
+    document.getElementById('position-multi-search-input').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            document.getElementById('position-multi-search-button').click();
+        }
+    });
+    
+    // 全选/取消全选
+    document.getElementById('check-all-positions').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.position-checkbox');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = this.checked;
+        }, this);
+        updateSelectedPositions();
+    });
+    
+    // 单个复选框变化时更新已选列表
+    const checkboxes = document.querySelectorAll('.position-checkbox');
+    checkboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            updateSelectedPositions();
+        });
+    });
+    
+    // 更新已选岗位列表
+    function updateSelectedPositions() {
+        const selectedPositions = [];
+        const checkboxes = document.querySelectorAll('.position-checkbox:checked');
+        const selectedList = document.getElementById('selected-positions-list');
+        const selectedCount = document.getElementById('selected-count');
+        
+        selectedList.innerHTML = '';
+        
+        checkboxes.forEach(function(checkbox) {
+            const positionId = checkbox.value;
+            const row = document.querySelector(`.position-multi-item[data-id="${positionId}"]`);
+            const positionName = row.getAttribute('data-name');
+            
+            selectedPositions.push({
+                id: positionId,
+                name: positionName
+            });
+            
+            const tag = document.createElement('div');
+            tag.className = 'ef-tag';
+            tag.innerHTML = `
+                ${positionName}
+                <button class="ef-tag-close" data-id="${positionId}">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            `;
+            selectedList.appendChild(tag);
+        });
+        
+        selectedCount.textContent = selectedPositions.length;
+        
+        // 为标签关闭按钮添加事件
+        const closeBtns = document.querySelectorAll('.ef-tag-close');
+        closeBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const positionId = this.getAttribute('data-id');
+                const checkbox = document.getElementById(`position-${positionId}`);
+                checkbox.checked = false;
+                updateSelectedPositions();
+            });
+        });
+    }
+    
+    // 确认选择
+    document.getElementById('position-multi-confirm-button').addEventListener('click', function() {
+        const selectedCheckboxes = document.querySelectorAll('.position-checkbox:checked');
+        if (selectedCheckboxes.length === 0) {
+            alert('请至少选择一个岗位');
+            return;
+        }
+        
+        const selectedPositions = [];
+        selectedCheckboxes.forEach(function(checkbox) {
+            const positionId = checkbox.value;
+            const row = document.querySelector(`.position-multi-item[data-id="${positionId}"]`);
+            const positionName = row.getAttribute('data-name');
+            
+            selectedPositions.push({
+                id: positionId,
+                name: positionName
+            });
+        });
+        
+        // 将选中的岗位传递给调用者
+        if (window.positionMultiSelectorCallback) {
+            window.positionMultiSelectorCallback(selectedPositions);
+        }
+        
+        // 关闭模态框
+        document.getElementById('position-multi-selector-modal').remove();
+    });
+    
+    // 行点击事件
+    const rows = document.querySelectorAll('.position-multi-item');
+    rows.forEach(function(row) {
+        row.addEventListener('click', function(event) {
+            // 如果点击的是复选框，不做处理
+            if (event.target.type === 'checkbox' || event.target.closest('.ef-checkbox')) {
+                return;
+            }
+            
+            const checkbox = this.querySelector('.position-checkbox');
+            checkbox.checked = !checkbox.checked;
+            updateSelectedPositions();
+        });
+    });
+});
+</script>

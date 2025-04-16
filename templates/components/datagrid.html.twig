@@ -1,0 +1,324 @@
+{# 通用数据表格组件 #}
+{% macro dataGrid(tableData, columns, options = {}) %}
+    {% set uniqueId = random() %}
+    {% set gridId = options.gridId ?? ('grid-' ~ uniqueId) %}
+    {% set checkAllId = 'check-all-' ~ uniqueId %}
+    {% set modalId = 'modal' ~ gridId %}
+    {% set toolbarButtons = options.toolbarButtons ?? [
+        { type: 'create', text: '新增', icon: 'fa-solid fa-plus-circle', id: 'add-button-' ~ uniqueId },
+        { type: 'delete', text: '删除', icon: 'fa-solid fa-minus-circle', id: 'delete-button-' ~ uniqueId },
+        { type: 'edit', text: '编辑', icon: 'fa-solid fa-edit', id: 'edit-button-' ~ uniqueId },
+        { type: 'update', text: '修改', icon: 'fa-solid fa-pencil-alt', id: 'update-button' ~ uniqueId },
+        { type: 'filter', text: '搜索', icon: 'fa-solid fa-filter', id: 'filter-button-' ~ uniqueId, classes: 'search' }
+    ] %}
+    {% set showCheckbox = options.showCheckbox ?? true %}
+    {% set showRowNumber = options.showRowNumber ?? true %}
+    {% set pagination = options.pagination ?? true %}
+    {% set pageSize = options.pageSize ?? 10 %}
+    {% set currentPage = options.currentPage ?? 1 %}
+    {% set totalItems = tableData|length %}
+    {% set totalPages = (totalItems / pageSize)|round(0, 'ceil') %}
+    {% set sortable = options.sortable ?? true %}
+    {% set actionColumn = options.actionColumn ?? true %}
+    {% set actionButtons = options.actionButtons ?? [
+        { type: 'view', text: '查看', icon: 'fa-solid fa-eye', classes: 'view-button' },
+        { type: 'edit', text: '编辑', icon: 'fa-solid fa-edit', classes: 'edit-button' },
+        { type: 'delete', text: '删除', icon: 'fa-solid fa-trash', classes: 'delete-button' }
+    ] %}
+    {% set emptyText = options.emptyText ?? '暂无数据' %}
+    {% set createUrl = options.createUrl ?? '#' %}
+    {% set editUrlPrefix = options.editUrlPrefix ?? '#' %}
+    {% set viewUrlPrefix = options.viewUrlPrefix ?? '#' %}
+    {% set deleteUrlPrefix = options.deleteUrlPrefix ?? '#' %}
+
+    <div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id="{{gridId}}">
+        {# 工具栏 #}
+        {% import 'ui/template/ui.html.twig' as ui %}
+        {{ ui.toolBar(toolbarButtons, { 'parentId': gridId }) }}
+
+        {# 表格内容 #}
+        <div class="ef-spin">
+            <div class="ef-table-container">
+                <div class="ef-scrollbar ef-scrollbar-type-embed" style="height: 100%;">
+                    <div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x">
+                        <table class="ef-table-element" cellpadding="0" cellspacing="0">
+                            <colgroup>
+                                {% if showRowNumber %}<col width="50">{% endif %}
+                                {% if showCheckbox %}<col width="50">{% endif %}
+                                {% for column in columns %}
+                                    <col {% if column.width is defined %}width="{{ column.width }}"{% endif %}>
+                                {% endfor %}
+                                {% if actionColumn %}<col width="150">{% endif %}
+                            </colgroup>
+                            <thead>
+                                <tr class="ef-table-tr">
+                                    {% if showRowNumber %}
+                                    <th class="ef-table-th">
+                                        <span class="ef-table-cell ef-table-cell-align-center">#</span>
+                                    </th>
+                                    {% endif %}
+                                    
+                                    {% if showCheckbox %}
+                                    <th class="ef-table-th">
+                                        <span class="ef-table-cell ef-table-cell-align-center">
+                                            <label class="ef-checkbox check-all" checkboxId="{{ checkAllId }}">
+                                                <input type="checkbox" class="ef-checkbox-target" id="{{ checkAllId }}" value="0">
+                                                <span class="ef-icon-hover ef-checkbox-icon-hover">
+                                                    <span class="ef-checkbox-icon"></span>
+                                                </span>
+                                            </label>
+                                        </span>
+                                    </th>
+                                    {% endif %}
+                                    
+                                    {% for column in columns %}
+                                    <th class="ef-table-th">
+                                        <span class="ef-table-cell ef-table-cell-align-center {% if options.sortable is defined and options.sortable and column.sortable is defined and column.sortable != false %}ef-table-cell-with-sorter{% endif %}">
+                                            <span class="ef-table-th-title">{{ column.label }}</span>
+                                            {% if options.sortable is defined and options.sortable and column.sortable is defined and column.sortable != false %}
+                                            <span class="ef-table-th-sort">
+                                                <div class="ef-table-th-sort-icon">
+                                                    <i class="fa-solid fa-sort"></i>
+                                                </div>
+                                            </span>
+                                            {% endif %}
+                                        </span>
+                                    </th>
+                                    {% endfor %}
+                                    
+                                    {% if actionColumn %}
+                                    <th class="ef-table-th">
+                                        <span class="ef-table-cell ef-table-cell-align-center">操作</span>
+                                    </th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if tableData|length > 0 %}
+                                    {% for row in tableData %}
+                                    <tr class="ef-table-tr" data-id="{{ row.id }}">
+                                        {% if showRowNumber %}
+                                        <td class="ef-table-td">
+                                            <span class="ef-table-cell ef-table-cell-align-center">
+                                                <span class="ef-table-td-content">{{ loop.index }}</span>
+                                            </span>
+                                        </td>
+                                        {% endif %}
+                                        
+                                        {% if showCheckbox %}
+                                        <td class="ef-table-td">
+                                            <span class="ef-table-cell ef-table-cell-align-center">
+                                                <label class="ef-checkbox" checkboxId="checkbox-{{ row.id }}">
+                                                    <input type="checkbox" class="ef-checkbox-target" id="checkbox-{{ row.id }}" value="0" data-id="{{ row.id }}">
+                                                    <span class="ef-icon-hover ef-checkbox-icon-hover">
+                                                        <span class="ef-checkbox-icon"></span>
+                                                    </span>
+                                                </label>
+                                            </span>
+                                        </td>
+                                        {% endif %}
+                                        
+                                        {% for column in columns %}
+                                        <td class="ef-table-td">
+                                            <span class="ef-table-cell ef-table-cell-align-left">
+                                                <span class="ef-table-td-content">
+                                                    {% if column.render is defined %}
+                                                        {{ column.render(row[column.field], row)|raw }}
+                                                    {% else %}
+                                                        {{ row[column.field] }}
+                                                    {% endif %}
+                                                </span>
+                                            </span>
+                                        </td>
+                                        {% endfor %}
+                                        
+                                        {% if actionColumn %}
+                                        <td class="ef-table-td">
+                                            <span class="ef-table-cell ef-table-cell-align-center">
+                                                <div class="ef-table-action-buttons">
+                                                    {% for button in actionButtons %}
+                                                        {% if button.type == 'view' %}
+                                                            <a href="{{ viewUrlPrefix }}/{{ row.id }}" class="ef-button ef-button-text {{ button.classes }}">
+                                                                <i class="{{ button.icon }}"></i> {{ button.text }}
+                                                            </a>
+                                                        {% elseif button.type == 'edit' %}
+                                                            <a href="{{ editUrlPrefix }}/{{ row.id }}" class="ef-button ef-button-text {{ button.classes }}">
+                                                                <i class="{{ button.icon }}"></i> {{ button.text }}
+                                                            </a>
+                                                        {% elseif button.type == 'delete' %}
+                                                            <button class="ef-button ef-button-text {{ button.classes }}" data-id="{{ row.id }}" data-url="{{ deleteUrlPrefix }}/{{ row.id }}">
+                                                                <i class="{{ button.icon }}"></i> {{ button.text }}
+                                                            </button>
+                                                        {% else %}
+                                                            <button class="ef-button ef-button-text {{ button.classes }}" data-id="{{ row.id }}">
+                                                                <i class="{{ button.icon }}"></i> {{ button.text }}
+                                                            </button>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </span>
+                                        </td>
+                                        {% endif %}
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr class="ef-table-tr">
+                                        <td class="ef-table-td" colspan="{{ (showRowNumber ? 1 : 0) + (showCheckbox ? 1 : 0) + columns|length + (actionColumn ? 1 : 0) }}">
+                                            <div class="ef-table-empty">{{ emptyText }}</div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# 分页 #}
+        {% if pagination and tableData|length > 0 %}
+        <div class="ef-pagination-bar">
+            <div class="ef-pagination-left">
+                <select class="ef-page-size">
+                    <option value="10" {% if pageSize == 10 %}selected{% endif %}>10条/页</option>
+                    <option value="20" {% if pageSize == 20 %}selected{% endif %}>20条/页</option>
+                    <option value="50" {% if pageSize == 50 %}selected{% endif %}>50条/页</option>
+                    <option value="100" {% if pageSize == 100 %}selected{% endif %}>100条/页</option>
+                </select>
+                <span class="separator">|</span>
+                <button class="first-page" {% if currentPage == 1 %}disabled{% endif %}>
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button class="prev-page" {% if currentPage == 1 %}disabled{% endif %}>
+                    <i class="fa-solid fa-angle-left"></i>
+                </button>
+                <span>第</span>
+                <input type="number" class="current-page" value="{{ currentPage }}" min="1" max="{{ totalPages }}">
+                <span>页，共 <span class="total-pages">{{ totalPages }}</span> 页</span>
+                <button class="next-page" {% if currentPage == totalPages %}disabled{% endif %}>
+                    <i class="fa-solid fa-angle-right"></i>
+                </button>
+                <button class="last-page" {% if currentPage == totalPages %}disabled{% endif %}>
+                    <i class="fa-solid fa-angles-right"></i>
+                </button>
+            </div>
+            <div class="ef-pagination-right">
+                <span class="total-items">共 {{ totalItems }} 条</span>
+                <span class="item-range">
+                    {{ ((currentPage - 1) * pageSize + 1) }} - {{ min(currentPage * pageSize, totalItems) }}
+                </span>
+                <button class="refresh">
+                    <i class="fa-solid fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {# 搜索弹窗 #}
+    <div class="ef-modal" id="{{ modalId }}" style="display: none;">
+        <div class="ef-modal-mask"></div>
+        <div class="ef-modal-wrapper">
+            <div class="ef-modal-container">
+                <div class="ef-modal-header">
+                    <div class="ef-modal-title">高级搜索</div>
+                    <button class="ef-modal-close" onclick="document.getElementById('{{ modalId }}').style.display='none'">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <div class="ef-modal-body">
+                    <div class="ef-filter">
+                        <div class="ef-filter-entity">
+                            <div class="ef-filter-entity-title">可用字段</div>
+                            <div class="ef-filter-entity-column">
+                                {% for column in columns %}
+                                <div class="ef-filter-entity-field" data-field="{{ column.field }}">{{ column.label }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="ef-filter-condition-editor" contenteditable="true">
+                            <div class="ef-filter-editor-wrapper"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ef-modal-footer">
+                    <button class="ef-button ef-button-default" onclick="document.getElementById('{{ modalId }}').style.display='none'">取消</button>
+                    <button class="ef-button ef-button-primary">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# 删除确认弹窗 #}
+    <div class="ef-modal" id="delete-confirm-modal-{{ gridId }}" style="display: none;">
+        <div class="ef-modal-mask"></div>
+        <div class="ef-modal-wrapper">
+            <div class="ef-modal-container">
+                <div class="ef-modal-header">
+                    <div class="ef-modal-title">确认删除</div>
+                    <button class="ef-modal-close" onclick="document.getElementById('delete-confirm-modal-{{ gridId }}').style.display='none'">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <div class="ef-modal-body">
+                    <p>确定要删除选中的记录吗？此操作不可恢复。</p>
+                </div>
+                <div class="ef-modal-footer">
+                    <button class="ef-button ef-button-default" onclick="document.getElementById('delete-confirm-modal-{{ gridId }}').style.display='none'">取消</button>
+                    <button class="ef-button ef-button-danger confirm-delete-btn" data-grid-id="{{ gridId }}">确定删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 删除按钮点击事件
+        const deleteButtons = document.querySelectorAll('#{{ gridId }} .delete-button');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const id = this.getAttribute('data-id');
+                const url = this.getAttribute('data-url');
+                const modal = document.getElementById('delete-confirm-modal-{{ gridId }}');
+                const confirmBtn = modal.querySelector('.confirm-delete-btn');
+                
+                confirmBtn.setAttribute('data-id', id);
+                confirmBtn.setAttribute('data-url', url);
+                modal.style.display = 'block';
+            });
+        });
+
+        // 确认删除按钮点击事件
+        const confirmDeleteBtn = document.querySelector('#delete-confirm-modal-{{ gridId }} .confirm-delete-btn');
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const url = this.getAttribute('data-url');
+                
+                // 创建一个表单来提交删除请求
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = url;
+                document.body.appendChild(form);
+                form.submit();
+            });
+        }
+
+        // 批量删除按钮点击事件
+        const batchDeleteBtn = document.querySelector('#delete-button-{{ uniqueId }}');
+        if (batchDeleteBtn) {
+            batchDeleteBtn.addEventListener('click', function() {
+                const checkedBoxes = document.querySelectorAll('#{{ gridId }} input[type="checkbox"]:checked:not(#{{ checkAllId }})');
+                if (checkedBoxes.length === 0) {
+                    alert('请至少选择一条记录');
+                    return;
+                }
+                
+                const modal = document.getElementById('delete-confirm-modal-{{ gridId }}');
+                modal.style.display = 'block';
+            });
+        }
+    });
+    </script>
+{% endmacro %}

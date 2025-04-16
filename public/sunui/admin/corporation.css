@@ -1,8 +1,8 @@
-.org-sturcture-container {
+.org-structure-container {
   overflow: auto;
 }
 
-.org-sturcture-container ol {
+.org-structure-container ol {
   list-style: none;
 }
 
