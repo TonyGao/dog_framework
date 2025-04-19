@@ -5,16 +5,17 @@
 {% set checkAllId = 'check-all-' ~ uniqueId %}
 {% set modalId = 'modal' ~ gridId %}
 
-{% block javascripts %}
+{% block stylesheets %}
 	{{ parent() }}
-	<script>
+	<style>
 
-	</script>
+	</style>
 {% endblock %}
 
 {% block body %}
-	<div class="container" style="width: 800px">
-		<div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id={{gridId}}>
+	<div class="container" style="overflow-x: auto;">
+		<h3>自适应内容宽度的表格示例</h3>
+		<div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id={{gridId}} data-auto-fit-content="true">
 			{{ ui.toolBar([
 					{ type: 'create', text: '新增', icon: 'fa-solid fa-plus-circle', id: 'add-button' },
 					{ type: 'delete', text: '删除', icon: 'fa-solid fa-minus-circle', id: 'delete-button' },
@@ -25,9 +26,9 @@
 			<div class="ef-spin">
 				<div class="ef-table-container">
 					<div class="ef-scrollbar ef-scrollbar-type-embed" style="height: 100%;">
-						<div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x">
+						<div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x" style="width: fit-content;">
 							<table class="ef-table-element" cellpadding="0" cellspacing="0">
-								<colgroup><col><col><col><col></colgroup>
+								<colgroup><col><col><col class="auto-fit-content"><col class="auto-fit-content"><col class="auto-fit-content"><col class="auto-fit-content"></colgroup>
 								<thead>
 									<tr class="ef-table-tr">
 										<th class="ef-table-th">
@@ -95,7 +96,7 @@
 										</td>
 										<td class="ef-table-td">
 											<span class="ef-table-cell ef-table-cell-align-left">
-												<span class="ef-table-td-content">jane.doe@example.com</span>
+												<span class="ef-table-td-content">jane.doe@example.commmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm</span>
 											</span>
 										</td>
 									</tr>
@@ -268,7 +269,14 @@
 
 		<br>
 
-		<div class="ef-table ef-table-size-large ef-table-border ef-table-hover ef-classic-table">
+		<h3>带有列最大宽度限制的自适应表格示例</h3>
+		<div class="ef-table ef-table-size-large ef-table-border ef-table-hover ef-classic-table" id="{{gridId}}-2" data-auto-fit-content="true">
+			<!-- 设置列的最大宽度 -->
+			<style>
+				#{{gridId}}-2 .ef-table-element colgroup col:nth-child(3) { max-width: 100px; }
+				#{{gridId}}-2 .ef-table-element colgroup col:nth-child(5) { max-width: 150px; }
+				#{{gridId}}-2 .ef-table-element colgroup col:nth-child(6) { max-width: 200px; }
+			</style>
 			{{ ui.toolBar([
         { type: 'create', text: '新增', icon: 'fa-solid fa-plus-circle', id: 'add-button' },
         { type: 'delete', text: '删除', icon: 'fa-solid fa-minus-circle', id: 'delete-button' },
@@ -278,9 +286,9 @@
 			<div class="ef-spin">
 				<div class="ef-table-container">
 					<div class="ef-scrollbar ef-scrollbar-type-embed" style="height: 100%;">
-						<div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x">
+						<div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x" style="width: fit-content;">
 							<table class="ef-table-element" cellpadding="0" cellspacing="0">
-								<colgroup><col><col><col><col></colgroup>
+								<colgroup><col><col><col class="auto-fit-content"><col class="auto-fit-content"><col class="auto-fit-content"><col class="auto-fit-content"></colgroup>
 								<thead>
 									<tr class="ef-table-tr">
 										<th class="ef-table-th">

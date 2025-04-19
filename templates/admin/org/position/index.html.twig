@@ -15,7 +15,7 @@
 
 {% block app_content_container %}
 	<div class="org-structure-container">
-		<div class="outside-wrapper">
+		<div class="outside-wrapper" style="padding: 20px;">
 			{{ grid.dataGrid(
                     tableData,
                     columns,
@@ -38,7 +38,8 @@
                             { type: 'delete', text: '删除', icon: 'fa-solid fa-trash', classes: 'delete-button' }
                         ],
                         emptyText: '暂无岗位数据',
-                        sortable: true
+                        sortable: true,
+                        maxWidth: '1000px',
                     }
                 ) }}
 		</div>
