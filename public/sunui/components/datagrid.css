@@ -29,7 +29,8 @@
   color: #333;
 }
 
-.ef-pagination-left, .ef-pagination-right {
+.ef-pagination-left,
+.ef-pagination-right {
   display: flex;
   align-items: center;
 }
@@ -49,21 +50,24 @@
   color: #aaa;
 }
 
-.ef-pagination-bar button, .refresh {
+.ef-pagination-bar button,
+.refresh {
   padding: 4px 8px;
   background: none;
   border: none;
   cursor: pointer;
   font-size: 16px;
-  color: rgb(29,33,41);
+  color: rgb(29, 33, 41);
   transition: color 0.3s ease;
 }
 
-.ef-pagination-bar button i, .refresh i {
+.ef-pagination-bar button i,
+.refresh i {
   font-size: 14px;
 }
 
-.ef-pagination-bar button:hover, .refresh:hover {
+.ef-pagination-bar button:hover,
+.refresh:hover {
   color: #0056b3;
 }
 
@@ -75,8 +79,10 @@
   margin: 0 4px;
   padding: 4px;
   font-size: 14px;
-  -webkit-appearance: none; /* Chrome, Safari, Edge */
-  -moz-appearance: textfield; /* Firefox */
+  -webkit-appearance: none;
+  /* Chrome, Safari, Edge */
+  -moz-appearance: textfield;
+  /* Firefox */
   appearance: none;
 }
 
@@ -85,7 +91,8 @@
   color: #333;
 }
 
-.ef-pagination-bar .total-items, .item-range {
+.ef-pagination-bar .total-items,
+.item-range {
   font-size: 14px;
   color: #333;
 }
@@ -116,21 +123,74 @@ input[type=number] {
   border-style: dotted;
 }
 
+/* 自适应内容宽度功能实现 - 纯CSS版本 */
+.ef-table[data-auto-fit-content="true"] {
+  width: auto;
+  display: inline-block;
+}
+
+.ef-table[data-auto-fit-content="true"] .ef-table-element {
+  table-layout: auto;
+  width: max-content;
+  /* 移除min-width限制，允许表格根据内容自适应宽度 */
+}
+
+.ef-table[data-auto-fit-content="true"] .ef-table-element col.auto-fit-content {
+  width: max-content;
+}
+
+.ef-table[data-auto-fit-content="true"] .ef-table-cell {
+  width: auto;
+  /* 移除inline-block，让单元格正常显示 */
+}
+
+.ef-table[data-auto-fit-content="true"] .ef-table-td-content,
+.ef-table[data-auto-fit-content="true"] .ef-table-th-title {
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  padding: 0 15px;
+  /* 移除inline-block，让内容正常显示 */
+}
+
+/* 确保表格容器不会强制表格扩展 */
+.ef-table[data-auto-fit-content="true"] .ef-table-container,
+.ef-table[data-auto-fit-content="true"] .ef-scrollbar,
+.ef-table[data-auto-fit-content="true"] .ef-scrollbar-container {
+  width: auto !important;
+  overflow: visible !important;
+}
+
+/* 确保分页栏宽度与表格主体一致 */
+.ef-table[data-auto-fit-content="true"] .ef-pagination-bar {
+  width: auto;
+  /* 移除max-content和min-width限制，使其与表格容器保持一致 */
+}
+
 /* 这里是针对过滤器的样式 */
 
 /* 过滤器弹窗专用样式 */
 
 /* 通用基础样式 */
 :root {
-  --ef-primary-color: #165dff; /* 主色 */
-  --ef-secondary-color: #f4f6fb; /* 背景色 */
-  --ef-border-color: #e0e6ed; /* 边框色 */
-  --ef-separator-color: #d6d9de; /* 列分隔线颜色 */
-  --ef-font-color: #333; /* 主字体颜色 */
-  --ef-font-color-secondary: #6e7783; /* 次要字体颜色 */
-  --ef-highlight-color: #165dff; /* 高亮色 */
-  --ef-border-radius: 8px; /* 圆角 */
-  --ef-shadow: 0px 6px 12px rgba(0, 0, 0, 0.08); /* 阴影 */
+  --ef-primary-color: #165dff;
+  /* 主色 */
+  --ef-secondary-color: #f4f6fb;
+  /* 背景色 */
+  --ef-border-color: #e0e6ed;
+  /* 边框色 */
+  --ef-separator-color: #d6d9de;
+  /* 列分隔线颜色 */
+  --ef-font-color: #333;
+  /* 主字体颜色 */
+  --ef-font-color-secondary: #6e7783;
+  /* 次要字体颜色 */
+  --ef-highlight-color: #165dff;
+  /* 高亮色 */
+  --ef-border-radius: 8px;
+  /* 圆角 */
+  --ef-shadow: 0px 6px 12px rgba(0, 0, 0, 0.08);
+  /* 阴影 */
 }
 
 /* 容器 */
@@ -161,20 +221,25 @@ input[type=number] {
 .ef-filter .ef-filter-entity-column {
   display: flex;
   align-items: center;
-  flex-wrap: nowrap; /* 防止换行 */
+  flex-wrap: nowrap;
+  /* 防止换行 */
   gap: 12px;
-  overflow-x: auto; /* 当字段过多时支持横向滚动 */
+  overflow-x: auto;
+  /* 当字段过多时支持横向滚动 */
 }
 
 .ef-filter .ef-filter-entity-field {
-  flex: 0 0 100%; /* 每个字段占 50% 宽度，减去间距 */
-  box-sizing: border-box; /* 包括内边距和边框 */
+  flex: 0 0 100%;
+  /* 每个字段占 50% 宽度，减去间距 */
+  box-sizing: border-box;
+  /* 包括内边距和边框 */
   padding: 2px;
   border: 1px dashed var(--ef-border-color);
   border-radius: var(--ef-border-radius);
   background-color: #fff;
   color: var(--ef-font-color);
-  text-align: center; /* 文本居中 */
+  text-align: center;
+  /* 文本居中 */
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -187,7 +252,8 @@ input[type=number] {
 /* 响应式：字段在小屏幕时变为一列 */
 @media (max-width: 768px) {
   .ef-filter-entity-field {
-    flex: 0 0 100%; /* 占满一行 */
+    flex: 0 0 100%;
+    /* 占满一行 */
   }
 }
 
@@ -309,8 +375,10 @@ input[type=number] {
 
 .ef-filter .ef-filter-entity-fields {
   display: flex;
-  flex-wrap: wrap; /* 自动换行 */
-  gap: 8px; /* 字段间距 */
+  flex-wrap: wrap;
+  /* 自动换行 */
+  gap: 8px;
+  /* 字段间距 */
 }
 
 .modal-leader-line {
@@ -327,7 +395,7 @@ input[type=number] {
 
 .ef-filter-editor-operator {
   min-height: 22px;
-  min-width: 20px; 
+  min-width: 20px;
 }
 
 .ef-filter-editor-value {
@@ -351,7 +419,8 @@ input[type=number] {
   padding: 3px 8px;
   border-radius: 5px;
   margin: 2px;
-  position: relative; /* 为伪元素定位 */
+  position: relative;
+  /* 为伪元素定位 */
 }
 
 .ef-filter-editor-wrapper span.ef-filter-editor-parenthesis {
@@ -361,17 +430,24 @@ input[type=number] {
 .ef-filter-editor-wrapper span::after {
   content: '';
   position: absolute;
-  top: 0px;  /* 扩展上方 margin */
-  bottom: 0px;  /* 扩展下方 margin */
-  left: 0px;   /* 扩展左侧 margin */
-  right: 0px;  /* 扩展右侧 margin */
-  background: rgba(0, 0, 0, 0);  /* 透明 */
-  z-index: -1;  /* 确保点击区域在span后面 */
+  top: 0px;
+  /* 扩展上方 margin */
+  bottom: 0px;
+  /* 扩展下方 margin */
+  left: 0px;
+  /* 扩展左侧 margin */
+  right: 0px;
+  /* 扩展右侧 margin */
+  background: rgba(0, 0, 0, 0);
+  /* 透明 */
+  z-index: -1;
+  /* 确保点击区域在span后面 */
 }
 
 .ef-filter-editor-logic-div {
   position: relative;
-  padding-right: 10px; /* 给加号按钮预留空间 */
+  padding-right: 10px;
+  /* 给加号按钮预留空间 */
   display: flex;
   align-items: center;
 }
@@ -472,52 +548,54 @@ input[type=number] {
 }
 
 .ef-filter-editor-logic-div:hover .delete-button,
-.ef-filter-editor-logic-div .ef-filter-editor-parenthesis.active ~ .delete-button,
+.ef-filter-editor-logic-div .ef-filter-editor-parenthesis.active~.delete-button,
 .ef-filter-editor-logic-div.active .delete-button {
   display: block;
 }
 
 .ef-filter-editor-logic-div:hover .add-button,
-.ef-filter-editor-logic-div .ef-filter-editor-parenthesis.active ~ .add-button,
+.ef-filter-editor-logic-div .ef-filter-editor-parenthesis.active~.add-button,
 .ef-filter-editor-logic-div.active .add-button {
   display: block;
 }
+
 .ef-filter-editor-logic-div:hover .transition-button,
 .ef-filter-editor-logic-div.active .transition-button {
   display: block;
 }
 
 .ef-filter-empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  text-align: center;
 }
 
 .ef-filter-empty-text {
-    color: #999;
-    margin-bottom: 15px;
+  color: #999;
+  margin-bottom: 15px;
 }
 
 .ef-filter-add-first-condition {
-    background-color: #1a73e8;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
 }
 
 .ef-filter-add-first-condition i {
-    margin-right: 5px;
+  margin-right: 5px;
 }
 
 .ef-filter-add-first-condition:hover {
-    background-color: #1669d9;
+  background-color: #1669d9;
 }
+
 /* 过滤器样式 结束 */

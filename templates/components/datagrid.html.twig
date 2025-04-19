@@ -30,8 +30,10 @@
     {% set editUrlPrefix = options.editUrlPrefix ?? '#' %}
     {% set viewUrlPrefix = options.viewUrlPrefix ?? '#' %}
     {% set deleteUrlPrefix = options.deleteUrlPrefix ?? '#' %}
+    {% set maxWidth = options.maxWidth ?? null %}
+    {% set autoFitContent = options.autoFitContent ?? false %}
 
-    <div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id="{{gridId}}">
+    <div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id="{{gridId}}"{% if maxWidth %} style="max-width: {{ maxWidth }}"{% endif %}{% if autoFitContent %} data-auto-fit-content="true"{% endif %}>
         {# 工具栏 #}
         {% import 'ui/template/ui.html.twig' as ui %}
         {{ ui.toolBar(toolbarButtons, { 'parentId': gridId }) }}
@@ -46,7 +48,7 @@
                                 {% if showRowNumber %}<col width="50">{% endif %}
                                 {% if showCheckbox %}<col width="50">{% endif %}
                                 {% for column in columns %}
-                                    <col {% if column.width is defined %}width="{{ column.width }}"{% endif %}>
+                                    <col {% if not autoFitContent and column.width is defined %}width="{{ column.width }}"{% endif %} {% if autoFitContent %}class="auto-fit-content"{% if column.maxWidth is defined %} style="max-width: {{ column.maxWidth }}px"{% endif %}{% endif %}>
                                 {% endfor %}
                                 {% if actionColumn %}<col width="150">{% endif %}
                             </colgroup>
