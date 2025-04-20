@@ -1,14 +1,19 @@
 ## 狗狗框架
 
+<div align="center">
+
 ![狗狗框架图片](/documents/conceptions/assets/dog215.png)
+
+</div>
+
+### 项目介绍
+
+狗狗框架是一个基于Symfony框架的开源企业应用开发框架，致力于为企业级应用提供基础的开发底座，实现快速、高质量、功能丰富、愉快的开发过程。
 
 ### 功能概述
 
-* 组织架构
-  * 公司架构
-  * 部门管理
-  * 岗位管理
-  * 职级管理
+* [UI库](/documents/features/ui/ui.md)
+* [组织架构](/documents/features/organization/org.md)
 * 人员管理
   * 人员信息
 * 模型和接口
@@ -21,20 +26,6 @@
 ### Todo List
 
 * [ ] UI库
-  * [x] Button 按钮
-  * [x] Divider 分隔线
-  * [x] Grid 网格布局
-  * [x] Layout 布局
-  * [x] Link 链接
-  * [x] Input 单行文本输入框
-  * [x] InputNumber 数字输入框
-  * [x] Switch 切换按钮
-  * [x] Select 选择框
-  * [x] Textarea 多行文本
-  * [x] Modal 模态窗口
-  * [x] Radio 单选框
-  * [x] Checkbox 复选框
-  * [x] Tabs 标签页
   * [ ] Table 表格
     * [x] 简单版本
   * [x] 公司选择器

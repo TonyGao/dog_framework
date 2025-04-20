@@ -132,7 +132,6 @@ input[type=number] {
 .ef-table[data-auto-fit-content="true"] .ef-table-element {
   table-layout: auto;
   width: max-content;
-  /* 移除min-width限制，允许表格根据内容自适应宽度 */
 }
 
 .ef-table[data-auto-fit-content="true"] .ef-table-element col.auto-fit-content {
@@ -141,7 +140,6 @@ input[type=number] {
 
 .ef-table[data-auto-fit-content="true"] .ef-table-cell {
   width: auto;
-  /* 移除inline-block，让单元格正常显示 */
 }
 
 .ef-table[data-auto-fit-content="true"] .ef-table-td-content,
@@ -151,6 +149,32 @@ input[type=number] {
   text-overflow: clip;
   padding: 0 15px;
   /* 移除inline-block，让内容正常显示 */
+}
+
+.ef-table[data-auto-fit-content="false"] {
+  width: auto;
+  display: inline-block;
+}
+
+.ef-table[data-auto-fit-content="false"] .ef-table-element {
+  table-layout: auto;
+  width: auto;
+}
+
+.ef-table[data-auto-fit-content="false"] .ef-table-element col.auto-fit-content {
+  width: max-content;
+}
+
+.ef-table[data-auto-fit-content="false"] .ef-table-cell {
+  width: auto;
+}
+
+.ef-table[data-auto-fit-content="false"] .ef-table-td-content,
+.ef-table[data-auto-fit-content="false"] .ef-table-th-title {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  padding: 0 15px;
 }
 
 /* 确保表格容器不会强制表格扩展 */
