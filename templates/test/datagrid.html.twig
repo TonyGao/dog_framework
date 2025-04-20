@@ -7,22 +7,92 @@
 
 {% block stylesheets %}
 	{{ parent() }}
-	<style>
-
-	</style>
 {% endblock %}
 
 {% block body %}
 	<div class="container" style="overflow-x: auto;">
+		<h3>空表格示例</h3>
+		<div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id="{{gridId}}-1" data-auto-fit-content="true" style="min-height: 300px;">
+			{{ ui.toolBar([
+					{ type: 'create', text: '新增', icon: 'fa-solid fa-plus-circle', id: 'add-button' },
+					{ type: 'delete', text: '删除', icon: 'fa-solid fa-minus-circle', id: 'delete-button' },
+					{ type: 'edit', text: '编辑', icon: 'fa-solid fa-edit', id: 'edit-button' },
+					{ type: 'update', text: '修改', icon: 'fa-solid fa-pencil-alt', id: 'update-button' }
+			], { 'parentId': "{{gridId}}-1" }) }}
+			<div class="ef-spin">
+				<div class="ef-table-container">
+					<div class="ef-scrollbar ef-scrollbar-type-embed" style="height: 100%;">
+						<div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x" style="width: fit-content;">
+							<table class="ef-table-element" cellpadding="0" cellspacing="0">
+								<colgroup><col><col><col class="auto-fit-content"><col class="auto-fit-content"><col class="auto-fit-content"><col class="auto-fit-content"></colgroup>
+								<thead>
+									<tr class="ef-table-tr">
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center">#</span>
+										</th>
+										<th class="ef-table-th">
+											{{ ui.checkbox(checkAllId, '', '0', false, 'check-all') }}
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center ef-table-cell-with-sorter">
+												<span class="ef-table-th-title">Name</span>
+												<span class="ef-table-th-sort">
+													<div class="ef-table-th-sort-icon">
+														<i class="fa-solid fa-sort"></i>
+													</div>
+												</span>
+											</span>
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center ef-table-cell-with-sorter">
+												<span class="ef-table-th-title">Salary</span>
+												<span class="ef-table-th-sort">
+													<div class="ef-table-th-sort-icon">
+														<i class="fa-solid fa-sort"></i>
+													</div>
+												</span>
+											</span>
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center">
+												<span class="ef-table-th-title">Address</span>
+											</span>
+										</th>
+										<th class="ef-table-th">
+											<span class="ef-table-cell ef-table-cell-align-center">
+												<span class="ef-table-th-title">Email</span>
+											</span>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="ef-table-tr">
+										<td class="ef-table-td" colspan="6">
+											<div class="ef-table-empty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px;">
+												<i class="fa-solid fa-inbox" style="font-size: 48px; margin-bottom: 16px; color: #999;"></i>
+												<span style="color: #666;">暂无数据</span>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<br>
+
 		<h3>自适应内容宽度的表格示例</h3>
-		<div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id={{gridId}} data-auto-fit-content="true">
+		<div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id="{{gridId}}-2" data-auto-fit-content="true">
 			{{ ui.toolBar([
 					{ type: 'create', text: '新增', icon: 'fa-solid fa-plus-circle', id: 'add-button' },
 					{ type: 'delete', text: '删除', icon: 'fa-solid fa-minus-circle', id: 'delete-button' },
 					{ type: 'edit', text: '编辑', icon: 'fa-solid fa-edit', id: 'edit-button' },
 					{ type: 'update', text: '修改', icon: 'fa-solid fa-pencil-alt', id: 'update-button' },
 					{ type: 'filter', text: '搜索', icon: 'fa-solid fa-filter', id: 'filter-button'~uniqueId, classes: 'search' }
-			], { 'parentId': gridId }) }}
+			], { 'parentId': "{{gridId}}-2" }) }}
 			<div class="ef-spin">
 				<div class="ef-table-container">
 					<div class="ef-scrollbar ef-scrollbar-type-embed" style="height: 100%;">
@@ -270,7 +340,7 @@
 		<br>
 
 		<h3>带有列最大宽度限制的自适应表格示例</h3>
-		<div class="ef-table ef-table-size-large ef-table-border ef-table-hover ef-classic-table" id="{{gridId}}-2" data-auto-fit-content="true">
+		<div class="ef-table ef-table-size-large ef-table-border ef-table-hover ef-classic-table" id="{{gridId}}-3" data-auto-fit-content="true">
 			<!-- 设置列的最大宽度 -->
 			<style>
 				#{{gridId}}-2 .ef-table-element colgroup col:nth-child(3) { max-width: 100px; }
@@ -356,7 +426,7 @@
 										</td>
 										<td class="ef-table-td">
 											<span class="ef-table-cell ef-table-cell-align-left">
-												<span class="ef-table-td-content">jane.doe@example.com</span>
+												<span class="ef-table-td-content">jane.doe@example.commmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm</span>
 											</span>
 										</td>
 									</tr>
@@ -527,6 +597,7 @@
 			</div>
 		</div>
 	</div>
+
 	{% macro filterBodyContent() %}
 		<div class="ef-filter">
 			<div class="ef-row ef-row-align-start ef-row-justify-start">
@@ -634,4 +705,97 @@
     modalFooter,
     modalOptions
 ) }}
+
+	<h3>固定宽度Email列的表格示例</h3>
+	<div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id="{{gridId}}-4" data-auto-fit-content="false">
+		{{ ui.toolBar([
+				{ type: 'create', text: '新增', icon: 'fa-solid fa-plus-circle', id: 'add-button' },
+				{ type: 'delete', text: '删除', icon: 'fa-solid fa-minus-circle', id: 'delete-button' },
+				{ type: 'edit', text: '编辑', icon: 'fa-solid fa-edit', id: 'edit-button' },
+				{ type: 'update', text: '修改', icon: 'fa-solid fa-pencil-alt', id: 'update-button' }
+		], { 'parentId': "{{gridId}}-4" }) }}
+		<div class="ef-spin">
+			<div class="ef-table-container">
+				<div class="ef-scrollbar ef-scrollbar-type-embed" style="height: 100%;">
+					<div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x" style="width: fit-content;">
+						<table class="ef-table-element" cellpadding="0" cellspacing="0">
+							<colgroup><col><col><col class="auto-fit-content"><col class="auto-fit-content"><col class="auto-fit-content"><col></colgroup>
+							<thead>
+								<tr class="ef-table-tr">
+									<th class="ef-table-th">
+										<span class="ef-table-cell ef-table-cell-align-center">#</span>
+									</th>
+									<th class="ef-table-th">
+										{{ ui.checkbox(checkAllId, '', '0', false, 'check-all') }}
+									</th>
+									<th class="ef-table-th">
+										<span class="ef-table-cell ef-table-cell-align-center ef-table-cell-with-sorter">
+											<span class="ef-table-th-title">Name</span>
+											<span class="ef-table-th-sort">
+												<div class="ef-table-th-sort-icon">
+													<i class="fa-solid fa-sort"></i>
+												</div>
+											</span>
+										</span>
+									</th>
+									<th class="ef-table-th">
+										<span class="ef-table-cell ef-table-cell-align-center ef-table-cell-with-sorter">
+											<span class="ef-table-th-title">Salary</span>
+											<span class="ef-table-th-sort">
+												<div class="ef-table-th-sort-icon">
+													<i class="fa-solid fa-sort"></i>
+												</div>
+											</span>
+										</span>
+									</th>
+									<th class="ef-table-th">
+										<span class="ef-table-cell ef-table-cell-align-center">
+											<span class="ef-table-th-title">Address</span>
+										</span>
+									</th>
+									<th class="ef-table-th">
+										<span class="ef-table-cell ef-table-cell-align-center">
+											<span class="ef-table-th-title">Email</span>
+										</span>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="ef-table-tr">
+									<td class="ef-table-td">
+										<span class="ef-table-cell ef-table-cell-align-left">
+											<span class="ef-table-td-content">1</span>
+										</span>
+									</td>
+									<td class="ef-table-td">
+										{{ ui.checkbox('checkbox1', '', '0') }}
+									</td>
+									<td class="ef-table-td">
+										<span class="ef-table-cell ef-table-cell-align-left">
+											<span class="ef-table-td-content">Jane Doe</span>
+										</span>
+									</td>
+									<td class="ef-table-td">
+										<span class="ef-table-cell ef-table-cell-align-left">
+											<span class="ef-table-td-content">23000</span>
+										</span>
+									</td>
+									<td class="ef-table-td">
+										<span class="ef-table-cell ef-table-cell-align-left">
+											<span class="ef-table-td-content">32 Park Road, London</span>
+										</span>
+									</td>
+									<td class="ef-table-td">
+										<span class="ef-table-cell ef-table-cell-align-left">
+											<span class="ef-table-td-content">jane.doe@example.commmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm</span>
+										</span>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}
