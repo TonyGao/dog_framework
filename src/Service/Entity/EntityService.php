@@ -459,7 +459,7 @@ class EntityService extends BaseService
    * $parentAtEPG --> $parent
    * $type  --> $type
    */
-  public function convertEntityToPropertyGroupData(Entity $entity, $type, $parent = null): array
+  public function convertEntityToPropertyGroupData(Entity $entity, $type, $parent = null)
   {
     // 如果没有传入 $parent 参数，则使用 $entity->parentAtEPG
     $parentValue = $parent ?? $entity->parentAtEPG ?? null;

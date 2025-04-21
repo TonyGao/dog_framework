@@ -1,5 +1,6 @@
 {% extends 'admin/layout.html.twig' %}
 {% import 'components/datagrid.html.twig' as grid %}
+{% import 'ui/template/ui.html.twig' as ui %}
 
 {% block title %}岗位管理
 {% endblock %}
@@ -17,8 +18,8 @@
 	<div class="org-structure-container">
 		<div class="outside-wrapper" style="padding: 20px;">
 			{{ grid.dataGrid(
-                    tableData,
-                    columns,
+                    tableData|default([]),
+                    columns|default([]),
                     {
                         createUrl: path('org_position_new'),
                         editUrlPrefix: path('org_position_edit', {'id': 'placeholder'})|replace({'placeholder': ''}),
@@ -29,9 +30,6 @@
                             { type: 'delete', text: '批量删除', icon: 'fa-solid fa-minus-circle', id: 'batch-delete-button' },
                             { type: 'filter', text: '高级搜索', icon: 'fa-solid fa-filter', id: 'filter-button', classes: 'search' }
                         ],
-                        extraButtons: [
-                            { text: '岗位级别管理', icon: 'fa-solid fa-layer-group', id: 'position-level-button', classes: 'ef-button-info', onclick: "window.location.href='" ~ path('org_position_level') ~ "'" }
-                        ],
                         actionButtons: [
                             { type: 'view', text: '查看', icon: 'fa-solid fa-eye', classes: 'view-button' },
                             { type: 'edit', text: '编辑', icon: 'fa-solid fa-edit', classes: 'edit-button' },
@@ -39,7 +37,17 @@
                         ],
                         emptyText: '暂无岗位数据',
                         sortable: true,
-                        maxWidth: '1000px',
+                        maxWidth: '100%',
+                        minHeight: '500px',
+                        autoFitContent: false,
+                        gridId: 'position-grid',
+                        pagination: true,
+                        pageSize: 10,
+                        currentPage: 1,
+                        totalPages: 1,
+                        totalItems: tableData|length,
+                        showCheckbox: true,
+                        showRowNumber: true
                     }
                 ) }}
 		</div>
