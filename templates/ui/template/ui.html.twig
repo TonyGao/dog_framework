@@ -164,3 +164,35 @@ $(document).ready(function () {
 })
 </script>
 {% endmacro %}
+
+{# 数字输入框组件 #}
+{# 使用方法：
+   {{ ui.inputNumber('input1', 100, 0, 1, 0) }} // id, max, min, step, precision
+   // 这几个参数都是可选的，分别代表：id, 最大值, 最小值, 步长, 小数位数
+   {{ ui.inputNumber('input2', null, null, 1.5, 3) }} // 不设置最大最小值
+#}
+{% macro inputNumber(id, max = null, min = null, step = 1, precision = 0, placeholder = "") %}
+    <span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium">
+        <input role="spinbutton"
+            id="{{ id }}"
+            {% if max is not null %}num-valuemax="{{ max }}"{% endif %}
+            {% if min is not null %}num-valuemin="{{ min }}"{% endif %}
+            num-value=""
+            step="{{ step }}"
+            precision="{{ precision }}"
+            class="ef-input ef-input-size-medium number"
+            type="text"
+            placeholder="{{ placeholder }}"
+        >
+        <span class="ef-input-suffix">
+            <div class="ef-input-number-step">
+                <button class="ef-input-number-step-button add" type="button" tabindex="-1">
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-up" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"><path d="M39.6 30.557 24.043 15 8.487 30.557"></path></svg>
+                </button>
+                <button class="ef-input-number-step-button subtract" type="button" tabindex="-1">
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-down" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"><path d="M39.6 17.443 24.043 33 8.487 17.443"></path></svg>
+                </button>
+            </div>
+        </span>
+    </span>
+{% endmacro %}

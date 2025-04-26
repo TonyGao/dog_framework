@@ -343,3 +343,7 @@ h1, h2, h3 {
   padding: 0 6px;
   font-size: 12px;
 }
+
+.ef-component.ef-table-component {
+  width: -webkit-fill-available;
+}
