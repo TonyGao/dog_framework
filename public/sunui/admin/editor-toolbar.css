@@ -1,0 +1,75 @@
+/* 编辑器工具栏样式 */
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 4px 8px;
+  height: 40px;
+  width: 100%;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background-color: #e0e0e0;
+  margin: 0 8px;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background-color: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #333;
+  margin: 0 2px;
+}
+
+.toolbar-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.toolbar-btn.active {
+  background-color: #e6f7ff;
+  color: #3370ff;
+}
+
+.toolbar-select {
+  height: 28px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0 4px;
+  margin: 0 2px;
+  font-size: 12px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.toolbar-select:focus {
+  outline: none;
+  border-color: #3370ff;
+}
+
+/* 响应式调整 */
+@media (max-width: 1200px) {
+  .toolbar-btn {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .toolbar-select {
+    height: 24px;
+    max-width: 80px;
+  }
+}

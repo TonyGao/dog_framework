@@ -54,7 +54,7 @@ $(document).ready(function () {
                   <button class="btn-layout"><i class="fa-solid fa-grip"></i></button>
                   <button class="btn-close"><i class="fa-solid fa-times"></i></button>
               </div>
-              <div class="section-content">
+              <div class="section-content ui-droppable">
                   <!-- 新的 Section 内容 -->
               </div>
           </div>`;
@@ -190,11 +190,12 @@ $(document).ready(function () {
 
   let sixEqualParts = `
     <div class="ef-row ef-row-align-start ef-row-justify-start" style="width: 1140px;">
-      <div class="ef-col-4 item-block" style="min-height: 68px; line-height: 68px; color: white; text-align: center; border: 1px dashed #d5d8dc""></div>
-      <div class="ef-col-4 item-block" style="min-height: 68px; line-height: 68px; color: white; text-align: center; border: 1px dashed #d5d8dc""></div>
-      <div class="ef-col-4 item-block" style="min-height: 68px; line-height: 68px; color: white; text-align: center; border: 1px dashed #d5d8dc""></div>
-      <div class="ef-col-4 item-block" style="min-height: 68px; line-height: 68px; color: white; text-align: center; border: 1px dashed #d5d8dc""></div>
-      <div class="ef-col-4 item-block" style="min-height: 68px; line-height: 68px; color: white; text-align: center; border: 1px dashed #d5d8dc""></div>
+      <div class="ef-col-4 item-block" style="min-height: 68px; line-height: 68px; color: white; text-align: center; border: 1px dashed #d5d8dc"></div>
+      <div class="ef-col-4 item-block" style="min-height: 68px; line-height: 68px; color: white; text-align: center; border: 1px dashed #d5d8dc"></div>
+      <div class="ef-col-4 item-block" style="min-height: 68px; line-height: 68px; color: white; text-align: center; border: 1px dashed #d5d8dc"></div>
+      <div class="ef-col-4 item-block" style="min-height: 68px; line-height: 68px; color: white; text-align: center; border: 1px dashed #d5d8dc"></div>
+      <div class="ef-col-4 item-block" style="min-height: 68px; line-height: 68px; color: white; text-align: center; border: 1px dashed #d5d8dc"></div>
+      <div class="ef-col-4 item-block" style="min-height: 68px; line-height: 68px; color: white; text-align: center; border: 1px dashed #d5d8dc"></div>
     </div>
   `;
 
@@ -284,6 +285,40 @@ $(document).ready(function () {
       width: 512, // 模板的预期宽度
       height: 68 // 模板的预期高度
     },
+    // 表格组件模板
+    table: {
+      template: `
+      <div id="ef-table-comp-{uniqueId}" class="ef-component ef-table-component ef-table-comp-{uniqueId}" style="position: static">
+        <span class="ef-component-labels ef-label-small label-above-line label-top" style="left: 0px">
+          <span class="ef-label-comp-type draggable">
+            <span>Table</span>
+          </span>
+        </span>
+        <table class="ef-table" style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 1</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 2</th>
+              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">内容 1</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">内容 2</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">内容 3</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">内容 4</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">内容 5</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">内容 6</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>`,
+      width: 600, // 表格的预期宽度
+      height: 200 // 表格的预期高度
+    }
     // 可以添加更多组件类型
   };
 
@@ -291,6 +326,9 @@ $(document).ready(function () {
   function generateUniqueId () {
     return Math.random().toString(36).substr(2, 9);
   }
+
+  // 初始化页面时调用一次初始化函数
+  initDraggableDroppable();
 
   // 使用事件委托，将组件设为可拖动
   $('.component-grid').on('mousedown', '.component-item', function (e) {
@@ -320,137 +358,513 @@ $(document).ready(function () {
       });
     });
 
+    // 创建一个标志变量，用于防止重复处理
+    let isProcessed = false;
+    
     $(document).on('mouseup.drag', function () {
+      // 如果已经处理过，则直接返回
+      if (isProcessed) return;
+      isProcessed = true;
+      
       $(document).off('mousemove.drag mouseup.drag');
       placeholder.remove(); // 移除虚框
-    
-      // 检查放置位置
-      const droppableArea = $('.item-block:hover');
-      if (droppableArea.length) {
-        const uniqueId = generateUniqueId();
-        const html = templateConfig.template.replace(/{uniqueId}/g, uniqueId);
-        const newComponent = $(html);
-    
-        // 将生成的组件添加到目标位置
-        droppableArea.append(newComponent);
-    
-        // 使新添加的组件可以拖动
-        makeComponentDraggable(newComponent);
-    
-        // 获取新添加组件中的可编辑元素
-        const editableElement = newComponent.find('[contenteditable]');
-    
-        // 添加点击事件，用户手动点击后才清空 placeholder
-        editableElement.one('click', function () {
-          if ($(this).text() === textPlaceHolder) {
-            $(this).empty(); // 清空 placeholder
-            $(this).focus(); // 聚焦在该元素上
+
+      // 检查放置位置 - 优先选择item-block，其次是section-content
+      // 确保只选择一个最合适的目标容器
+      let droppableArea;
+      const itemBlock = $('.item-block:hover');
+      const sectionContent = $('.section-content:hover');
+      
+      // 优先使用item-block作为放置目标
+      if (itemBlock.length) {
+        droppableArea = itemBlock;
+      } else if (sectionContent.length) {
+        droppableArea = sectionContent;
+      }
+      
+      if (droppableArea && droppableArea.length) {
+        // 如果是表格组件，显示表格模态窗口让用户输入行列数
+        if (componentType === 'table') {
+          // 保存当前拖放的位置和目标元素
+          const dropTarget = droppableArea;
+          const dropOffsetX = placeholder.offset().left - dropTarget.offset().left;
+          const dropOffsetY = placeholder.offset().top - dropTarget.offset().top;
+
+          // 显示表格行列输入模态框
+          $('#tableModal').css('display', 'flex');
+
+          // 处理确定按钮点击事件
+          $('#create-table-btn').off('click').on('click', function () {
+            const rows = parseInt($('#table-rows').val()) || 3;
+            const cols = parseInt($('#table-cols').val()) || 3;
+
+            // 生成表格HTML
+            let tableHtml = '<table class="ef-table" style="width:100%; border-collapse: collapse;"><tbody>';
+
+            // 生成表格内容
+            for (let i = 0; i < rows; i++) {
+              tableHtml += '<tr>';
+              for (let j = 0; j < cols; j++) {
+                tableHtml += '<td style="border: 1px dashed #d5d8dc; padding: 8px;" contenteditable="true"></td>';
+              }
+              tableHtml += '</tr>';
+            }
+            tableHtml += '</tbody></table>';
+
+            // 创建表格组件
+            const uniqueId = generateUniqueId();
+            const componentHtml = `
+              <div id="ef-table-comp-${uniqueId}" class="ef-component ef-table-component ef-table-comp-${uniqueId}" style="position: static">
+                <span class="ef-component-labels ef-label-small label-above-line label-top" style="left: 0px">
+                  <span class="ef-label-comp-type draggable">
+                    <span>Table</span>
+                  </span>
+                </span>
+                ${tableHtml}
+              </div>`;
+
+            const newComponent = $(componentHtml);
+
+            // 设置组件位置并添加到目标位置
+            newComponent.css({
+              position: 'static !important',
+              // 使用!important确保不被jQuery UI覆盖
+              left: '',
+              top: ''
+            }).appendTo(dropTarget);
+
+            // 使新添加的组件可以拖动
+            makeComponentDraggable(newComponent);
+
+            // 初始化表格交互功能
+            let isSelecting = false;
+            let startCell = null;
+            let selectedCells = [];
+            let startRowIndex = -1;
+            let startColIndex = -1;
+
+            // 获取单元格的行列索引
+            function getCellIndex(cell) {
+              const $cell = $(cell);
+              const $row = $cell.parent();
+              return {
+                row: $row.index(),
+                col: $cell.index()
+              };
+            }
+
+            // 选择区域内的所有单元格
+            function selectCellsInRange(startCell, endCell) {
+              const start = getCellIndex(startCell);
+              const end = getCellIndex(endCell);
+              const minRow = Math.min(start.row, end.row);
+              const maxRow = Math.max(start.row, end.row);
+              const minCol = Math.min(start.col, end.col);
+              const maxCol = Math.max(start.col, end.col);
+              clearSelection();
+              newComponent.find('tr').each(function(rowIndex) {
+                if (rowIndex >= minRow && rowIndex <= maxRow) {
+                  $(this).find('td, th').each(function(colIndex) {
+                    if (colIndex >= minCol && colIndex <= maxCol) {
+                      $(this).css({
+                        'background-color': '#007bff33',
+                        'border': '1px dashed #d5d8dc'
+                      });
+                      
+                      // 设置外边框
+                      if (rowIndex === minRow) {
+                        $(this).css('border-top', '2px solid #007bff');
+                      }
+                      if (rowIndex === maxRow) {
+                        $(this).css('border-bottom', '2px solid #007bff');
+                      }
+                      if (colIndex === minCol) {
+                        $(this).css('border-left', '2px solid #007bff');
+                      }
+                      if (colIndex === maxCol) {
+                        $(this).css('border-right', '2px solid #007bff');
+                      }
+                    }
+                  });
+                }
+              });
+            }
+
+            // 保持选中状态
+            let isSelected = false;
+            let selectedRange = null;
+
+            // 鼠标按下时开始选择
+            newComponent.find('td, th').on('mousedown', function(e) {
+              e.preventDefault();
+              isSelecting = true;
+              startCell = this;
+              clearSelection();
+              const indices = getCellIndex(this);
+              startRowIndex = indices.row;
+              startColIndex = indices.col;
+              isSelected = true;
+            });
+
+            // 鼠标移动时更新选择范围
+            newComponent.find('td, th').on('mousemove', function(e) {
+              if (isSelecting) {
+                selectCellsInRange(startCell, this);
+              }
+            });
+
+            // 鼠标松开时结束选择
+            $(document).on('mouseup', function() {
+              if (isSelecting) {
+                isSelecting = false;
+                if (selectedCells.length > 0) {
+                  selectedRange = {
+                    startCell: startCell,
+                    endCell: selectedCells[selectedCells.length - 1]
+                  };
+                }
+              }
+            });
+
+            // 点击表格外部时清除选择
+            $(document).on('click', '.ef-table', function(e) {
+              if (!$(e.target).closest('.ef-table').length && isSelected) {
+                clearSelection();
+                isSelected = false;
+                selectedRange = null;
+              }
+            });
+
+            // 禁用单元格的默认编辑功能
+            newComponent.find('th, td').attr('contenteditable', 'false').css('cursor', 'default');
+
+            // 双击进入编辑模式
+            newComponent.find('th, td').on('dblclick', function() {
+              clearSelection(); // 清除已有的选中效果
+              $(this).attr('contenteditable', 'true')
+                     .css('cursor', 'text')
+                     .focus();
+            });
+
+            // 失去焦点时退出编辑模式
+            newComponent.find('th, td').on('blur', function() {
+              $(this).attr('contenteditable', 'false')
+                     .css('cursor', 'default');
+            });
+
+            // 鼠标按下开始选择
+            newComponent.find('th, td').on('mousedown', function(e) {
+              if ($(this).attr('contenteditable') !== 'true') {
+                isSelecting = true;
+                startCell = this;
+                clearSelection();
+                selectedCells = [this];
+                $(this).css({
+                  'background-color': '#f0f8ff',
+                  'outline': '2px solid #007bff'
+                });
+                e.preventDefault();
+              }
+            });
+
+            // 鼠标移动时选择单元格
+            newComponent.find('th, td').on('mouseover', function() {
+              if (isSelecting && $(this).attr('contenteditable') !== 'true') {
+                selectCellsInRange(startCell, this);
+              }
+            });
+
+            // 鼠标松开结束选择
+            $(document).on('mouseup', function() {
+              isSelecting = false;
+            });
+
+            // 点击其他区域取消选中
+            $(document).on('click', '.ef-table', function(e) {
+              if (!$(e.target).closest('.ef-table').length) {
+                clearSelection();
+              }
+            });
+
+            // 清除选择样式的函数
+            function clearSelection() {
+              newComponent.find('th, td').css({
+                'background-color': '',
+                'outline': 'none',
+              });
+            }
+
+            // 点击其他地方清除选择
+            $(document).on('click', function(e) {
+              if (!$(e.target).is('th, td')) {
+                clearSelection();
+              }
+            });
+
+            // 隐藏模态窗口
+            $('#tableModal').hide();
+
+            // 设置section-content的背景色为白色
+            dropTarget.css('background-color', 'white');
+          });
+
+          // 处理取消按钮点击事件
+          $('#cancel-table-btn').off('click').on('click', function () {
+            $('#tableModal').hide();
+          });
+        } else {
+          // 非表格组件的处理逻辑
+          const uniqueId = generateUniqueId();
+          const html = templateConfig.template.replace(/{uniqueId}/g, uniqueId);
+          const newComponent = $(html);
+          
+          // 检查目标区域是否已包含相同ID的组件，避免重复添加
+          const componentId = `ef-${componentType}-comp-${uniqueId}`;
+          if (droppableArea.find(`#${componentId}`).length === 0) {
+            // 将生成的组件添加到目标位置
+            droppableArea.append(newComponent);
           }
-        });
-    
-        // 监听该组件中 h2 的 input 事件
-        newComponent.find('[contenteditable]').on('input', function () {
-          if ($(this).html() === '<br>') {
-            $(this).html(''); // 清除多余的 <br> 标签
+
+          // 使新添加的组件可以拖动
+          makeComponentDraggable(newComponent);
+
+          // 文本组件的特定初始化逻辑
+          if (componentType === 'text') {
+            // 获取新添加组件中的可编辑元素
+            const editableElement = newComponent.find('[contenteditable]');
+
+            // 添加点击事件，用户手动点击后才清空 placeholder
+            editableElement.one('click', function () {
+              if ($(this).text() === textPlaceHolder) {
+                $(this).empty(); // 清空 placeholder
+                $(this).focus(); // 聚焦在该元素上
+              }
+            });
+
+            // 监听该组件中 h2 的 input 事件
+            newComponent.find('[contenteditable]').on('input', function () {
+              if ($(this).html() === '<br>') {
+                $(this).html(''); // 清除多余的 <br> 标签
+              }
+            });
           }
-        });
+        }
       }
     });
+    
+    // 应用CSS规则来覆盖jQuery UI自动添加的样式
+    if ($('#ui-draggable-override-style').length === 0) {
+      $('<style id="ui-draggable-override-style">')
+        .prop('type', 'text/css')
+        .html('.ui-draggable:not(.being-dragged) { position: static !important; }')
+        .appendTo('head');
+    }
   });
 
   // 封装 draggable 初始化逻辑
-  function makeComponentDraggable(element) {
+  function makeComponentDraggable (element) {
+    // 先确保元素初始状态为static
+    $(element).css('position', 'static !important');
+    
     $(element).draggable({
       handle: '.ef-component-labels', // 拖拽的句柄
       containment: $canvas,
-      helper: 'orginal',
-      cursor:'move',
+      helper: 'original', // 修正拼写错误
+      cursor: 'move',
       opacity: 0.7,
-      start: function(event, ui) {
+      zIndex: 1000,
+      start: function (event, ui) {
+        $(this).addClass('being-dragged');
         $(ui.helper).addClass('dragging-placeholder');
+        // 拖拽开始时临时移除!important
+        $(this).css('position', '');
       },
-      stop: function(event, ui) {
+      stop: function (event, ui) {
+        $(this).removeClass('being-dragged');
         $(ui.helper).removeClass('dragging-placeholder');
-      },
-      drag: function(event, ui) {
-        // 当拖动时更新位置
-        $(this).css({
-          left: ui.position.left,
-          top: ui.position.top,
-          position: 'absolute',
-        });
+        
+        // 拖拽结束后，如果用户确实移动了元素，则设置为absolute
+        // 否则恢复为static
+        if (ui.position.left !== 0 || ui.position.top !== 0) {
+          $(this).css({
+            left: ui.position.left,
+            top: ui.position.top,
+            position: 'absolute',
+          });
+        } else {
+          $(this).css('position', 'static !important');
+        }
       }
     });
+    
+  }
+
+  // 页面加载时添加全局CSS规则来覆盖jQuery UI自动添加的position: relative样式
+  if ($('#ui-draggable-override-style').length === 0) {
+    $('<style id="ui-draggable-override-style">')
+      .prop('type', 'text/css')
+      .html('.ui-draggable:not(.being-dragged) { position: static !important; }')
+      .appendTo('head');
   }
 
   // 当新的 item-block 添加时重新初始化 droppable 区域
-  function reinitializeDroppables() {
+  function reinitializeDroppables () {
     // 销毁已经初始化的 droppable
-    // $('.ef-component').each(function() {
-    //   if ($(this).hasClass('ui-draggable')) {
-    //     $(this).draggable('destroy');
-    //   }
-    // });
-    // 检查是否已经初始化 droppable
-    $('.item-block').each(function() {
-      if ($(this).hasClass('ui-droppable')) {
-        $(this).droppable('destroy'); // 只有在已经初始化的情况下才销毁
+    $('.item-block.ui-droppable').droppable('destroy');
+    $('.section-content.ui-droppable').droppable('destroy');
+    
+    // 重新初始化
+    initDraggableDroppable();
+    
+    // 确保所有组件都是可拖动的
+    $('.ef-component').each(function() {
+      if (!$(this).hasClass('ui-draggable')) {
+        makeComponentDraggable($(this));
       }
     });
-    initDraggableDroppable(); // 重新初始化
+    
+    // 应用CSS规则来覆盖jQuery UI自动添加的样式
+    if ($('#ui-draggable-override-style').length === 0) {
+      $('<style id="ui-draggable-override-style">')
+        .prop('type', 'text/css')
+        .html('.ui-draggable:not(.being-dragged) { position: static !important; }')
+        .appendTo('head');
+    }
   }
 
   // 初始化 draggable 和 droppable 逻辑
-  function initDraggableDroppable() {
+  function initDraggableDroppable () {
     // 设置 item-block 可以接收放置组件
     $('.item-block').droppable({
-      accept: '.ef-component',
-      tolerance: 'pointer', // 当鼠标指针到达目标时放置
-      hoverClass: 'droppable-hover', // 鼠标悬停时的样式
-      drop: function(event, ui) {
-        const droppedComponent = $(ui.helper); // 获取原始元素
-        const offsetX = ui.offset.left - $(this).offset().left; // 计算相对于目标 item-block 的 X 位置
-        const offsetY = ui.offset.top - $(this).offset().top; // 计算相对于目标 item-block 的 Y 位置
-    
-        // 将组件移除并添加到目标 item-block 中，同时设置新的位置
-        droppedComponent.detach().appendTo($(this)).css({
-          position: 'absolute', // 设置为绝对定位
-          top: offsetY, // 使用相对偏移的 Y 值
-          left: offsetX // 使用相对偏移的 X 值
-        });
-
-        droppedComponent.removeClass('dragging-placeholder');
-
-        // 将组件添加到目标 item-block 中
-        //$(this).append(droppedComponent);
-        makeComponentDraggable(droppedComponent); // 重新初始化可拖拽
+      accept: '.ef-component, .component-item',
+      tolerance: 'pointer',
+      hoverClass: 'droppable-hover',
+      drop: function (event, ui) {
+        const $this = $(this);
+        
+        // 处理从组件面板拖拽的新组件
+        if (ui.draggable.hasClass('component-item')) {
+          const componentType = ui.draggable.attr('componenttype');
+          if (!componentType) return;
+          
+          // 根据组件类型创建新组件
+          if (componentType === 'table') {
+            // 显示表格行列输入模态框
+            $('#tableModal').css('display', 'flex');
+            
+            // 保存当前拖放的位置和目标元素
+            const dropTarget = $this;
+            const dropOffsetX = ui.offset.left - dropTarget.offset().left;
+            const dropOffsetY = ui.offset.top - dropTarget.offset().top;
+            
+            // 处理确定按钮点击事件
+            $('#create-table-btn').off('click').on('click', function() {
+              // ... 表格创建逻辑 ...
+            });
+          } else {
+            // 非表格组件的处理逻辑
+            const uniqueId = generateUniqueId();
+            const templateConfig = componentTemplates[componentType];
+            const html = templateConfig.template.replace(/{uniqueId}/g, uniqueId);
+            const newComponent = $(html);
+            
+            // 计算放置位置
+            const offsetX = ui.offset.left - $this.offset().left;
+            const offsetY = ui.offset.top - $this.offset().top;
+            
+            // 设置位置并添加到目标
+            newComponent.css({
+              position: 'absolute',
+              top: offsetY,
+              left: offsetX
+            }).appendTo($this);
+            
+            // 使新添加的组件可以拖动
+            makeComponentDraggable(newComponent);
+            
+            // 隐藏模态框
+            $ ('#tableModal').hide();
+            
+            // 文本组件的特定初始化逻辑
+            if (componentType === 'text') {
+              // 获取新添加组件中的可编辑元素
+              const editableElement = newComponent.find('[contenteditable]');
+              
+              // 添加点击事件，用户手动点击后才清空 placeholder
+              editableElement.one('click', function () {
+                if ($(this).text() === textPlaceHolder) {
+                  $(this).empty(); // 清空 placeholder
+                  $(this).focus(); // 聚焦在该元素上
+                }
+              });
+              
+              // 监听该组件中 h2 的 input 事件
+              newComponent.find('[contenteditable]').on('input', function () {
+                if ($(this).html() === '<br>') {
+                  $(this).html(''); // 清除多余的 <br> 标签
+                }
+              });
+            }
+          }
+        } else if (ui.draggable.hasClass('ef-component')) {
+          // 处理已存在组件的拖拽
+          const offsetX = ui.offset.left - $this.offset().left;
+          const offsetY = ui.offset.top - $this.offset().top;
+          
+          // 移动组件到新位置
+          ui.draggable.detach().appendTo($this).css({
+            position: 'absolute',
+            top: offsetY,
+            left: offsetX
+          });
+        }
       }
     });
-  }
 
-  let preventBlur = false;
-
-  // 当点击 ef-component-labels 时设置标志
-  $(document).on('mousedown', '.ef-component-labels', function (event) {
-    preventBlur = true;
-    event.stopPropagation();
-  });
-  
-  // 当 [contenteditable="true"] 失去焦点时，检查标志来决定是否隐藏
-  $(document).on('blur', '[contenteditable="true"]', function () {
-    if (!preventBlur) {
-      $(this).closest('.ef-text-component')
-        .css('border', 'none')
-        .find('.ef-component-labels').hide();
+    // 设置 section-content 可以接收放置组件
+    $('.section-content').droppable({
+      accept: '.ef-component, .component-item',
+      tolerance: 'pointer',
+      hoverClass: 'droppable-hover',
+      drop: function (event, ui) {
+        // 与 item-block 类似的处理逻辑
+        // ... 
+      }
+    });
+    
+    // 应用CSS规则来覆盖jQuery UI自动添加的样式
+    if ($('#ui-draggable-override-style').length === 0) {
+      $('<style id="ui-draggable-override-style">')
+        .prop('type', 'text/css')
+        .html('.ui-draggable:not(.being-dragged) { position: static !important; }')
+        .appendTo('head');
     }
-    // 重置标志
-    preventBlur = false;
-  });
-  
-  // 当 [contenteditable="true"] 获得焦点时显示
-  $(document).on('focus', '[contenteditable="true"]', function () {
+  }
+});
+
+
+let preventBlur = false;
+
+// 当点击 ef-component-labels 时设置标志
+$(document).on('mousedown', '.ef-component-labels', function (event) {
+  preventBlur = true;
+  event.stopPropagation();
+});
+
+// 当 [contenteditable="true"] 失去焦点时，检查标志来决定是否隐藏
+$(document).on('blur', '[contenteditable="true"]', function () {
+  if (!preventBlur) {
     $(this).closest('.ef-text-component')
-      .css('border', '1px solid #116dff')
-      .find('.ef-component-labels').show();
-  });
+      .css('border', 'none')
+      .find('.ef-component-labels').hide();
+  }
+  // 重置标志
+  preventBlur = false;
+});
+
+// 当 [contenteditable="true"] 获得焦点时显示
+$(document).on('focus', '[contenteditable="true"]', function () {
+  $(this).closest('.ef-text-component')
+    .css('border', '1px solid #116dff')
+    .find('.ef-component-labels').show();
 });

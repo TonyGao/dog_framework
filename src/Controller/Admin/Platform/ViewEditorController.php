@@ -42,7 +42,7 @@ class ViewEditorController extends BaseController
       },
       'childOpen' => '<li>',
       'childClose' => '</li>',
-      'nodeDecorator' => static function (array $node) use (&$controller): ?string {
+      'nodeDecorator' => static function (array $node): ?string {
         if ($node['type'] === 'root') {
           return '
             <div class="item-content scroll-item">
@@ -93,6 +93,8 @@ class ViewEditorController extends BaseController
             </div>
             ';
         }
+
+        return null;
       }
     ]);
     return $this->render('admin/platform/view/index.html.twig', [
@@ -222,6 +224,7 @@ class ViewEditorController extends BaseController
   {
     $components = [
       ['icon' => 'fa-solid fa-border-none', 'name' => '布局', 'componentType' => 'layout'],
+      ['icon' => 'fa-solid fa-table', 'name' => '表格', 'componentType' => 'table'],
       ['icon' => 'fa-solid fa-text-height', 'name' => '文本', 'componentType' => 'text'],
       ['icon' => 'fa-solid fa-image', 'name' => '图片', 'componentType' => 'image'],
       ['icon' => 'fa-regular fa-newspaper', 'name' => '富文本', 'componentType' => 'rich_text'],

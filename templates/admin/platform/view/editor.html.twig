@@ -20,7 +20,7 @@
 						<i class="fa-solid fa-times" style="font-size: 1em;"></i>
 					</button>
 				</div>
-				<div class="section-content"></div>
+				<div class="section-content ui-droppable"></div>
 			</div>
 		</div>
 
@@ -133,75 +133,54 @@
                         <div class="ef-col-4" style="background-color: #ddd; height: 68px; line-height: 68px; color: white; text-align: center;"></div>
 					</div>
 				</div>
-				{# <div class="structure-grid">
-									<!-- 第一行结构选项 -->
-									<div class="structure-option">
-										<div class="col col-24"></div>
-									</div>
-									<div class="structure-option">
-										<div class="col col-12"></div>
-										<div class="col col-12"></div>
-									</div>
-									<div class="structure-option">
-										<div class="col col-8"></div>
-										<div class="col col-8"></div>
-										<div class="col col-8"></div>
-									</div>
-									<div class="structure-option">
-										<div class="col col-6"></div>
-										<div class="col col-6"></div>
-										<div class="col col-6"></div>
-										<div class="col col-6"></div>
-									</div>
-									<div class="structure-option">
-										<div class="col col-9"></div>
-										<div class="col col-15"></div>
-									</div>
-									<div class="structure-option">
-										<div class="col col-15"></div>
-										<div class="col col-9"></div>
-									</div>
-				
-									<!-- 第二行结构选项 -->
-									<div class="structure-option">
-										<div class="col col-6"></div>
-										<div class="col col-6"></div>
-										<div class="col col-12"></div>
-									</div>
-									<div class="structure-option">
-										<div class="col col-12"></div>
-										<div class="col col-6"></div>
-										<div class="col col-6"></div>
-									</div>
-									<div class="structure-option">
-										<div class="col col-6"></div>
-										<div class="col col-12"></div>
-										<div class="col col-6"></div>
-									</div>
-									<div class="structure-option">
-										<div class="col col-5"></div>
-										<div class="col col-5"></div>
-										<div class="col col-5"></div>
-										<div class="col col-5"></div>
-										<div class="col col-5"></div>
-									</div>
-									<div class="structure-option">
-										<div class="col col-4"></div>
-										<div class="col col-4"></div>
-										<div class="col col-4"></div>
-										<div class="col col-4"></div>
-										<div class="col col-4"></div>
-										<div class="col col-4"></div>
-									</div>
-									<div class="structure-option">
-										<div class="col col-4"></div>
-										<div class="col col-16"></div>
-										<div class="col col-4"></div>
-									</div>
-								</div> #}
 			</div>
 		</div>
 
+		{% set tableModalBody %}
+		<div class="ef-row ef-row-align-start ef-row-justify-start">
+			<div class="ef-col-12" style="margin-bottom: 20px;">
+				<div class="ef-form-item ef-form-item-layout-horizontal">
+					<div class="ef-col ef-col-10 ef-form-item-label-col">
+						<label class="ef-form-item-label">行数</label>
+					</div>
+					<div class="ef-col ef-col-14 ef-form-item-wrapper-col">
+						<div class="ef-form-item-content-wrapper">
+							<div class="ef-form-item-content">
+								{{ ui.inputNumber("table-rows") }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="ef-col-12">
+				<div class="ef-form-item ef-form-item-layout-horizontal">
+					<div class="ef-col ef-col-10 ef-form-item-label-col">
+						<label class="ef-form-item-label">列数</label>
+					</div>
+					<div class="ef-col ef-col-14 ef-form-item-wrapper-col">
+						<div class="ef-form-item-content-wrapper">
+							<div class="ef-form-item-content">
+								{{ ui.inputNumber("table-cols") }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% endset %}
+
+		{% set tableModalFooter %}
+		<div class="ef-space ef-space-horizontal ef-space-align-center">
+			<div class="ef-space-item" style="margin-right: 8px;">
+				<button class="btn primary medium" id="create-table-btn">确定</button>
+			</div>
+			<div class="ef-space-item">
+				<button class="btn outline medium" id="cancel-table-btn">取消</button>
+			</div>
+		</div>
+		{% endset %}
+
+		{{ ui.modal('tableModal', '创建表格', tableModalBody, tableModalFooter, {width: '400px'}) }}
 
 		<div class="properties-panel" id="properties-panel">
 			<h3>属性面板</h3>
