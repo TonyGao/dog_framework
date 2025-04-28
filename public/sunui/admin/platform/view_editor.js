@@ -437,6 +437,15 @@ $(document).ready(function () {
             makeComponentDraggable(newComponent);
 
             // 初始化表格交互功能
+            /**
+             * isSelecting: 一个标志变量，用于判断当前是否处于选择状态。
+             * startCell: 选择开始时的单元格。
+             * selectedCells: 存储已选择的单元格的数组。
+             * startRowIndex: 选择开始时的行索引。
+             * startColIndex: 选择开始时的列索引
+             * 
+             * isSelecting: 默认为false，当表格被点击时，将其设置为true。
+             */
             let isSelecting = false;
             let startCell = null;
             let selectedCells = [];
@@ -513,6 +522,16 @@ $(document).ready(function () {
               }
             });
 
+            // 将事件绑定到组件级别
+            newComponent.on('click', function(e) {
+              const $target = $(e.target);
+              if (!$target.closest('.ef-table').length) {
+                clearSelection();
+                isSelected = false;
+                selectedRange = null;
+              }
+            });
+
             // 鼠标松开时结束选择
             $(document).on('mouseup', function() {
               if (isSelecting) {
@@ -527,13 +546,13 @@ $(document).ready(function () {
             });
 
             // 点击表格外部时清除选择
-            $(document).on('click', '.ef-table', function(e) {
-              if (!$(e.target).closest('.ef-table').length && isSelected) {
-                clearSelection();
-                isSelected = false;
-                selectedRange = null;
-              }
-            });
+            // $(document).on('click', '.ef-table', function(e) {
+            //   if (!$(e.target).closest('.ef-table').length && isSelected) {
+            //     clearSelection();
+            //     isSelected = false;
+            //     selectedRange = null;
+            //   }
+            // });
 
             // 禁用单元格的默认编辑功能
             newComponent.find('th, td').attr('contenteditable', 'false').css('cursor', 'default');
@@ -580,26 +599,30 @@ $(document).ready(function () {
             });
 
             // 点击其他区域取消选中
-            $(document).on('click', '.ef-table', function(e) {
-              if (!$(e.target).closest('.ef-table').length) {
-                clearSelection();
-              }
-            });
+            // $(document).on('click', '.ef-table', function(e) {
+            //   if (!$(e.target).closest('.ef-table').length) {
+            //     clearSelection();
+            //   }
+            // });
 
             // 清除选择样式的函数
             function clearSelection() {
               newComponent.find('th, td').css({
                 'background-color': '',
                 'outline': 'none',
+                'border': '1px dashed #d5d8dc',  // 恢复为灰色虚线边框
+                'border-width': '1px',
+                'border-style': 'dashed',
+                'border-color': '#d5d8dc'
               });
             }
 
             // 点击其他地方清除选择
-            $(document).on('click', function(e) {
-              if (!$(e.target).is('th, td')) {
-                clearSelection();
-              }
-            });
+            // $(document).on('click', function(e) {
+            //   if (!$(e.target).is('th, td')) {
+            //     clearSelection();
+            //   }
+            // });
 
             // 隐藏模态窗口
             $('#tableModal').hide();
