@@ -1,4 +1,10 @@
 /* 编辑器工具栏样式 */
+.app-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .editor-toolbar {
   display: flex;
   align-items: center;
@@ -67,7 +73,7 @@
     width: 24px;
     height: 24px;
   }
-  
+
   .toolbar-select {
     height: 24px;
     max-width: 80px;

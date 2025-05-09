@@ -183,7 +183,52 @@
 		{{ ui.modal('tableModal', '创建表格', tableModalBody, tableModalFooter, {width: '400px'}) }}
 
 		<div class="properties-panel" id="properties-panel">
-			<h3>属性面板</h3>
+			{% set propTabId1 = random() %}
+			{% set propTabId2 = random() %}
+			{% set propTabId3 = random() %}
+			
+			<div id="property-tabs" class="ef-tabs tabs-container">
+				<div class="tabs-header tabs-header-plain">
+					<div class="tabs-scroller-left" style="display: none;"><i class="fa-solid fa-angles-left"></i></div>
+					<div class="tabs-scroller-right" style="display: none;"><i class="fa-solid fa-angles-right"></i></div>
+					<div class="tabs-wrap">
+						<ul class="tabs">
+							<li class="tabs-first tabs-selected" id="{{ propTabId1 }}">
+								<span class="tabs-inner">
+									<span class="tabs-title">Section</span>
+								</span>
+							</li>
+							<li class="" id="{{ propTabId2 }}">
+								<span class="tabs-inner">
+									<span class="tabs-title">组件</span>
+								</span>
+							</li>
+							<li class="tabs-last" id="{{ propTabId3 }}">
+								<span class="tabs-inner">
+									<span class="tabs-title">高级</span>
+								</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="tabs-panels">
+					<div class="panel panel-htop" liid="{{ propTabId1 }}">
+						<div class="panel-body panel-body-noheader panel-body-noborder" style="padding: 10px;">
+							{% include 'admin/platform/view/editor_section_properties.html.twig' %}
+						</div>
+					</div>
+					<div class="panel panel-htop" style="display: none;" liid="{{ propTabId2 }}">
+						<div class="panel-body panel-body-noheader panel-body-noborder" style="padding: 10px;">
+							<p>组件属性将根据选中的组件类型显示</p>
+						</div>
+					</div>
+					<div class="panel panel-htop" style="display: none;" liid="{{ propTabId3 }}">
+						<div class="panel-body panel-body-noheader panel-body-noborder" style="padding: 10px;">
+							<p>高级属性配置</p>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<button class="toggle-properties" id="toggle-button">
 			<i class="fa-solid fa-angle-right"></i>

@@ -87,7 +87,7 @@ class ViewEditorController extends BaseController
                 <i class="fa-solid fa-o"></i>
               </div>
               <div class="node-name">
-                <div class="tree-text-content branch" type="view">' . $node['name'] . '</div>
+                <div class="tree-text-content branch" type="view" id="' . $node['id'] . '>' . $node['name'] . '</div>
                 <div class="postscript">'. $node['label'] .'</div>
               </div>
             </div>

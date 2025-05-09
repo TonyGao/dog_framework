@@ -36,6 +36,9 @@
   border-style: solid;
   border-top-width: 0;
   overflow: hidden;
+  overflow-y: auto;
+  height: auto;
+  max-height: calc(100vh - 100px);
 }
 
 .tabs-scroller-left, .tabs-scroller-right {
