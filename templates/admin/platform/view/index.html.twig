@@ -16,8 +16,9 @@
 		<div class="outside-wrapper">
 			{# 渲染工具栏，并传入按钮配置数组 #}
 			{{ ui.toolBar([
+				  {'type': 'modify', 'text': '视图编辑器', 'id': 'viewEditor'},
 					{'type': 'create', 'text': '新建视图', 'id': 'createView'},
-					{'type': 'modify', 'text': '编辑视图', 'id': 'modifyView'},
+					{'type': 'modify', 'text': '修改名称', 'id': 'modifyView'},
 					{'type': 'create', 'text': '新建文件夹', 'icon': 'fa-solid fa-folder-plus', 'id': 'createFolder'}
 			]) }}
 			<div class="inside-wrapper">

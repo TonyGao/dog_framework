@@ -15,13 +15,33 @@ $(document).ready(function () {
     });
   }
 
-  // 页面加载时调整按钮位置
+  // 页面加载时调整按钮位置和canvas对齐方式
   adjustButtonPosition();
+  adjustCanvasAlignment();
 
   // 窗口大小改变时调整按钮位置
   $(window).resize(function () {
     adjustButtonPosition();
+    adjustCanvasAlignment();
   });
+  
+  // 检查section-content宽度并调整canvas对齐方式
+  function adjustCanvasAlignment() {
+    const $activeSection = $('.section.active');
+    if ($activeSection.length > 0) {
+      const $sectionContent = $activeSection.find('.section-content');
+      const sectionContentWidth = $sectionContent.outerWidth();
+      const canvasWidth = $canvas.width();
+      
+      // 如果section-content宽度超过canvas宽度，将canvas的align-items设置为flex-start
+      // 否则保持居中对齐
+      if (sectionContentWidth > canvasWidth) {
+        $canvas.css('align-items', 'flex-start');
+      } else {
+        $canvas.css('align-items', 'center');
+      }
+    }
+  }
 
   // 点击 section 时激活该 section
   function activateSection (section) {
@@ -30,10 +50,26 @@ $(document).ready(function () {
 
     // 给当前点击的 section 添加 active class
     section.addClass('active');
+    
+    // 调整canvas对齐方式
+    adjustCanvasAlignment();
   }
 
+  // 给canvas添加点击事件，处理空白区域点击
+  $canvas.on('click', function(event) {
+    // 检查点击的是否是canvas本身（空白区域）
+    if (event.target === this) {
+      // 清除所有表格单元格的选中状态
+      $('.ef-table td').css({'border': '1px dashed #d5d8dc', 'background-color': 'transparent'});
+      // 移除所有section的active状态
+      $('.section').removeClass('active');
+    }
+  });
+
   // 给现有的 section 添加点击事件
-  $canvas.on('click', '.section', function () {
+  $canvas.on('click', '.section', function (event) {
+    // 阻止事件冒泡到canvas
+    event.stopPropagation();
     // 激活当前点击的 section
     activateSection($(this));
   });
@@ -54,13 +90,21 @@ $(document).ready(function () {
                   <button class="btn-layout"><i class="fa-solid fa-grip"></i></button>
                   <button class="btn-close"><i class="fa-solid fa-times"></i></button>
               </div>
-              <div class="section-content ui-droppable">
+              <div class="section-content ui-droppable" style="width: 1140px">
                   <!-- 新的 Section 内容 -->
               </div>
           </div>`;
     const $newSection = $(newSectionHtml);
     $canvas = $('.canvas');
     $canvas.append($newSection);
+    
+    // 确保section元素的宽度比section-content大10px
+    const $sectionContent = $newSection.find('.section-content');
+    const contentWidth = $sectionContent.outerWidth();
+    if (contentWidth) {
+        $newSection.css('min-width', (contentWidth + 10) + 'px');
+    }
+    
     activateSection($newSection);
     reinitializeDroppables();
   });
@@ -296,19 +340,19 @@ $(document).ready(function () {
         </span>
         <table class="ef-table" style="width:100%; border-collapse: collapse;">
           <thead>
-            <tr>
+            <tr style="height: 30px;">
               <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 1</th>
               <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 2</th>
               <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 3</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr style="height: 30px;">
               <td style="border: 1px solid #ddd; padding: 8px;">内容 1</td>
               <td style="border: 1px solid #ddd; padding: 8px;">内容 2</td>
               <td style="border: 1px solid #ddd; padding: 8px;">内容 3</td>
             </tr>
-            <tr>
+            <tr style="height: 30px;">
               <td style="border: 1px solid #ddd; padding: 8px;">内容 4</td>
               <td style="border: 1px solid #ddd; padding: 8px;">内容 5</td>
               <td style="border: 1px solid #ddd; padding: 8px;">内容 6</td>
@@ -403,7 +447,7 @@ $(document).ready(function () {
 
             // 生成表格内容
             for (let i = 0; i < rows; i++) {
-              tableHtml += '<tr>';
+              tableHtml += '<tr style="height: 30px;">';
               for (let j = 0; j < cols; j++) {
                 tableHtml += '<td style="border: 1px dashed #d5d8dc; padding: 8px;" contenteditable="true"></td>';
               }
@@ -482,16 +526,16 @@ $(document).ready(function () {
                       
                       // 设置外边框
                       if (rowIndex === minRow) {
-                        $(this).css('border-top', '2px solid #007bff');
+                        $(this).css('border-top', '1px solid #007bff');
                       }
                       if (rowIndex === maxRow) {
-                        $(this).css('border-bottom', '2px solid #007bff');
+                        $(this).css('border-bottom', '1px solid #007bff');
                       }
                       if (colIndex === minCol) {
-                        $(this).css('border-left', '2px solid #007bff');
+                        $(this).css('border-left', '1px solid #007bff');
                       }
                       if (colIndex === maxCol) {
-                        $(this).css('border-right', '2px solid #007bff');
+                        $(this).css('border-right', '1px solid #007bff');
                       }
                     }
                   });

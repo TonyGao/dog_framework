@@ -1,0 +1,197 @@
+<div class="section-properties-panel">
+    <div class="property-group">
+        <div class="property-group-header">
+            <i class="fa-solid fa-caret-down"></i>
+            <span>Container</span>
+        </div>
+        <div class="property-group-content">
+            <div class="property-item" id="content-width-item">
+                <label>Content Width</label>
+                <div class="property-control">
+                    <select id="content-width" class="property-select">
+                        <option value="full-width">Full Width</option>
+                        <option value="boxed">Boxed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="property-item">
+                <label>Width</label>
+                <div class="property-control slider-with-input">
+                    <div class="slider-container">
+                        <input type="range" id="width-slider" min="200" max="100" value="100" class="property-slider">
+                    </div>
+                    <div class="input-with-unit">
+                        <input type="number" id="width-value" value="100" class="property-input">
+                        <div class="unit-selector">
+                            <span>%</span>
+                            <i class="fa-solid fa-caret-down"></i>
+                            <div class="unit-dropdown">
+                                <div class="unit-option" data-unit="px">px</div>
+                                <div class="unit-option" data-unit="%">%</div>
+                                <div class="unit-option" data-unit="em">em</div>
+                                <div class="unit-option" data-unit="rem">rem</div>
+                                <div class="unit-option" data-unit="vw">vw</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="property-item">
+                <label>Min Height</label>
+                <div class="property-control slider-with-input">
+                    <div class="slider-container">
+                        <input type="range" id="min-height-slider" min="100" max="1440" value="216" class="property-slider">
+                    </div>
+                    <div class="input-with-unit">
+                        <input type="number" id="min-height-value" value="216" class="property-input">
+                        <div class="unit-selector">
+                            <span>px</span>
+                            <i class="fa-solid fa-caret-down"></i>
+                            <div class="unit-dropdown">
+                                <div class="unit-option" data-unit="px">px</div>
+                                <div class="unit-option" data-unit="em">em</div>
+                                <div class="unit-option" data-unit="rem">rem</div>
+                                <div class="unit-option" data-unit="vh">vh</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="property-hint">
+                <p>To achieve full height Container use 100vh.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="property-group">
+        <div class="property-group-header">
+            <i class="fa-solid fa-caret-down"></i>
+            <span>Items</span>
+        </div>
+        <div class="property-group-content">
+            <div class="property-item">
+                <label>Grid Outline</label>
+                <div class="property-control toggle-switch">
+                    <div class="toggle-label">Show</div>
+                    <label class="switch">
+                        <input type="checkbox" id="grid-outline" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="property-item">
+                <label>Columns</label>
+                <div class="property-control slider-with-input">
+                    <div class="unit-icon"><i class="fa-solid fa-table-columns"></i></div>
+                    <div class="slider-container">
+                        <input type="range" id="columns-slider" min="1" max="12" value="3" class="property-slider">
+                    </div>
+                    <div class="input-with-unit">
+                        <input type="number" id="columns-value" value="3" class="property-input">
+                        <div class="unit-selector">
+                            <span>fr</span>
+                            <i class="fa-solid fa-caret-down"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="property-item">
+                <label>Rows</label>
+                <div class="property-control slider-with-input">
+                    <div class="unit-icon"><i class="fa-solid fa-table-rows"></i></div>
+                    <div class="slider-container">
+                        <input type="range" id="rows-slider" min="1" max="12" value="2" class="property-slider">
+                    </div>
+                    <div class="input-with-unit">
+                        <input type="number" id="rows-value" value="2" class="property-input">
+                        <div class="unit-selector">
+                            <span>fr</span>
+                            <i class="fa-solid fa-caret-down"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="property-item">
+                <label>Gaps</label>
+                <div class="property-control gap-inputs">
+                    <div class="gap-input-group">
+                        <input type="number" id="column-gap" value="67" class="property-input">
+                        <div class="gap-label">Column</div>
+                        <div class="unit-selector gap-unit">
+                            <span>px</span>
+                            <i class="fa-solid fa-caret-down"></i>
+                            <div class="unit-dropdown">
+                                <div class="unit-option" data-unit="px">px</div>
+                                <div class="unit-option" data-unit="%">%</div>
+                                <div class="unit-option" data-unit="em">em</div>
+                                <div class="unit-option" data-unit="rem">rem</div>
+                                <div class="unit-option" data-unit="vw">vw</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gap-input-group">
+                        <input type="number" id="row-gap" value="26" class="property-input">
+                        <div class="gap-label">Row</div>
+                        <div class="unit-selector gap-unit">
+                            <span>px</span>
+                            <i class="fa-solid fa-caret-down"></i>
+                            <div class="unit-dropdown">
+                                <div class="unit-option" data-unit="px">px</div>
+                                <div class="unit-option" data-unit="%">%</div>
+                                <div class="unit-option" data-unit="em">em</div>
+                                <div class="unit-option" data-unit="rem">rem</div>
+                                <div class="unit-option" data-unit="vw">vw</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="link-icon">
+                        <i class="fa-solid fa-link"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="property-item">
+                <label>Auto Flow</label>
+                <div class="property-control">
+                    <select id="auto-flow" class="property-select">
+                        <option value="row">Row</option>
+                        <option value="column">Column</option>
+                    </select>
+                </div>
+            </div>
+            <div class="property-item">
+                <label>Justify Items</label>
+                <div class="property-control justify-align-controls">
+                    <button class="align-button active" data-value="start">
+                        <i class="fa-solid fa-align-left"></i>
+                    </button>
+                    <button class="align-button" data-value="center">
+                        <i class="fa-solid fa-align-center"></i>
+                    </button>
+                    <button class="align-button" data-value="end">
+                        <i class="fa-solid fa-align-right"></i>
+                    </button>
+                    <button class="align-button" data-value="stretch">
+                        <i class="fa-solid fa-arrows-left-right"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="property-item">
+                <label>Align Items</label>
+                <div class="property-control justify-align-controls">
+                    <button class="align-button" data-value="start">
+                        <i class="fa-solid fa-align-left fa-rotate-90"></i>
+                    </button>
+                    <button class="align-button active" data-value="center">
+                        <i class="fa-solid fa-align-center fa-rotate-90"></i>
+                    </button>
+                    <button class="align-button" data-value="end">
+                        <i class="fa-solid fa-align-right fa-rotate-90"></i>
+                    </button>
+                    <button class="align-button" data-value="stretch">
+                        <i class="fa-solid fa-arrows-up-down"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

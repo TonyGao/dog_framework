@@ -91,6 +91,16 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   border-radius: 10px; /* 圆角 */
   transition: all 0.3s ease; /* 平滑过渡 */
+  text-align: center; /* 使section元素在canvas中居中 */
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  overflow: auto;
+  flex-direction: column;
+  width: 100%; /* 确保canvas宽度占满可用空间 */
+  min-width: 0; /* 允许canvas在小屏幕上缩小 */
+  max-width: 100%; /* 确保不超出父容器 */
+  margin-bottom: 60px;
 }
 
 /* Section 样式 */
@@ -98,8 +108,11 @@
   margin: 0;
   position: relative;
   background-color: #f0f8ff;
-  overflow: hidden;
+  overflow: visible; /* 修改为visible以允许section-content滚动 */
   padding: 0;
+  /* 使section能够根据内容自适应宽度 */
+  display: inline-block; /* 使元素宽度自适应内容 */
+  max-width: 100%; /* 确保不超出父容器 */
 }
 
 .section.active {
@@ -114,6 +127,29 @@
   justify-content: center;
   flex-flow: row wrap;
   align-items: center;
+  width: 1140px; /* 默认宽度设置在section-content上 */
+  min-width: 200px; /* 最小宽度 */
+  overflow-y: auto; /* 启用垂直滚动条，当内容超出时可滚动查看 */
+  overflow-x: visible; /* 确保水平方向内容可见，不被截断 */
+  max-height: 100%; /* 确保不超出父容器高度 */
+  scrollbar-width: none; /* 隐藏Firefox的默认滚动条 */
+  position: relative; /* 确保定位正确 */
+}
+
+/* 自定义滚动条样式 */
+.section-content::-webkit-scrollbar {
+  background-color: transparent;
+  width: 0px;
+}
+
+.section-content:hover::-webkit-scrollbar {
+  width: 9px;
+}
+
+.section-content:hover::-webkit-scrollbar-thumb {
+  background-color: rgb(201,205,212);
+  border-radius: 6px;
+  margin: 0 3px;
 }
 
 .section:hover {
@@ -346,4 +382,51 @@ h1, h2, h3 {
 
 .ef-component.ef-table-component {
   width: -webkit-fill-available;
+}
+
+/* 页面属性样式 */
+.page-properties {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.page-property-item {
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+}
+
+.page-property-item label {
+  margin-right: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.page-property-item .property-control {
+  display: flex;
+  align-items: center;
+}
+
+.page-property-item .slider-container {
+  width: 100px;
+  margin-right: 8px;
+}
+
+.page-property-item .input-with-unit {
+  display: flex;
+  align-items: center;
+}
+
+.page-property-item .property-input {
+  width: 60px;
+  height: 24px;
+  padding: 0 5px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+.page-property-item .unit-selector {
+  margin-left: 5px;
+  font-size: 12px;
 }
