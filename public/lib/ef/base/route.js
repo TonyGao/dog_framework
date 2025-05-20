@@ -60,9 +60,23 @@ class Route {
     }
 
     let path = route.path;
-    // Replace route parameters in path
+    // 验证必需的路由参数
+    if (route.parameters && route.parameters.length > 0) {
+      for (const param of route.parameters) {
+        if (!parameters[param]) {
+          console.error(`Missing required parameter: ${param} for route ${routeName}`);
+          return null;
+        }
+      }
+    }
+
+    // 替换路由参数
     for (const [key, value] of Object.entries(parameters)) {
-      path = path.replace(`{${key}}`, value);
+      if (route.parameters && route.parameters.includes(key)) {
+        path = path.replace(`{${key}}`, value);
+      } else {
+        console.warn(`Unused parameter: ${key} for route ${routeName}`);
+      }
     }
 
     // Default to GET method if methods array is empty

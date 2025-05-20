@@ -4,6 +4,9 @@
 	<head>
 		<meta charset="UTF-8">
     <meta name="session" session="{{ get_session_id() }}">
+		{% if app.request.server.get('KEY_DEBUG') is defined and app.request.server.get('KEY_DEBUG') == 'true' %}
+		<meta name="keydebug" content="true">
+		{% endif %}
 		{% for type in ['org.singleDepartment'] %}
 				{% for message in app.flashes(type) %}
 						<meta name="cache-status" data-cache-type="{{ type }}" content="{{ message }}">
@@ -97,4 +100,12 @@
 	<body>
 		{% block body %}{% endblock %}
 	</body>
+
+{% block end_javascripts %}
+	<script>
+		$(document).ready(function() {
+			$(document.body).hotkeyManager();
+		});
+	</script>
+{% endblock %}
 </html>

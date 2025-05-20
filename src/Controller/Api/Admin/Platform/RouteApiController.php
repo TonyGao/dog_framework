@@ -28,19 +28,23 @@ class RouteApiController extends AbstractController
     // 格式化路由信息
     $formattedRoutes = [];
     foreach ($routes as $name => $route) {
-      // 只返回以 api 开头的路由
-      // if (strpos($name, 'api') === 0 || substr($name, -5) === 'cache') {
-      //     $formattedRoutes[$name] = [
-      //         'path' => $route->getPath(),
-      //         'methods' => $route->getMethods(),
-      //     ];
-      // }
+      // 只返回特定前缀的路由给前端
+      $allowedPrefixes = ['api_', 'platform_'];
+      $shouldInclude = false;
+      
+      // 检查路由名称是否以允许的前缀开头
+      foreach ($allowedPrefixes as $prefix) {
+        if (strpos($name, $prefix) === 0) {
+          $shouldInclude = true;
+          break;
+        }
+      }
 
-      // 暂时全部开放给前端
-      if (strpos($name, '_') !== 0) {
+      if ($shouldInclude) {
         $formattedRoutes[$name] = [
           'path' => $route->getPath(),
           'methods' => $route->getMethods(),
+          'parameters' => $route->compile()->getPathVariables(),
         ];
       }
     }

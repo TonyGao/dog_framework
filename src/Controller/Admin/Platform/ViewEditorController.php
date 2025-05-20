@@ -87,7 +87,7 @@ class ViewEditorController extends BaseController
                 <i class="fa-solid fa-o"></i>
               </div>
               <div class="node-name">
-                <div class="tree-text-content branch" type="view" id="' . $node['id'] . '>' . $node['name'] . '</div>
+                <div class="tree-text-content branch" type="view" id="' . $node['id'] . '">' . $node['name'] . '</div>
                 <div class="postscript">'. $node['label'] .'</div>
               </div>
             </div>
@@ -119,10 +119,10 @@ class ViewEditorController extends BaseController
     // 处理上级目录的逻辑
     if ($parentId) {
       $parent = $em->getRepository(View::class)->find($parentId);
-      if ($parent && $parent->getType() === 'folder') {
+      if ($parent && ($parent->getType() === 'folder' || $parent->getType() === 'root')) {
         $view->setParent($parent);
       } else {
-        return new JsonResponse(['error' => '上级目录无效或不是文件夹'], 400);
+        return new JsonResponse(['message' => '上级目录无效或不是文件夹'], 400);
       }
     } else {
       // 如果没有父目录，创建根目录
@@ -147,6 +147,38 @@ class ViewEditorController extends BaseController
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+      // 检查同级目录下是否有同名文件夹
+      $parent = $view->getParent();
+      $existingFolder = $em->getRepository(View::class)->findOneBy([
+        'parent' => $parent,
+        'name' => $view->getName(),
+        'type' => 'folder'
+      ]);
+
+      if ($existingFolder) {
+        return new JsonResponse(['message' => '同级目录下已存在同名文件夹'], 400);
+      }
+
+      // 构建文件夹路径
+      $basePath = $this->getParameter('kernel.project_dir') . '/templates/views';
+      $relativePath = $this->buildRelativePath($parent, $view->getName());
+      $folderPath = $basePath . '/' . $relativePath;
+      
+      // 检查文件系统中是否已存在该目录
+      if (file_exists($folderPath) && is_dir($folderPath)) {
+        return new JsonResponse(['message' => '文件系统中已存在同名文件夹'], 400);
+      }
+      
+      // 创建文件夹
+      if (!file_exists($folderPath)) {
+        if (!mkdir($folderPath, 0755, true)) {
+          return new JsonResponse(['message' => '创建文件夹失败，请检查权限'], 500);
+        }
+      }
+      
+      // 设置相对路径到数据库
+      $view->setPath($relativePath);
+      
       $em->persist($view);
       $em->flush();
 
@@ -179,7 +211,7 @@ class ViewEditorController extends BaseController
       if ($parent && ($parent->getType() === 'folder' || $parent->getType() === 'root')) {
         $view->setParent($parent);
       } else {
-        return new JsonResponse(['error' => '上级目录无效或不是文件夹'], 400);
+        return new JsonResponse(['message' => '上级目录无效或不是文件夹'], 400);
       }
     } else {
       // 如果没有父目录，创建根目录
@@ -204,6 +236,57 @@ class ViewEditorController extends BaseController
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+      // 检查同级目录下是否有同名视图
+      $parent = $view->getParent();
+      $existingView = $em->getRepository(View::class)->findOneBy([
+        'parent' => $parent,
+        'name' => $view->getName(),
+        'type' => 'view'
+      ]);
+
+      if ($existingView) {
+        return new JsonResponse(['message' => '同级目录下已存在同名视图'], 400);
+      }
+
+      // 构建视图文件路径
+      $basePath = $this->getParameter('kernel.project_dir') . '/templates/views';
+      $relativePath = $this->buildRelativePath($parent, $view->getName());
+      $viewPath = $basePath . '/' . $relativePath;
+      $viewDir = dirname($viewPath);
+      
+      // 确保目录存在
+      if (!file_exists($viewDir)) {
+        if (!mkdir($viewDir, 0755, true)) {
+          return new JsonResponse(['message' => '创建视图目录失败，请检查权限'], 500);
+        }
+      }
+      
+      // 创建两个视图文件：name.html.twig 和 name.design.twig
+      $name = $view->getName();
+      $htmlTwigPath = $viewDir . '/' . $name . '.html.twig';
+      $designTwigPath = $viewDir . '/' . $name . '.design.twig';
+      
+      // 检查文件是否已存在
+      if (file_exists($htmlTwigPath) || file_exists($designTwigPath)) {
+        return new JsonResponse(['message' => '文件系统中已存在同名视图文件'], 400);
+      }
+      
+      // 创建视图文件
+      if (file_put_contents($htmlTwigPath, '{# ' . $view->getLabel() . ' 视图模板 #}\n{% extends "base.html.twig" %}\n\n{% block body %}\n  {# 视图内容 #}\n{% endblock %}') === false) {
+        return new JsonResponse(['message' => '创建视图HTML文件失败'], 500);
+      }
+      
+      if (file_put_contents($designTwigPath, '{# ' . $view->getLabel() . ' 设计文件 #}\n{# 此文件用于存储视图设计信息 #}') === false) {
+        // 如果设计文件创建失败，删除已创建的HTML文件
+        if (file_exists($htmlTwigPath)) {
+          unlink($htmlTwigPath);
+        }
+        return new JsonResponse(['message' => '创建视图设计文件失败'], 500);
+      }
+      
+      // 设置相对路径到数据库
+      $view->setPath($relativePath);
+      
       $em->persist($view);
       $em->flush();
 
@@ -214,6 +297,39 @@ class ViewEditorController extends BaseController
     return $this->render('admin/platform/view/add_view.html.twig', [
       'form' => $form->createView(),
     ]);
+  }
+  
+  /**
+   * 构建相对路径
+   * 
+   * @param View $parent 父节点
+   * @param string $name 当前节点名称
+   * @return string 相对路径
+   */
+  private function buildRelativePath(View $parent, string $name): string
+  {
+    $path = $name;
+    
+    // 如果父节点是根节点，直接返回当前名称
+    if ($parent->getType() === 'root') {
+      return $path;
+    }
+    
+    // 递归构建路径
+    $currentParent = $parent;
+    $segments = [];
+    
+    while ($currentParent && $currentParent->getType() !== 'root') {
+      array_unshift($segments, $currentParent->getName());
+      $currentParent = $currentParent->getParent();
+    }
+    
+    // 拼接路径
+    if (!empty($segments)) {
+      $path = implode('/', $segments) . '/' . $path;
+    }
+    
+    return $path;
   }
 
   #[Route(

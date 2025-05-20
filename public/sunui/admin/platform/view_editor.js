@@ -2,12 +2,24 @@ $(document).ready(function () {
   let $canvas = $('.canvas');
   const $addSectionButton = $('.add-section-button');
 
+  // 清除选择样式的函数
+  function clearSelection (container) {
+    container.find('th, td').css({
+      'background-color': '',
+      'outline': 'none',
+      'border': '1px dashed #d5d8dc',  // 恢复为灰色虚线边框
+      'border-width': '1px',
+      'border-style': 'dashed',
+      'border-color': '#d5d8dc'
+    }).removeAttr('data-cell-active');
+  }
+
   function adjustButtonPosition () {
     const canvasOffset = $canvas.offset();
     const canvasWidth = $canvas.outerWidth();
 
-    console.log("canvasOffset.left:", canvasOffset.left); // 输出 canvas 左侧位置
-    console.log("canvasWidth:", canvasWidth);             // 输出 canvas 宽度
+    // console.log("canvasOffset.left:", canvasOffset.left); // 输出 canvas 左侧位置
+    // console.log("canvasWidth:", canvasWidth);             // 输出 canvas 宽度
 
     // 固定按钮到屏幕底部，调整按钮相对于 .canvas 的水平位置
     $addSectionButton.css({
@@ -59,19 +71,42 @@ $(document).ready(function () {
   $canvas.on('click', function(event) {
     // 检查点击的是否是canvas本身（空白区域）
     if (event.target === this) {
-      // 清除所有表格单元格的选中状态
-      $('.ef-table td').css({'border': '1px dashed #d5d8dc', 'background-color': 'transparent'});
+      // 清除所有表格单元格的选中状态（包括th和td元素）
+      $('.ef-table th, .ef-table td').css({
+        'border': '1px dashed #d5d8dc', 
+        'background-color': 'transparent',
+        'outline': 'none',  // 清除outline属性，解决单元格蓝色边框无法清除的问题
+        'border-top': '1px dashed #d5d8dc',
+        'border-bottom': '1px dashed #d5d8dc',
+        'border-left': '1px dashed #d5d8dc',
+        'border-right': '1px dashed #d5d8dc'
+      });
       // 移除所有section的active状态
       $('.section').removeClass('active');
     }
   });
 
+
   // 给现有的 section 添加点击事件
   $canvas.on('click', '.section', function (event) {
     // 阻止事件冒泡到canvas
     event.stopPropagation();
+    const $section = $(this);
+    const $sectionHeader = $section.find('.section-header');
+    
+    // 检查点击的目标元素
+    const $target = $(event.target);
+    
+    // 如果点击的是section内的组件（表格、文本等）或其子元素，隐藏section-header
+    if ($target.closest('.ef-component').length > 0 || $target.closest('.item-block').length > 0) {
+      $sectionHeader.hide();
+    } else {
+      // 如果点击的是section的空白区域，显示section-header
+      $sectionHeader.show();
+    }
+    
     // 激活当前点击的 section
-    activateSection($(this));
+    activateSection($section);
   });
 
   // 监听contenteditable为true的元素，粘贴时仅插入纯文本
@@ -79,6 +114,53 @@ $(document).ready(function () {
     event.preventDefault(); // 阻止默认粘贴行为
     const text = event.originalEvent.clipboardData.getData('text/plain'); // 获取纯文本
     document.execCommand('insertText', false, text); // 插入纯文本
+  });
+
+  // 处理表格单元格点击事件
+  $canvas.on('click', '.ef-table td', function(event) {
+    const $currentCell = $(this);
+    const $allEditableCells = $('.ef-table td[contenteditable="true"]');
+    
+    // 如果点击的是当前正在编辑的单元格，不做任何处理
+    if ($currentCell.attr('contenteditable') === 'true') {
+      return;
+    }
+
+    // 得到当前单元格的表格
+    const $table = $currentCell.closest('table');
+    clearSelection($table);
+
+    // 移除此表格的所有单元格的data-cell-active属性
+    // const $allCells = $('.ef-table td');
+    // $allCells.attr('data-cell-active', 'false');
+    $currentCell.attr('data-cell-active', 'true');
+    $currentCell.css({
+      'background-color': '#f0f8ff',
+      'outline': '1px solid #007bff'
+    });
+    $currentCell.focus();
+    
+    // 移除其他单元格的可编辑状态
+    $allEditableCells.removeAttr('contenteditable');
+  });
+  
+  // 添加双击事件处理，使单元格可编辑
+  $canvas.on('dblclick', '.ef-table td', function(event) {
+    const $currentCell = $(this);
+    
+    // 设置当前单元格为可编辑状态
+    $currentCell.attr('contenteditable', 'true');
+    $currentCell.attr('data-cell-active', 'true');
+    $currentCell.focus();
+    
+    // 选中单元格内容，方便用户直接编辑
+    if (window.getSelection && document.createRange) {
+      const range = document.createRange();
+      range.selectNodeContents($currentCell[0]);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
   });
 
   // 处理添加 section 的逻辑
@@ -338,7 +420,7 @@ $(document).ready(function () {
             <span>Table</span>
           </span>
         </span>
-        <table class="ef-table" style="width:100%; border-collapse: collapse;">
+        <table class="ef-table" ef-table-hotkeys style="width:100%; border-collapse: collapse;">
           <thead>
             <tr style="height: 30px;">
               <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 1</th>
@@ -348,14 +430,14 @@ $(document).ready(function () {
           </thead>
           <tbody>
             <tr style="height: 30px;">
-              <td style="border: 1px solid #ddd; padding: 8px;">内容 1</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">内容 2</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">内容 3</td>
+              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 1</td>
+              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 2</td>
+              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 3</td>
             </tr>
             <tr style="height: 30px;">
-              <td style="border: 1px solid #ddd; padding: 8px;">内容 4</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">内容 5</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">内容 6</td>
+              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 4</td>
+              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 5</td>
+              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 6</td>
             </tr>
           </tbody>
         </table>
@@ -388,7 +470,7 @@ $(document).ready(function () {
       width: templateConfig.width,
       height: templateConfig.height,
       position: 'absolute',
-      border: '2px dashed #007bff',
+      border: '1px dashed #007bff',
       backgroundColor: 'rgba(0, 123, 255, 0.1)',
       pointerEvents: 'none'
     });
@@ -443,13 +525,38 @@ $(document).ready(function () {
             const cols = parseInt($('#table-cols').val()) || 3;
 
             // 生成表格HTML
-            let tableHtml = '<table class="ef-table" style="width:100%; border-collapse: collapse;"><tbody>';
+            let tableHtml = `
+            <table class="ef-table" ef-table-hotkeys 
+              data-table-keys='{
+                "ctrl+a": "selectAll",
+                "cmd+a": "selectAll",
+                "ctrl+c": "copy",
+                "cmd+c": "copy",
+                "ctrl+v": "paste",
+                "cmd+v": "paste",
+                "tab": "nextCell",
+                "shift+tab": "prevCell",
+                "up": "moveUp",
+                "down": "moveDown",
+                "left": "moveLeft",
+                "right": "moveRight"
+              }' 
+              style="width:100%; border-collapse: collapse;">
+              <tbody>
+          `;
+          
+
+            // 计算单元格宽度
+            const sectionContent = dropTarget.closest('.section-content');
+            const sectionWidth = sectionContent.width();
+            const cellWidth = Math.floor(sectionWidth / cols);
+            const cellMaxWidth = cellWidth;
 
             // 生成表格内容
             for (let i = 0; i < rows; i++) {
               tableHtml += '<tr style="height: 30px;">';
               for (let j = 0; j < cols; j++) {
-                tableHtml += '<td style="border: 1px dashed #d5d8dc; padding: 8px;" contenteditable="true"></td>';
+              tableHtml += `<td style="font-family: 'Microsoft YaHei', Helvetica, Tahoma, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Heiti SC', 'WenQuanYi Micro Hei', sans-serif; font-size: 14px; font-weight: normal; font-style: normal; text-decoration: none; text-align: left; vertical-align: middle; background-color: transparent; padding: 1px 2px; width: ${cellWidth}px; max-width: ${cellMaxWidth}px; border: 1px dashed #d5d8dc;" contenteditable="true" tabindex="0" data-cell-active="false"></td>`;
               }
               tableHtml += '</tr>';
             }
@@ -514,7 +621,7 @@ $(document).ready(function () {
               const maxRow = Math.max(start.row, end.row);
               const minCol = Math.min(start.col, end.col);
               const maxCol = Math.max(start.col, end.col);
-              clearSelection();
+              clearSelection(newComponent);
               newComponent.find('tr').each(function(rowIndex) {
                 if (rowIndex >= minRow && rowIndex <= maxRow) {
                   $(this).find('td, th').each(function(colIndex) {
@@ -552,7 +659,7 @@ $(document).ready(function () {
               e.preventDefault();
               isSelecting = true;
               startCell = this;
-              clearSelection();
+              clearSelection(newComponent);
               const indices = getCellIndex(this);
               startRowIndex = indices.row;
               startColIndex = indices.col;
@@ -570,7 +677,7 @@ $(document).ready(function () {
             newComponent.on('click', function(e) {
               const $target = $(e.target);
               if (!$target.closest('.ef-table').length) {
-                clearSelection();
+                clearSelection(newComponent);
                 isSelected = false;
                 selectedRange = null;
               }
@@ -589,21 +696,17 @@ $(document).ready(function () {
               }
             });
 
-            // 点击表格外部时清除选择
-            // $(document).on('click', '.ef-table', function(e) {
-            //   if (!$(e.target).closest('.ef-table').length && isSelected) {
-            //     clearSelection();
-            //     isSelected = false;
-            //     selectedRange = null;
-            //   }
-            // });
-
             // 禁用单元格的默认编辑功能
-            newComponent.find('th, td').attr('contenteditable', 'false').css('cursor', 'default');
+            newComponent.find('th, td').attr({
+              'contenteditable': 'false',
+              'key-press': 'enter',
+              'key-event': 'dblclick',
+              'key-scope': '.ef-table-component'
+            }).css('cursor', 'default');
 
             // 双击进入编辑模式
             newComponent.find('th, td').on('dblclick', function() {
-              clearSelection(); // 清除已有的选中效果
+              clearSelection(newComponent); // 清除已有的选中效果
               $(this).attr('contenteditable', 'true')
                      .css('cursor', 'text')
                      .focus();
@@ -620,12 +723,13 @@ $(document).ready(function () {
               if ($(this).attr('contenteditable') !== 'true') {
                 isSelecting = true;
                 startCell = this;
-                clearSelection();
+                clearSelection(newComponent);
                 selectedCells = [this];
                 $(this).css({
                   'background-color': '#f0f8ff',
-                  'outline': '2px solid #007bff'
+                  'outline': '1px solid #007bff'
                 });
+                $(this).attr('data-cell-active', 'true');
                 e.preventDefault();
               }
             });
@@ -637,36 +741,24 @@ $(document).ready(function () {
               }
             });
 
+            newComponent.hotkeyManager();
+
             // 鼠标松开结束选择
             $(document).on('mouseup', function() {
               isSelecting = false;
             });
 
-            // 点击其他区域取消选中
-            // $(document).on('click', '.ef-table', function(e) {
-            //   if (!$(e.target).closest('.ef-table').length) {
-            //     clearSelection();
-            //   }
-            // });
-
             // 清除选择样式的函数
-            function clearSelection() {
-              newComponent.find('th, td').css({
-                'background-color': '',
-                'outline': 'none',
-                'border': '1px dashed #d5d8dc',  // 恢复为灰色虚线边框
-                'border-width': '1px',
-                'border-style': 'dashed',
-                'border-color': '#d5d8dc'
-              });
-            }
-
-            // 点击其他地方清除选择
-            // $(document).on('click', function(e) {
-            //   if (!$(e.target).is('th, td')) {
-            //     clearSelection();
-            //   }
-            // });
+            // function clearSelection() {
+            //   newComponent.find('th, td').css({
+            //     'background-color': '',
+            //     'outline': 'none',
+            //     'border': '1px dashed #d5d8dc',  // 恢复为灰色虚线边框
+            //     'border-width': '1px',
+            //     'border-style': 'dashed',
+            //     'border-color': '#d5d8dc'
+            //   }).removeAttr('data-cell-active');
+            // }
 
             // 隐藏模态窗口
             $('#tableModal').hide();
@@ -790,6 +882,21 @@ $(document).ready(function () {
       }
     });
     
+    // 初始化表格快捷键
+    $('table[ef-table-hotkeys]').each(function() {
+      const $table = $(this);
+      const keyConfig = $table.attr('data-table-keys');
+      if (keyConfig && typeof TableHotkeyManager !== 'undefined') {
+        try {
+          // 确保表格单元格有正确的属性用于导航
+          $table.find('td').attr('tabindex', '0');
+          TableHotkeyManager.initTableHotkeys($table, keyConfig);
+        } catch (e) {
+          console.error('初始化表格快捷键失败:', e);
+        }
+      }
+    });
+    
     // 应用CSS规则来覆盖jQuery UI自动添加的样式
     if ($('#ui-draggable-override-style').length === 0) {
       $('<style id="ui-draggable-override-style">')
@@ -894,8 +1001,7 @@ $(document).ready(function () {
       tolerance: 'pointer',
       hoverClass: 'droppable-hover',
       drop: function (event, ui) {
-        // 与 item-block 类似的处理逻辑
-        // ... 
+        console.log('dropped');
       }
     });
     
