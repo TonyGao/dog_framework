@@ -197,7 +197,7 @@
 /* 添加新 Section 按钮 */
 .add-section-button {
   position: fixed;
-  bottom: 30px;
+  bottom: 80px;
   right: 30px;
   background-color: #3370ff;
   color: white;

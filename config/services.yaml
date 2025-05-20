@@ -1,4 +1,5 @@
 parameters:
+    app.key_debug: '%env(KEY_DEBUG)%'
     page_limit: 12
     entity_gen_stuff:
         use_imports:

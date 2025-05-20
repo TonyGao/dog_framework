@@ -403,19 +403,19 @@
 
       switch (type) {
         case 'success':
-          alert.success(message, { percent: '380px', title: "请求错误"});
+          alert.success(message, { percent: '380px', title: "操作成功"});
           break;
         case 'error':
-          alert.error(message, { percent: '380px', title: "请求错误", closable: true });
+          alert.error(message, { percent: '380px', title: "发生错误", closable: true });
           break;
         case 'warning':
-          alert.warning(message, { percent: '380px', title: "请求错误", closable: true });
+          alert.warning(message, { percent: '380px', title: "注意警告", closable: true });
           break;
         case 'info':
-          alert.info(message, { percent: '380px', title: "请求错误", closable: true });
+          alert.info(message, { percent: '380px', title: "相关信息", closable: true });
           break;
         default:
-          alert.info(message, { percent: '380px', title: "请求错误", closable: true });
+          alert.info(message, { percent: '380px', title: "相关信息", closable: true });
           break;
       }
     });
