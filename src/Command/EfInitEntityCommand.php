@@ -122,19 +122,28 @@ class EfInitEntityCommand extends Command
                         if (is_array($nameSpaceResult) && !empty($nameSpaceResult) && !$this->isSameNameSpace($entityClass, $nameSpaceArr)) {
                             $nameSpaceArr[] = Str::removeLastWord($entityClass);
                             foreach ($nameSpaceResult as $index => $namespace) {
-                                $epg[$index] = new EntityPropertyGroup();
-                                $epg[$index]
-                                    ->setName($namespace)
-                                    ->setEntityToken($entityToken)
-                                    ->setLabel($namespace)
-                                    ->setType('namespace')
-                                    ->setParent($previousGroup);
-
-                                // 持久化当前 group
-                                $this->em->persist($epg[$index]);
+                                // 检查数据库中是否已存在该命名空间分组
+                                $existingNamespace = $repo->findOneBy(['name' => $namespace, 'type' => 'namespace']);
                                 
-                                // 更新 $previousGroup 为当前 group
-                                $previousGroup = $epg[$index];
+                                if ($existingNamespace) {
+                                    // 如果存在，使用已存在的分组
+                                    $previousGroup = $existingNamespace;
+                                } else {
+                                    // 如果不存在，创建新的分组
+                                    $epg[$index] = new EntityPropertyGroup();
+                                    $epg[$index]
+                                        ->setName($namespace)
+                                        ->setEntityToken($entityToken)
+                                        ->setLabel($namespace)
+                                        ->setType('namespace')
+                                        ->setParent($previousGroup);
+
+                                    // 持久化当前 group
+                                    $this->em->persist($epg[$index]);
+                                    
+                                    // 更新 $previousGroup 为当前 group
+                                    $previousGroup = $epg[$index];
+                                }
                             }
                             // 在循环结束后统一调用 flush
                             $this->em->flush();
@@ -349,11 +358,6 @@ class EfInitEntityCommand extends Command
                 }
             }
         }
-
-        // if ($input->getOption('listPropertyGroup')) {
-        //     $repo = $this->em->getRepository(EntityPropertyGroup::class);
-        //     $tree = $repo->childrenHierarchy();
-        // }
 
         $io->success('已成功初始化所有Entity文件到数据库');
 

@@ -33,6 +33,15 @@ class UtilsApiController extends AbstractController
         $sourceLanguage = $data['sourceLanguage'] ?? 'zh';
         $targetLanguage = $data['targetLanguage'] ?? 'en';
 
+        // 检查是否包含中文字符
+        $containsChinese = preg_match('/[\x{4e00}-\x{9fa5}]/u', $sourceText);
+        
+        // 如果源语言是中文但文本不包含中文字符，直接返回原文
+        if ($sourceLanguage === 'zh' && !$containsChinese) {
+            $jsonResponse = json_encode(['translatedText' => $sourceText]);
+            return ApiResponse::success($jsonResponse, 'success', 'No translation needed');
+        }
+
         try {
             // 调用翻译服务
             $text = $this->translationService->translate($sourceText, $sourceLanguage, $targetLanguage);

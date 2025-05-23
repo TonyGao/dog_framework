@@ -1,5 +1,8 @@
 {% set sideDisplay = sideMenuState == 'shrunk' ? 'none' : 'flex' %} {% set
 scrollBtnDisplay = sideMenuState == 'shrunk' ? 'flex' : 'none' %}
+
+{% set tabId1 = 'tab1' ~ random() %}
+{% set tabId2 = 'tab2' ~ random() %}
 <section class="app-side-menu">
   <div class="app-side-menu-scroll-btn" style="display: {{ scrollBtnDisplay }}">
     <i class="fa-solid fa-angle-right"></i>
@@ -10,17 +13,105 @@ scrollBtnDisplay = sideMenuState == 'shrunk' ? 'flex' : 'none' %}
         <div class="universe-icon side-scroll-btn system-menu-toggle-btn">
           <i class="fa-solid fa-angles-left"></i>
         </div>
-        <div class="side-menu-content">
-          <h3 class="library-title">组件库</h3>
-          <div class="component-grid">
-            {% for component in components %}
-              <div class="component-item" draggable="true" componentType="{{ component.componentType }}">
-                <div class="component-icon">
-                  <i class="{{ component.icon }}"></i>
+        <div class="side-menu-content ef-tabs tabs-container" style="height: 100%;">
+          <div class="tabs-header tabs-header-plain">
+            <div class="tabs-wrap">
+              <ul class="tabs">
+                <li class="tabs-first tabs-selected" id="{{ tabId1 }}">
+                  <span class="tabs-inner">
+                    <span class="tabs-title">组件库</span>
+                  </span>
+                </li>
+                <li class="tabs-last" id="{{ tabId2 }}">
+                  <span class="tabs-inner">
+                    <span class="tabs-title">数据源</span>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="tabs-panels" style="height: 100%;">
+            <div class="panel panel-htop" liid="{{ tabId1 }}" style="padding: 16px;">
+              <div class="panel-body panel-body-noheader panel-body-noborder">
+                <div class="component-grid">
+                  {% for component in components %}
+                    <div class="component-item" draggable="true" componentType="{{ component.componentType }}">
+                      <div class="component-icon">
+                        <i class="{{ component.icon }}"></i>
+                      </div>
+                      <div class="component-name">{{ component.name }}</div>
+                    </div>
+                  {% endfor %}
                 </div>
-                <div class="component-name">{{ component.name }}</div>
               </div>
-            {% endfor %}
+            </div>
+            <div class="panel panel-htop" liid="{{ tabId2 }}" style="display: none; padding: 0;">
+              <div class="panel-body panel-body-noheader panel-body-noborder">
+                <div class="datasource-content">
+                  <div class="model-status text-primary mb-3">暂未绑定模型</div>
+                  <div class="model-properties">
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>标签</th>
+                          <th>值</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>岗位名称</td>
+                          <td>name</td>
+                        </tr>
+                        <tr class="table-light">
+                          <td>岗位编码</td>
+                          <td>code</td>
+                        </tr>
+                        <tr>
+                          <td>岗位职责</td>
+                          <td>responsibility</td>
+                        </tr>
+                        <tr class="table-light">
+                          <td>任职要求</td>
+                          <td>requirement</td>
+                        </tr>
+                        <tr>
+                          <td>编制人数</td>
+                          <td>headcount</td>
+                        </tr>
+                        <tr class="table-light">
+                          <td>状态（启用/停用）</td>
+                          <td>state</td>
+                        </tr>
+                        <tr>
+                          <td>排序号</td>
+                          <td>sortOrder</td>
+                        </tr>
+                        <tr class="table-light">
+                          <td>备注</td>
+                          <td>remark</td>
+                        </tr>
+                        <tr>
+                          <td>所属部门</td>
+                          <td>department</td>
+                        </tr>
+                        <tr class="table-light">
+                          <td>岗位类型</td>
+                          <td>type</td>
+                        </tr>
+                        <tr>
+                          <td>岗位级别</td>
+                          <td>level</td>
+                        </tr>
+                        <tr class="table-light">
+                          <td>上级岗位</td>
+                          <td>parent</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -37,19 +37,44 @@
 
 这些不以文字描述，而是以图形形式表现，我准备div css的形式来展现，就用grid分割这些图形，每个都是长方形，再以这些要求用灰色的块呈现出来。
 
-
-
 ## 视图保存的基本逻辑
 
 视图编辑器将肩负两种功能，一种是普通的视图，它类似CMS的功能，将内容（静态或动态）的呈现给用户，另一种是表单视图，它将主体是表单的视图呈现给用户。
 
-在点击保存时，前端将canvas里的html代码通过ajax请求放到后端控制器，控制器通过特殊的处理将类似添加section按钮这种设计器的部分dom去掉，以及将特殊标记的dom作为变量来替代为twig变量和代码，视图将存为两位twig文件，一个是html.twig，一个是design.twig，第一个文件是用来存放用于Symfony框架能够识别的带有变量的twig模板文件，第二个是用来存在原始的视图编辑器里的画板html内容的twig模板文件，这个文件用于下次再次编辑。
+在视图编辑器点击保存图标（id="save-view-button"）时，前端将视图编辑器的URL中的id(/admin/platform/view/editor/f8914ab2-b300-488e-ab76-ce1e19518eb5 即f8914ab2-b300-488e-ab76-ce1e19518eb5的部分)作为参数1，和整个canvas的html代码作为参数2，通过ajax请求放到后端控制器，在控制器将传入的内容存成两份twig文件，第一份文件是设计器视图，第二份文件是可执行视图。下边我们将逐一解释这两个视图文件。
 
-后台处理器（Controller + Service）接收原始 HTML，进行过滤/处理
+### 设计器视图文件
 
-- 去掉没用的元素（比如 .add-section-button、.btn-add、.btn-layout 这种编辑器用的操作按钮）。
-- 清理调试用样式（如果有）。
-- 可以用 DOM 解析库（比如 Symfony 推荐的 DOMDocument，或 symfony/dom-crawler，甚至简单的 preg_replace）去做这一块。
+设计器视图文件包含了整个视图编辑器画布的所有内容，设计器视图文件的作用是为了方便开发者在后期进行二次编辑视图。控制器在收到请求后，先通过传入的视图id，通过[view模型](/src/Entity/Platform/View.php)查询出视图path（如 组织架构/post_management/1_0），那么最终视图文件的路径是这样存储的 `/templates/views/组织架构/post_management/1_0/post_management.design.twig` ，下边的可执行视图文件也在这个路径内，文件名是`post_management.html.twig`。通过 Symfony Filesystem Component 将传入的 canvas html 内容写入到 `/templates/views/组织架构/post_management/1_0/post_management.design.twig` 文件中。
+
+### 可执行视图文件
+
+可执行视图文件用来在生产环境中呈现视图。在与上边相同的请求控制中，将请求传入的 canvas html 通过基于Symfony DomCrawler Component封装的[DomManipulator](/src/Service/Utils/DomManipulator.php)将画布和有用的内容提取出来，去掉设计器的辅助dom，只保留可执行的视图内容，也是最终呈现给用户的视图。
+
+是通过特殊的处理将类似添加section按钮这种设计器的部分dom去掉，以及将特殊标记的dom作为变量来替代为twig变量和代码，最终将处理好的html代码写入到 `/templates/views/组织架构/post_management/1_0/post_management.html.twig` 文件中。
+
+首先，去掉特定的dom，包括：
+
+- .add-section-button
+- .section-header
+
+然后，遍历dom，去掉特定的class, 包括：
+
+- ui-droppable
+- class="section active" 里的 active
+- ui-droppable
+- ef-component-labels
+
+与此同时，遍历中去掉特定的dom属性，包括：
+
+- data-table-keys
+- contenteditable
+- data-cell-active
+- key-press
+- key-event
+- key-scope
+
+与此同时，遍历中如果是`<td>`dom，那么当它有border: 1px dashed rgb(213, 216, 220);这个特定的css样式时，将它的border属性去掉。
 
 把未来会用到的动态字段用 Twig 语法替换进去
 比如：
@@ -70,11 +95,11 @@
 
 后台发现 data-dynamic，就替换为
 
-```twig 
+```twig
 {{ dynamic_field }} 
 ```
 
-甚至更复杂的，用 data-repeat="table_data"，后台替换成 
+甚至更复杂的，用 data-repeat="table_data"，后台替换成
 
 ```twig
 {% for row in table_data %}...{% endfor %}

@@ -251,20 +251,31 @@ class ViewEditorController extends BaseController
       // 构建视图文件路径
       $basePath = $this->getParameter('kernel.project_dir') . '/templates/views';
       $relativePath = $this->buildRelativePath($parent, $view->getName());
-      $viewPath = $basePath . '/' . $relativePath;
-      $viewDir = dirname($viewPath);
       
-      // 确保目录存在
-      if (!file_exists($viewDir)) {
-        if (!mkdir($viewDir, 0755, true)) {
+      // 创建视图目录结构：视图名/1_0/
+      $name = $view->getName();
+      // 在原目录下创建以视图名命名的文件夹
+      $viewFolderPath = $basePath . '/' . $relativePath;
+      // 在视图名文件夹下创建版本控制目录 1_0 表示 v1.0
+      $versionFolderPath = $viewFolderPath . '/1_0';
+      
+      // 确保视图目录存在
+      if (!file_exists($viewFolderPath)) {
+        if (!mkdir($viewFolderPath, 0755, true)) {
           return new JsonResponse(['message' => '创建视图目录失败，请检查权限'], 500);
         }
       }
       
-      // 创建两个视图文件：name.html.twig 和 name.design.twig
-      $name = $view->getName();
-      $htmlTwigPath = $viewDir . '/' . $name . '.html.twig';
-      $designTwigPath = $viewDir . '/' . $name . '.design.twig';
+      // 创建版本目录
+      if (!file_exists($versionFolderPath)) {
+        if (!mkdir($versionFolderPath, 0755, true)) {
+          return new JsonResponse(['message' => '创建版本目录失败，请检查权限'], 500);
+        }
+      }
+      
+      // 创建两个视图文件：1_0/name.html.twig 和 1_0/name.design.twig
+      $htmlTwigPath = $versionFolderPath . '/' . $name . '.html.twig';
+      $designTwigPath = $versionFolderPath . '/' . $name . '.design.twig';
       
       // 检查文件是否已存在
       if (file_exists($htmlTwigPath) || file_exists($designTwigPath)) {
@@ -284,7 +295,8 @@ class ViewEditorController extends BaseController
         return new JsonResponse(['message' => '创建视图设计文件失败'], 500);
       }
       
-      // 设置相对路径到数据库
+      // 设置相对路径到数据库（包含版本目录）
+      $relativePath = $relativePath . '/1_0';
       $view->setPath($relativePath);
       
       $em->persist($view);
