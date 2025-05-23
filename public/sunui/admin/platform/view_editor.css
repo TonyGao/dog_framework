@@ -1,7 +1,7 @@
 /* 侧边栏内容容器 */
-.side-menu-content {
+/* .side-menu-content .tabs-panels .panel{
   padding: 16px;
-}
+} */
 
 /* 标题样式 */
 .library-title {
@@ -429,4 +429,95 @@ h1, h2, h3 {
 .page-property-item .unit-selector {
   margin-left: 5px;
   font-size: 12px;
+}
+
+/* 数据源内容样式 */
+.datasource-content {
+  padding: 16px 8px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 模型状态提示 */
+.model-status {
+  font-size: 15px;
+  font-weight: 500;
+  color: #3370ff;
+  text-align: center;
+  padding: 8px;
+  background-color: rgba(51, 112, 255, 0.1);
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+/* 模型属性表格 */
+.model-properties .table {
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-size: 14px;
+}
+
+.model-properties .table th {
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  padding: 6px 3px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* 模型属性表格单元格样式 */
+.model-properties .table td {
+  padding: 8px 3px;
+  border-bottom: 1px solid #e9ecef;
+  color: #495057;
+  vertical-align: middle;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* 模型属性表格单元格悬停效果 */
+.model-properties .table td:hover {
+  background-color: rgba(51, 112, 255, 0.05);
+  cursor: pointer;
+}
+
+.model-properties .table td:hover::after {
+  content: "\f0c1"; /* 链接图标 */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  right: 10px;
+  color: #3370ff;
+  opacity: 0.7;
+  font-size: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.2s ease;
+}
+
+.model-properties .table td:active {
+  background-color: rgba(51, 112, 255, 0.1);
+}
+
+.model-properties .table td:hover::after:hover {
+  opacity: 1;
+}
+
+.model-properties .table tr:last-child td {
+  border-bottom: none;
+}
+
+.model-properties .table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.model-properties .table tr.table-light {
+  background-color: #f8f9fa;
+}
+
+.model-properties .table tr.table-light:hover {
+  background-color: #e9ecef;
 }
