@@ -39,15 +39,15 @@ $(document).ready(function() {
     syncSliderAndInput('page-width-slider', 'page-width-value');
     
     // 初始化时，确保section元素能够适应section-content的宽度
-    $('.section').each(function() {
-        const $section = $(this);
-        const $sectionContent = $section.find('.section-content');
-        // 确保section-content的宽度变化能够正确反映在section元素上
-        const contentWidth = $sectionContent.width() + 10;
-        if (contentWidth) {
-            $section.css('min-width', contentWidth + 'px');
-        }
-    });
+    // $('.section').each(function() {
+    //     const $section = $(this);
+    //     const $sectionContent = $section.find('.section-content');
+    //     // 确保section-content的宽度变化能够正确反映在section元素上
+    //     const contentWidth = $sectionContent.width();
+    //     if (contentWidth) {
+    //         $section.css('min-width', contentWidth + 'px');
+    //     }
+    // });
     
     // 单位选择器点击事件
     $('.unit-selector').on('click', function(e) {
@@ -212,7 +212,7 @@ $(document).ready(function() {
                     if (contentWidth) {
                         // 更新section元素的宽度，使其比section-content宽度大10px
                         $activeSection.css('width', 'auto');
-                        $activeSection.css('min-width', (contentWidth + 10) + 'px');
+                        // $activeSection.css('min-width', (contentWidth + 10) + 'px');
                         
                         // 调整canvas对齐方式
                         // 定义内部函数来调整canvas对齐

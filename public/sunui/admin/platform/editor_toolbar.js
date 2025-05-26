@@ -117,22 +117,90 @@ $(document).ready(function() {
     $('#loading-indicator').hide();
   }
   
+  /**
+   * 同步DOM元素的样式状态与工具栏按钮的激活状态
+   * @param {jQuery} element - 需要检查样式的DOM元素
+   */
+  function syncToolbarButtonStates(element) {
+    // 定义样式与按钮的映射关系
+    const styleButtonMap = [
+      {
+        style: 'font-weight',
+        values: ['700', 'bold'],
+        buttonClass: 'fa-bold'
+      },
+      {
+        style: 'font-style',
+        values: ['italic'],
+        buttonClass: 'fa-italic'
+      },
+      {
+        style: 'text-decoration',
+        values: ['underline'],
+        buttonClass: 'fa-underline'
+      },
+      {
+        style: 'text-align',
+        values: ['left'],
+        buttonClass: 'fa-align-left'
+      },
+      {
+        style: 'text-align',
+        values: ['center'],
+        buttonClass: 'fa-align-center'
+      },
+      {
+        style: 'text-align',
+        values: ['right'],
+        buttonClass: 'fa-align-right'
+      },
+      {
+        style: 'border',
+        values: (value) => value !== 'none' && value !== '',
+        buttonClass: 'fa-border-all'
+      }
+    ];
+  
+    // 遍历每个样式映射
+    styleButtonMap.forEach(mapping => {
+      const $button = $(`.toolbar-btn i.${mapping.buttonClass}`).parent();
+      if (!$button.length) return;
+  
+      const currentStyle = element.css(mapping.style);
+      let shouldBeActive = false;
+  
+      if (typeof mapping.values === 'function') {
+        shouldBeActive = mapping.values(currentStyle);
+      } else {
+        shouldBeActive = mapping.values.some(value => currentStyle === value);
+      }
+  
+      $button.toggleClass('active', shouldBeActive);
+    });
+  }
+
+// 确保 viewEditor 对象存在
+window.viewEditor = window.viewEditor || {};
+
+// 定义工具栏模块
+window.viewEditor.toolbar = {
+  // 同步工具栏按钮状态方法
+  syncToolbarButtonStates: syncToolbarButtonStates,
+};
+  
+  // 修改原有的粗体按钮点击事件处理
   $('.toolbar-btn.font-bold').on('click', function() {
-    // 切换按钮状态
-    $(this).toggleClass('active');
-    
-    // 获取当前活跃的section中的表格单元格
     const activeSection = $('#canvas .section.active');
     const activeCell = activeSection.find('td[data-cell-active="true"]');
     
     if (activeCell.length > 0) {
-      // 如果单元格内容已经加粗，则移除加粗效果
-      if (activeCell.css('font-weight') === '700' || activeCell.css('font-weight') === 'bold') {
-        activeCell.css('font-weight', 'normal');
-      } else {
-        // 否则添加加粗效果
-        activeCell.css('font-weight', 'bold');
-      }
+      // 切换粗体状态
+      const currentWeight = activeCell.css('font-weight');
+      const newWeight = (currentWeight === '700' || currentWeight === 'bold') ? 'normal' : 'bold';
+      activeCell.css('font-weight', newWeight);
+      
+      // 同步按钮状态
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCell);
     }
   });
 });
