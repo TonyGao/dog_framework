@@ -116,10 +116,13 @@ $(document).ready(function () {
     document.execCommand('insertText', false, text); // 插入纯文本
   });
 
-  // 处理表格单元格点击事件
+  // 处理表格单元格点击事件，点击单元格
   $canvas.on('click', '.ef-table td', function(event) {
     const $currentCell = $(this);
     const $allEditableCells = $('.ef-table td[contenteditable="true"]');
+
+    // 同步视图编辑器工具栏的按钮状态
+    window.viewEditor.toolbar.syncToolbarButtonStates($currentCell);
     
     // 如果点击的是当前正在编辑的单元格，不做任何处理
     if ($currentCell.attr('contenteditable') === 'true') {
@@ -166,13 +169,13 @@ $(document).ready(function () {
   // 处理添加 section 的逻辑
   $('.add-section-button').click(function () {
     const newSectionHtml = `
-          <div class="section" id="${Str.generateRandomString(9)}">
+          <div class="section" id="${Str.generateRandomString(9)}" style="width: 1140px;">
               <div class="section-header">
                   <button class="btn-add"><i class="fa-solid fa-plus"></i></button>
                   <button class="btn-layout"><i class="fa-solid fa-grip"></i></button>
                   <button class="btn-close"><i class="fa-solid fa-times"></i></button>
               </div>
-              <div class="section-content ui-droppable" style="width: 1140px">
+              <div class="section-content ui-droppable">
                   <!-- 新的 Section 内容 -->
               </div>
           </div>`;
@@ -181,11 +184,11 @@ $(document).ready(function () {
     $canvas.append($newSection);
     
     // 确保section元素的宽度比section-content大10px
-    const $sectionContent = $newSection.find('.section-content');
-    const contentWidth = $sectionContent.outerWidth();
-    if (contentWidth) {
-        $newSection.css('min-width', (contentWidth + 10) + 'px');
-    }
+    // const $sectionContent = $newSection.find('.section-content');
+    // const contentWidth = $sectionContent.outerWidth();
+    // if (contentWidth) {
+    //     $newSection.css('min-width', (contentWidth) + 'px');
+    // }
     
     activateSection($newSection);
     reinitializeDroppables();
@@ -414,13 +417,13 @@ $(document).ready(function () {
     // 表格组件模板
     table: {
       template: `
-      <div id="ef-table-comp-{uniqueId}" class="ef-component ef-table-component ef-table-comp-{uniqueId}" style="position: static">
+      <div id="ef-table-comp-{uniqueId}" class="ef-component ef-table-component ef-table-comp-{uniqueId}" style="position: static; overflow: visible !important;">
         <span class="ef-component-labels ef-label-small label-above-line label-top" style="left: 0px">
           <span class="ef-label-comp-type draggable">
             <span>Table</span>
           </span>
         </span>
-        <table class="ef-table" ef-table-hotkeys style="width:100%; border-collapse: collapse;">
+        <table class="ef-table" ef-table-hotkeys style="width: fit-content;">
           <thead>
             <tr style="height: 30px;">
               <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 1</th>
@@ -541,22 +544,21 @@ $(document).ready(function () {
                 "left": "moveLeft",
                 "right": "moveRight"
               }' 
-              style="width:100%; border-collapse: collapse;">
+              style="width: fit-content; border-collapse: collapse; margin-left: auto; margin-right: auto;">
               <tbody>
           `;
-          
 
             // 计算单元格宽度
             const sectionContent = dropTarget.closest('.section-content');
-            const sectionWidth = sectionContent.width();
-            const cellWidth = Math.floor(sectionWidth / cols);
-            const cellMaxWidth = cellWidth;
+            const sectionWidth = sectionContent.width() - 4;
+            const cellWidth = (sectionWidth / cols).toFixed(2);
+            // const cellMaxWidth = cellWidth;
 
             // 生成表格内容
             for (let i = 0; i < rows; i++) {
-              tableHtml += '<tr style="height: 30px;">';
+              tableHtml += '<tr>';
               for (let j = 0; j < cols; j++) {
-              tableHtml += `<td style="font-family: 'Microsoft YaHei', Helvetica, Tahoma, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Heiti SC', 'WenQuanYi Micro Hei', sans-serif; font-size: 14px; font-weight: normal; font-style: normal; text-decoration: none; text-align: left; vertical-align: middle; background-color: transparent; padding: 1px 2px; width: ${cellWidth}px; max-width: ${cellMaxWidth}px; border: 1px dashed #d5d8dc;" contenteditable="true" tabindex="0" data-cell-active="false"></td>`;
+              tableHtml += `<td style="font-family: 'Microsoft YaHei', Helvetica, Tahoma, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Heiti SC', 'WenQuanYi Micro Hei', sans-serif; font-size: 14px; font-weight: normal; font-style: normal; text-decoration: none; text-align: left; vertical-align: middle; background-color: transparent; padding: 1px 2px; width: ${cellWidth}px; height: 30px; border: 1px dashed #d5d8dc;" contenteditable="true" tabindex="0" data-cell-active="false"></td>`;
               }
               tableHtml += '</tr>';
             }
@@ -565,7 +567,7 @@ $(document).ready(function () {
             // 创建表格组件
             const uniqueId = generateUniqueId();
             const componentHtml = `
-              <div id="ef-table-comp-${uniqueId}" class="ef-component ef-table-component ef-table-comp-${uniqueId}" style="position: static">
+              <div id="ef-table-comp-${uniqueId}" class="ef-component ef-table-component ef-table-comp-${uniqueId}" style="position: static; overflow: visible !important;">
                 <span class="ef-component-labels ef-label-small label-above-line label-top" style="left: 0px">
                   <span class="ef-label-comp-type draggable">
                     <span>Table</span>
@@ -869,8 +871,16 @@ $(document).ready(function () {
   // 当新的 item-block 添加时重新初始化 droppable 区域
   function reinitializeDroppables () {
     // 销毁已经初始化的 droppable
-    $('.item-block.ui-droppable').droppable('destroy');
-    $('.section-content.ui-droppable').droppable('destroy');
+    // 在调用destroy前先检查元素是否已经初始化为droppable
+    const $itemBlocks = $('.item-block.ui-droppable');
+    if ($itemBlocks.length > 0) {
+      $itemBlocks.droppable('destroy');
+    }
+    
+    const $sectionContents = $('.section-content.ui-droppable');
+    if ($sectionContents.length > 0) {
+      $sectionContents.droppable('destroy');
+    }
     
     // 重新初始化
     initDraggableDroppable();

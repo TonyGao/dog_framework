@@ -4,7 +4,7 @@
 	{{ parent() }}
 	<link rel="stylesheet" type="text/css" href="{{ asset('view_editor_layout.css', 'admin') }}">
   <link rel="stylesheet" type="text/css" href="{{ asset('platform/view_editor.css', 'admin') }}">
-  <link rel="stylesheet" type="text/css" href="{{ asset('platform/editor-toolbar.css', 'admin') }}">
+  <link rel="stylesheet" type="text/css" href="{{ asset('platform/editor_toolbar.css', 'admin') }}">
 	<link rel="stylesheet" type="text/css" href="{{ asset('platform/view_editor_properties.css', 'admin') }}">
 {% endblock %}
 
@@ -12,8 +12,9 @@
 	{{ parent() }}
 	<script src="{{ asset('layout.js', 'admin') }}"></script>
   <script src="{{ asset('platform/view_editor.js', 'admin') }}"></script>
-  <script src="{{ asset('platform/editor-toolbar.js', 'admin') }}"></script>
+  <script src="{{ asset('platform/editor_toolbar.js', 'admin') }}"></script>
 	<script src="{{ asset('platform/view_editor_section_properties.js', 'admin') }}"></script>
+	<script src="{{ asset('platform//view_table.js', 'admin') }}"></script>
 	<script>
   // 初始化 localforage 数据库名
   localforage.config({

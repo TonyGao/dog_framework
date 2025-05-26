@@ -130,7 +130,7 @@ input[type=number] {
 }
 
 .ef-table[data-auto-fit-content="true"] .ef-table-element {
-  table-layout: auto;
+  table-layout: fixed;
   width: max-content;
 }
 
@@ -157,7 +157,7 @@ input[type=number] {
 }
 
 .ef-table[data-auto-fit-content="false"] .ef-table-element {
-  table-layout: auto;
+  table-layout: fixed;
   width: auto;
 }
 
