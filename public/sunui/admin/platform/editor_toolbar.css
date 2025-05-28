@@ -51,6 +51,10 @@
   color: #3370ff;
 }
 
+.toolbar-btn.newline {
+  transform: rotate(90deg);
+}
+
 .toolbar-select {
   height: 28px;
   border: 1px solid #e0e0e0;
