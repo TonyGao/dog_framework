@@ -18,6 +18,10 @@
             <meta name="flash-{{ type }}" content="{{ message }}">
         {% endfor %}
     {% endfor %}
+    
+    {# View Editor 配置 #}
+    <meta name="view-editor-undo-steps" content="{{ app.request.server.get('VIEW_EDITOR_UNDO_STEPS', 50) }}">
+    <meta name="view-editor-version" content="1.0">
 		<title>
 			{% block title %}Welcome!{% endblock %}
 		</title>
@@ -86,6 +90,7 @@
 			<script src="{{ asset('drawer.js', 'ui') }}"></script>
 			<script src="{{ asset('datagrid.js', 'ui') }}"></script>
 			<script src="{{ asset('modal.js', 'ui') }}"></script>
+			<script src="{{ asset('sunui/admin/platform/undo_redo_manager.js') }}"></script>
 			{# <script src="https://kit.fontawesome.com/ef1baf8144.js" crossorigin="anonymous"></script> #}
 			{{ encore_entry_script_tags('app') }}
 		{% endblock %}

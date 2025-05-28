@@ -678,7 +678,21 @@ h1, h2, h3 {
   user-select: none;
 }
 
-/* .resize-guide {
+/* 表格单元格编辑状态下隐藏resize handle */
+.ef-table td[contenteditable="true"] .column-resize-handle,
+.ef-table td[contenteditable="true"] .row-resize-handle,
+.ef-table td[contenteditable="true"] .resize-handle-corner {
+  display: none;
+  pointer-events: none;
+}
+
+/* 确保编辑状态下单元格内容可以正常编辑 */
+.ef-table td[contenteditable="true"] {
+  z-index: 12;
+  position: relative;
+}
+
+.resize-guide {
   position: absolute;
   background-color: #3370ff;
   z-index: 1000;
@@ -698,4 +712,4 @@ h1, h2, h3 {
   top: 0;
   bottom: 0;
   height: 100vh;
-} */
+}

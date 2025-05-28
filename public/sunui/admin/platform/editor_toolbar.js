@@ -122,61 +122,130 @@ $(document).ready(function() {
    * @param {jQuery} element - 需要检查样式的DOM元素
    */
   function syncToolbarButtonStates(element) {
-    // 定义样式与按钮的映射关系
-    const styleButtonMap = [
-      {
-        style: 'font-weight',
-        values: ['700', 'bold'],
-        buttonClass: 'fa-bold'
-      },
-      {
-        style: 'font-style',
-        values: ['italic'],
-        buttonClass: 'fa-italic'
-      },
-      {
-        style: 'text-decoration',
-        values: ['underline'],
-        buttonClass: 'fa-underline'
-      },
-      {
-        style: 'text-align',
-        values: ['left'],
-        buttonClass: 'fa-align-left'
-      },
-      {
-        style: 'text-align',
-        values: ['center'],
-        buttonClass: 'fa-align-center'
-      },
-      {
-        style: 'text-align',
-        values: ['right'],
-        buttonClass: 'fa-align-right'
-      },
-      {
-        style: 'border',
-        values: (value) => value !== 'none' && value !== '',
-        buttonClass: 'fa-border-all'
-      }
-    ];
+    // 定义样式与按钮的映射关系，并按互斥组进行分组
+    const styleButtonGroups = {
+      // 独立按钮（不需要互斥）
+      standalone: [
+        {
+          style: 'font-weight',
+          values: ['700', 'bold'],
+          buttonClass: 'fa-bold'
+        },
+        {
+          style: 'font-style',
+          values: ['italic'],
+          buttonClass: 'fa-italic'
+        },
+        {
+          style: 'text-decoration',
+          values: ['underline'],
+          buttonClass: 'fa-underline'
+        },
+        {
+          style: 'border',
+          values: (value) => value !== 'none' && value !== '' && value !== '1px dashed rgb(213, 216, 220)',
+          buttonClass: 'fa-border-all'
+        }
+      ],
+      // 水平对齐按钮组（互斥）
+      horizontalAlign: [
+        {
+          style: 'text-align',
+          values: ['left'],
+          buttonClass: 'font-align-left'
+        },
+        {
+          style: 'text-align',
+          values: ['center'],
+          buttonClass: 'font-align-center'
+        },
+        {
+          style: 'text-align',
+          values: ['right'],
+          buttonClass: 'font-align-right'
+        }
+      ],
+      // 垂直对齐按钮组（互斥）
+      verticalAlign: [
+        {
+          style: 'vertical-align',
+          values: ['top'],
+          buttonClass: 'font-align-vertical-top'
+        },
+        {
+          style: 'vertical-align',
+          values: ['middle'],
+          buttonClass: 'font-align-vertical-center'
+        },
+        {
+          style: 'vertical-align',
+          values: ['bottom'],
+          buttonClass: 'font-align-vertical-bottom'
+        }
+      ]
+    };
   
-    // 遍历每个样式映射
-    styleButtonMap.forEach(mapping => {
-      const $button = $(`.toolbar-btn i.${mapping.buttonClass}`).parent();
-      if (!$button.length) return;
-  
-      const currentStyle = element.css(mapping.style);
-      let shouldBeActive = false;
-  
-      if (typeof mapping.values === 'function') {
-        shouldBeActive = mapping.values(currentStyle);
-      } else {
-        shouldBeActive = mapping.values.some(value => currentStyle === value);
-      }
-  
-      $button.toggleClass('active', shouldBeActive);
+    // 处理每个按钮组
+    Object.entries(styleButtonGroups).forEach(([groupName, mappings]) => {
+      // 先移除该组所有按钮的激活状态
+      mappings.forEach(mapping => {
+        $(`.toolbar-btn.${mapping.buttonClass}`).removeClass('active');
+      });
+
+      // 对于每个组中的按钮
+      mappings.forEach(mapping => {
+        const $button = $(`.toolbar-btn.${mapping.buttonClass}`);
+        if (!$button.length) return;
+
+        const currentStyle = element.css(mapping.style);
+        let shouldBeActive = false;
+
+        if (typeof mapping.values === 'function') {
+          shouldBeActive = mapping.values(currentStyle);
+        } else {
+          shouldBeActive = mapping.values.some(value => currentStyle === value);
+        }
+
+        // 如果是互斥组（非standalone），先移除组内所有按钮的激活状态
+        if (groupName !== 'standalone' && shouldBeActive) {
+          // 获取同组的所有按钮
+          mappings.forEach(groupMapping => {
+            const $groupButton = $(`.toolbar-btn.${groupMapping.buttonClass}`);
+            if ($groupButton.length) {
+              $groupButton.removeClass('active');
+            }
+          });
+        }
+
+        // 设置当前按钮的状态
+        $button.toggleClass('active', shouldBeActive);
+      });
     });
+    
+    // 处理字体颜色按钮
+    const $fontColorBtn = $('.toolbar-btn.font-palette');
+    if ($fontColorBtn.length) {
+      const currentColor = element.css('color');
+    }
+    
+    // 处理背景颜色按钮
+    const $bgColorBtn = $('.toolbar-btn.bg-palette');
+    if ($bgColorBtn.length) {
+      const currentBgColor = element.css('background-color');
+      if (currentBgColor && currentBgColor !== 'rgba(0, 0, 0, 0)' && currentBgColor !== 'transparent') {
+        // 设置按钮的指示器颜色
+        const $bgColorIndicator = $bgColorBtn.find('.color-indicator');
+        if ($bgColorIndicator.length === 0) {
+          // 如果不存在颜色指示器，则创建一个
+          const $indicator = $('<span class="color-indicator" style="display: block; width: 14px; height: 3px; margin: 2px auto 0; border-radius: 1px;"></span>');
+          $indicator.css('background-color', currentBgColor);
+          $bgColorBtn.append($indicator);
+        } else {
+          // 更新现有指示器的颜色
+          $bgColorIndicator.css('background-color', currentBgColor);
+        }
+      }
+    }
   }
 
 // 确保 viewEditor 对象存在
@@ -191,16 +260,667 @@ window.viewEditor.toolbar = {
   // 修改原有的粗体按钮点击事件处理
   $('.toolbar-btn.font-bold').on('click', function() {
     const activeSection = $('#canvas .section.active');
-    const activeCell = activeSection.find('td[data-cell-active="true"]');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
     
-    if (activeCell.length > 0) {
-      // 切换粗体状态
-      const currentWeight = activeCell.css('font-weight');
-      const newWeight = (currentWeight === '700' || currentWeight === 'bold') ? 'normal' : 'bold';
-      activeCell.css('font-weight', newWeight);
+    if (activeCells.length > 0) {
+      // 获取第一个单元格的当前粗体状态
+      const firstCellWeight = activeCells.first().css('font-weight');
+      const newWeight = (firstCellWeight === '700' || firstCellWeight === 'bold') ? 'normal' : 'bold';
       
-      // 同步按钮状态
-      window.viewEditor.toolbar.syncToolbarButtonStates(activeCell);
+      // 为所有选中的单元格应用相同的粗体状态
+      activeCells.each(function() {
+        $(this).css('font-weight', newWeight);
+      });
+      
+      // 使用第一个单元格同步按钮状态
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
     }
   });
+
+  $('.toolbar-btn.font-italic').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length > 0) {
+      // 获取第一个单元格的当前斜体状态
+      const firstCellStyle = activeCells.first().css('font-style');
+      const newStyle = firstCellStyle === 'italic' ? 'normal' : 'italic';
+      
+      // 为所有选中的单元格应用相同的斜体状态
+      activeCells.each(function() {
+        $(this).css('font-style', newStyle);
+      });
+      
+      // 使用第一个单元格同步按钮状态
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+    }
+  });
+
+  $('.toolbar-btn.font-underline').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length > 0) {
+      // 获取第一个单元格的当前下划线状态
+      const firstCellDecoration = activeCells.first().css('text-decoration');
+      const newDecoration = firstCellDecoration.includes('underline') ? 'none' : 'underline';
+      
+      // 为所有选中的单元格应用相同的下划线状态
+      activeCells.each(function() {
+        $(this).css('text-decoration', newDecoration);
+      });
+      
+      // 使用第一个单元格同步按钮状态
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+    }
+  });
+  
+  // 初始化边框样式选择器
+  let borderStylePicker = null;
+  
+  // 边框样式按钮点击事件
+  $('.toolbar-btn.cell-border').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length === 0) return;
+    
+    // 获取第一个选中单元格的当前边框样式
+    const firstCell = activeCells.first();
+    const currentBorderWidth = firstCell.css('border-width') || '1px';
+    const currentBorderStyle = firstCell.css('border-style') || 'solid';
+    const currentBorderColor = firstCell.css('border-color') || '#000000';
+    
+    // 检查四个方向的边框是否存在
+    const hasTopBorder = firstCell.css('border-top-width') !== '0px' && firstCell.css('border-top-style') !== 'none';
+    const hasRightBorder = firstCell.css('border-right-width') !== '0px' && firstCell.css('border-right-style') !== 'none';
+    const hasBottomBorder = firstCell.css('border-bottom-width') !== '0px' && firstCell.css('border-bottom-style') !== 'none';
+    const hasLeftBorder = firstCell.css('border-left-width') !== '0px' && firstCell.css('border-left-style') !== 'none';
+    
+    // 如果边框样式选择器不存在，则创建
+    if (!borderStylePicker) {
+      borderStylePicker = new BorderStylePicker({
+        container: 'body',
+        onChange: function(style) {
+          // 重新获取当前激活的单元格
+          const activeSection = $('#canvas .section.active');
+          const currentActiveCells = activeSection.find('td[data-cell-active="true"]');
+          
+          // 记录撤销重做状态
+          if (window.undoRedoManager) {
+            window.undoRedoManager.recordAction('border_style_change', {
+              style: style,
+              cellCount: currentActiveCells.length
+            });
+          }
+          
+          // 为所有选中的单元格应用新的边框逻辑
+          currentActiveCells.each(function() {
+            const $cell = $(this);
+            const $table = $cell.closest('table');
+            const cellIndex = $cell.index();
+            const rowIndex = $cell.parent().index();
+            
+            // 重置当前单元格的边框
+            $cell.css({
+              'border-width': '0',
+              'border-style': 'none',
+              'border-color': 'transparent'
+            });
+            
+            // 新的边框设置逻辑：只设置右侧和下方边框
+            if (style.right) {
+              $cell.css({
+                'border-right-width': style.width,
+                'border-right-style': style.style,
+                'border-right-color': style.color
+              });
+            }
+            
+            if (style.bottom) {
+              $cell.css({
+                'border-bottom-width': style.width,
+                'border-bottom-style': style.style,
+                'border-bottom-color': style.color
+              });
+            }
+            
+            // 处理上方边框：设置上方单元格的下边框
+            if (style.top && rowIndex > 0) {
+              const $topCell = $table.find('tr').eq(rowIndex - 1).find('td, th').eq(cellIndex);
+              if ($topCell.length) {
+                $topCell.css({
+                  'border-bottom-width': style.width,
+                  'border-bottom-style': style.style,
+                  'border-bottom-color': style.color
+                });
+                $topCell.attr('data-custom-border', 'true');
+              }
+            }
+            
+            // 处理左侧边框：设置左侧单元格的右边框
+            if (style.left && cellIndex > 0) {
+              const $leftCell = $cell.parent().find('td, th').eq(cellIndex - 1);
+              if ($leftCell.length) {
+                $leftCell.css({
+                  'border-right-width': style.width,
+                  'border-right-style': style.style,
+                  'border-right-color': style.color
+                });
+                $leftCell.attr('data-custom-border', 'true');
+              }
+            }
+            
+            // 如果是表格的第一行且设置了上边框，直接设置当前单元格的上边框
+            if (style.top && rowIndex === 0) {
+              $cell.css({
+                'border-top-width': style.width,
+                'border-top-style': style.style,
+                'border-top-color': style.color
+              });
+            }
+            
+            // 如果是表格的第一列且设置了左边框，直接设置当前单元格的左边框
+            if (style.left && cellIndex === 0) {
+              $cell.css({
+                'border-left-width': style.width,
+                'border-left-style': style.style,
+                'border-left-color': style.color
+              });
+            }
+
+            // 如果至少有一个方向设置了边框，添加data-custom-border属性
+            if (style.top || style.right || style.bottom || style.left) {
+              $cell.attr('data-custom-border', 'true');
+            } else {
+              $cell.removeAttr('data-custom-border');
+            }
+          });
+          
+          // 更新按钮状态
+          if (currentActiveCells.length > 0) {
+            window.viewEditor.toolbar.syncToolbarButtonStates(currentActiveCells.first());
+          }
+        },
+        onClose: function() {
+          // 可以在这里添加关闭时的处理逻辑
+        }
+      });
+    }
+    
+    // 设置当前边框样式
+    borderStylePicker.setStyle({
+      width: currentBorderWidth,
+      style: currentBorderStyle,
+      color: rgbToHex(currentBorderColor) || '#000000',
+      top: hasTopBorder,
+      right: hasRightBorder,
+      bottom: hasBottomBorder,
+      left: hasLeftBorder
+    });
+    
+    // 打开边框样式选择器
+    borderStylePicker.open(this);
+  });
+  
+  // 初始化背景颜色选择器
+  let bgColorPicker = null;
+
+  // 背景颜色按钮点击事件
+  $('.toolbar-btn.cell-background-color').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length === 0) return;
+    
+    // 获取第一个选中单元格的当前背景颜色
+    const firstCellBgColor = activeCells.first().css('background-color');
+    let hexColor = rgbToHex(firstCellBgColor) || '#FFFFFF';
+    
+    // 如果颜色选择器不存在，则创建
+    if (!bgColorPicker) {
+      bgColorPicker = new ColorPicker({
+        container: 'body',
+        defaultColor: hexColor,
+        onChange: function(color) {
+          // 重新获取当前激活的单元格
+          const activeSection = $('#canvas .section.active');
+          const currentActiveCells = activeSection.find('td[data-cell-active="true"]');
+          
+          // 记录撤销重做状态
+          if (window.undoRedoManager) {
+            window.undoRedoManager.recordAction('background_color_change', {
+              color: color,
+              cellCount: currentActiveCells.length
+            });
+          }
+          
+          // 为所有选中的单元格应用相同的背景颜色
+          currentActiveCells.each(function() {
+            $(this).css('background-color', color);
+          });
+          
+          // 更新按钮状态
+          if (currentActiveCells.length > 0) {
+            window.viewEditor.toolbar.syncToolbarButtonStates(currentActiveCells.first());
+          }
+        },
+        onClose: function() {
+          // 可以在这里添加关闭时的处理逻辑
+        }
+      });
+    } else {
+      // 更新颜色选择器的当前颜色
+      bgColorPicker.setColor(hexColor);
+    }
+    
+    // 打开颜色选择器
+    bgColorPicker.open(this);
+  });
+
+  // 初始化字体颜色选择器
+  let fontColorPicker = null;
+  
+  // 字体颜色按钮点击事件
+  $('.toolbar-btn.font-palette').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length === 0) return;
+    
+    // 获取第一个选中单元格的当前颜色
+    const firstCellColor = activeCells.first().css('color');
+    let hexColor = rgbToHex(firstCellColor) || '#000000';
+    
+    // 如果颜色选择器不存在，则创建
+    if (!fontColorPicker) {
+      fontColorPicker = new ColorPicker({
+        container: 'body',
+        defaultColor: hexColor,
+        onChange: function(color) {
+          // 重新获取当前激活的单元格
+          const activeSection = $('#canvas .section.active');
+          const currentActiveCells = activeSection.find('td[data-cell-active="true"]');
+          
+          // 为所有选中的单元格应用相同的颜色
+          currentActiveCells.each(function() {
+            $(this).css('color', color);
+          });
+          
+          // 更新按钮状态
+          if (currentActiveCells.length > 0) {
+            window.viewEditor.toolbar.syncToolbarButtonStates(currentActiveCells.first());
+          }
+        },
+        onClose: function() {
+          // 可以在这里添加关闭时的处理逻辑
+        }
+      });
+    } else {
+      // 更新颜色选择器的当前颜色
+      fontColorPicker.setColor(hexColor);
+    }
+    
+    // 打开颜色选择器
+    fontColorPicker.open(this);
+  });
+  
+  // 水平对齐按钮事件处理
+  $('.toolbar-btn.font-align-left').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length > 0) {
+      activeCells.each(function() {
+        $(this).css('text-align', 'left');
+      });
+      
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+    }
+  });
+  
+  $('.toolbar-btn.font-align-center').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length > 0) {
+      activeCells.each(function() {
+        $(this).css('text-align', 'center');
+      });
+      
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+    }
+  });
+  
+  $('.toolbar-btn.font-align-right').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length > 0) {
+      activeCells.each(function() {
+        $(this).css('text-align', 'right');
+      });
+      
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+    }
+  });
+  
+  // 垂直对齐按钮事件处理
+  $('.toolbar-btn.font-align-vertical-top').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length > 0) {
+      activeCells.each(function() {
+        $(this).css('vertical-align', 'top');
+      });
+      
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+    }
+  });
+  
+  $('.toolbar-btn.font-align-vertical-center').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length > 0) {
+      activeCells.each(function() {
+        $(this).css('vertical-align', 'middle');
+      });
+      
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+    }
+  });
+  
+  $('.toolbar-btn.font-align-vertical-bottom').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length > 0) {
+      activeCells.each(function() {
+        $(this).css('vertical-align', 'bottom');
+      });
+      
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+    }
+  });
+  
+  // 单元格合并功能
+  $('.toolbar-btn.merge-cells').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length < 2) {
+      alert('请选择至少两个单元格进行合并');
+      return;
+    }
+    
+    // 检查选中的单元格是否连续
+    if (!areSelectedCellsContinuous(activeCells)) {
+      alert('只能合并连续的单元格区域');
+      return;
+    }
+    
+    // 记录撤销重做状态
+    if (window.undoRedoManager) {
+      window.undoRedoManager.recordAction('merge_cells', {
+        cellCount: activeCells.length,
+        firstCellIndex: activeCells.first().index()
+      });
+    }
+    
+    // 获取合并区域的范围
+    const mergeInfo = getMergeInfo(activeCells);
+    const firstCell = activeCells.first();
+    
+    // 合并文本内容
+    let mergedContent = '';
+    activeCells.each(function() {
+      const cellContent = $(this).text().trim();
+      if (cellContent) {
+        mergedContent += (mergedContent ? ' ' : '') + cellContent;
+      }
+    });
+    
+    // 设置合并属性
+    firstCell.attr({
+      'colspan': mergeInfo.colspan,
+      'rowspan': mergeInfo.rowspan
+    }).text(mergedContent);
+    
+    // 隐藏其他被合并的单元格
+    activeCells.not(firstCell).hide().attr('data-merged', 'true');
+    
+    // 清除选择
+    activeCells.removeAttr('data-cell-active').css({
+      'border-style': '',
+      'border-width': '',
+      'border-color': '',
+      'outline': ''
+    });
+    
+    alert('单元格合并成功');
+  });
+  
+  // 单元格拆分功能
+  $('.toolbar-btn.split-cells').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length !== 1) {
+      alert('请选择一个已合并的单元格进行拆分');
+      return;
+    }
+    
+    const cell = activeCells.first();
+    const colspan = parseInt(cell.attr('colspan')) || 1;
+    const rowspan = parseInt(cell.attr('rowspan')) || 1;
+    
+    if (colspan === 1 && rowspan === 1) {
+      alert('该单元格未合并，无需拆分');
+      return;
+    }
+    
+    // 记录撤销重做状态
+    if (window.undoRedoManager) {
+      window.undoRedoManager.recordAction('split_cells', {
+        cellIndex: cell.index(),
+        colspan: colspan,
+        rowspan: rowspan
+      });
+    }
+    
+    // 移除合并属性
+    cell.removeAttr('colspan rowspan');
+    
+    // 显示被隐藏的单元格
+    const table = cell.closest('table');
+    table.find('td[data-merged="true"]').show().removeAttr('data-merged');
+    
+    // 清除选择
+    cell.removeAttr('data-cell-active').css({
+      'border-style': '',
+      'border-width': '',
+      'border-color': '',
+      'outline': ''
+    });
+    
+    alert('单元格拆分成功');
+  });
+  
+  // 自动换行功能
+  $('.toolbar-btn.newline').on('click', function() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length > 0) {
+      // 记录撤销重做状态
+      if (window.undoRedoManager) {
+        window.undoRedoManager.recordAction('toggle_wrap', {
+          cellCount: activeCells.length
+        });
+      }
+      
+      activeCells.each(function() {
+        const currentWrap = $(this).css('white-space');
+        if (currentWrap === 'nowrap') {
+          $(this).css('white-space', 'normal');
+        } else {
+          $(this).css('white-space', 'nowrap');
+        }
+      });
+      
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+    }
+  });
+  
+  // 辅助函数：检查选中的单元格是否连续
+  function areSelectedCellsContinuous(cells) {
+    if (cells.length <= 1) return true;
+    
+    const positions = [];
+    cells.each(function() {
+      const $cell = $(this);
+      const row = $cell.parent().index();
+      const col = $cell.index();
+      positions.push({row, col, element: $cell});
+    });
+    
+    // 按行列排序
+    positions.sort((a, b) => a.row - b.row || a.col - b.col);
+    
+    // 检查是否形成矩形区域
+    const minRow = Math.min(...positions.map(p => p.row));
+    const maxRow = Math.max(...positions.map(p => p.row));
+    const minCol = Math.min(...positions.map(p => p.col));
+    const maxCol = Math.max(...positions.map(p => p.col));
+    
+    const expectedCount = (maxRow - minRow + 1) * (maxCol - minCol + 1);
+    return positions.length === expectedCount;
+  }
+  
+  // 辅助函数：获取合并信息
+  function getMergeInfo(cells) {
+    const positions = [];
+    cells.each(function() {
+      const $cell = $(this);
+      const row = $cell.parent().index();
+      const col = $cell.index();
+      positions.push({row, col});
+    });
+    
+    const minRow = Math.min(...positions.map(p => p.row));
+    const maxRow = Math.max(...positions.map(p => p.row));
+    const minCol = Math.min(...positions.map(p => p.col));
+    const maxCol = Math.max(...positions.map(p => p.col));
+    
+    return {
+      colspan: maxCol - minCol + 1,
+      rowspan: maxRow - minRow + 1
+    };
+  }
+
+  // 字号选择功能
+  $('.font-size-select').on('change', function() {
+    const selectedValue = $(this).val();
+    
+    if (selectedValue === 'custom') {
+      // 显示自定义输入框
+      $('.custom-font-size-container').show();
+      $('.custom-font-size-input').focus();
+    } else {
+      // 隐藏自定义输入框
+      $('.custom-font-size-container').hide();
+      
+      // 应用字号
+      applyFontSize(selectedValue + 'px');
+    }
+  });
+  
+  // 自定义字号确定按钮
+  $('.apply-custom-font-size').on('click', function() {
+    const customSize = $('.custom-font-size-input').val();
+    
+    if (customSize && customSize >= 6 && customSize <= 200) {
+      applyFontSize(customSize + 'px');
+      
+      // 添加到选择框中
+      const $select = $('.font-size-select');
+      const customOption = `<option value="${customSize}">${customSize}px</option>`;
+      
+      // 检查是否已存在该选项
+      if ($select.find(`option[value="${customSize}"]`).length === 0) {
+        $select.find('option[value="custom"]').before(customOption);
+      }
+      
+      // 选中新添加的选项
+      $select.val(customSize);
+      
+      // 隐藏自定义输入框
+      $('.custom-font-size-container').hide();
+      $('.custom-font-size-input').val('');
+    } else {
+      alert('请输入6-200之间的有效字号');
+    }
+  });
+  
+  // 自定义字号取消按钮
+  $('.cancel-custom-font-size').on('click', function() {
+    $('.custom-font-size-container').hide();
+    $('.custom-font-size-input').val('');
+    $('.font-size-select').val('14'); // 恢复默认值
+  });
+  
+  // 自定义字号输入框回车事件
+  $('.custom-font-size-input').on('keypress', function(e) {
+    if (e.which === 13) {
+      $('.apply-custom-font-size').click();
+    }
+  });
+  
+  // 应用字号的函数
+  function applyFontSize(fontSize) {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    
+    if (activeCells.length > 0) {
+      // 记录撤销重做状态
+      if (window.undoRedoManager) {
+        window.undoRedoManager.recordAction('font_size_change', {
+          fontSize: fontSize,
+          cellCount: activeCells.length
+        });
+      }
+      
+      activeCells.each(function() {
+        $(this).css('font-size', fontSize);
+      });
+      
+      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+    }
+  }
+
+  /**
+   * 将RGB颜色转换为十六进制颜色
+   * @param {string} rgb - RGB颜色字符串，如 'rgb(255, 0, 0)'
+   * @returns {string} 十六进制颜色字符串，如 '#FF0000'
+   */
+  function rgbToHex(rgb) {
+    if (!rgb || rgb === 'rgba(0, 0, 0, 0)' || rgb === 'transparent') {
+      return '#000000';
+    }
+    
+    // 提取RGB值
+    const rgbMatch = rgb.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/);
+    if (!rgbMatch) return '#000000';
+    
+    // 转换为十六进制
+    const r = parseInt(rgbMatch[1], 10).toString(16).padStart(2, '0');
+    const g = parseInt(rgbMatch[2], 10).toString(16).padStart(2, '0');
+    const b = parseInt(rgbMatch[3], 10).toString(16).padStart(2, '0');
+    
+    
+    return `#${r}${g}${b}`.toUpperCase();
+  }
+
 });

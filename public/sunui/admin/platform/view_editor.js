@@ -4,14 +4,20 @@ $(document).ready(function () {
 
   // 清除选择样式的函数
   function clearSelection (container) {
-    container.find('th, td').css({
-      'background-color': '',
-      'outline': 'none',
-      'border': '1px dashed #d5d8dc',  // 恢复为灰色虚线边框
-      'border-width': '1px',
-      'border-style': 'dashed',
-      'border-color': '#d5d8dc'
-    }).removeAttr('data-cell-active');
+    container.find('th, td').each(function() {
+      const $cell = $(this);
+      // 只清除没有手动设置边框的单元格
+      if (!$cell.attr('data-custom-border')) {
+        $cell.css({
+          'border': '1px dashed #d5d8dc',  // 恢复为灰色虚线边框
+          'border-width': '1px',
+          'border-style': 'dashed',
+          'border-color': '#d5d8dc'
+        });
+      }
+      $cell.css({'outline': 'none'});  // 清除临时选取外部的蓝色边框
+      $cell.removeAttr('data-cell-active');
+    });
   }
 
   function adjustButtonPosition () {
@@ -72,14 +78,21 @@ $(document).ready(function () {
     // 检查点击的是否是canvas本身（空白区域）
     if (event.target === this) {
       // 清除所有表格单元格的选中状态（包括th和td元素）
-      $('.ef-table th, .ef-table td').css({
-        'border': '1px dashed #d5d8dc', 
-        'background-color': 'transparent',
-        'outline': 'none',  // 清除outline属性，解决单元格蓝色边框无法清除的问题
-        'border-top': '1px dashed #d5d8dc',
-        'border-bottom': '1px dashed #d5d8dc',
-        'border-left': '1px dashed #d5d8dc',
-        'border-right': '1px dashed #d5d8dc'
+      $('.ef-table th, .ef-table td').each(function() {
+        const $cell = $(this);
+        // 只清除没有手动设置边框的单元格
+        if (!$cell.attr('data-custom-border')) {
+          $cell.css({
+            'border': '1px dashed #d5d8dc', 
+            'border-top': '1px dashed #d5d8dc',
+            'border-bottom': '1px dashed #d5d8dc',
+            'border-left': '1px dashed #d5d8dc',
+            'border-right': '1px dashed #d5d8dc'
+          });
+        }
+
+        $cell.css({'outline': 'none'});  // 清除临时选取外部的蓝色边框
+        $cell.removeAttr('data-cell-active');
       });
       // 移除所有section的active状态
       $('.section').removeClass('active');
@@ -133,12 +146,9 @@ $(document).ready(function () {
     const $table = $currentCell.closest('table');
     clearSelection($table);
 
-    // 移除此表格的所有单元格的data-cell-active属性
-    // const $allCells = $('.ef-table td');
-    // $allCells.attr('data-cell-active', 'false');
     $currentCell.attr('data-cell-active', 'true');
     $currentCell.css({
-      'background-color': '#f0f8ff',
+      //'background-color': '#f0f8ff',
       'outline': '1px solid #007bff'
     });
     $currentCell.focus();
@@ -182,21 +192,24 @@ $(document).ready(function () {
     const $newSection = $(newSectionHtml);
     $canvas = $('.canvas');
     $canvas.append($newSection);
-    
-    // 确保section元素的宽度比section-content大10px
-    // const $sectionContent = $newSection.find('.section-content');
-    // const contentWidth = $sectionContent.outerWidth();
-    // if (contentWidth) {
-    //     $newSection.css('min-width', (contentWidth) + 'px');
-    // }
-    
     activateSection($newSection);
     reinitializeDroppables();
   });
 
   // 处理 section 的关闭逻辑
   $(document).on('click', '.btn-close', function () {
-    $(this).closest('.section').remove();
+    var $section = $(this).closest('.section');
+    var sectionId = $section.data('section-id');
+    
+    // 记录撤销重做状态
+    if (window.undoRedoManager) {
+      window.undoRedoManager.recordAction('remove_section', {
+        sectionId: sectionId,
+        sectionHtml: $section[0].outerHTML
+      });
+    }
+    
+    $section.remove();
   });
 
   $('#toggle-button').on('click', function () {
@@ -418,8 +431,8 @@ $(document).ready(function () {
     table: {
       template: `
       <div id="ef-table-comp-{uniqueId}" class="ef-component ef-table-component ef-table-comp-{uniqueId}" style="position: static; overflow: visible !important;">
-        <span class="ef-component-labels ef-label-small label-above-line label-top" style="left: 0px">
-          <span class="ef-label-comp-type draggable">
+        <span class="ef-component-labels ef-label-small label-above-line label-top table-label" style="left: 0px">
+          <span class="ef-label-comp-type">
             <span>Table</span>
           </span>
         </span>
@@ -516,8 +529,6 @@ $(document).ready(function () {
         if (componentType === 'table') {
           // 保存当前拖放的位置和目标元素
           const dropTarget = droppableArea;
-          const dropOffsetX = placeholder.offset().left - dropTarget.offset().left;
-          const dropOffsetY = placeholder.offset().top - dropTarget.offset().top;
 
           // 显示表格行列输入模态框
           $('#tableModal').css('display', 'flex');
@@ -616,36 +627,52 @@ $(document).ready(function () {
             }
 
             // 选择区域内的所有单元格
-            function selectCellsInRange(startCell, endCell) {
+            function selectCellsInRange(startCell, endCell, isMultiSelect = false) {
               const start = getCellIndex(startCell);
               const end = getCellIndex(endCell);
               const minRow = Math.min(start.row, end.row);
               const maxRow = Math.max(start.row, end.row);
               const minCol = Math.min(start.col, end.col);
               const maxCol = Math.max(start.col, end.col);
-              clearSelection(newComponent);
+              
+              // 如果不是多选模式，清除之前的选择
+              if (!isMultiSelect) {
+                clearSelection(newComponent);
+              }
+              
               newComponent.find('tr').each(function(rowIndex) {
                 if (rowIndex >= minRow && rowIndex <= maxRow) {
                   $(this).find('td, th').each(function(colIndex) {
                     if (colIndex >= minCol && colIndex <= maxCol) {
-                      $(this).css({
-                        'background-color': '#007bff33',
-                        'border': '1px dashed #d5d8dc'
-                      });
+                      const $cell = $(this);
+                      // 只清除没有手动设置边框的单元格
+                      if (!$cell.attr('data-custom-border')) {
+                        $cell.css({
+                          'border': '1px dashed #d5d8dc',
+                          'border-width': '1px',
+                          'border-style': 'dashed',
+                          'border-color': '#d5d8dc'
+                        });
+                        
+                        // 为选中区域的边界设置特殊边框，确保可见性
+                        if (rowIndex === minRow) { // 顶部边界
+                          $cell.css('border-top', '1px solid #007bff');
+                        }
+                        if (rowIndex === maxRow) { // 底部边界
+                          $cell.css('border-bottom', '1px solid #007bff');
+                        }
+                        if (colIndex === minCol) { // 左侧边界
+                          $cell.css('border-left', '1px solid #007bff');
+                        }
+                        if (colIndex === maxCol) { // 右侧边界
+                          $cell.css('border-right', '1px solid #007bff');
+                        }
+                      }
                       
-                      // 设置外边框
-                      if (rowIndex === minRow) {
-                        $(this).css('border-top', '1px solid #007bff');
-                      }
-                      if (rowIndex === maxRow) {
-                        $(this).css('border-bottom', '1px solid #007bff');
-                      }
-                      if (colIndex === minCol) {
-                        $(this).css('border-left', '1px solid #007bff');
-                      }
-                      if (colIndex === maxCol) {
-                        $(this).css('border-right', '1px solid #007bff');
-                      }
+                      $cell.attr('data-cell-active', 'true');
+                      $cell.css({
+                        'outline': '1px solid #007bff'
+                      });
                     }
                   });
                 }
@@ -655,13 +682,30 @@ $(document).ready(function () {
             // 保持选中状态
             let isSelected = false;
             let selectedRange = null;
+            let multiSelectRanges = []; // 存储多选的区域
 
             // 鼠标按下时开始选择
             newComponent.find('td, th').on('mousedown', function(e) {
               e.preventDefault();
               isSelecting = true;
               startCell = this;
-              clearSelection(newComponent);
+              
+              // 检查是否按住了Ctrl(Windows/Linux)或Command(macOS)键
+              const isMultiSelect = e.ctrlKey || e.metaKey;
+              
+              if (!isMultiSelect) {
+                // 单选模式：清除之前的选择
+                clearSelection(newComponent);
+                multiSelectRanges = [];
+              } else {
+                // 多选模式：检查当前单元格是否已经在选中区域内
+                const clickedCellInSelection = $(this).attr('data-cell-active') === 'true';
+                if (clickedCellInSelection) {
+                  // 如果点击的是已选中的单元格，不清除选择，允许继续拖拽
+                  return;
+                }
+              }
+              
               const indices = getCellIndex(this);
               startRowIndex = indices.row;
               startColIndex = indices.col;
@@ -671,24 +715,82 @@ $(document).ready(function () {
             // 鼠标移动时更新选择范围
             newComponent.find('td, th').on('mousemove', function(e) {
               if (isSelecting) {
-                selectCellsInRange(startCell, this);
+                const isMultiSelect = e.ctrlKey || e.metaKey;
+                if (isMultiSelect) {
+                  // 多选模式：重新渲染所有已保存的区域，然后添加当前拖拽区域
+                  clearSelection(newComponent);
+                  // 重新渲染之前保存的所有区域
+                  multiSelectRanges.forEach(range => {
+                    selectCellsInRange(range.startCell, range.endCell, true);
+                  });
+                  // 添加当前拖拽的区域
+                  selectCellsInRange(startCell, this, true);
+                } else {
+                  // 单选模式：只显示当前拖拽的区域
+                  selectCellsInRange(startCell, this, false);
+                }
               }
             });
 
             // 将事件绑定到组件级别
             newComponent.on('click', function(e) {
               const $target = $(e.target);
-              if (!$target.closest('.ef-table').length) {
+              // 只有当点击的不是表格内容且不是在多选模式下时才清空选区
+              if (!$target.closest('.ef-table').length && !(e.ctrlKey || e.metaKey)) {
                 clearSelection(newComponent);
                 isSelected = false;
                 selectedRange = null;
+                multiSelectRanges = [];
               }
             });
+            
+            // 单独处理单元格点击事件
+            newComponent.find('td, th').on('click', function(e) {
+              const isMultiSelect = e.ctrlKey || e.metaKey;
+              if (!isMultiSelect && !isSelecting) {
+                // 单选模式且不在拖拽状态：选中当前单元格
+                clearSelection(newComponent);
+                multiSelectRanges = [];
+                $(this).attr('data-cell-active', 'true');
+                $(this).css({
+                  'border-style': 'dashed',
+                  'border-width': '2px',
+                  'border-color': '#007bff',
+                  'outline': '2px solid #007bff'
+                });
+              }
+            });
+            
+            // 添加函数来重新渲染所有多选区域
+            function renderAllSelections() {
+              clearSelection(newComponent);
+              multiSelectRanges.forEach(range => {
+                if (range.startCell && range.endCell) {
+                  selectCellsInRange(range.startCell, range.endCell, true);
+                }
+              });
+            }
 
             // 鼠标松开时结束选择
-            $(document).on('mouseup', function() {
-              if (isSelecting) {
-                isSelecting = false;
+            $(document).on('mouseup', function(e) {
+              if (isSelecting && startCell) {
+                const isMultiSelect = e.ctrlKey || e.metaKey;
+                if (isMultiSelect) {
+                  // 多选模式：保存当前选择区域
+                  const endCell = document.elementFromPoint(e.clientX, e.clientY);
+                  if (endCell && $(endCell).closest('.ef-table').length) {
+                    const currentRange = {
+                      startCell: startCell,
+                      endCell: endCell
+                    };
+                    multiSelectRanges.push(currentRange);
+                    // 重新渲染所有选择区域
+                    renderAllSelections();
+                  }
+                } else {
+                  // 单选模式：清除多选区域
+                  multiSelectRanges = [];
+                }
                 if (selectedCells.length > 0) {
                   selectedRange = {
                     startCell: startCell,
@@ -696,6 +798,8 @@ $(document).ready(function () {
                   };
                 }
               }
+              isSelecting = false;
+              startCell = null;
             });
 
             // 禁用单元格的默认编辑功能
@@ -728,7 +832,7 @@ $(document).ready(function () {
                 clearSelection(newComponent);
                 selectedCells = [this];
                 $(this).css({
-                  'background-color': '#f0f8ff',
+                  // 'background-color': '#f0f8ff',
                   'outline': '1px solid #007bff'
                 });
                 $(this).attr('data-cell-active', 'true');
@@ -749,18 +853,6 @@ $(document).ready(function () {
             $(document).on('mouseup', function() {
               isSelecting = false;
             });
-
-            // 清除选择样式的函数
-            // function clearSelection() {
-            //   newComponent.find('th, td').css({
-            //     'background-color': '',
-            //     'outline': 'none',
-            //     'border': '1px dashed #d5d8dc',  // 恢复为灰色虚线边框
-            //     'border-width': '1px',
-            //     'border-style': 'dashed',
-            //     'border-color': '#d5d8dc'
-            //   }).removeAttr('data-cell-active');
-            // }
 
             // 隐藏模态窗口
             $('#tableModal').hide();
@@ -872,14 +964,22 @@ $(document).ready(function () {
   function reinitializeDroppables () {
     // 销毁已经初始化的 droppable
     // 在调用destroy前先检查元素是否已经初始化为droppable
-    const $itemBlocks = $('.item-block.ui-droppable');
-    if ($itemBlocks.length > 0) {
-      $itemBlocks.droppable('destroy');
-    }
-    
-    const $sectionContents = $('.section-content.ui-droppable');
-    if ($sectionContents.length > 0) {
-      $sectionContents.droppable('destroy');
+    try {
+      const $itemBlocks = $('.item-block');
+      $itemBlocks.each(function() {
+        if ($(this).hasClass('ui-droppable')) {
+          $(this).droppable('destroy');
+        }
+      });
+      
+      const $sectionContents = $('.section-content');
+      $sectionContents.each(function() {
+        if ($(this).hasClass('ui-droppable')) {
+          $(this).droppable('destroy');
+        }
+      });
+    } catch (error) {
+      console.warn('Droppable destroy error:', error);
     }
     
     // 重新初始化
@@ -967,7 +1067,7 @@ $(document).ready(function () {
             makeComponentDraggable(newComponent);
             
             // 隐藏模态框
-            $ ('#tableModal').hide();
+            $('#tableModal').hide();
             
             // 文本组件的特定初始化逻辑
             if (componentType === 'text') {

@@ -10,10 +10,10 @@
 		  </button>
 		<!-- 撤销/重做 -->
 		<div class="toolbar-group">
-			<button class="toolbar-btn" title="上一步">
+			<button class="toolbar-btn previous-step" title="上一步">
 				<i class="fa-solid fa-rotate-left"></i>
 			</button>
-			<button class="toolbar-btn" title="下一步">
+			<button class="toolbar-btn next-step" title="下一步">
 				<i class="fa-solid fa-rotate-right"></i>
 			</button>
 		</div>
@@ -22,31 +22,52 @@
 
 		<!-- 文本格式化 -->
 		<div class="toolbar-group">
-			<select class="toolbar-select" title="字体选择">
+			<select class="toolbar-select font-chosed" title="字体选择">
 				<option value="Arial">Arial</option>
 				<option value="Helvetica">Helvetica</option>
 				<option value="Times New Roman">Times New Roman</option>
 				<option value="微软雅黑">微软雅黑</option>
 			</select>
 
-			<select class="toolbar-select" title="字号选择">
+			<select class="toolbar-select font-size-select" title="字号选择">
+				<option value="8">8px</option>
+				<option value="9">9px</option>
+				<option value="10">10px</option>
+				<option value="11">11px</option>
 				<option value="12">12px</option>
-				<option value="14">14px</option>
+				<option value="14" selected>14px</option>
 				<option value="16">16px</option>
 				<option value="18">18px</option>
 				<option value="20">20px</option>
+				<option value="22">22px</option>
+				<option value="24">24px</option>
+				<option value="26">26px</option>
+				<option value="28">28px</option>
+				<option value="30">30px</option>
+				<option value="32">32px</option>
+				<option value="36">36px</option>
+				<option value="42">42px</option>
+				<option value="48">48px</option>
+				<option value="custom">自定义...</option>
 			</select>
+			
+			<!-- 自定义字号输入框 -->
+			<div class="custom-font-size-container" style="display: none; margin-left: 5px;">
+				<input type="number" class="custom-font-size-input" placeholder="输入字号" min="6" max="200" style="width: 60px; height: 28px; border: 1px solid #ccc; border-radius: 3px; padding: 0 5px;">
+				<button class="apply-custom-font-size" style="height: 28px; margin-left: 2px; padding: 0 8px; border: 1px solid #ccc; border-radius: 3px; background: #f5f5f5; cursor: pointer;">确定</button>
+				<button class="cancel-custom-font-size" style="height: 28px; margin-left: 2px; padding: 0 8px; border: 1px solid #ccc; border-radius: 3px; background: #f5f5f5; cursor: pointer;">取消</button>
+			</div>
 
 			<button class="toolbar-btn font-bold" title="粗体">
 				<i class="fa-solid fa-bold"></i>
 			</button>
-			<button class="toolbar-btn" title="斜体">
+			<button class="toolbar-btn font-italic" title="斜体">
 				<i class="fa-solid fa-italic"></i>
 			</button>
-			<button class="toolbar-btn" title="下划线">
+			<button class="toolbar-btn font-underline" title="下划线">
 				<i class="fa-solid fa-underline"></i>
 			</button>
-			<button class="toolbar-btn" title="字体颜色">
+			<button class="toolbar-btn font-palette" title="字体颜色">
 				<i class="fa-solid fa-palette"></i>
 			</button>
 		</div>
@@ -55,22 +76,22 @@
 
 		<!-- 文本对齐 -->
 		<div class="toolbar-group">
-			<button class="toolbar-btn" title="左对齐">
+			<button class="toolbar-btn font-align-left" title="左对齐">
 				<i class="fa-solid fa-align-left"></i>
 			</button>
-			<button class="toolbar-btn" title="居中对齐">
+			<button class="toolbar-btn font-align-center" title="居中对齐">
 				<i class="fa-solid fa-align-center"></i>
 			</button>
-			<button class="toolbar-btn" title="右对齐">
+			<button class="toolbar-btn font-align-right" title="右对齐">
 				<i class="fa-solid fa-align-right"></i>
 			</button>
-			<button class="toolbar-btn" title="顶部对齐">
+			<button class="toolbar-btn font-align-vertical-top" title="顶部对齐">
 				<i class="fa-solid fa-align-left fa-rotate-90"></i>
 			</button>
-			<button class="toolbar-btn" title="垂直居中">
+			<button class="toolbar-btn font-align-vertical-center" title="垂直居中">
 				<i class="fa-solid fa-align-center fa-rotate-90"></i>
 			</button>
-			<button class="toolbar-btn" title="底部对齐">
+			<button class="toolbar-btn font-align-vertical-bottom" title="底部对齐">
 				<i class="fa-solid fa-align-right fa-rotate-90"></i>
 			</button>
 		</div>
@@ -79,24 +100,24 @@
 
 		<!-- 表格编辑 -->
 		<div class="toolbar-group">
-			<button class="toolbar-btn" title="表格背景颜色">
+			<button class="toolbar-btn cell-background-color" title="表格背景颜色">
 				<i class="fa-solid fa-fill-drip"></i>
 			</button>
-			<button class="toolbar-btn" title="表格边框">
+			<button class="toolbar-btn cell-border" title="表格边框">
 				<i class="fa-solid fa-border-all"></i>
 			</button>
-			<button class="toolbar-btn" title="合并单元格">
-				<i class="fa-solid fa-table-cells-large"></i>
+			<button class="toolbar-btn merge-cells" title="合并单元格">
+				<i class="fa-solid fa-arrows-to-dot"></i>
 			</button>
-			<button class="toolbar-btn" title="拆分单元格">
-				<i class="fa-solid fa-table-cells"></i>
+			<button class="toolbar-btn split-cells" title="拆分单元格">
+				<i class="fa-solid fa-table-columns"></i>
 			</button>
-			<button class="toolbar-btn" title="内容自动换行">
+			<button class="toolbar-btn newline" title="内容自动换行">
 				<i class="fa-solid fa-arrow-turn-down"></i>
 			</button>
-			<button class="toolbar-btn" title="横版/竖版切换">
+			{# <button class="toolbar-btn" title="横版/竖版切换">
 				<i class="fa-solid fa-arrows-left-right-to-line"></i>
-			</button>
+			</button> #}
 		</div>
 	</div>
 	<div class="toolbar-right">
