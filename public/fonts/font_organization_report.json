@@ -1,0 +1,686 @@
+{
+  "summary": {
+    "total_fonts": 15,
+    "available_fonts": 11,
+    "unavailable_fonts": 4,
+    "organization_date": "/Users/tony/projects/enterprise_framework"
+  },
+  "available_fonts": [
+    {
+      "key": "chinese/Source_Han_Sans_SC",
+      "display_name": "思源黑体 SC",
+      "category": "chinese",
+      "file_count": 1,
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ]
+    },
+    {
+      "key": "chinese/Source_Han_Serif_SC",
+      "display_name": "思源宋体 SC",
+      "category": "chinese",
+      "file_count": 1,
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ]
+    },
+    {
+      "key": "chinese/AlibabaPuHuiTi",
+      "display_name": "阿里巴巴普惠体",
+      "category": "chinese",
+      "file_count": 40,
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ]
+    },
+    {
+      "key": "chinese/Liu_Jian_Mao_Cao",
+      "display_name": "刘建毛草",
+      "category": "chinese",
+      "file_count": 1,
+      "weights": [
+        400
+      ]
+    },
+    {
+      "key": "chinese/Long_Cang",
+      "display_name": "龙藏体",
+      "category": "chinese",
+      "file_count": 1,
+      "weights": [
+        400
+      ]
+    },
+    {
+      "key": "chinese/Ma_Shan_Zheng",
+      "display_name": "马善政楷书",
+      "category": "chinese",
+      "file_count": 1,
+      "weights": [
+        400
+      ]
+    },
+    {
+      "key": "chinese/ZCOOL_KuaiLe",
+      "display_name": "站酷快乐体",
+      "category": "chinese",
+      "file_count": 1,
+      "weights": [
+        400
+      ]
+    },
+    {
+      "key": "chinese/ZCOOL_QingKe_HuangYou",
+      "display_name": "站酷庆科黄油体",
+      "category": "chinese",
+      "file_count": 1,
+      "weights": [
+        400
+      ]
+    },
+    {
+      "key": "chinese/ZCOOL_XiaoWei",
+      "display_name": "站酷小薇",
+      "category": "chinese",
+      "file_count": 1,
+      "weights": [
+        400
+      ]
+    },
+    {
+      "key": "chinese/Zhi_Mang_Xing",
+      "display_name": "志芒星",
+      "category": "chinese",
+      "file_count": 1,
+      "weights": [
+        400
+      ]
+    },
+    {
+      "key": "english/HarmonyOS_Sans",
+      "display_name": "HarmonyOS Sans",
+      "category": "english",
+      "file_count": 6,
+      "weights": [
+        100,
+        300,
+        400,
+        500,
+        700,
+        900
+      ]
+    }
+  ],
+  "unavailable_fonts": [
+    {
+      "key": "chinese/Noto_Sans_SC",
+      "display_name": "思源黑体 简体",
+      "category": "chinese",
+      "missing_files": [
+        "NotoSansSC-VariableFont_wght.ttf"
+      ]
+    },
+    {
+      "key": "chinese/Noto_Sans_HK",
+      "display_name": "思源黑体 繁体",
+      "category": "chinese",
+      "missing_files": [
+        "NotoSansHK-VariableFont_wght.ttf"
+      ]
+    },
+    {
+      "key": "chinese/HarmonyOS_Sans_SC",
+      "display_name": "鸿蒙黑体",
+      "category": "chinese",
+      "missing_files": [
+        "HarmonyOS_Sans_SC_Thin.ttf",
+        "HarmonyOS_Sans_SC_Light.ttf",
+        "HarmonyOS_Sans_SC_Regular.ttf",
+        "HarmonyOS_Sans_SC_Medium.ttf",
+        "HarmonyOS_Sans_SC_Bold.ttf",
+        "HarmonyOS_Sans_SC_Black.ttf"
+      ]
+    },
+    {
+      "key": "english/Noto_Sans_Mono",
+      "display_name": "Noto Sans Mono",
+      "category": "english",
+      "missing_files": [
+        "NotoSansMono-VariableFont_wdth_wght.ttf"
+      ]
+    }
+  ],
+  "detailed_info": {
+    "chinese/Noto_Sans_SC": {
+      "display_name": "思源黑体 简体",
+      "category": "chinese",
+      "files": [],
+      "missing_files": [
+        "NotoSansSC-VariableFont_wght.ttf"
+      ],
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "available": false
+    },
+    "chinese/Noto_Sans_HK": {
+      "display_name": "思源黑体 繁体",
+      "category": "chinese",
+      "files": [],
+      "missing_files": [
+        "NotoSansHK-VariableFont_wght.ttf"
+      ],
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "available": false
+    },
+    "chinese/Source_Han_Sans_SC": {
+      "display_name": "思源黑体 SC",
+      "category": "chinese",
+      "files": [
+        {
+          "name": "SourceHanSansSC-VF.ttf",
+          "path": "chinese/Source_Han_Sans_SC/SourceHanSansSC-VF.ttf",
+          "size": 36144992
+        }
+      ],
+      "missing_files": [],
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "available": true
+    },
+    "chinese/Source_Han_Serif_SC": {
+      "display_name": "思源宋体 SC",
+      "category": "chinese",
+      "files": [
+        {
+          "name": "SourceHanSerifSC-VF.ttf",
+          "path": "chinese/Source_Han_Serif_SC/SourceHanSerifSC-VF.ttf",
+          "size": 59899480
+        }
+      ],
+      "missing_files": [],
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "available": true
+    },
+    "chinese/HarmonyOS_Sans_SC": {
+      "display_name": "鸿蒙黑体",
+      "category": "chinese",
+      "files": [],
+      "missing_files": [
+        "HarmonyOS_Sans_SC_Thin.ttf",
+        "HarmonyOS_Sans_SC_Light.ttf",
+        "HarmonyOS_Sans_SC_Regular.ttf",
+        "HarmonyOS_Sans_SC_Medium.ttf",
+        "HarmonyOS_Sans_SC_Bold.ttf",
+        "HarmonyOS_Sans_SC_Black.ttf"
+      ],
+      "weights": [
+        100,
+        300,
+        400,
+        500,
+        700,
+        900
+      ],
+      "available": false
+    },
+    "chinese/AlibabaPuHuiTi": {
+      "display_name": "阿里巴巴普惠体",
+      "category": "chinese",
+      "files": [
+        {
+          "name": "AlibabaPuHuiTi-3-35-Thin.woff",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-35-Thin.woff",
+          "size": 5682392
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-35-Thin.ttf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-35-Thin.ttf",
+          "size": 8548544
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-35-Thin.otf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-35-Thin.otf",
+          "size": 7374884
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-35-Thin.woff2",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-35-Thin.woff2",
+          "size": 5289936
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-55-Regular.woff",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-55-Regular.woff",
+          "size": 5592280
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-55-Regular.ttf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-55-Regular.ttf",
+          "size": 8532824
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-55-Regular.otf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-55-Regular.otf",
+          "size": 7366576
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-55-Regular.woff2",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-55-Regular.woff2",
+          "size": 5256740
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-65-Medium.woff2",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-65-Medium.woff2",
+          "size": 5469328
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-65-Medium.ttf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-65-Medium.ttf",
+          "size": 8429388
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-65-Medium.otf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-65-Medium.otf",
+          "size": 7190084
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-65-Medium.woff",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-65-Medium.woff",
+          "size": 5690408
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-115-Black.ttf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-115-Black.ttf",
+          "size": 2517492
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-115-Black.otf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-115-Black.otf",
+          "size": 2133604
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-115-Black.woff2",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-115-Black.woff2",
+          "size": 1423292
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-115-Black.woff",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-115-Black.woff",
+          "size": 1650688
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-45-Light.otf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-45-Light.otf",
+          "size": 7434456
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-45-Light.woff",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-45-Light.woff",
+          "size": 5678680
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-45-Light.ttf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-45-Light.ttf",
+          "size": 8559848
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-45-Light.woff2",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-45-Light.woff2",
+          "size": 5382804
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-105-Heavy.ttf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-105-Heavy.ttf",
+          "size": 2536300
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-105-Heavy.otf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-105-Heavy.otf",
+          "size": 2151384
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-105-Heavy.woff2",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-105-Heavy.woff2",
+          "size": 1492108
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-105-Heavy.woff",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-105-Heavy.woff",
+          "size": 1688696
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-85-Bold.woff2",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-85-Bold.woff2",
+          "size": 5560840
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-85-Bold.woff",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-85-Bold.woff",
+          "size": 5737960
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-85-Bold.ttf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-85-Bold.ttf",
+          "size": 8371268
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-85-Bold.otf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-85-Bold.otf",
+          "size": 7007912
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-95-ExtraBold.ttf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-95-ExtraBold.ttf",
+          "size": 8203580
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-95-ExtraBold.otf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-95-ExtraBold.otf",
+          "size": 7023784
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-95-ExtraBold.woff2",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-95-ExtraBold.woff2",
+          "size": 5382784
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-95-ExtraBold.woff",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-95-ExtraBold.woff",
+          "size": 5595396
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-55-RegularL3.ttf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-55-RegularL3.ttf",
+          "size": 21725156
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-55-RegularL3.otf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-55-RegularL3.otf",
+          "size": 15590732
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-55-RegularL3.woff",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-55-RegularL3.woff",
+          "size": 13356376
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-55-RegularL3.woff2",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-55-RegularL3.woff2",
+          "size": 10410156
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-75-SemiBold.otf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-75-SemiBold.otf",
+          "size": 7029752
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-75-SemiBold.ttf",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-75-SemiBold.ttf",
+          "size": 8375164
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-75-SemiBold.woff",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-75-SemiBold.woff",
+          "size": 5695376
+        },
+        {
+          "name": "AlibabaPuHuiTi-3-75-SemiBold.woff2",
+          "path": "chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-75-SemiBold.woff2",
+          "size": 5481108
+        }
+      ],
+      "missing_files": [],
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "available": true
+    },
+    "chinese/Liu_Jian_Mao_Cao": {
+      "display_name": "刘建毛草",
+      "category": "chinese",
+      "files": [
+        {
+          "name": "LiuJianMaoCao-Regular.ttf",
+          "path": "chinese/Liu_Jian_Mao_Cao/LiuJianMaoCao-Regular.ttf",
+          "size": 4940224
+        }
+      ],
+      "missing_files": [],
+      "weights": [
+        400
+      ],
+      "available": true
+    },
+    "chinese/Long_Cang": {
+      "display_name": "龙藏体",
+      "category": "chinese",
+      "files": [
+        {
+          "name": "LongCang-Regular.ttf",
+          "path": "chinese/Long_Cang/LongCang-Regular.ttf",
+          "size": 5151180
+        }
+      ],
+      "missing_files": [],
+      "weights": [
+        400
+      ],
+      "available": true
+    },
+    "chinese/Ma_Shan_Zheng": {
+      "display_name": "马善政楷书",
+      "category": "chinese",
+      "files": [
+        {
+          "name": "MaShanZheng-Regular.ttf",
+          "path": "chinese/Ma_Shan_Zheng/MaShanZheng-Regular.ttf",
+          "size": 5856232
+        }
+      ],
+      "missing_files": [],
+      "weights": [
+        400
+      ],
+      "available": true
+    },
+    "chinese/ZCOOL_KuaiLe": {
+      "display_name": "站酷快乐体",
+      "category": "chinese",
+      "files": [
+        {
+          "name": "ZCOOLKuaiLe-Regular.ttf",
+          "path": "chinese/ZCOOL_KuaiLe/ZCOOLKuaiLe-Regular.ttf",
+          "size": 3264168
+        }
+      ],
+      "missing_files": [],
+      "weights": [
+        400
+      ],
+      "available": true
+    },
+    "chinese/ZCOOL_QingKe_HuangYou": {
+      "display_name": "站酷庆科黄油体",
+      "category": "chinese",
+      "files": [
+        {
+          "name": "ZCOOLQingKeHuangYou-Regular.ttf",
+          "path": "chinese/ZCOOL_QingKe_HuangYou/ZCOOLQingKeHuangYou-Regular.ttf",
+          "size": 8312296
+        }
+      ],
+      "missing_files": [],
+      "weights": [
+        400
+      ],
+      "available": true
+    },
+    "chinese/ZCOOL_XiaoWei": {
+      "display_name": "站酷小薇",
+      "category": "chinese",
+      "files": [
+        {
+          "name": "ZCOOLXiaoWei-Regular.ttf",
+          "path": "chinese/ZCOOL_XiaoWei/ZCOOLXiaoWei-Regular.ttf",
+          "size": 6302244
+        }
+      ],
+      "missing_files": [],
+      "weights": [
+        400
+      ],
+      "available": true
+    },
+    "chinese/Zhi_Mang_Xing": {
+      "display_name": "志芒星",
+      "category": "chinese",
+      "files": [
+        {
+          "name": "ZhiMangXing-Regular.ttf",
+          "path": "chinese/Zhi_Mang_Xing/ZhiMangXing-Regular.ttf",
+          "size": 4052388
+        }
+      ],
+      "missing_files": [],
+      "weights": [
+        400
+      ],
+      "available": true
+    },
+    "english/Noto_Sans_Mono": {
+      "display_name": "Noto Sans Mono",
+      "category": "english",
+      "files": [],
+      "missing_files": [
+        "NotoSansMono-VariableFont_wdth_wght.ttf"
+      ],
+      "weights": [
+        100,
+        200,
+        300,
+        400,
+        500,
+        600,
+        700,
+        800,
+        900
+      ],
+      "available": false
+    },
+    "english/HarmonyOS_Sans": {
+      "display_name": "HarmonyOS Sans",
+      "category": "english",
+      "files": [
+        {
+          "name": "HarmonyOS_Sans_Thin.woff",
+          "path": "english/HarmonyOS_Sans/HarmonyOS_Sans_Thin.woff",
+          "size": 59360
+        },
+        {
+          "name": "HarmonyOS_Sans_Light.woff",
+          "path": "english/HarmonyOS_Sans/HarmonyOS_Sans_Light.woff",
+          "size": 59376
+        },
+        {
+          "name": "HarmonyOS_Sans_Regular.woff",
+          "path": "english/HarmonyOS_Sans/HarmonyOS_Sans_Regular.woff",
+          "size": 57224
+        },
+        {
+          "name": "HarmonyOS_Sans_Medium.woff",
+          "path": "english/HarmonyOS_Sans/HarmonyOS_Sans_Medium.woff",
+          "size": 59168
+        },
+        {
+          "name": "HarmonyOS_Sans_Bold.woff",
+          "path": "english/HarmonyOS_Sans/HarmonyOS_Sans_Bold.woff",
+          "size": 59432
+        },
+        {
+          "name": "HarmonyOS_Sans_Black.woff",
+          "path": "english/HarmonyOS_Sans/HarmonyOS_Sans_Black.woff",
+          "size": 59244
+        }
+      ],
+      "missing_files": [],
+      "weights": [
+        100,
+        300,
+        400,
+        500,
+        700,
+        900
+      ],
+      "available": true
+    }
+  }
+}

@@ -1,0 +1,301 @@
+/* 字体选择器弹窗样式 */
+.font-selector-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+}
+
+.font-selector-modal.show {
+    display: flex;
+}
+
+.font-selector-content {
+    background: white;
+    border-radius: 8px;
+    width: 900px;
+    max-width: 95vw;
+    max-height: 85vh;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.font-selector-header {
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.font-selector-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.font-selector-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.font-selector-close:hover {
+    color: #333;
+}
+
+.font-selector-body {
+    flex: 1;
+    overflow: hidden;
+    padding: 20px;
+}
+
+.font-selector-main {
+    display: flex;
+    height: 100%;
+    gap: 0;
+}
+
+.font-category-tabs {
+    position: absolute;
+    left: -140px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 120px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 10px 0;
+    height: fit-content;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.font-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 15px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    margin: 2px 8px;
+}
+
+.font-tab:hover {
+    background: #e9ecef;
+    color: #333;
+}
+
+.font-tab.active {
+    background: #007bff;
+    color: white;
+    font-weight: 600;
+}
+
+.font-content-area {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 50vh;
+    width: 100%;
+}
+
+.font-category {
+    margin-bottom: 20px;
+    display: none;
+}
+
+.font-category.active {
+    display: block;
+}
+
+/* 移除了font-category-header相关样式，因为使用了标签页 */
+
+
+
+.font-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 15px;
+}
+
+.font-item {
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fafafa;
+}
+
+.font-item:hover {
+    border-color: #007bff;
+    background: #f0f8ff;
+}
+
+.font-item.selected {
+    border-color: #007bff;
+    background: #e3f2fd;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+}
+
+.font-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.font-type-tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+}
+
+.font-type-tag.web-font {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 1px 3px rgba(102, 126, 234, 0.3);
+}
+
+.font-type-tag.windows-font {
+    background: linear-gradient(135deg, #00d4ff 0%, #0078d4 100%);
+    color: white;
+    box-shadow: 0 1px 3px rgba(0, 120, 212, 0.3);
+}
+
+.font-type-tag.macos-font {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+    box-shadow: 0 1px 3px rgba(255, 107, 107, 0.3);
+}
+
+.font-preview {
+    margin-bottom: 8px;
+}
+
+.font-preview-text {
+    margin: 4px 0;
+    line-height: 1.4;
+}
+
+.font-preview-chinese {
+    font-size: 16px;
+}
+
+.font-preview-english {
+    font-size: 14px;
+}
+
+.font-weight-demos {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.font-weight-demo {
+    font-size: 12px;
+    padding: 2px 6px;
+    background: #f5f5f5;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    transition: all 0.2s ease;
+}
+
+.font-weight-demo:hover {
+    background: #e8f4fd;
+    border-color: #007bff;
+}
+
+.font-weight-demo.selected {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.font-selector-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.font-selector-btn {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #f5f5f5;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.font-selector-btn.primary {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.font-selector-btn:hover {
+    background: #e0e0e0;
+}
+
+.font-selector-btn.primary:hover {
+    background: #0056b3;
+}
+
+.font-selector-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 搜索框样式 */
+.font-search-container {
+    margin-bottom: 20px;
+}
+
+.font-search-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.font-search-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}

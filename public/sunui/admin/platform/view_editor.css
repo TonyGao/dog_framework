@@ -175,6 +175,55 @@
   gap: 5px;
 }
 
+/* Section控制按钮组 */
+.section-controls {
+  position: absolute;
+  top: 10px;
+  left: -35px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 3;
+}
+
+.section-controls button {
+  width: 28px;
+  height: 28px;
+  background-color: #007bff;
+  border: 1px solid #0056b3;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section-controls button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.section-controls button:active {
+  transform: scale(0.95);
+}
+
+/* 折叠状态的section样式 */
+.section.collapsed {
+  height: 80px;
+}
+
+.section.collapsed .section-content {
+  height: 80px;
+  min-height: 80px;
+  overflow: hidden;
+  transition: height 0.3s ease;
+}
+
 /* 小图标样式 */
 .section-header button {
   background: transparent;

@@ -4,7 +4,7 @@
  */
 $(document).ready(function() {
   // 初始化Alert组件
-  let alert = new Alert($('.app-content-container'));
+  let alert = new Alert($('.canvas'));
   
   // 获取所有工具栏按钮并添加点击事件
   $('.toolbar-btn').on('click', function() {
@@ -42,6 +42,30 @@ $(document).ready(function() {
     // 实现字号更改逻辑
   });
   
+  // 字体选择器按钮点击事件 - Feature 3
+  $('#fontSelectorTrigger').on('click', function() {
+    if (window.fontSelectorModal) {
+      window.fontSelectorModal.show(function(selectedFont) {
+        // 应用选中的字体到当前选中的单元格或文本
+        const activeSection = $('#canvas .section.active');
+        const activeCells = activeSection.find('td[data-cell-active="true"]');
+        
+        if (activeCells.length > 0) {
+          // 应用字体到选中的单元格
+          activeCells.css('font-family', selectedFont.family);
+          activeCells.css('font-weight', selectedFont.weight);
+          
+          // 更新按钮显示的字体名称
+          $('#fontSelectorTrigger .font-selector-text').text(selectedFont.name);
+          
+          console.log('应用字体:', selectedFont.name, '到', activeCells.length, '个单元格');
+        } else {
+          alert.warning('请先选择要应用字体的单元格');
+        }
+      });
+    }
+  });
+
   // 保存按钮点击事件
   $('#save-view-button').on('click', function() {
     saveView();
@@ -117,6 +141,85 @@ $(document).ready(function() {
     $('#loading-indicator').hide();
   }
   
+  /**
+   * 获取选中单元格的范围信息
+   * @param {jQuery} selectedCells - 选中的单元格集合
+   * @returns {Object|null} 包含边界单元格信息的对象
+   */
+  function getSelectedCellsRange(selectedCells) {
+    if (!selectedCells || selectedCells.length === 0) {
+      return null;
+    }
+    
+    const cellsInfo = [];
+    const tables = new Set();
+    
+    // 收集所有选中单元格的信息
+    selectedCells.each(function() {
+      const $cell = $(this);
+      const $table = $cell.closest('table');
+      const cellIndex = $cell.index();
+      const rowIndex = $cell.parent().index();
+      
+      cellsInfo.push({
+        cell: $cell,
+        table: $table[0],
+        row: rowIndex,
+        col: cellIndex
+      });
+      
+      tables.add($table[0]);
+    });
+    
+    // 按表格分组处理
+    const result = {
+      rightBorderCells: [],
+      bottomBorderCells: []
+    };
+    
+    tables.forEach(function(table) {
+      const tableCells = cellsInfo.filter(info => info.table === table);
+      
+      // 找到每行的最右侧单元格（右边界）
+      const rowGroups = {};
+      tableCells.forEach(function(cellInfo) {
+        if (!rowGroups[cellInfo.row]) {
+          rowGroups[cellInfo.row] = [];
+        }
+        rowGroups[cellInfo.row].push(cellInfo);
+      });
+      
+      Object.keys(rowGroups).forEach(function(row) {
+        const rowCells = rowGroups[row];
+        const maxCol = Math.max(...rowCells.map(c => c.col));
+        const rightBorderCell = rowCells.find(c => c.col === maxCol);
+        if (rightBorderCell) {
+          result.rightBorderCells.push(rightBorderCell);
+        }
+      });
+      
+      // 找到每列的最下方单元格（下边界）
+      const colGroups = {};
+      tableCells.forEach(function(cellInfo) {
+        if (!colGroups[cellInfo.col]) {
+          colGroups[cellInfo.col] = [];
+        }
+        colGroups[cellInfo.col].push(cellInfo);
+      });
+      
+      Object.keys(colGroups).forEach(function(col) {
+        const colCells = colGroups[col];
+        const maxRow = Math.max(...colCells.map(c => c.row));
+        const bottomBorderCell = colCells.find(c => c.row === maxRow);
+        if (bottomBorderCell) {
+          result.bottomBorderCells.push(bottomBorderCell);
+        }
+      });
+    });
+    
+    return result;
+  }
+
   /**
    * 同步DOM元素的样式状态与工具栏按钮的激活状态
    * @param {jQuery} element - 需要检查样式的DOM元素
@@ -354,12 +457,20 @@ window.viewEditor.toolbar = {
             });
           }
           
+          // 获取选中单元格的范围信息
+          const selectedCellsInfo = getSelectedCellsRange(currentActiveCells);
+          
           // 为所有选中的单元格应用新的边框逻辑
           currentActiveCells.each(function() {
             const $cell = $(this);
             const $table = $cell.closest('table');
             const cellIndex = $cell.index();
             const rowIndex = $cell.parent().index();
+            
+            // 检查当前单元格是否为合并单元格
+            const colspan = parseInt($cell.attr('colspan')) || 1;
+            const rowspan = parseInt($cell.attr('rowspan')) || 1;
+            const isMergedCell = colspan > 1 || rowspan > 1;
             
             // 重置当前单元格的边框
             $cell.css({
@@ -375,6 +486,8 @@ window.viewEditor.toolbar = {
                 'border-right-style': style.style,
                 'border-right-color': style.color
               });
+              
+              // 合并单元格的右边框处理已在下方统一处理
             }
             
             if (style.bottom) {
@@ -383,31 +496,41 @@ window.viewEditor.toolbar = {
                 'border-bottom-style': style.style,
                 'border-bottom-color': style.color
               });
+              
+              // 合并单元格的下边框处理已在下方统一处理
             }
             
             // 处理上方边框：设置上方单元格的下边框
             if (style.top && rowIndex > 0) {
-              const $topCell = $table.find('tr').eq(rowIndex - 1).find('td, th').eq(cellIndex);
-              if ($topCell.length) {
-                $topCell.css({
-                  'border-bottom-width': style.width,
-                  'border-bottom-style': style.style,
-                  'border-bottom-color': style.color
-                });
-                $topCell.attr('data-custom-border', 'true');
+              // 对于合并单元格，需要为所有跨越的列设置上方边框
+              for (let i = 0; i < colspan; i++) {
+                const targetColIndex = cellIndex + i;
+                const $topCell = $table.find('tr').eq(rowIndex - 1).find('td, th').eq(targetColIndex);
+                if ($topCell.length) {
+                  $topCell.css({
+                    'border-bottom-width': style.width,
+                    'border-bottom-style': style.style,
+                    'border-bottom-color': style.color
+                  });
+                  $topCell.attr('data-custom-border', 'true');
+                }
               }
             }
             
             // 处理左侧边框：设置左侧单元格的右边框
             if (style.left && cellIndex > 0) {
-              const $leftCell = $cell.parent().find('td, th').eq(cellIndex - 1);
-              if ($leftCell.length) {
-                $leftCell.css({
-                  'border-right-width': style.width,
-                  'border-right-style': style.style,
-                  'border-right-color': style.color
-                });
-                $leftCell.attr('data-custom-border', 'true');
+              // 对于合并单元格，需要为所有跨越的行设置左侧边框
+              for (let i = 0; i < rowspan; i++) {
+                const targetRowIndex = rowIndex + i;
+                const $leftCell = $table.find('tr').eq(targetRowIndex).find('td, th').eq(cellIndex - 1);
+                if ($leftCell.length) {
+                  $leftCell.css({
+                    'border-right-width': style.width,
+                    'border-right-style': style.style,
+                    'border-right-color': style.color
+                  });
+                  $leftCell.attr('data-custom-border', 'true');
+                }
               }
             }
             
@@ -436,6 +559,37 @@ window.viewEditor.toolbar = {
               $cell.removeAttr('data-custom-border');
             }
           });
+          
+          // 处理选取区域边界的相邻单元格边框
+          if (selectedCellsInfo && style.right) {
+            // 为选取区域右侧边界的右侧单元格设置左边框
+            selectedCellsInfo.rightBorderCells.forEach(function(cellInfo) {
+              const $rightCell = $(cellInfo.table).find('tr').eq(cellInfo.row).find('td, th').eq(cellInfo.col + 1);
+              if ($rightCell.length) {
+                $rightCell.css({
+                  'border-left-width': style.width,
+                  'border-left-style': style.style,
+                  'border-left-color': style.color
+                });
+                $rightCell.attr('data-custom-border', 'true');
+              }
+            });
+          }
+          
+          if (selectedCellsInfo && style.bottom) {
+            // 为选取区域下边界的下侧单元格设置上边框
+            selectedCellsInfo.bottomBorderCells.forEach(function(cellInfo) {
+              const $bottomCell = $(cellInfo.table).find('tr').eq(cellInfo.row + 1).find('td, th').eq(cellInfo.col);
+              if ($bottomCell.length) {
+                $bottomCell.css({
+                  'border-top-width': style.width,
+                  'border-top-style': style.style,
+                  'border-top-color': style.color
+                });
+                $bottomCell.attr('data-custom-border', 'true');
+              }
+            });
+          }
           
           // 更新按钮状态
           if (currentActiveCells.length > 0) {
@@ -651,13 +805,13 @@ window.viewEditor.toolbar = {
     const activeCells = activeSection.find('td[data-cell-active="true"]');
     
     if (activeCells.length < 2) {
-      alert('请选择至少两个单元格进行合并');
+      alert.warning('请选择至少两个单元格进行合并');
       return;
     }
     
     // 检查选中的单元格是否连续
     if (!areSelectedCellsContinuous(activeCells)) {
-      alert('只能合并连续的单元格区域');
+      alert.warning('只能合并连续的单元格区域');
       return;
     }
     
@@ -699,16 +853,54 @@ window.viewEditor.toolbar = {
       'outline': ''
     });
     
-    alert('单元格合并成功');
+    alert.success('单元格合并成功');
   });
   
+  // 检查拆分单元格按钮状态 - Feature 5
+  function updateSplitCellsButtonState() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    const splitButton = $('.toolbar-btn.split-cells');
+    
+    // 检查是否只选中了一个单元格且该单元格已合并
+    if (activeCells.length === 1) {
+      const cell = activeCells.first();
+      const colspan = parseInt(cell.attr('colspan')) || 1;
+      const rowspan = parseInt(cell.attr('rowspan')) || 1;
+      
+      if (colspan > 1 || rowspan > 1) {
+        // 单元格已合并，启用按钮
+        splitButton.removeClass('disabled').prop('disabled', false);
+      } else {
+        // 单元格未合并，禁用按钮
+        splitButton.addClass('disabled').prop('disabled', true);
+      }
+    } else {
+      // 没有选中单元格或选中多个单元格，禁用按钮
+      splitButton.addClass('disabled').prop('disabled', true);
+    }
+  }
+  
+  // 监听单元格选择变化，更新拆分按钮状态
+  $(document).on('cell-selection-changed', function() {
+    updateSplitCellsButtonState();
+  });
+  
+  // 初始化时更新按钮状态
+  updateSplitCellsButtonState();
+
   // 单元格拆分功能
   $('.toolbar-btn.split-cells').on('click', function() {
+    // 检查按钮是否被禁用
+    if ($(this).hasClass('disabled') || $(this).prop('disabled')) {
+      return;
+    }
+    
     const activeSection = $('#canvas .section.active');
     const activeCells = activeSection.find('td[data-cell-active="true"]');
     
     if (activeCells.length !== 1) {
-      alert('请选择一个已合并的单元格进行拆分');
+      alert.warning('请选择一个已合并的单元格进行拆分');
       return;
     }
     
@@ -717,7 +909,7 @@ window.viewEditor.toolbar = {
     const rowspan = parseInt(cell.attr('rowspan')) || 1;
     
     if (colspan === 1 && rowspan === 1) {
-      alert('该单元格未合并，无需拆分');
+      alert.warning('该单元格未合并，无需拆分');
       return;
     }
     
@@ -745,7 +937,10 @@ window.viewEditor.toolbar = {
       'outline': ''
     });
     
-    alert('单元格拆分成功');
+    // 更新按钮状态
+    updateSplitCellsButtonState();
+    
+    alert.success('单元格拆分成功');
   });
   
   // 自动换行功能
@@ -860,7 +1055,7 @@ window.viewEditor.toolbar = {
       $('.custom-font-size-container').hide();
       $('.custom-font-size-input').val('');
     } else {
-      alert('请输入6-200之间的有效字号');
+      alert.warning('请输入6-200之间的有效字号');
     }
   });
   
