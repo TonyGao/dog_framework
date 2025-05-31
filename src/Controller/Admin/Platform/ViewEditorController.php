@@ -370,4 +370,29 @@ class ViewEditorController extends BaseController
     ]);
   }
   
+  #[Route(
+    '/admin/platform/view/neweditor/{id}',
+    name: 'platform_view_new_editor'
+  )]
+  public function newEditor(string $id): Response
+  {
+    $components = [
+      ['icon' => 'fa-solid fa-border-none', 'name' => '布局', 'componentType' => 'layout'],
+      ['icon' => 'fa-solid fa-table', 'name' => '表格', 'componentType' => 'table'],
+      ['icon' => 'fa-solid fa-text-height', 'name' => '文本', 'componentType' => 'text'],
+      ['icon' => 'fa-solid fa-image', 'name' => '图片', 'componentType' => 'image'],
+      ['icon' => 'fa-regular fa-newspaper', 'name' => '富文本', 'componentType' => 'rich_text'],
+      ['icon' => 'fa-solid fa-video', 'name' => '视频', 'componentType' => 'video'],
+      ['icon' => 'fa-solid fa-mattress-pillow', 'name' => '按钮', 'componentType' => 'button'],
+      ['icon' => 'fa-solid fa-divide', 'name' => 'Divider', 'componentType' => 'divider'],
+      ['icon' => 'fa-solid fa-arrows-up-to-line', 'name' => 'Spacer', 'componentType' => 'spacer'],
+      ['icon' => 'fa-solid fa-map-location-dot', 'name' => '地图', 'componentType' => 'map'],
+      ['icon' => 'fa-solid fa-map', 'name' => 'Icon', 'componentType' => 'icon'],
+      ['icon' => 'fa-solid fa-map', 'name' => '相册', 'componentType' => 'gallery'],
+    ];
+  
+    return $this->render('admin/platform/view/editor.html.twig', [
+      'components' => $components,
+    ]);
+  }
 }

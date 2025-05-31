@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字体库演示 - 整理后的字体展示</title>
+    <link rel="stylesheet" href="fonts_organized.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .font-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .font-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .font-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .font-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .font-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .font-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .font-preview {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .font-weights {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .weight-sample {
+            padding: 5px 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .control-group label {
+            color: white;
+            font-weight: 500;
+            min-width: 80px;
+        }
+
+        .control-group input, .control-group select {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            min-width: 150px;
+        }
+
+        .test-text {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .test-content {
+            font-size: 1.5rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .unavailable-fonts {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .unavailable-title {
+            color: #856404;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .unavailable-list {
+            color: #856404;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>字体库演示</h1>
+            <p>整理后的字体文件展示与测试</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">15</div>
+                <div class="stat-label">总字体数量</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">11</div>
+                <div class="stat-label">可用字体</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label">不可用字体</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">73%</div>
+                <div class="stat-label">可用率</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="testText">测试文本:</label>
+                <input type="text" id="testText" value="字体测试 Font Test 1234567890" style="flex: 1;">
+            </div>
+            <div class="control-group">
+                <label for="fontSize">字体大小:</label>
+                <input type="range" id="fontSize" min="12" max="48" value="24">
+                <span id="fontSizeValue" style="color: white;">24px</span>
+            </div>
+            <div class="control-group">
+                <label for="fontWeight">字体粗细:</label>
+                <select id="fontWeight">
+                    <option value="100">100 - Thin</option>
+                    <option value="300">300 - Light</option>
+                    <option value="400" selected>400 - Regular</option>
+                    <option value="500">500 - Medium</option>
+                    <option value="700">700 - Bold</option>
+                    <option value="900">900 - Black</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="test-text">
+            <h3>实时字体测试</h3>
+            <div id="testContent" class="test-content">
+                字体测试 Font Test 1234567890
+            </div>
+        </div>
+
+        <div class="font-section">
+            <h2 class="section-title">中文字体 (Chinese Fonts)</h2>
+            <div class="font-grid" id="chineseFonts">
+                <!-- 中文字体将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <div class="font-section">
+            <h2 class="section-title">英文字体 (English Fonts)</h2>
+            <div class="font-grid" id="englishFonts">
+                <!-- 英文字体将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <div class="unavailable-fonts">
+            <div class="unavailable-title">不可用字体列表</div>
+            <div class="unavailable-list">
+                <p>• 思源黑体 简体 (Noto Sans SC) - 缺失文件</p>
+                <p>• 思源黑体 繁体 (Noto Sans HK) - 缺失文件</p>
+                <p>• 鸿蒙黑体 (HarmonyOS Sans SC) - 缺失文件</p>
+                <p>• Noto Sans Mono - 缺失文件</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="font_library_manager_organized.js"></script>
+    <script>
+        // 字体数据
+        const fontData = {
+            chinese: [
+                {
+                    name: '思源黑体 SC',
+                    family: 'Source Han Sans SC',
+                    files: 1,
+                    weights: [100, 200, 300, 400, 500, 600, 700, 800, 900]
+                },
+                {
+                    name: '思源宋体 SC',
+                    family: 'Source Han Serif SC',
+                    files: 1,
+                    weights: [100, 200, 300, 400, 500, 600, 700, 800, 900]
+                },
+                {
+                    name: '阿里巴巴普惠体',
+                    family: 'AlibabaPuHuiTi',
+                    files: 40,
+                    weights: [100, 200, 300, 400, 500, 600, 700, 800, 900]
+                },
+                {
+                    name: '刘建毛草',
+                    family: 'Liu Jian Mao Cao',
+                    files: 1,
+                    weights: [400]
+                },
+                {
+                    name: '龙藏体',
+                    family: 'Long Cang',
+                    files: 1,
+                    weights: [400]
+                },
+                {
+                    name: '马善政楷书',
+                    family: 'Ma Shan Zheng',
+                    files: 1,
+                    weights: [400]
+                },
+                {
+                    name: '站酷快乐体',
+                    family: 'ZCOOL KuaiLe',
+                    files: 1,
+                    weights: [400]
+                },
+                {
+                    name: '站酷庆科黄油体',
+                    family: 'ZCOOL QingKe HuangYou',
+                    files: 1,
+                    weights: [400]
+                },
+                {
+                    name: '站酷小薇',
+                    family: 'ZCOOL XiaoWei',
+                    files: 1,
+                    weights: [400]
+                },
+                {
+                    name: '志芒星',
+                    family: 'Zhi Mang Xing',
+                    files: 1,
+                    weights: [400]
+                }
+            ],
+            english: [
+                {
+                    name: 'HarmonyOS Sans',
+                    family: 'HarmonyOS Sans',
+                    files: 6,
+                    weights: [100, 300, 400, 500, 700, 900]
+                }
+            ]
+        };
+
+        // 生成字体展示
+        function generateFontDisplay(fonts, containerId) {
+            const container = document.getElementById(containerId);
+            
+            fonts.forEach(font => {
+                const fontItem = document.createElement('div');
+                fontItem.className = 'font-item';
+                fontItem.innerHTML = `
+                    <div class="font-name">${font.name}</div>
+                    <div class="font-info">文件数量: ${font.files} | 支持字重: ${font.weights.length}个</div>
+                    <div class="font-preview" style="font-family: '${font.name}', '${font.family}', sans-serif;">
+                        ${containerId === 'chineseFonts' ? '中文字体展示效果' : 'English Font Display'}
+                    </div>
+                    <div class="font-weights">
+                        ${font.weights.map(weight => 
+                            `<span class="weight-sample" style="font-family: '${font.name}', '${font.family}', sans-serif; font-weight: ${weight};">字重${weight}</span>`
+                        ).join('')}
+                    </div>
+                `;
+                container.appendChild(fontItem);
+            });
+        }
+
+        // 初始化字体展示
+        generateFontDisplay(fontData.chinese, 'chineseFonts');
+        generateFontDisplay(fontData.english, 'englishFonts');
+
+        // 控制面板功能
+        const testTextInput = document.getElementById('testText');
+        const fontSizeSlider = document.getElementById('fontSize');
+        const fontSizeValue = document.getElementById('fontSizeValue');
+        const fontWeightSelect = document.getElementById('fontWeight');
+        const testContent = document.getElementById('testContent');
+
+        function updateTestText() {
+            const text = testTextInput.value;
+            const fontSize = fontSizeSlider.value;
+            const fontWeight = fontWeightSelect.value;
+            
+            testContent.textContent = text;
+            testContent.style.fontSize = fontSize + 'px';
+            testContent.style.fontWeight = fontWeight;
+            fontSizeValue.textContent = fontSize + 'px';
+        }
+
+        testTextInput.addEventListener('input', updateTestText);
+        fontSizeSlider.addEventListener('input', updateTestText);
+        fontWeightSelect.addEventListener('change', updateTestText);
+
+        // 字体切换功能
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.font-item')) {
+                const fontItem = e.target.closest('.font-item');
+                const fontName = fontItem.querySelector('.font-name').textContent;
+                testContent.style.fontFamily = `'${fontName}', sans-serif`;
+                
+                // 高亮选中的字体
+                document.querySelectorAll('.font-item').forEach(item => {
+                    item.style.border = '1px solid #e0e0e0';
+                });
+                fontItem.style.border = '2px solid #667eea';
+            }
+        });
+
+        // 初始化字体库管理器
+        const fontManager = new FontLibraryManager();
+        fontManager.initFontLibrary().then(fonts => {
+            console.log('字体库初始化完成:', fonts);
+        }).catch(error => {
+            console.error('字体库初始化失败:', error);
+        });
+    </script>
+</body>
+</html>

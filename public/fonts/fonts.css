@@ -1,89 +1,284 @@
-/* 声明 Noto Sans HK 字体 适合繁体字 */
+/* 更新的字体CSS文件 */
+/* 基于整理后的字体目录结构生成 */
+
+/* CHINESE FONTS */
+
+/* 增加 /fonts/organized_fonts/chinese/Alimama_DongFangDaKai_Regular/Alimama_DongFangDaKai_Regular.ttf */
 @font-face {
-  font-family: 'Noto Sans HK';
-  src: url('../fonts/google_fonts/Noto_Sans_HK/NotoSansHK-VariableFont_wght.ttf') format('truetype-variations');
-  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-family: '阿里妈妈东方大楷';
+  src: url('/fonts/organized_fonts/chinese/Alimama/AlimamaDongFangDaKai/Alimama_DongFangDaKai_Regular.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-/* 声明 Noto Sans SC 字体 适合简体字 */
 @font-face {
-  font-family: 'Noto Sans HK';
-  src: url('../fonts/google_fonts/Noto_Sans_SC/NotoSansSC-VariableFont_wght.ttf') format('truetype-variations');
-  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-family: '阿里妈妈刀隶体';
+  src: url('/fonts/organized_fonts/chinese/Alimama/AlimamaDaoLiTi/AlimamaDaoLiTi-Regular.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-/* 声明 Noto Sans SC 字体 适合日文 */
 @font-face {
-  font-family: 'Noto Sans JP';
-  src: url('../fonts/google_fonts/Noto_Sans_JP/NotoSansJP-VariableFont_wght.ttf') format('truetype-variations');
-  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-family: '阿里妈妈方圆体';
+  src: url('/fonts/organized_fonts/chinese/Alimama/AlimamaFangYuanTi/AlimamaFangYuanTiVF-Thin.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-/* 声明 Noto Sans SC 字体 适合韓文 */
 @font-face {
-  font-family: 'Noto Sans KR';
-  src: url('../fonts/google_fonts/Noto_Sans_KR/NotoSansKR-VariableFont_wght.ttf') format('truetype-variations');
-  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-family: '阿里妈妈数黑体';
+  src: url('/fonts/organized_fonts/chinese/Alimama/AlimamaShuHeiTi/AlimamaShuHeiTi-Bold.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-/** Noto Sans Mono 英文 **/
 @font-face {
-  font-family: 'Noto Sans Mono';
-  src: url('../fonts/google_fonts/Noto_Sans_Mono/NotoSansMono-VariableFont_wdth_wght.ttf') format('truetype-variations');
-  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-family: '钉钉进步体';
+  src: url('/fonts/organized_fonts/chinese/DingTalk/DingTalkJinBuTi/DingTalkJinBuTi-Regular.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-/** Noto Sans Mono CJK SC 简体中文 **/
 @font-face {
-  font-family: 'Noto Sans Mono CJK SC';
-  src: url('../fonts/google_fonts/NotoSansMonoCJK-VF/NotoSansMonoCJKsc-VF.ttf') format('truetype-variations');
-  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-family: '思源黑体简体中文';
+  src: url('/fonts/organized_fonts/chinese/SourceHan/SourceHanSans/SourceHanSansSC-VF.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-/* 为繁体中文定义字体 */
 @font-face {
-  font-family: 'Noto Sans Mono CJK TC';
-  src: url('../fonts/google_fonts/NotoSansMonoCJK-VF/NotoSansMonoCJKtc-VF.ttf') format('truetype-variations');
-  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-family: '思源黑体香港';
+  src: url('/fonts/organized_fonts/chinese/SourceHan/SourceHanSans/SourceHanSansHC-VF.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-/* 为日文定义字体 */
 @font-face {
-  font-family: 'Noto Sans Mono CJK JP';
-  src: url('../fonts/google_fonts/NotoSansMonoCJK-VF/NotoSansMonoCJKjp-VF.ttf') format('truetype-variations');
-  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-family: '思源宋体简体中文';
+  src: url('/fonts/organized_fonts/chinese/SourceHan/SourceHanSerifSC/SourceHanSerifSC-VF.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-/* 为韩文定义字体 */
 @font-face {
-  font-family: 'Noto Sans Mono CJK KR';
-  src: url('../fonts/google_fonts/NotoSansMonoCJK-VF/NotoSansMonoCJKkr-VF.ttf') format('truetype-variations');
-  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-family: '思源宋体香港';
+  src: url('/fonts/organized_fonts/chinese/SourceHan/SourceHanSerifHC/SourceHanSerifHC-VF.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
-/* 为香港中文定义字体 */
 @font-face {
-  font-family: 'Noto Sans Mono CJK HK';
-  src: url('../fonts/google_fonts/NotoSansMonoCJK-VF/NotoSansMonoCJKhk-VF.ttf') format('truetype-variations');
-  font-weight: 100 900; /* 支持从 100 到 900 的权重 */
+  font-family: '阿里巴巴普惠体';
+  src: url('/fonts/organized_fonts/chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-35-Thin.woff2') format('woff2');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '阿里巴巴普惠体';
+  src: url('/fonts/organized_fonts/chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-45-Light.woff2') format('woff2');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '阿里巴巴普惠体';
+  src: url('/fonts/organized_fonts/chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-55-Regular.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '阿里巴巴普惠体';
+  src: url('/fonts/organized_fonts/chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-65-Medium.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '阿里巴巴普惠体';
+  src: url('/fonts/organized_fonts/chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-75-SemiBold.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '阿里巴巴普惠体';
+  src: url('/fonts/organized_fonts/chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-85-Bold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '阿里巴巴普惠体';
+  src: url('/fonts/organized_fonts/chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-85-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '阿里巴巴普惠体';
+  src: url('/fonts/organized_fonts/chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-95-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '阿里巴巴普惠体';
+  src: url('/fonts/organized_fonts/chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-105-Heavy.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '阿里巴巴普惠体';
+  src: url('/fonts/organized_fonts/chinese/AlibabaPuHuiTi/AlibabaPuHuiTi-3-115-Black.woff2') format('woff2');
+  font-weight: 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '钟齐流江毛草';
+  src: url('/fonts/organized_fonts/chinese/googleFonts/Liu_Jian_Mao_Cao/LiuJianMaoCao-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* checked */
+@font-face {
+  font-family: '龙藏体';
+  src: url('/fonts/organized_fonts/chinese/LongCang/LongCang-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '钟齐马善政毛笔楷书';
+  src: url('/fonts/organized_fonts/chinese/Ma_Shan_Zheng/MaShanZheng-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* checked */
+@font-face {
+  font-family: '站酷快乐体';
+  src: url('/fonts/organized_fonts/chinese/ZCOOL/ZCOOLKuaiLe/ZCOOLKuaiLe-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* checked */
+@font-face {
+  font-family: '站酷庆科黄油体';
+  src: url('/fonts/organized_fonts/chinese/ZCOOL/ZCOOLQingKeHuangYou/ZCOOLQingKeHuangYou-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* checked */
+@font-face {
+  font-family: '站酷小薇';
+  src: url('/fonts/organized_fonts/chinese/ZCOOL/ZCOOLXiaoWei/ZCOOLXiaoWei-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+/* checked */
+@font-face {
+  font-family: '志莽行书';
+  src: url('/fonts/organized_fonts/chinese/googleFonts/ZhiMangXing/ZhiMangXing-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '志莽行书';
+  src: url('/fonts/organized_fonts/chinese/googleFonts/ZhiMangXing/ZhiMangXing-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto宋体简体中文';
+  src: url('/fonts/organized_fonts/chinese/googleFonts/Noto/NotoSerifSC/NotoSerifSC-VariableFont_wght.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+/* ENGLISH FONTS */
+@font-face {
+  font-family: 'NotoSansSymbols2';
+  src: url('/fonts/organized_fonts/english/Noto/Noto_Sans_Symbols_2/NotoSansSymbols2-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'AlimamaAgile';
+  src: url('/fonts/organized_fonts/english/Alimama/AlimamaAgile/AlimamaAgileVF-Thin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 日本字体 */
+
+@font-face {
+  font-family: '思源黑体日本';
+  src: url('/fonts/organized_fonts/japanese/SourceHan/SourceHanSans/SourceHanSans-VF.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '思源宋体日本';
+  src: url('/fonts/organized_fonts/japanese/SourceHan/SourceHanSerif/SourceHanSerif-VF.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 韩国字体 */
+
+@font-face {
+  font-family: '思源黑体韩国';
+  src: url('/fonts/organized_fonts/korean/SourceHan/SourceHanSans/SourceHanSansK-VF.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: '思源宋体韩国';
+  src: url('/fonts/organized_fonts/korean/SourceHan/SourceHanSerifK/SourceHanSerifK-VF.ttf') format('truetype');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }

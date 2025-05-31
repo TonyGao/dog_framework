@@ -156,19 +156,35 @@ class UndoRedoManager {
     
     try {
       const canvas = $('#canvas');
-      canvas.empty();
       
-      // 添加默认的section
-      const defaultSection = `
-        <div class="section active" data-section-id="1">
-          <div class="section-content">
-            <div class="item-block" style="position: relative; min-height: 200px; border: 1px dashed #ccc;">
-              <!-- 组件将被放置在这里 -->
-            </div>
+      // 生成随机ID
+      const sectionId = Math.floor(Math.random() * 1000000000);
+      
+      // 使用正确的初始状态HTML结构
+      const initialState = `
+        <button class="add-section-button" style="right: 319.67px;">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+        <div class="section active" id="${sectionId}">
+          <div class="section-controls">
+            <button class="btn-toggle-header" title="显示/隐藏标题栏"><i class="fa-solid fa-eye"></i></button>
+            <button class="btn-toggle-collapse" title="折叠/展开"><i class="fa-solid fa-chevron-up"></i></button>
           </div>
+          <div class="section-header">
+            <button class="btn-add">
+              <i class="fa-solid fa-plus" style="font-size: 1em;"></i>
+            </button>
+            <button class="btn-layout">
+              <i class="fa-solid fa-grip" style="font-size: 1em;"></i>
+            </button>
+            <button class="btn-close">
+              <i class="fa-solid fa-times" style="font-size: 1em;"></i>
+            </button>
+          </div>
+          <div class="section-content ui-droppable"></div>
         </div>
       `;
-      canvas.html(defaultSection);
+      canvas.html(initialState);
       
       // 重新初始化
       if (window.viewEditor && window.viewEditor.initDraggableDroppable) {

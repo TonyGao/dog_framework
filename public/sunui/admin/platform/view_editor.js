@@ -6,18 +6,27 @@ $(document).ready(function () {
   function clearSelection (container) {
     container.find('th, td').each(function() {
       const $cell = $(this);
-      // 只清除没有手动设置边框的单元格
-      if (!$cell.attr('data-custom-border')) {
-        $cell.css({
-          'border': '1px dashed #d5d8dc',  // 恢复为灰色虚线边框
-          'border-width': '1px',
-          'border-style': 'dashed',
-          'border-color': '#d5d8dc'
-        });
-      }
+      // 只清除outline，不修改border
       $cell.css({'outline': 'none'});  // 清除临时选取外部的蓝色边框
       $cell.removeAttr('data-cell-active');
+      
+      // 只有在没有手动设置边框的情况下才恢复默认边框
+      if (!$cell.attr('data-custom-border')) {
+        // 检查是否有原始的border样式，如果没有则设置默认样式
+        const currentBorder = $cell.css('border');
+        if (!currentBorder || currentBorder === 'none' || currentBorder === '0px none rgb(0, 0, 0)') {
+          $cell.css({
+            'border': '1px dashed #d5d8dc',
+            'border-width': '1px',
+            'border-style': 'dashed',
+            'border-color': '#d5d8dc'
+          });
+        }
+      }
     });
+    
+    // 触发单元格选择变化事件 - Feature 5
+    $(document).trigger('cell-selection-changed');
   }
 
   function adjustButtonPosition () {
@@ -42,6 +51,253 @@ $(document).ready(function () {
     adjustButtonPosition();
     adjustCanvasAlignment();
   });
+  
+  // 绑定表格事件的公共方法
+  function bindTableEvents() {
+    // 重新绑定表格单元格选择事件
+    $('.ef-table td, .ef-table th').off('mousedown mousemove click dblclick blur mouseover');
+    
+    // 处理表格单元格点击事件，点击单元格
+    $canvas.off('click', '.ef-table td').on('click', '.ef-table td', function(event) {
+      const $currentCell = $(this);
+      const $allEditableCells = $('.ef-table td[contenteditable="true"]');
+
+      // 同步视图编辑器工具栏的按钮状态
+      if (window.viewEditor && window.viewEditor.toolbar && window.viewEditor.toolbar.syncToolbarButtonStates) {
+        window.viewEditor.toolbar.syncToolbarButtonStates($currentCell);
+      }
+      
+      // 如果点击的是当前正在编辑的单元格，不做任何处理
+      if ($currentCell.attr('contenteditable') === 'true') {
+        return;
+      }
+
+      // 得到当前单元格的表格
+      const $table = $currentCell.closest('table');
+      clearSelection($table);
+
+      $currentCell.attr('data-cell-active', 'true');
+      $currentCell.css({
+        'outline': '2px solid #007bff'
+      });
+    });
+    
+    // 重新绑定表格组件的多选事件
+    $('.ef-table-component').each(function() {
+      const $component = $(this);
+      bindTableComponentEvents($component);
+    });
+  }
+  
+  // 绑定单个表格组件的事件
+  function bindTableComponentEvents($component) {
+    let isSelecting = false;
+    let startCell = null;
+    let selectedCells = [];
+    let startRowIndex = -1;
+    let startColIndex = -1;
+    let isSelected = false;
+    let selectedRange = null;
+    let multiSelectRanges = [];
+    
+    // 获取单元格的行列索引
+    function getCellIndex(cell) {
+      const $cell = $(cell);
+      const $row = $cell.parent();
+      return {
+        row: $row.index(),
+        col: $cell.index()
+      };
+    }
+
+    // 选择区域内的所有单元格
+    function selectCellsInRange(startCell, endCell, isMultiSelect = false) {
+      const start = getCellIndex(startCell);
+      const end = getCellIndex(endCell);
+      const minRow = Math.min(start.row, end.row);
+      const maxRow = Math.max(start.row, end.row);
+      const minCol = Math.min(start.col, end.col);
+      const maxCol = Math.max(start.col, end.col);
+      
+      // 如果不是多选模式，清除之前的选择
+      if (!isMultiSelect) {
+        clearSelection($component);
+      }
+      
+      $component.find('tr').each(function(rowIndex) {
+        if (rowIndex >= minRow && rowIndex <= maxRow) {
+          $(this).find('td, th').each(function(colIndex) {
+            if (colIndex >= minCol && colIndex <= maxCol) {
+              const $cell = $(this);
+              // 只清除没有手动设置边框的单元格
+              if (!$cell.attr('data-custom-border')) {
+                $cell.css({
+                  'border': '1px dashed #d5d8dc',
+                  'border-width': '1px',
+                  'border-style': 'dashed',
+                  'border-color': '#d5d8dc'
+                });
+                
+                // 为选中区域的边界设置特殊边框，确保可见性
+                // if (rowIndex === minRow) { // 顶部边界
+                //   $cell.css('border-top', '1px solid #007bff');
+                // }
+                // if (rowIndex === maxRow) { // 底部边界
+                //   $cell.css('border-bottom', '1px solid #007bff');
+                // }
+                // if (colIndex === minCol) { // 左侧边界
+                //   $cell.css('border-left', '1px solid #007bff');
+                // }
+                // if (colIndex === maxCol) { // 右侧边界
+                //   $cell.css('border-right', '1px solid #007bff');
+                // }
+              }
+              
+              $cell.attr('data-cell-active', 'true');
+              $cell.css({
+                'outline': '1px solid #007bff'
+              });
+            }
+          });
+        }
+      });
+    }
+    
+    // 添加函数来重新渲染所有多选区域
+    function renderAllSelections() {
+      clearSelection($component);
+      multiSelectRanges.forEach(range => {
+        if (range.startCell && range.endCell) {
+          selectCellsInRange(range.startCell, range.endCell, true);
+        }
+      });
+    }
+    
+    // 鼠标按下时开始选择
+    $component.find('td, th').off('mousedown').on('mousedown', function(e) {
+      e.preventDefault();
+      isSelecting = true;
+      startCell = this;
+      
+      // 检查是否按住了Ctrl(Windows/Linux)或Command(macOS)键
+      const isMultiSelect = e.ctrlKey || e.metaKey;
+      
+      if (!isMultiSelect) {
+        // 单选模式：清除之前的选择
+        clearSelection($component);
+        multiSelectRanges = [];
+      } else {
+        // 多选模式：检查当前单元格是否已经在选中区域内
+        const clickedCellInSelection = $(this).attr('data-cell-active') === 'true';
+        if (clickedCellInSelection) {
+          // 如果点击的是已选中的单元格，不清除选择，允许继续拖拽
+          return;
+        }
+      }
+      
+      const indices = getCellIndex(this);
+      startRowIndex = indices.row;
+      startColIndex = indices.col;
+      isSelected = true;
+    });
+
+    // 鼠标移动时更新选择范围
+    $component.find('td, th').off('mousemove').on('mousemove', function(e) {
+      if (isSelecting) {
+        const isMultiSelect = e.ctrlKey || e.metaKey;
+        if (isMultiSelect) {
+          // 多选模式：重新渲染所有已保存的区域，然后添加当前拖拽区域
+          clearSelection($component);
+          // 重新渲染之前保存的所有区域
+          multiSelectRanges.forEach(range => {
+            selectCellsInRange(range.startCell, range.endCell, true);
+          });
+          // 添加当前拖拽的区域
+          selectCellsInRange(startCell, this, true);
+        } else {
+          // 单选模式：只显示当前拖拽的区域
+          selectCellsInRange(startCell, this, false);
+        }
+      }
+    });
+
+    // 将事件绑定到组件级别
+    $component.off('click').on('click', function(e) {
+      const $target = $(e.target);
+      // 只有当点击的不是表格内容且不是在多选模式下时才清空选区
+      if (!$target.closest('.ef-table').length && !(e.ctrlKey || e.metaKey)) {
+        clearSelection($component);
+        isSelected = false;
+        selectedRange = null;
+        multiSelectRanges = [];
+      }
+    });
+    
+    // 单独处理单元格点击事件
+    $component.find('td, th').off('click').on('click', function(e) {
+      const isMultiSelect = e.ctrlKey || e.metaKey;
+      if (!isMultiSelect && !isSelecting) {
+        // 单选模式且不在拖拽状态：选中当前单元格
+        clearSelection($component);
+        multiSelectRanges = [];
+        $(this).attr('data-cell-active', 'true');
+        $(this).css({
+          'outline': '2px solid #007bff'
+        });
+      }
+    });
+    
+    // 双击进入编辑模式
+    $component.find('th, td').off('dblclick').on('dblclick', function() {
+      clearSelection($component); // 清除已有的选中效果
+      $(this).attr('contenteditable', 'true')
+             .css('cursor', 'text')
+             .focus();
+    });
+
+    // 失去焦点时退出编辑模式
+    $component.find('th, td').off('blur').on('blur', function() {
+      $(this).attr('contenteditable', 'false')
+             .css('cursor', 'default');
+    });
+    
+    // 鼠标松开时结束选择
+    $(document).off('mouseup.tableComponent').on('mouseup.tableComponent', function(e) {
+      if (isSelecting && startCell) {
+        const isMultiSelect = e.ctrlKey || e.metaKey;
+        if (isMultiSelect) {
+          // 多选模式：保存当前选择区域
+          const endCell = document.elementFromPoint(e.clientX, e.clientY);
+          if (endCell && $(endCell).closest('.ef-table').length) {
+            const currentRange = {
+              startCell: startCell,
+              endCell: endCell
+            };
+            multiSelectRanges.push(currentRange);
+            // 重新渲染所有选择区域
+            renderAllSelections();
+          }
+        } else {
+          // 单选模式：清除多选区域
+          multiSelectRanges = [];
+        }
+        if (selectedCells.length > 0) {
+          selectedRange = {
+            startCell: startCell,
+            endCell: selectedCells[selectedCells.length - 1]
+          };
+        }
+      }
+      isSelecting = false;
+      startCell = null;
+    });
+  }
+  
+  // 暴露bindTableEvents方法到全局
+  if (!window.viewEditor) {
+    window.viewEditor = {};
+  }
+  window.viewEditor.bindTableEvents = bindTableEvents;
   
   // 检查section-content宽度并调整canvas对齐方式
   function adjustCanvasAlignment() {
@@ -122,6 +378,20 @@ $(document).ready(function () {
     activateSection($section);
   });
 
+  // 表格标签点击事件 - Feature 4
+  $canvas.on('click', '.ef-component-labels .label-top', function (event) {
+    event.stopPropagation();
+    
+    // 找到表格所在的section
+    const $tableComponent = $(this).closest('.ef-table-component');
+    const $section = $tableComponent.closest('.section');
+    
+    if ($section.length > 0) {
+      // 触发section的点击事件
+      $section.trigger('click');
+    }
+  });
+
   // 监听contenteditable为true的元素，粘贴时仅插入纯文本
   $canvas.on('paste', '[contenteditable="true"]', function (event) {
     event.preventDefault(); // 阻止默认粘贴行为
@@ -155,6 +425,9 @@ $(document).ready(function () {
     
     // 移除其他单元格的可编辑状态
     $allEditableCells.removeAttr('contenteditable');
+    
+    // 触发单元格选择变化事件，更新split-cells按钮状态
+    $(document).trigger('cell-selection-changed');
   });
   
   // 添加双击事件处理，使单元格可编辑
@@ -175,11 +448,33 @@ $(document).ready(function () {
       selection.addRange(range);
     }
   });
+  
+  // 添加键盘事件处理，当单元格处于编辑状态时按回车键取消编辑
+  $canvas.on('keydown', '.ef-table td[contenteditable="true"]', function(event) {
+    if (event.key === 'Enter' || event.keyCode === 13) {
+      event.preventDefault();
+      const $currentCell = $(this);
+      
+      // 取消编辑状态
+      $currentCell.removeAttr('contenteditable');
+      $currentCell.blur();
+      
+      // 恢复到单击时的状态
+      $currentCell.css({
+        'outline': '1px solid #007bff'
+      });
+      $currentCell.attr('data-cell-active', 'true');
+    }
+  });
 
   // 处理添加 section 的逻辑
   $('.add-section-button').click(function () {
     const newSectionHtml = `
-          <div class="section" id="${Str.generateRandomString(9)}" style="width: 1140px;">
+          <div class="section" id="${Str.generateRandomString(9)}">
+              <div class="section-controls">
+                  <button class="btn-toggle-header" title="显示/隐藏标题栏"><i class="fa-solid fa-eye"></i></button>
+                  <button class="btn-toggle-collapse" title="折叠/展开"><i class="fa-solid fa-chevron-up"></i></button>
+              </div>
               <div class="section-header">
                   <button class="btn-add"><i class="fa-solid fa-plus"></i></button>
                   <button class="btn-layout"><i class="fa-solid fa-grip"></i></button>
@@ -194,6 +489,9 @@ $(document).ready(function () {
     $canvas.append($newSection);
     activateSection($newSection);
     reinitializeDroppables();
+    
+    // 为新section绑定控制按钮事件
+    bindSectionControlEvents($newSection);
   });
 
   // 处理 section 的关闭逻辑
@@ -210,6 +508,68 @@ $(document).ready(function () {
     }
     
     $section.remove();
+  });
+
+  // 绑定section控制按钮事件的函数
+  function bindSectionControlEvents($section) {
+    // 显示/隐藏header按钮事件
+    $section.find('.btn-toggle-header').off('click').on('click', function(e) {
+      e.stopPropagation();
+      const $header = $section.find('.section-header');
+      const $icon = $(this).find('i');
+      
+      if ($header.is(':visible')) {
+        $header.hide();
+        $icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        $(this).attr('title', '显示标题栏');
+      } else {
+        $header.show();
+        $icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        $(this).attr('title', '隐藏标题栏');
+      }
+    });
+    
+    // 折叠/展开section按钮事件
+    $section.find('.btn-toggle-collapse').off('click').on('click', function(e) {
+      e.stopPropagation();
+      const $content = $section.find('.section-content');
+      const $icon = $(this).find('i');
+      
+      if ($section.hasClass('collapsed')) {
+        // 展开：恢复原始高度
+        $content.css({
+          'height': 'auto',
+          'overflow': 'visible'
+        });
+        $section.removeClass('collapsed');
+        $icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        $(this).attr('title', '折叠');
+      } else {
+        // 折叠：设置为手风琴效果的高度
+        $content.css({
+          'height': '80px',
+          'overflow': 'hidden'
+        });
+        $section.addClass('collapsed');
+        $icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        $(this).attr('title', '展开');
+      }
+    });
+  }
+  
+  // 为现有的section绑定控制按钮事件
+  $('.section').each(function() {
+    const $section = $(this);
+    // 如果section没有控制按钮，添加它们
+    if ($section.find('.section-controls').length === 0) {
+      const controlsHtml = `
+        <div class="section-controls">
+            <button class="btn-toggle-header" title="显示/隐藏标题栏"><i class="fa-solid fa-eye"></i></button>
+            <button class="btn-toggle-collapse" title="折叠/展开"><i class="fa-solid fa-chevron-up"></i></button>
+        </div>`;
+      $section.prepend(controlsHtml);
+    }
+    bindSectionControlEvents($section);
   });
 
   $('#toggle-button').on('click', function () {
@@ -655,18 +1015,18 @@ $(document).ready(function () {
                         });
                         
                         // 为选中区域的边界设置特殊边框，确保可见性
-                        if (rowIndex === minRow) { // 顶部边界
-                          $cell.css('border-top', '1px solid #007bff');
-                        }
-                        if (rowIndex === maxRow) { // 底部边界
-                          $cell.css('border-bottom', '1px solid #007bff');
-                        }
-                        if (colIndex === minCol) { // 左侧边界
-                          $cell.css('border-left', '1px solid #007bff');
-                        }
-                        if (colIndex === maxCol) { // 右侧边界
-                          $cell.css('border-right', '1px solid #007bff');
-                        }
+                        // if (rowIndex === minRow) { // 顶部边界
+                        //   $cell.css('border-top', '1px solid #007bff');
+                        // }
+                        // if (rowIndex === maxRow) { // 底部边界
+                        //   $cell.css('border-bottom', '1px solid #007bff');
+                        // }
+                        // if (colIndex === minCol) { // 左侧边界
+                        //   $cell.css('border-left', '1px solid #007bff');
+                        // }
+                        // if (colIndex === maxCol) { // 右侧边界
+                        //   $cell.css('border-right', '1px solid #007bff');
+                        // }
                       }
                       
                       $cell.attr('data-cell-active', 'true');
@@ -753,11 +1113,14 @@ $(document).ready(function () {
                 multiSelectRanges = [];
                 $(this).attr('data-cell-active', 'true');
                 $(this).css({
-                  'border-style': 'dashed',
-                  'border-width': '2px',
-                  'border-color': '#007bff',
+                  // 'border-style': 'dashed',
+                  // 'border-width': '2px',
+                  // 'border-color': '#007bff',
                   'outline': '2px solid #007bff'
                 });
+                
+                // 触发单元格选择变化事件 - Feature 5
+                $(document).trigger('cell-selection-changed');
               }
             });
             
@@ -826,7 +1189,10 @@ $(document).ready(function () {
 
             // 鼠标按下开始选择
             newComponent.find('th, td').on('mousedown', function(e) {
-              if ($(this).attr('contenteditable') !== 'true') {
+              // 检查是否有任何单元格处于编辑状态
+              const hasEditingCell = newComponent.find('td[contenteditable="true"], th[contenteditable="true"]').length > 0;
+              
+              if ($(this).attr('contenteditable') !== 'true' && !hasEditingCell) {
                 isSelecting = true;
                 startCell = this;
                 clearSelection(newComponent);
@@ -838,11 +1204,15 @@ $(document).ready(function () {
                 $(this).attr('data-cell-active', 'true');
                 e.preventDefault();
               }
+              // 如果当前单元格处于编辑状态，不阻止默认行为，允许光标定位
             });
 
             // 鼠标移动时选择单元格
             newComponent.find('th, td').on('mouseover', function() {
-              if (isSelecting && $(this).attr('contenteditable') !== 'true') {
+              // 检查是否有任何单元格处于编辑状态
+              const hasEditingCell = newComponent.find('td[contenteditable="true"], th[contenteditable="true"]').length > 0;
+              
+              if (isSelecting && $(this).attr('contenteditable') !== 'true' && !hasEditingCell) {
                 selectCellsInRange(startCell, this);
               }
             });
@@ -1063,8 +1433,8 @@ $(document).ready(function () {
               left: offsetX
             }).appendTo($this);
             
-            // 使新添加的组件可以拖动
-            makeComponentDraggable(newComponent);
+            // 使新添加的组件可以拖动 TODO: 暂时注释掉
+            // makeComponentDraggable(newComponent);
             
             // 隐藏模态框
             $('#tableModal').hide();
@@ -1127,12 +1497,6 @@ $(document).ready(function () {
 
 
 let preventBlur = false;
-
-// 当点击 ef-component-labels 时设置标志
-$(document).on('mousedown', '.ef-component-labels', function (event) {
-  preventBlur = true;
-  event.stopPropagation();
-});
 
 // 当 [contenteditable="true"] 失去焦点时，检查标志来决定是否隐藏
 $(document).on('blur', '[contenteditable="true"]', function () {

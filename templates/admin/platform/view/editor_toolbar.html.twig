@@ -1,3 +1,8 @@
+<!-- 字体选择器样式和脚本 -->
+<link rel="stylesheet" href="{{ asset('sunui/admin/platform/font_selector.css') }}">
+<link rel="stylesheet" href="{{ asset('sunui/admin/platform/toolbar_button_states.css') }}">
+<script src="{{ asset('sunui/admin/platform/font_selector.js') }}"></script>
+
 <section class="app-toolbar">
 	<div class="editor-toolbar">
 	  <!-- 保存按钮 -->
@@ -22,12 +27,10 @@
 
 		<!-- 文本格式化 -->
 		<div class="toolbar-group">
-			<select class="toolbar-select font-chosed" title="字体选择">
-				<option value="Arial">Arial</option>
-				<option value="Helvetica">Helvetica</option>
-				<option value="Times New Roman">Times New Roman</option>
-				<option value="微软雅黑">微软雅黑</option>
-			</select>
+			<button class="toolbar-btn font-selector-btn" title="选择字体" id="fontSelectorTrigger">
+				<i class="fa-solid fa-font"></i>
+				<span class="font-selector-text">选择字体</span>
+			</button>
 
 			<select class="toolbar-select font-size-select" title="字号选择">
 				<option value="8">8px</option>
