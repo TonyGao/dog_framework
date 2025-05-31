@@ -114,6 +114,28 @@ class FontSelectorModal {
     createModal() {
         const modalHTML = `
             <div class="font-selector-modal" id="fontSelectorModal">
+                <div class="font-category-tabs">
+                    <div class="font-tab active" data-category="chinese">
+                        <i class="fa-solid fa-font"></i>
+                        <span>中文</span>
+                    </div>
+                    <div class="font-tab" data-category="english">
+                        <i class="fa-solid fa-font"></i>
+                        <span>英文</span>
+                    </div>
+                    <div class="font-tab" data-category="korean">
+                        <i class="fa-solid fa-font"></i>
+                        <span>韩文</span>
+                    </div>
+                    <div class="font-tab" data-category="japanese">
+                        <i class="fa-solid fa-font"></i>
+                        <span>日文</span>
+                    </div>
+                    <div class="font-tab" data-category="emoji">
+                        <i class="fa-solid fa-smile"></i>
+                        <span>表情</span>
+                    </div>
+                </div>
                 <div class="font-selector-content">
                     <div class="font-selector-header">
                         <h3 class="font-selector-title">选择字体</h3>
@@ -124,28 +146,6 @@ class FontSelectorModal {
                             <input type="text" class="font-search-input" placeholder="搜索字体..." id="fontSearchInput">
                         </div>
                         <div class="font-selector-main">
-                            <div class="font-category-tabs">
-                                <div class="font-tab active" data-category="chinese">
-                                    <i class="fa-solid fa-font"></i>
-                                    <span>中文</span>
-                                </div>
-                                <div class="font-tab" data-category="english">
-                                    <i class="fa-solid fa-font"></i>
-                                    <span>英文</span>
-                                </div>
-                                <div class="font-tab" data-category="korean">
-                                    <i class="fa-solid fa-font"></i>
-                                    <span>韩文</span>
-                                </div>
-                                <div class="font-tab" data-category="japanese">
-                                    <i class="fa-solid fa-font"></i>
-                                    <span>日文</span>
-                                </div>
-                                <div class="font-tab" data-category="emoji">
-                                    <i class="fa-solid fa-smile"></i>
-                                    <span>表情</span>
-                                </div>
-                            </div>
                             <div class="font-content-area">
                                 <div class="font-category active" id="chineseCategory" data-category="chinese">
                                     <div class="font-grid" id="chineseFontGrid"></div>
