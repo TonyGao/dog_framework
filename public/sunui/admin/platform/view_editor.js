@@ -175,6 +175,11 @@ $(document).ready(function () {
     
     // 鼠标按下时开始选择
     $component.find('td, th').off('mousedown').on('mousedown', function(e) {
+      // 如果单元格处于编辑状态，允许默认的文本选择行为
+      if ($(this).attr('contenteditable') === 'true') {
+        return;
+      }
+      
       e.preventDefault();
       isSelecting = true;
       startCell = this;
