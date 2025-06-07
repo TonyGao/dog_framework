@@ -6,6 +6,8 @@
   <link rel="stylesheet" type="text/css" href="{{ asset('platform/view_editor.css', 'admin') }}">
   <link rel="stylesheet" type="text/css" href="{{ asset('platform/editor_toolbar.css', 'admin') }}">
 	<link rel="stylesheet" type="text/css" href="{{ asset('platform/view_editor_properties.css', 'admin') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('platform/view_editor_table_context_menu.css', 'admin') }}">
+	<link rel="stylesheet" type="text/css" href="{{ asset('platform/view_editor_canvas.css', 'admin') }}">
 {% endblock %}
 
 {% block javascripts %}
@@ -17,6 +19,11 @@
 	<script src="{{ asset('platform/border_style_picker.js', 'admin') }}"></script>
 	<script src="{{ asset('platform/view_editor_section_properties.js', 'admin') }}"></script>
 	<script src="{{ asset('platform/view_table.js', 'admin') }}"></script>
+	<script src="{{ asset('platform/view_editor_table_context_menu.js', 'admin') }}"></script>
+	<script src="{{ asset('platform/view_editor_canvas.js', 'admin') }}"></script>
+	<script src="{{ asset('platform/components/table_component_properties.js', 'admin') }}"></script>
+  <script src="{{ asset('platform/components/text_component_properties.js', 'admin') }}"></script>
+  <script src="{{ asset('platform/view_editor_component_properties.js', 'admin') }}"></script>
 	<script>
   // 初始化 localforage 数据库名
   localforage.config({

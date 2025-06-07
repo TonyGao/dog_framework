@@ -6,7 +6,7 @@
         </div>
         <div class="property-group-content">
             <div class="property-item" id="content-width-item">
-                <label>Content Width</label>
+                <label for="content-width">Content Width</label>
                 <div class="property-control">
                     <select id="content-width" class="property-select">
                         <option value="full-width">Full Width</option>
@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div class="property-item">
-                <label>Width</label>
+                <label for="width-slider">Width</label>
                 <div class="property-control slider-with-input">
                     <div class="slider-container">
                         <input type="range" id="width-slider" min="200" max="100" value="100" class="property-slider">
@@ -37,7 +37,7 @@
                 </div>
             </div>
             <div class="property-item">
-                <label>Min Height</label>
+                <label for="min-height-slider">Min Height</label>
                 <div class="property-control slider-with-input">
                     <div class="slider-container">
                         <input type="range" id="min-height-slider" min="100" max="1440" value="216" class="property-slider">
@@ -70,7 +70,7 @@
         </div>
         <div class="property-group-content">
             <div class="property-item">
-                <label>Grid Outline</label>
+                <label for="grid-outline">Grid Outline</label>
                 <div class="property-control toggle-switch">
                     <div class="toggle-label">Show</div>
                     <label class="switch">
@@ -80,7 +80,7 @@
                 </div>
             </div>
             <div class="property-item">
-                <label>Columns</label>
+                <label for="columns-slider">Columns</label>
                 <div class="property-control slider-with-input">
                     <div class="unit-icon"><i class="fa-solid fa-table-columns"></i></div>
                     <div class="slider-container">
@@ -96,7 +96,7 @@
                 </div>
             </div>
             <div class="property-item">
-                <label>Rows</label>
+                <label for="rows-slider">Rows</label>
                 <div class="property-control slider-with-input">
                     <div class="unit-icon"><i class="fa-solid fa-table-rows"></i></div>
                     <div class="slider-container">
@@ -112,7 +112,7 @@
                 </div>
             </div>
             <div class="property-item">
-                <label>Gaps</label>
+                <label for="column-gap">Gaps</label>
                 <div class="property-control gap-inputs">
                     <div class="gap-input-group">
                         <input type="number" id="column-gap" value="67" class="property-input">
@@ -150,7 +150,7 @@
                 </div>
             </div>
             <div class="property-item">
-                <label>Auto Flow</label>
+                <label for="auto-flow">Auto Flow</label>
                 <div class="property-control">
                     <select id="auto-flow" class="property-select">
                         <option value="row">Row</option>
@@ -191,6 +191,119 @@
                         <i class="fa-solid fa-arrows-up-down"></i>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 表格组件特有属性 -->
+    <div class="property-group" id="table-properties" style="display: none;">
+        <div class="property-group-header">
+            <i class="fa-solid fa-caret-down"></i>
+            <span>Table Properties</span>
+        </div>
+        <div class="property-group-content">
+            <div class="property-item">
+                <label for="table-border-width">Border Width</label>
+                <div class="property-control slider-with-input">
+                    <div class="slider-container">
+                        <input type="range" id="table-border-width" min="0" max="10" value="1" class="property-slider">
+                    </div>
+                    <div class="input-with-unit">
+                        <input type="number" id="table-border-width-value" value="1" class="property-input">
+                        <div class="unit-selector">
+                            <span>px</span>
+                            <i class="fa-solid fa-caret-down"></i>
+                            <div class="unit-dropdown">
+                                <div class="unit-option" data-unit="px">px</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="property-item">
+                <label for="table-border-color">Border Color</label>
+                <div class="property-control">
+                    <input type="color" id="table-border-color" value="#d5d8dc" class="property-color-input">
+                </div>
+            </div>
+            <div class="property-item">
+                <label for="table-border-style">Border Style</label>
+                <div class="property-control">
+                    <select id="table-border-style" class="property-select">
+                        <option value="solid">Solid</option>
+                        <option value="dashed" selected>Dashed</option>
+                        <option value="dotted">Dotted</option>
+                        <option value="double">Double</option>
+                    </select>
+                </div>
+            </div>
+            <div class="property-item">
+                <label for="table-cell-padding">Cell Padding</label>
+                <div class="property-control slider-with-input">
+                    <div class="slider-container">
+                        <input type="range" id="table-cell-padding" min="0" max="20" value="2" class="property-slider">
+                    </div>
+                    <div class="input-with-unit">
+                        <input type="number" id="table-cell-padding-value" value="2" class="property-input">
+                        <div class="unit-selector">
+                            <span>px</span>
+                            <i class="fa-solid fa-caret-down"></i>
+                            <div class="unit-dropdown">
+                                <div class="unit-option" data-unit="px">px</div>
+                                <div class="unit-option" data-unit="em">em</div>
+                                <div class="unit-option" data-unit="rem">rem</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="property-item">
+                <label for="table-stripe">Stripe Rows</label>
+                <div class="property-control toggle-switch">
+                    <div class="toggle-label">Enable</div>
+                    <label class="switch">
+                        <input type="checkbox" id="table-stripe">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="property-item">
+                <label for="table-hover">Hover Effect</label>
+                <div class="property-control toggle-switch">
+                    <div class="toggle-label">Enable</div>
+                    <label class="switch">
+                        <input type="checkbox" id="table-hover">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认模态窗口 -->
+<div class="ef-modal-container" id="deleteConfirmModal" style="z-index: 1001; display: none;">
+    <div class="ef-modal-mask"></div>
+    <div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+        <div class="ef-modal">
+            <div class="ef-modal-header">
+                <div class="ef-modal-title ef-modal-title-align-left">
+                    确认删除
+                </div>
+                <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="closeDeleteConfirmModal()">
+                    <span class="ef-icon-hover">
+                        <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                            <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <div class="ef-modal-body">
+                <div>确定要删除这个组件吗？此操作不可撤销。</div>
+            </div>
+            <div class="ef-modal-footer">
+                <button class="btn secondary small" type="button" onclick="closeDeleteConfirmModal()">取消</button>
+                <button class="btn red small" type="button" id="confirm-delete-btn">确定删除</button>
             </div>
         </div>
     </div>

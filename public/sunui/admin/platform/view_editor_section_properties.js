@@ -140,7 +140,16 @@ $(document).ready(function() {
         
         // 获取对齐值并更新section属性
         const alignValue = $button.data('value');
-        const propertyName = $parent.prev('label').text().toLowerCase().replace(' ', '-');
+        const $label = $parent.prev('label');
+        let propertyName = $label.text().toLowerCase().replace(/\s+/g, '-');
+        
+        // 特殊处理一些属性名称映射
+        if (propertyName === 'justify-items') {
+            propertyName = 'justify-items';
+        } else if (propertyName === 'align-items') {
+            propertyName = 'align-items';
+        }
+        
         updateSectionProperty(propertyName, alignValue);
     });
     
@@ -276,6 +285,42 @@ $(document).ready(function() {
             case 'justify-items':
                 // 设置水平对齐方式
                 $activeSection.find('.section-content').css('justify-items', value);
+                
+                // 同时控制表格的margin对齐
+                const $tables = $activeSection.find('.ef-table');
+                $tables.each(function() {
+                    const $table = $(this);
+                    switch(value) {
+                        case 'start':
+                            $table.css({
+                                'margin-left': '0',
+                                'margin-right': 'auto',
+                                'width': ''
+                            });
+                            break;
+                        case 'center':
+                            $table.css({
+                                'margin-left': 'auto',
+                                'margin-right': 'auto',
+                                'width': ''
+                            });
+                            break;
+                        case 'end':
+                            $table.css({
+                                'margin-left': 'auto',
+                                'margin-right': '0',
+                                'width': ''
+                            });
+                            break;
+                        case 'stretch':
+                            $table.css({
+                                'margin-left': '0',
+                                'margin-right': '0',
+                                'width': '100%'
+                            });
+                            break;
+                    }
+                });
                 break;
                 
             case 'align-items':
@@ -415,9 +460,13 @@ $(document).ready(function() {
         $('.justify-align-controls').first().find('.align-button').removeClass('active')
             .filter(`[data-value="${justifyItems}"]`).addClass('active');
         
-        const alignItems = $content.css('align-items') || 'center';
-        $('.justify-align-controls').last().find('.align-button').removeClass('active')
-            .filter(`[data-value="${alignItems}"]`).addClass('active');
+        // 获取真实的align-items值，不使用默认值
+        const alignItems = $content.css('align-items');
+        $('.justify-align-controls').last().find('.align-button').removeClass('active');
+        if (alignItems && alignItems !== 'normal') {
+            $('.justify-align-controls').last().find('.align-button')
+                .filter(`[data-value="${alignItems}"]`).addClass('active');
+        }
     }
     
     // 页面宽度变更事件
@@ -440,6 +489,232 @@ $(document).ready(function() {
                     updateSectionProperty('width-slider', pageWidth);
                 }
             }
+        }
+    });
+    
+    // 表格属性事件处理
+    
+    // 边框宽度滑块事件
+    $('#table-border-width').on('input', function() {
+        const value = $(this).val();
+        $('#table-border-width-value').val(value);
+        updateTableProperty('border-width', value + 'px');
+    });
+    
+    $('#table-border-width-value').on('input', function() {
+        const value = $(this).val();
+        $('#table-border-width').val(value);
+        updateTableProperty('border-width', value + 'px');
+    });
+    
+    // 边框颜色事件
+    $('#table-border-color').on('change', function() {
+        const value = $(this).val();
+        updateTableProperty('border-color', value);
+    });
+    
+    // 边框样式事件
+    $('#table-border-style').on('change', function() {
+        const value = $(this).val();
+        updateTableProperty('border-style', value);
+    });
+    
+    // 单元格内边距滑块事件
+    $('#table-cell-padding').on('input', function() {
+        const value = $(this).val();
+        $('#table-cell-padding-value').val(value);
+        updateTableProperty('cell-padding', value + 'px');
+    });
+    
+    $('#table-cell-padding-value').on('input', function() {
+        const value = $(this).val();
+        $('#table-cell-padding').val(value);
+        updateTableProperty('cell-padding', value + 'px');
+    });
+    
+    // 条纹行开关事件
+    $('#table-stripe-rows').on('change', function() {
+        const isChecked = $(this).prop('checked');
+        updateTableProperty('stripe-rows', isChecked);
+    });
+    
+    // 悬停效果开关事件
+    $('#table-hover-effect').on('change', function() {
+        const isChecked = $(this).prop('checked');
+        updateTableProperty('hover-effect', isChecked);
+    });
+    
+    // 删除组件按钮事件
+    $('#delete-component-btn').on('click', function() {
+        $('#delete-confirm-modal').show();
+    });
+    
+    // 确认删除事件
+    $('#confirm-delete-btn').on('click', function() {
+        deleteSelectedComponent();
+        $('#delete-confirm-modal').hide();
+    });
+    
+    // 取消删除事件
+    $('#cancel-delete-btn, .modal-close').on('click', function() {
+        $('#delete-confirm-modal').hide();
+    });
+    
+    // 点击模态框背景关闭
+    $('#delete-confirm-modal').on('click', function(e) {
+        if (e.target === this) {
+            $(this).hide();
+        }
+    });
+    
+    // 更新表格属性的函数
+    function updateTableProperty(property, value) {
+        // 获取当前选中的表格组件
+        const $selectedTable = $('.ef-table.selected');
+        
+        if ($selectedTable.length === 0) {
+            console.warn('没有选中的表格组件');
+            return;
+        }
+        
+        switch(property) {
+            case 'border-width':
+                $selectedTable.css('border-width', value);
+                $selectedTable.find('td, th').css('border-width', value);
+                break;
+                
+            case 'border-color':
+                $selectedTable.css('border-color', value);
+                $selectedTable.find('td, th').css('border-color', value);
+                break;
+                
+            case 'border-style':
+                $selectedTable.css('border-style', value);
+                $selectedTable.find('td, th').css('border-style', value);
+                break;
+                
+            case 'cell-padding':
+                $selectedTable.find('td, th').css('padding', value);
+                break;
+                
+            case 'stripe-rows':
+                if (value) {
+                    $selectedTable.addClass('table-striped');
+                    // 添加条纹样式
+                    $selectedTable.find('tbody tr:nth-child(even)').css('background-color', '#f8f9fa');
+                } else {
+                    $selectedTable.removeClass('table-striped');
+                    $selectedTable.find('tbody tr').css('background-color', '');
+                }
+                break;
+                
+            case 'hover-effect':
+                if (value) {
+                    $selectedTable.addClass('table-hover');
+                } else {
+                    $selectedTable.removeClass('table-hover');
+                }
+                break;
+        }
+    }
+    
+    // 删除选中组件的函数
+    function deleteSelectedComponent() {
+        const $selectedComponent = $('.ef-table.selected, .ef-text.selected, .ef-image.selected');
+        
+        if ($selectedComponent.length === 0) {
+            console.warn('没有选中的组件');
+            return;
+        }
+        
+        // 移除组件
+        $selectedComponent.remove();
+        
+        // 隐藏属性面板
+        $('.properties-panel').hide();
+        
+        console.log('组件已删除');
+    }
+    
+    // 检查是否选中表格组件并显示/隐藏表格属性
+    function checkTableSelection() {
+        const $selectedTable = $('.ef-table.selected');
+        const $tableProperties = $('#table-properties');
+        
+        if ($selectedTable.length > 0) {
+            $tableProperties.show();
+            loadTableProperties($selectedTable);
+        } else {
+            $tableProperties.hide();
+        }
+    }
+    
+    // 加载表格属性到面板
+    function loadTableProperties($table) {
+        // 边框宽度
+        const borderWidth = parseInt($table.css('border-width')) || 1;
+        $('#table-border-width').val(borderWidth);
+        $('#table-border-width-value').val(borderWidth);
+        
+        // 边框颜色
+        const borderColor = $table.css('border-color') || '#dee2e6';
+        $('#table-border-color').val(rgbToHex(borderColor));
+        
+        // 边框样式
+        const borderStyle = $table.css('border-style') || 'solid';
+        $('#table-border-style').val(borderStyle);
+        
+        // 单元格内边距
+        const cellPadding = parseInt($table.find('td, th').first().css('padding')) || 8;
+        $('#table-cell-padding').val(cellPadding);
+        $('#table-cell-padding-value').val(cellPadding);
+        
+        // 条纹行
+        const hasStripes = $table.hasClass('table-striped');
+        $('#table-stripe-rows').prop('checked', hasStripes);
+        
+        // 悬停效果
+        const hasHover = $table.hasClass('table-hover');
+        $('#table-hover-effect').prop('checked', hasHover);
+    }
+    
+    // RGB转十六进制颜色
+    function rgbToHex(rgb) {
+        if (rgb.startsWith('#')) return rgb;
+        
+        const result = rgb.match(/\d+/g);
+        if (!result || result.length < 3) return '#dee2e6';
+        
+        return '#' + result.slice(0, 3).map(x => {
+            const hex = parseInt(x).toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+        }).join('');
+    }
+    
+    // 监听组件选择变化
+    $(document).on('click', '.ef-table', function() {
+        const $this = $(this);
+        setTimeout(function() {
+            checkTableSelection();
+            // 触发组件选择事件
+            $(document).trigger('componentSelected', [$this[0]]);
+        }, 100);
+    });
+    
+    $(document).on('click', '.ef-text, .ef-image', function() {
+        const $this = $(this);
+        setTimeout(function() {
+            $('#table-properties').hide();
+            // 触发组件选择事件
+            $(document).trigger('componentSelected', [$this[0]]);
+        }, 100);
+    });
+    
+    // 监听画布点击，取消组件选择
+    $(document).on('click', '.canvas', function(e) {
+        // 如果点击的不是组件，则取消选择
+        if (!$(e.target).closest('.ef-table, .ef-text, .ef-image').length) {
+            $(document).trigger('componentDeselected');
         }
     });
 });

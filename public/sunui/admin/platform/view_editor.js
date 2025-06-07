@@ -2,12 +2,14 @@ $(document).ready(function () {
   let $canvas = $('.canvas');
   const $addSectionButton = $('.add-section-button');
 
+  /** 供其他js文件共享此 alert */
+  let alert = new Alert($('.canvas'));
+  window.alert = alert;
+
   // 清除选择样式的函数
   function clearSelection (container) {
     container.find('th, td').each(function() {
       const $cell = $(this);
-      // 只清除outline，不修改border
-      $cell.css({'outline': 'none'});  // 清除临时选取外部的蓝色边框
       $cell.removeAttr('data-cell-active');
       
       // 只有在没有手动设置边框的情况下才恢复默认边框
@@ -25,16 +27,73 @@ $(document).ready(function () {
       }
     });
     
+    // 隐藏选择边框
+    hideSelectionBorder(container);
+    
     // 触发单元格选择变化事件 - Feature 5
     $(document).trigger('cell-selection-changed');
+  }
+  
+  // 显示选择边框的函数
+  function showSelectionBorder(cells) {
+    const $cells = $(cells);
+    if ($cells.length === 0) return;
+    
+    // 获取表格容器
+    const $tableContainer = $cells.closest('.table-container');
+    if ($tableContainer.length === 0) return;
+    
+    // 确保容器有相对定位
+    if ($tableContainer.css('position') !== 'relative') {
+      $tableContainer.css('position', 'relative');
+    }
+    
+    // 计算选区最外围的位置
+    let top = Infinity, left = Infinity, bottom = -Infinity, right = -Infinity;
+    $cells.each(function () {
+      const rect = this.getBoundingClientRect();
+      top = Math.min(top, rect.top);
+      left = Math.min(left, rect.left);
+      bottom = Math.max(bottom, rect.bottom);
+      right = Math.max(right, rect.right);
+    });
+    
+    // 将边界转为相对于容器的位置
+    const containerRect = $tableContainer[0].getBoundingClientRect();
+    
+    // 获取或创建选择边框div
+    let $borderDiv = $tableContainer.find('.selection-border');
+    if ($borderDiv.length === 0) {
+      $borderDiv = $('<div class="selection-border"></div>');
+      $tableContainer.append($borderDiv);
+    }
+    
+    $borderDiv.css({
+      position: 'absolute',
+      top: top - containerRect.top,
+      left: left - containerRect.left,
+      width: right - left,
+      height: bottom - top,
+      border: '2px solid rgb(0, 123, 255)',
+      'background-color': 'rgba(0, 123, 255, 0.1)',
+      'pointer-events': 'none',
+      'z-index': 1000,
+      display: 'block'
+    });
+  }
+  
+  // 隐藏选择边框的函数
+  function hideSelectionBorder(container) {
+    if (container) {
+      container.find('.selection-border').hide();
+    } else {
+      $('.selection-border').hide();
+    }
   }
 
   function adjustButtonPosition () {
     const canvasOffset = $canvas.offset();
     const canvasWidth = $canvas.outerWidth();
-
-    // console.log("canvasOffset.left:", canvasOffset.left); // 输出 canvas 左侧位置
-    // console.log("canvasWidth:", canvasWidth);             // 输出 canvas 宽度
 
     // 固定按钮到屏幕底部，调整按钮相对于 .canvas 的水平位置
     $addSectionButton.css({
@@ -60,15 +119,16 @@ $(document).ready(function () {
     // 处理表格单元格点击事件，点击单元格
     $canvas.off('click', '.ef-table td').on('click', '.ef-table td', function(event) {
       const $currentCell = $(this);
-      const $allEditableCells = $('.ef-table td[contenteditable="true"]');
+      const $allEditableCells = $('.ef-table .cell-content[contenteditable="true"]');
 
       // 同步视图编辑器工具栏的按钮状态
       if (window.viewEditor && window.viewEditor.toolbar && window.viewEditor.toolbar.syncToolbarButtonStates) {
         window.viewEditor.toolbar.syncToolbarButtonStates($currentCell);
       }
       
-      // 如果点击的是当前正在编辑的单元格，不做任何处理
-      if ($currentCell.attr('contenteditable') === 'true') {
+      // 如果点击的是当前正在编辑的单元格内容，不做任何处理
+      const $contentDiv = $currentCell.find('.cell-content');
+      if ($contentDiv.length && $contentDiv.attr('contenteditable') === 'true') {
         return;
       }
 
@@ -76,10 +136,59 @@ $(document).ready(function () {
       const $table = $currentCell.closest('table');
       clearSelection($table);
 
+      // 标记当前单元格为活动状态
       $currentCell.attr('data-cell-active', 'true');
-      $currentCell.css({
-        'outline': '2px solid #007bff'
-      });
+      
+      // 如果是合并单元格，还需要标记被合并隐藏的单元格
+      const colspan = parseInt($currentCell.attr('colspan')) || 1;
+      const rowspan = parseInt($currentCell.attr('rowspan')) || 1;
+      
+      if (colspan > 1 || rowspan > 1) {
+        const $currentRow = $currentCell.parent();
+        const currentRowIndex = $currentRow.index();
+        
+        // 计算当前单元格的逻辑列起始位置
+        let currentLogicalCol = 0;
+        $currentRow.find('td, th').each(function() {
+          if (this === $currentCell[0]) {
+            return false; // 找到当前单元格，停止计算
+          }
+          const cellColspan = parseInt($(this).attr('colspan')) || 1;
+          currentLogicalCol += cellColspan;
+        });
+        
+        // 遍历合并单元格覆盖的所有行
+        for (let r = 0; r < rowspan; r++) {
+          const $targetRow = $table.find('tr').eq(currentRowIndex + r);
+          if ($targetRow.length) {
+            let logicalColIndex = 0;
+            $targetRow.find('td, th').each(function() {
+              const $cell = $(this);
+              const cellColspan = parseInt($cell.attr('colspan')) || 1;
+              const cellRowspan = parseInt($cell.attr('rowspan')) || 1;
+              
+              // 检查当前单元格的逻辑列范围是否与合并单元格重叠
+              const cellStartCol = logicalColIndex;
+              const cellEndCol = logicalColIndex + cellColspan - 1;
+              const mergedStartCol = currentLogicalCol;
+              const mergedEndCol = currentLogicalCol + colspan - 1;
+              
+              // 如果单元格在合并区域内
+              if (cellStartCol <= mergedEndCol && cellEndCol >= mergedStartCol) {
+                // 如果是隐藏的合并单元格或者在合并区域内的单元格，标记为活动状态
+                if ($cell.attr('data-merged') || $cell.css('display') === 'none' || 
+                    (cellStartCol >= mergedStartCol && cellEndCol <= mergedEndCol && r > 0)) {
+                  $cell.attr('data-cell-active', 'true');
+                }
+              }
+              
+              logicalColIndex += cellColspan;
+            });
+          }
+        }
+      }
+      
+      showSelectionBorder($currentCell);
     });
     
     // 重新绑定表格组件的多选事件
@@ -104,9 +213,23 @@ $(document).ready(function () {
     function getCellIndex(cell) {
       const $cell = $(cell);
       const $row = $cell.parent();
+      
+      // 计算逻辑列索引，考虑合并单元格
+      let logicalColIndex = 0;
+      $row.find('td, th').each(function(index) {
+        if (this === cell) {
+          return false; // 找到目标单元格，停止循环
+        }
+        
+        const $currentCell = $(this);
+        const colspan = parseInt($currentCell.attr('colspan')) || 1;
+        logicalColIndex += colspan;
+      });
+      
       return {
         row: $row.index(),
-        col: $cell.index()
+        col: logicalColIndex,
+        domIndex: $cell.index() // DOM中的实际索引
       };
     }
 
@@ -124,11 +247,22 @@ $(document).ready(function () {
         clearSelection($component);
       }
       
+      const selectedCells = [];
       $component.find('tr').each(function(rowIndex) {
         if (rowIndex >= minRow && rowIndex <= maxRow) {
-          $(this).find('td, th').each(function(colIndex) {
-            if (colIndex >= minCol && colIndex <= maxCol) {
-              const $cell = $(this);
+          // 计算当前行的逻辑列映射
+          let logicalColIndex = 0;
+          $(this).find('td, th').each(function() {
+            const $cell = $(this);
+            const colspan = parseInt($cell.attr('colspan')) || 1;
+            const rowspan = parseInt($cell.attr('rowspan')) || 1;
+            
+            // 检查当前单元格的逻辑列范围是否与选择范围重叠
+            const cellStartCol = logicalColIndex;
+            const cellEndCol = logicalColIndex + colspan - 1;
+            
+            // 只选择实际可见的单元格，跳过被合并隐藏的单元格
+            if (cellStartCol <= maxCol && cellEndCol >= minCol && !$cell.attr('data-merged')) {
               // 只清除没有手动设置边框的单元格
               if (!$cell.attr('data-custom-border')) {
                 $cell.css({
@@ -137,30 +271,62 @@ $(document).ready(function () {
                   'border-style': 'dashed',
                   'border-color': '#d5d8dc'
                 });
-                
-                // 为选中区域的边界设置特殊边框，确保可见性
-                // if (rowIndex === minRow) { // 顶部边界
-                //   $cell.css('border-top', '1px solid #007bff');
-                // }
-                // if (rowIndex === maxRow) { // 底部边界
-                //   $cell.css('border-bottom', '1px solid #007bff');
-                // }
-                // if (colIndex === minCol) { // 左侧边界
-                //   $cell.css('border-left', '1px solid #007bff');
-                // }
-                // if (colIndex === maxCol) { // 右侧边界
-                //   $cell.css('border-right', '1px solid #007bff');
-                // }
               }
               
               $cell.attr('data-cell-active', 'true');
-              $cell.css({
-                'outline': '1px solid #007bff'
-              });
+              selectedCells.push($cell[0]);
+              
+              // 如果是合并单元格，立即处理其覆盖的隐藏单元格
+              if (colspan > 1 || rowspan > 1) {
+                // 遍历合并单元格覆盖的所有行
+                for (let r = 0; r < rowspan; r++) {
+                  const targetRowIndex = rowIndex + r;
+                  if (targetRowIndex <= maxRow) {
+                    const $targetRow = $component.find('tr').eq(targetRowIndex);
+                    if ($targetRow.length) {
+                      let targetLogicalColIndex = 0;
+                      $targetRow.find('td, th').each(function() {
+                        const $targetCell = $(this);
+                        const targetColspan = parseInt($targetCell.attr('colspan')) || 1;
+                        
+                        // 检查目标单元格的逻辑列范围是否在合并单元格覆盖范围内
+                        const targetCellStartCol = targetLogicalColIndex;
+                        const targetCellEndCol = targetLogicalColIndex + targetColspan - 1;
+                        
+                        // 如果目标单元格在合并单元格覆盖的范围内
+                        if (targetCellStartCol >= cellStartCol && targetCellEndCol <= cellEndCol) {
+                          // 如果是隐藏的合并单元格或在合并区域内的其他行
+                          if ($targetCell.attr('data-merged') || $targetCell.css('display') === 'none' || r > 0) {
+                            if (!$targetCell.attr('data-custom-border')) {
+                              $targetCell.css({
+                                'border': '1px dashed #d5d8dc',
+                                'border-width': '1px',
+                                'border-style': 'dashed',
+                                'border-color': '#d5d8dc'
+                              });
+                            }
+                            $targetCell.attr('data-cell-active', 'true');
+                            selectedCells.push($targetCell[0]);
+                          }
+                        }
+                        
+                        targetLogicalColIndex += targetColspan;
+                      });
+                    }
+                  }
+                }
+              }
             }
+            
+            logicalColIndex += colspan;
           });
         }
       });
+      
+      // 对整个选中区域显示选择边框
+      if (selectedCells.length > 0) {
+        showSelectionBorder(selectedCells);
+      }
     }
     
     // 添加函数来重新渲染所有多选区域
@@ -173,10 +339,21 @@ $(document).ready(function () {
       });
     }
     
-    // 鼠标按下时开始选择
+    // 鼠标按下时开始选择 鼠标拖动选择单元格区域
     $component.find('td, th').off('mousedown').on('mousedown', function(e) {
       // 如果单元格处于编辑状态，允许默认的文本选择行为
-      if ($(this).attr('contenteditable') === 'true') {
+      const $contentDiv = $(this).find('.cell-content');
+      if (($contentDiv.length && $contentDiv.attr('contenteditable') === 'true') || 
+          $(this).attr('contenteditable') === 'true') {
+        // 在编辑模式下，不阻止默认行为，允许文本选择
+        return;
+      }
+      
+      // 检查是否点击在拖拽手柄上
+      if ($(e.target).hasClass('column-resize-handle') || 
+          $(e.target).hasClass('left-resize-handle') ||
+          $(e.target).hasClass('row-resize-handle') ||
+          $(e.target).hasClass('resize-handle-corner')) {
         return;
       }
       
@@ -215,7 +392,7 @@ $(document).ready(function () {
           clearSelection($component);
           // 重新渲染之前保存的所有区域
           multiSelectRanges.forEach(range => {
-            selectCellsInRange(range.startCell, range.endCell, true);
+            selectCellsInRangeForNewComponent(range.startCell, range.endCell, true);
           });
           // 添加当前拖拽的区域
           selectCellsInRange(startCell, this, true);
@@ -245,25 +422,145 @@ $(document).ready(function () {
         // 单选模式且不在拖拽状态：选中当前单元格
         clearSelection($component);
         multiSelectRanges = [];
-        $(this).attr('data-cell-active', 'true');
-        $(this).css({
-          'outline': '2px solid #007bff'
+        
+        const $currentCell = $(this);
+        const $table = $currentCell.closest('table');
+        
+        // 收集所有合并单元格信息
+        const mergedCellsInfo = [];
+        $table.find('td[colspan], td[rowspan], th[colspan], th[rowspan]').each(function() {
+          const $cell = $(this);
+          const colspan = parseInt($cell.attr('colspan')) || 1;
+          const rowspan = parseInt($cell.attr('rowspan')) || 1;
+          
+          if (colspan > 1 || rowspan > 1) {
+            const $row = $cell.parent();
+            const rowIndex = $row.index();
+            
+            // 计算逻辑列位置
+            let logicalCol = 0;
+            $row.find('td, th').each(function() {
+              if (this === $cell[0]) {
+                return false;
+              }
+              const cellColspan = parseInt($(this).attr('colspan')) || 1;
+              logicalCol += cellColspan;
+            });
+            
+            mergedCellsInfo.push({
+              cell: $cell,
+              startRow: rowIndex,
+              endRow: rowIndex + rowspan - 1,
+              startCol: logicalCol,
+              endCol: logicalCol + colspan - 1
+            });
+          }
         });
+        
+        // 获取当前点击单元格的位置信息
+        const $currentRow = $currentCell.parent();
+        const currentRowIndex = $currentRow.index();
+        let currentLogicalCol = 0;
+        $currentRow.find('td, th').each(function() {
+          if (this === $currentCell[0]) {
+            return false;
+          }
+          const cellColspan = parseInt($(this).attr('colspan')) || 1;
+          currentLogicalCol += cellColspan;
+        });
+        
+        const currentColspan = parseInt($currentCell.attr('colspan')) || 1;
+        const currentRowspan = parseInt($currentCell.attr('rowspan')) || 1;
+        
+        // 激活当前点击的单元格
+        $currentCell.attr('data-cell-active', 'true');
+        
+        // 如果当前单元格是合并单元格，激活所有被隐藏的单元格
+        if (currentColspan > 1 || currentRowspan > 1) {
+          // 遍历合并单元格覆盖的所有行
+          for (let r = currentRowIndex; r < currentRowIndex + currentRowspan; r++) {
+            const $targetRow = $table.find('tr').eq(r);
+            if ($targetRow.length) {
+              let logicalColIndex = 0;
+              $targetRow.find('td, th').each(function() {
+                const $cell = $(this);
+                const cellColspan = parseInt($cell.attr('colspan')) || 1;
+                
+                // 检查是否在合并区域内的隐藏单元格
+                if (logicalColIndex >= currentLogicalCol && 
+                    logicalColIndex < currentLogicalCol + currentColspan &&
+                    $cell.attr('data-merged')) {
+                  $cell.attr('data-cell-active', 'true');
+                }
+                
+                logicalColIndex += cellColspan;
+              });
+            }
+          }
+        }
+        
+        // 检查当前单元格是否被其他合并单元格影响
+        mergedCellsInfo.forEach(mergedInfo => {
+          // 如果当前单元格在合并单元格的影响范围内
+          if (currentRowIndex >= mergedInfo.startRow && currentRowIndex <= mergedInfo.endRow &&
+              currentLogicalCol >= mergedInfo.startCol && currentLogicalCol < mergedInfo.endCol) {
+            
+            // 激活合并单元格本身
+            mergedInfo.cell.attr('data-cell-active', 'true');
+            
+            // 激活合并单元格覆盖区域内的所有隐藏单元格
+            for (let r = mergedInfo.startRow; r <= mergedInfo.endRow; r++) {
+              const $targetRow = $table.find('tr').eq(r);
+              if ($targetRow.length) {
+                let logicalColIndex = 0;
+                $targetRow.find('td, th').each(function() {
+                  const $cell = $(this);
+                  const cellColspan = parseInt($cell.attr('colspan')) || 1;
+                  
+                  // 检查是否在合并区域内的隐藏单元格
+                  if (logicalColIndex >= mergedInfo.startCol && 
+                      logicalColIndex < mergedInfo.endCol &&
+                      $cell.attr('data-merged')) {
+                    $cell.attr('data-cell-active', 'true');
+                  }
+                  
+                  logicalColIndex += cellColspan;
+                });
+              }
+            }
+          }
+        });
+        
+        showSelectionBorder($currentCell);
       }
     });
     
     // 双击进入编辑模式
     $component.find('th, td').off('dblclick').on('dblclick', function() {
       clearSelection($component); // 清除已有的选中效果
-      $(this).attr('contenteditable', 'true')
-             .css('cursor', 'text')
-             .focus();
+      const $contentDiv = $(this).find('.cell-content');
+      if ($contentDiv.length) {
+        $contentDiv.attr('contenteditable', 'true')
+                   .css('cursor', 'text')
+                   .focus();
+      } else {
+        $(this).attr('contenteditable', 'true')
+               .css('cursor', 'text')
+               .focus();
+      }
     });
 
     // 失去焦点时退出编辑模式
     $component.find('th, td').off('blur').on('blur', function() {
-      $(this).attr('contenteditable', 'false')
-             .css('cursor', 'default');
+      const $contentDiv = $(this).find('.cell-content');
+      if ($contentDiv.length) {
+        $contentDiv.attr('contenteditable', 'false')
+                   .css('cursor', 'default')
+                   .css('min-height', ''); // 清除min-height样式
+      } else {
+        $(this).attr('contenteditable', 'false')
+               .css('cursor', 'default');
+      }
     });
     
     // 鼠标松开时结束选择
@@ -303,6 +600,7 @@ $(document).ready(function () {
     window.viewEditor = {};
   }
   window.viewEditor.bindTableEvents = bindTableEvents;
+  window.viewEditor.bindTableComponentEvents = bindTableComponentEvents;
   
   // 检查section-content宽度并调整canvas对齐方式
   function adjustCanvasAlignment() {
@@ -355,6 +653,10 @@ $(document).ready(function () {
         $cell.css({'outline': 'none'});  // 清除临时选取外部的蓝色边框
         $cell.removeAttr('data-cell-active');
       });
+      
+      // 隐藏所有选择边框图层
+      hideSelectionBorder();
+      
       // 移除所有section的active状态
       $('.section').removeClass('active');
     }
@@ -407,13 +709,14 @@ $(document).ready(function () {
   // 处理表格单元格点击事件，点击单元格
   $canvas.on('click', '.ef-table td', function(event) {
     const $currentCell = $(this);
-    const $allEditableCells = $('.ef-table td[contenteditable="true"]');
+    const $allEditableCells = $('.ef-table .cell-content[contenteditable="true"]');
+    const $contentDiv = $currentCell.find('.cell-content');
 
     // 同步视图编辑器工具栏的按钮状态
     window.viewEditor.toolbar.syncToolbarButtonStates($currentCell);
     
-    // 如果点击的是当前正在编辑的单元格，不做任何处理
-    if ($currentCell.attr('contenteditable') === 'true') {
+    // 如果点击的是当前正在编辑的单元格内容，不做任何处理
+    if ($contentDiv.length && $contentDiv.attr('contenteditable') === 'true') {
       return;
     }
 
@@ -421,11 +724,42 @@ $(document).ready(function () {
     const $table = $currentCell.closest('table');
     clearSelection($table);
 
+    // 标记当前单元格为活动状态
     $currentCell.attr('data-cell-active', 'true');
-    $currentCell.css({
-      //'background-color': '#f0f8ff',
-      'outline': '1px solid #007bff'
-    });
+    
+    // 如果是合并单元格，还需要标记被合并隐藏的单元格
+    const colspan = parseInt($currentCell.attr('colspan')) || 1;
+    const rowspan = parseInt($currentCell.attr('rowspan')) || 1;
+    
+    if (colspan > 1 || rowspan > 1) {
+      const $currentRow = $currentCell.parent();
+      const currentRowIndex = $currentRow.index();
+      const currentColIndex = $currentCell.index();
+      
+      // 遍历合并单元格覆盖的所有逻辑位置
+      for (let r = 0; r < rowspan; r++) {
+        const $targetRow = $table.find('tr').eq(currentRowIndex + r);
+        if ($targetRow.length) {
+          let logicalColIndex = 0;
+          $targetRow.find('td, th').each(function() {
+            const $cell = $(this);
+            const cellColspan = parseInt($cell.attr('colspan')) || 1;
+            
+            // 检查当前单元格的逻辑列范围是否与合并单元格重叠
+            if (logicalColIndex >= currentColIndex && logicalColIndex < currentColIndex + colspan) {
+              // 如果是隐藏的合并单元格，标记为活动状态
+              if ($cell.attr('data-merged') || $cell.css('display') === 'none') {
+                $cell.attr('data-cell-active', 'true');
+              }
+            }
+            
+            logicalColIndex += cellColspan;
+          });
+        }
+      }
+    }
+    
+    showSelectionBorder($currentCell);
     $currentCell.focus();
     
     // 移除其他单元格的可编辑状态
@@ -438,37 +772,92 @@ $(document).ready(function () {
   // 添加双击事件处理，使单元格可编辑
   $canvas.on('dblclick', '.ef-table td', function(event) {
     const $currentCell = $(this);
+    const $contentDiv = $currentCell.find('.cell-content');
     
     // 设置当前单元格为可编辑状态
-    $currentCell.attr('contenteditable', 'true');
-    $currentCell.attr('data-cell-active', 'true');
-    $currentCell.focus();
-    
-    // 选中单元格内容，方便用户直接编辑
-    if (window.getSelection && document.createRange) {
-      const range = document.createRange();
-      range.selectNodeContents($currentCell[0]);
-      const selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
+    if ($contentDiv.length) {
+      $contentDiv.attr('contenteditable', 'true');
+      $contentDiv.css('min-height', '30px'); // 添加最小高度以解决光标纵向居中问题
+      $currentCell.attr('data-cell-active', 'true');
+      $contentDiv.focus();
+      
+      // 将光标定位到内容中间位置
+      if (window.getSelection && document.createRange) {
+        const range = document.createRange();
+        const contentElement = $contentDiv[0];
+        
+        // 如果有文本内容，将光标定位到文本中间
+        if (contentElement.textContent.length > 0) {
+          const textLength = contentElement.textContent.length;
+          const midPoint = Math.floor(textLength / 2);
+          
+          // 创建文本节点范围
+          if (contentElement.firstChild && contentElement.firstChild.nodeType === Node.TEXT_NODE) {
+            range.setStart(contentElement.firstChild, midPoint);
+            range.setEnd(contentElement.firstChild, midPoint);
+          } else {
+            range.setStart(contentElement, 0);
+            range.setEnd(contentElement, 0);
+          }
+        } else {
+          // 如果没有内容，将光标定位到元素开始位置
+          range.setStart(contentElement, 0);
+          range.setEnd(contentElement, 0);
+        }
+        
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    } else {
+      // 兼容旧格式
+      $currentCell.attr('contenteditable', 'true');
+      $currentCell.attr('data-cell-active', 'true');
+      $currentCell.focus();
+      
+      if (window.getSelection && document.createRange) {
+        const range = document.createRange();
+        const cellElement = $currentCell[0];
+        
+        // 如果有文本内容，将光标定位到文本中间
+        if (cellElement.textContent.length > 0) {
+          const textLength = cellElement.textContent.length;
+          const midPoint = Math.floor(textLength / 2);
+          
+          // 创建文本节点范围
+          if (cellElement.firstChild && cellElement.firstChild.nodeType === Node.TEXT_NODE) {
+            range.setStart(cellElement.firstChild, midPoint);
+            range.setEnd(cellElement.firstChild, midPoint);
+          } else {
+            range.setStart(cellElement, 0);
+            range.setEnd(cellElement, 0);
+          }
+        } else {
+          // 如果没有内容，将光标定位到元素开始位置
+          range.setStart(cellElement, 0);
+          range.setEnd(cellElement, 0);
+        }
+        
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
     }
   });
   
   // 添加键盘事件处理，当单元格处于编辑状态时按回车键取消编辑
-  $canvas.on('keydown', '.ef-table td[contenteditable="true"]', function(event) {
+  $canvas.on('keydown', '.ef-table .cell-content[contenteditable="true"]', function(event) {
     if (event.key === 'Enter' || event.keyCode === 13) {
       event.preventDefault();
-      const $currentCell = $(this);
+      const $contentDiv = $(this);
       
       // 取消编辑状态
-      $currentCell.removeAttr('contenteditable');
-      $currentCell.blur();
+      $contentDiv.removeAttr('contenteditable');
+      $contentDiv.blur();
       
       // 恢复到单击时的状态
-      $currentCell.css({
-        'outline': '1px solid #007bff'
-      });
       $currentCell.attr('data-cell-active', 'true');
+      showSelectionBorder($currentCell);
     }
   });
 
@@ -795,33 +1184,36 @@ $(document).ready(function () {
     // 表格组件模板
     table: {
       template: `
-      <div id="ef-table-comp-{uniqueId}" class="ef-component ef-table-component ef-table-comp-{uniqueId}" style="position: static; overflow: visible !important;">
+      <div id="ef-table-comp-{uniqueId}" class="ef-component ef-table-component ef-table-comp-{uniqueId}" style="position: static; overflow-x: auto; overflow-y: hidden;">
         <span class="ef-component-labels ef-label-small label-above-line label-top table-label" style="left: 0px">
           <span class="ef-label-comp-type">
             <span>Table</span>
           </span>
         </span>
-        <table class="ef-table" ef-table-hotkeys style="width: fit-content;">
-          <thead>
-            <tr style="height: 30px;">
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 1</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 2</th>
-              <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 3</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="height: 30px;">
-              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 1</td>
-              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 2</td>
-              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 3</td>
-            </tr>
-            <tr style="height: 30px;">
-              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 4</td>
-              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 5</td>
-              <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 6</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="table-container" style="position: relative;">
+          <table class="ef-table" ef-table-hotkeys style="width: fit-content;">
+            <thead>
+              <tr style="height: 30px;">
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 1</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 2</th>
+                <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">标题 3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="height: 30px;">
+                <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 1</td>
+                <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 2</td>
+                <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 3</td>
+              </tr>
+              <tr style="height: 30px;">
+                <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 4</td>
+                <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 5</td>
+                <td style="border: 1px solid #ddd; padding: 8px;" tabindex="0" data-cell-active="false">内容 6</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="selection-border" style="display: none; position: absolute; border: 2px solid #007bff; pointer-events: none; z-index: 1000;"></div>
+        </div>
       </div>`,
       width: 600, // 表格的预期宽度
       height: 200 // 表格的预期高度
@@ -920,21 +1312,25 @@ $(document).ready(function () {
                 "left": "moveLeft",
                 "right": "moveRight"
               }' 
-              style="width: fit-content; border-collapse: collapse; margin-left: auto; margin-right: auto;">
-              <tbody>
-          `;
-
-            // 计算单元格宽度
+              style="width: fit-content; border-collapse: collapse; margin-left: 0px; margin-right: auto;">
+              <colgroup>`;
+            
+            // 生成colgroup
             const sectionContent = dropTarget.closest('.section-content');
             const sectionWidth = sectionContent.width() - 4;
             const cellWidth = (sectionWidth / cols).toFixed(2);
-            // const cellMaxWidth = cellWidth;
+            
+            for (let i = 0; i < cols; i++) {
+              tableHtml += `<col style="width: ${cellWidth}px;">`;
+            }
+            
+            tableHtml += `</colgroup><tbody>`;
 
             // 生成表格内容
             for (let i = 0; i < rows; i++) {
-              tableHtml += '<tr>';
+              tableHtml += '<tr style="height: 30px;">';
               for (let j = 0; j < cols; j++) {
-              tableHtml += `<td style="font-family: 'Microsoft YaHei', Helvetica, Tahoma, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Heiti SC', 'WenQuanYi Micro Hei', sans-serif; font-size: 14px; font-weight: normal; font-style: normal; text-decoration: none; text-align: left; vertical-align: middle; background-color: transparent; padding: 1px 2px; width: ${cellWidth}px; height: 30px; border: 1px dashed #d5d8dc;" contenteditable="true" tabindex="0" data-cell-active="false"></td>`;
+              tableHtml += `<td style="font-family: 'Microsoft YaHei', Helvetica, Tahoma, Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Heiti SC', 'WenQuanYi Micro Hei', sans-serif; font-size: 14px; font-weight: normal; font-style: normal; text-decoration: none; text-align: left; vertical-align: middle; background-color: transparent; padding: 1px 2px; border: 1px dashed #d5d8dc; white-space: nowrap; width: ${cellWidth}px;" rowspan="1" colspan="1" tabindex="0" data-cell-active="false"><div class="cell-content" contenteditable="false" style="width: 100%; height: 100%; outline: none; border: none; background: transparent; cursor: default; display: flex; justify-content: flex-start; align-items: center;"></div></td>`;
               }
               tableHtml += '</tr>';
             }
@@ -943,13 +1339,16 @@ $(document).ready(function () {
             // 创建表格组件
             const uniqueId = generateUniqueId();
             const componentHtml = `
-              <div id="ef-table-comp-${uniqueId}" class="ef-component ef-table-component ef-table-comp-${uniqueId}" style="position: static; overflow: visible !important;">
+              <div id="ef-table-comp-${uniqueId}" class="ef-component ef-table-component ef-table-comp-${uniqueId}" style="position: static; overflow-x: auto; overflow-y: hidden;">
                 <span class="ef-component-labels ef-label-small label-above-line label-top" style="left: 0px">
                   <span class="ef-label-comp-type draggable">
                     <span>Table</span>
                   </span>
                 </span>
-                ${tableHtml}
+                <div class="table-container" style="position: relative;">
+                  ${tableHtml}
+                  <div class="selection-border" style="display: none; position: absolute; border: 2px solid #007bff; pointer-events: none; z-index: 1000;"></div>
+                </div>
               </div>`;
 
             const newComponent = $(componentHtml);
@@ -985,14 +1384,28 @@ $(document).ready(function () {
             function getCellIndex(cell) {
               const $cell = $(cell);
               const $row = $cell.parent();
+              
+              // 计算逻辑列索引，考虑合并单元格
+              let logicalColIndex = 0;
+              $row.find('td, th').each(function(index) {
+                if (this === cell) {
+                  return false; // 找到目标单元格，停止循环
+                }
+                
+                const $currentCell = $(this);
+                const colspan = parseInt($currentCell.attr('colspan')) || 1;
+                logicalColIndex += colspan;
+              });
+              
               return {
                 row: $row.index(),
-                col: $cell.index()
+                col: logicalColIndex,
+                domIndex: $cell.index() // DOM中的实际索引
               };
             }
 
-            // 选择区域内的所有单元格
-            function selectCellsInRange(startCell, endCell, isMultiSelect = false) {
+            // 选择区域内的所有单元格（为新组件定制）
+            function selectCellsInRangeForNewComponent(startCell, endCell, isMultiSelect = false) {
               const start = getCellIndex(startCell);
               const end = getCellIndex(endCell);
               const minRow = Math.min(start.row, end.row);
@@ -1005,11 +1418,22 @@ $(document).ready(function () {
                 clearSelection(newComponent);
               }
               
+              const selectedCells = [];
               newComponent.find('tr').each(function(rowIndex) {
                 if (rowIndex >= minRow && rowIndex <= maxRow) {
-                  $(this).find('td, th').each(function(colIndex) {
-                    if (colIndex >= minCol && colIndex <= maxCol) {
-                      const $cell = $(this);
+                  // 计算当前行的逻辑列映射
+                  let logicalColIndex = 0;
+                  $(this).find('td, th').each(function() {
+                    const $cell = $(this);
+                    const colspan = parseInt($cell.attr('colspan')) || 1;
+                    const rowspan = parseInt($cell.attr('rowspan')) || 1;
+                    
+                    // 检查当前单元格的逻辑列范围是否与选择范围重叠
+                    const cellStartCol = logicalColIndex;
+                    const cellEndCol = logicalColIndex + colspan - 1;
+                    
+                    // 只选择实际可见的单元格，跳过被合并隐藏的单元格
+                    if (cellStartCol <= maxCol && cellEndCol >= minCol && !$cell.attr('data-merged')) {
                       // 只清除没有手动设置边框的单元格
                       if (!$cell.attr('data-custom-border')) {
                         $cell.css({
@@ -1018,30 +1442,64 @@ $(document).ready(function () {
                           'border-style': 'dashed',
                           'border-color': '#d5d8dc'
                         });
-                        
-                        // 为选中区域的边界设置特殊边框，确保可见性
-                        // if (rowIndex === minRow) { // 顶部边界
-                        //   $cell.css('border-top', '1px solid #007bff');
-                        // }
-                        // if (rowIndex === maxRow) { // 底部边界
-                        //   $cell.css('border-bottom', '1px solid #007bff');
-                        // }
-                        // if (colIndex === minCol) { // 左侧边界
-                        //   $cell.css('border-left', '1px solid #007bff');
-                        // }
-                        // if (colIndex === maxCol) { // 右侧边界
-                        //   $cell.css('border-right', '1px solid #007bff');
-                        // }
                       }
                       
                       $cell.attr('data-cell-active', 'true');
-                      $cell.css({
-                        'outline': '1px solid #007bff'
-                      });
+                      selectedCells.push($cell[0]);
+                      
+                      // 如果是合并单元格，立即处理其覆盖的隐藏单元格
+                      if (colspan > 1 || rowspan > 1) {
+                        // 遍历合并单元格覆盖的所有行
+                        for (let r = 0; r < rowspan; r++) {
+                          const targetRowIndex = rowIndex + r;
+                          if (targetRowIndex <= maxRow) {
+                            const $targetRow = newComponent.find('tr').eq(targetRowIndex);
+                            if ($targetRow.length) {
+                              let targetLogicalColIndex = 0;
+                              $targetRow.find('td, th').each(function() {
+                                const $targetCell = $(this);
+                                const targetColspan = parseInt($targetCell.attr('colspan')) || 1;
+                                
+                                // 检查目标单元格的逻辑列范围是否在合并单元格覆盖范围内
+                                const targetCellStartCol = targetLogicalColIndex;
+                                const targetCellEndCol = targetLogicalColIndex + targetColspan - 1;
+                                
+                                // 如果目标单元格在合并单元格覆盖的范围内
+                                if (targetCellStartCol >= cellStartCol && targetCellEndCol <= cellEndCol) {
+                                  // 如果是隐藏的合并单元格或在合并区域内的其他行
+                                  if ($targetCell.attr('data-merged') || $targetCell.css('display') === 'none' || r > 0) {
+                                    if (!$targetCell.attr('data-custom-border')) {
+                                      $targetCell.css({
+                                        'border': '1px dashed #d5d8dc',
+                                        'border-width': '1px',
+                                        'border-style': 'dashed',
+                                        'border-color': '#d5d8dc'
+                                      });
+                                    }
+                                    $targetCell.attr('data-cell-active', 'true');
+                                    selectedCells.push($targetCell[0]);
+                                  }
+                                }
+                                
+                                targetLogicalColIndex += targetColspan;
+                              });
+                            }
+                          }
+                        }
+                      }
                     }
+                    
+                    logicalColIndex += colspan;
                   });
                 }
               });
+              
+              // 显示选择边框
+              if (selectedCells.length > 0) {
+                showSelectionBorder(selectedCells);
+              }
+              
+              return selectedCells;
             }
 
             // 保持选中状态
@@ -1051,6 +1509,22 @@ $(document).ready(function () {
 
             // 鼠标按下时开始选择
             newComponent.find('td, th').on('mousedown', function(e) {
+              // 如果单元格处于编辑状态，允许默认的文本选择行为
+              const $contentDiv = $(this).find('.cell-content');
+              if (($contentDiv.length && $contentDiv.attr('contenteditable') === 'true') || 
+                  $(this).attr('contenteditable') === 'true') {
+                // 在编辑模式下，不阻止默认行为，允许文本选择
+                return;
+              }
+              
+              // 检查是否点击在拖拽手柄上
+              if ($(e.target).hasClass('column-resize-handle') || 
+                  $(e.target).hasClass('left-resize-handle') ||
+                  $(e.target).hasClass('row-resize-handle') ||
+                  $(e.target).hasClass('resize-handle-corner')) {
+                return;
+              }
+              
               e.preventDefault();
               isSelecting = true;
               startCell = this;
@@ -1086,13 +1560,13 @@ $(document).ready(function () {
                   clearSelection(newComponent);
                   // 重新渲染之前保存的所有区域
                   multiSelectRanges.forEach(range => {
-                    selectCellsInRange(range.startCell, range.endCell, true);
+                    selectCellsInRangeForNewComponent(range.startCell, range.endCell, true);
                   });
                   // 添加当前拖拽的区域
-                  selectCellsInRange(startCell, this, true);
+                  selectCellsInRangeForNewComponent(startCell, this, true);
                 } else {
                   // 单选模式：只显示当前拖拽的区域
-                  selectCellsInRange(startCell, this, false);
+                  selectCellsInRangeForNewComponent(startCell, this, false);
                 }
               }
             });
@@ -1116,16 +1590,147 @@ $(document).ready(function () {
                 // 单选模式且不在拖拽状态：选中当前单元格
                 clearSelection(newComponent);
                 multiSelectRanges = [];
-                $(this).attr('data-cell-active', 'true');
-                $(this).css({
-                  // 'border-style': 'dashed',
-                  // 'border-width': '2px',
-                  // 'border-color': '#007bff',
-                  'outline': '2px solid #007bff'
+                
+                const $currentCell = $(this);
+                const $table = $currentCell.closest('table');
+                
+                // 收集所有合并单元格信息
+                const mergedCellsInfo = [];
+                $table.find('td[colspan], td[rowspan], th[colspan], th[rowspan]').each(function() {
+                  const $cell = $(this);
+                  const colspan = parseInt($cell.attr('colspan')) || 1;
+                  const rowspan = parseInt($cell.attr('rowspan')) || 1;
+                  
+                  if (colspan > 1 || rowspan > 1) {
+                    const $row = $cell.parent();
+                    const rowIndex = $row.index();
+                    
+                    // 计算逻辑列位置
+                    let logicalCol = 0;
+                    $row.find('td, th').each(function() {
+                      if (this === $cell[0]) {
+                        return false;
+                      }
+                      const cellColspan = parseInt($(this).attr('colspan')) || 1;
+                      logicalCol += cellColspan;
+                    });
+                    
+                    mergedCellsInfo.push({
+                      cell: $cell,
+                      startRow: rowIndex,
+                      endRow: rowIndex + rowspan - 1,
+                      startCol: logicalCol,
+                      endCol: logicalCol + colspan - 1
+                    });
+                  }
                 });
+                
+                // 获取当前点击单元格的位置信息
+                const $currentRow = $currentCell.parent();
+                const currentRowIndex = $currentRow.index();
+                let currentLogicalCol = 0;
+                $currentRow.find('td, th').each(function() {
+                  if (this === $currentCell[0]) {
+                    return false;
+                  }
+                  const cellColspan = parseInt($(this).attr('colspan')) || 1;
+                  currentLogicalCol += cellColspan;
+                });
+                
+                const currentColspan = parseInt($currentCell.attr('colspan')) || 1;
+                const currentRowspan = parseInt($currentCell.attr('rowspan')) || 1;
+                
+                // 激活当前点击的单元格
+                $currentCell.attr('data-cell-active', 'true');
+                
+                // 如果当前单元格是合并单元格，激活所有被隐藏的单元格
+                if (currentColspan > 1 || currentRowspan > 1) {
+                  // 遍历合并单元格覆盖的所有行
+                  for (let r = currentRowIndex; r < currentRowIndex + currentRowspan; r++) {
+                    const $targetRow = $table.find('tr').eq(r);
+                    if ($targetRow.length) {
+                      let logicalColIndex = 0;
+                      $targetRow.find('td, th').each(function() {
+                        const $cell = $(this);
+                        const cellColspan = parseInt($cell.attr('colspan')) || 1;
+                        
+                        // 检查是否在合并区域内的隐藏单元格
+                        if (logicalColIndex >= currentLogicalCol && 
+                            logicalColIndex < currentLogicalCol + currentColspan &&
+                            $cell.attr('data-merged')) {
+                          $cell.attr('data-cell-active', 'true');
+                        }
+                        
+                        logicalColIndex += cellColspan;
+                      });
+                    }
+                  }
+                }
+                
+                // 检查当前单元格是否被其他合并单元格影响
+                mergedCellsInfo.forEach(mergedInfo => {
+                  // 如果当前单元格在合并单元格的影响范围内
+                  if (currentRowIndex >= mergedInfo.startRow && currentRowIndex <= mergedInfo.endRow &&
+                      currentLogicalCol >= mergedInfo.startCol && currentLogicalCol < mergedInfo.endCol) {
+                    
+                    // 激活合并单元格本身
+                    mergedInfo.cell.attr('data-cell-active', 'true');
+                    
+                    // 激活合并单元格覆盖区域内的所有隐藏单元格
+                    for (let r = mergedInfo.startRow; r <= mergedInfo.endRow; r++) {
+                      const $targetRow = $table.find('tr').eq(r);
+                      if ($targetRow.length) {
+                        let logicalColIndex = 0;
+                        $targetRow.find('td, th').each(function() {
+                          const $cell = $(this);
+                          const cellColspan = parseInt($cell.attr('colspan')) || 1;
+                          
+                          // 检查是否在合并区域内的隐藏单元格
+                          if (logicalColIndex >= mergedInfo.startCol && 
+                              logicalColIndex < mergedInfo.endCol &&
+                              $cell.attr('data-merged')) {
+                            $cell.attr('data-cell-active', 'true');
+                          }
+                          
+                          logicalColIndex += cellColspan;
+                        });
+                      }
+                    }
+                  }
+                });
+                
+                showSelectionBorder($currentCell);
                 
                 // 触发单元格选择变化事件 - Feature 5
                 $(document).trigger('cell-selection-changed');
+              }
+            });
+            
+            // 双击进入编辑模式
+            newComponent.find('th, td').on('dblclick', function() {
+              clearSelection(newComponent); // 清除已有的选中效果
+              const $contentDiv = $(this).find('.cell-content');
+              if ($contentDiv.length) {
+                $contentDiv.attr('contenteditable', 'true')
+                           .css('cursor', 'text')
+                           .focus();
+              } else {
+                $(this).attr('contenteditable', 'true')
+                       .css('cursor', 'text')
+                       .focus();
+              }
+            });
+
+            // 失去焦点时退出编辑模式
+            newComponent.find('th, td').on('blur', function() {
+              const $contentDiv = $(this).find('.cell-content');
+              if ($contentDiv.length) {
+                $contentDiv.attr('contenteditable', 'false')
+                           .css('cursor', 'default')
+                           .css('min-height', ''); // 清除min-height样式
+              } else {
+                $(this).attr('contenteditable', 'false')
+                       .css('cursor', 'default');
               }
             });
             
@@ -1134,13 +1739,14 @@ $(document).ready(function () {
               clearSelection(newComponent);
               multiSelectRanges.forEach(range => {
                 if (range.startCell && range.endCell) {
-                  selectCellsInRange(range.startCell, range.endCell, true);
+                  selectCellsInRangeForNewComponent(range.startCell, range.endCell, true);
                 }
               });
             }
 
             // 鼠标松开时结束选择
-            $(document).on('mouseup', function(e) {
+            const componentId = 'newComponent_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            $(document).off('mouseup.' + componentId).on('mouseup.' + componentId, function(e) {
               if (isSelecting && startCell) {
                 const isMultiSelect = e.ctrlKey || e.metaKey;
                 if (isMultiSelect) {
@@ -1202,11 +1808,8 @@ $(document).ready(function () {
                 startCell = this;
                 clearSelection(newComponent);
                 selectedCells = [this];
-                $(this).css({
-                  // 'background-color': '#f0f8ff',
-                  'outline': '1px solid #007bff'
-                });
                 $(this).attr('data-cell-active', 'true');
+                showSelectionBorder($(this));
                 e.preventDefault();
               }
               // 如果当前单元格处于编辑状态，不阻止默认行为，允许光标定位
@@ -1218,7 +1821,7 @@ $(document).ready(function () {
               const hasEditingCell = newComponent.find('td[contenteditable="true"], th[contenteditable="true"]').length > 0;
               
               if (isSelecting && $(this).attr('contenteditable') !== 'true' && !hasEditingCell) {
-                selectCellsInRange(startCell, this);
+                selectCellsInRangeForNewComponent(startCell, this);
               }
             });
 

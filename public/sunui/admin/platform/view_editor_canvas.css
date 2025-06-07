@@ -1,0 +1,223 @@
+/* 标尺容器样式 */
+.ruler-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+}
+
+/* 标尺角落样式 */
+.ruler-corner {
+    background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    position: relative;
+}
+
+.ruler-corner::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background-color: #999;
+    border-radius: 50%;
+}
+
+/* 标尺基础样式 */
+.ruler {
+    position: relative;
+    background: linear-gradient(to bottom, #f8f8f8 0%, #f0f0f0 100%);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.ruler-horizontal {
+    border-bottom: 1px solid #ccc;
+    background: linear-gradient(to bottom, #f8f8f8 0%, #f0f0f0 100%);
+}
+
+.ruler-vertical {
+    border-right: 1px solid #ccc;
+    background: linear-gradient(to right, #f8f8f8 0%, #f0f0f0 100%);
+}
+
+/* 标尺刻度样式 */
+.ruler .tick {
+    position: absolute;
+    background-color: #666;
+}
+
+.ruler .tick.major {
+    background-color: #333;
+}
+
+.ruler .tick-label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 9px;
+    color: #666;
+    line-height: 1;
+}
+
+/* Canvas包装器样式 */
+.canvas-wrapper {
+    position: relative;
+    background-color: #fff;
+    overflow: auto;
+    height: 100%;
+}
+
+/* 辅助线容器样式 */
+.guide-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 500;
+}
+
+/* 辅助线样式 */
+.guide-line,
+.temp-guide-line {
+    position: absolute;
+    background-color: #007bff;
+    pointer-events: auto;
+    z-index: 600;
+    transition: opacity 0.2s ease;
+}
+
+.guide-line {
+    opacity: 0.6;
+}
+
+.guide-line:hover {
+    opacity: 1;
+    background-color: #0056b3;
+}
+
+.temp-guide-line {
+    opacity: 0.8;
+    background-color: #28a745;
+    box-shadow: 0 0 3px rgba(40, 167, 69, 0.5);
+}
+
+/* 垂直辅助线样式 */
+.guide-line[style*="width: 1px"],
+.temp-guide-line[style*="width: 1px"] {
+    cursor: ew-resize;
+}
+
+/* 水平辅助线样式 */
+.guide-line[style*="height: 1px"],
+.temp-guide-line[style*="height: 1px"] {
+    cursor: ns-resize;
+}
+
+/* 标尺悬停效果 */
+.ruler:hover {
+    background: linear-gradient(to bottom, #f0f0f0 0%, #e8e8e8 100%);
+}
+
+.ruler-horizontal:hover {
+    background: linear-gradient(to bottom, #f0f0f0 0%, #e8e8e8 100%);
+}
+
+.ruler-vertical:hover {
+    background: linear-gradient(to right, #f0f0f0 0%, #e8e8e8 100%);
+}
+
+/* 标尺活动状态 */
+.ruler.dragging {
+    background-color: #e3f2fd;
+    cursor: crosshair;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .ruler-corner,
+    .ruler-horizontal,
+    .ruler-vertical {
+        display: none;
+    }
+    
+    .ruler-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+    }
+    
+    .canvas-wrapper {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    
+    .guide-lines {
+        top: 0;
+        left: 0;
+    }
+}
+
+/* 辅助线删除提示 */
+.guide-line::before {
+    content: attr(title);
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 1000;
+}
+
+.guide-line:hover::before {
+    opacity: 1;
+}
+
+/* 垂直辅助线的提示位置 */
+.guide-line[style*="width: 1px"]::before {
+    top: 10px;
+    left: 5px;
+}
+
+/* 水平辅助线的提示位置 */
+.guide-line[style*="height: 1px"]::before {
+    top: -25px;
+    left: 10px;
+}
+
+/* 标尺刻度动画 */
+.ruler .tick {
+    transition: background-color 0.1s ease;
+}
+
+.ruler:hover .tick {
+    background-color: #333;
+}
+
+/* 改进的滚动条样式 */
+.canvas-wrapper::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.canvas-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.canvas-wrapper::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.canvas-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

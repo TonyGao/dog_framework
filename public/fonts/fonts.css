@@ -282,3 +282,13 @@
   font-style: normal;
   font-display: swap;
 }
+
+/* Emoji */
+
+@font-face {
+  font-family: 'NotoEmoji';
+  src: url('/fonts/organized_fonts/Emoji/NotoEmoji/NotoEmoji-VariableFont_wght.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
