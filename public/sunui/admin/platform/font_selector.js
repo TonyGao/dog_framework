@@ -95,12 +95,10 @@ class FontSelectorModal {
                 { name: 'Osaka', family: 'Osaka', weights: [400] },
             ],
             emoji: [
+                { name: 'NotoEmoji', family: 'NotoEmoji', weights: [400] },
                 { name: 'Apple Color Emoji', family: 'Apple Color Emoji', weights: [400] },
                 { name: 'Segoe UI Emoji', family: 'Segoe UI Emoji', weights: [400] },
                 { name: 'Noto Color Emoji', family: 'Noto Color Emoji', weights: [400] },
-                { name: 'Twemoji', family: 'Twemoji', weights: [400] },
-                { name: 'EmojiOne', family: 'EmojiOne', weights: [400] },
-                { name: 'Symbola', family: 'Symbola', weights: [400] },
             ]
         };
         this.init();
@@ -403,7 +401,7 @@ class FontSelectorModal {
         });
     }
 
-    show(callback) {
+    show(callback, currentFont = null) {
         this.onFontSelect = callback;
         this.selectedFont = null;
         this.selectedWeight = 400;
@@ -418,6 +416,38 @@ class FontSelectorModal {
         document.getElementById('fontSelectorConfirm').disabled = true;
         document.getElementById('fontSearchInput').value = '';
         this.filterFonts('');
+        
+        // 如果提供了当前字体信息，在弹窗中标记为选中
+        if (currentFont && currentFont.family) {
+            const fontItems = this.modal.querySelectorAll('.font-item');
+            fontItems.forEach(item => {
+                const itemFamily = item.dataset.fontFamily;
+                if (itemFamily === currentFont.family || 
+                    itemFamily.includes(currentFont.family) || 
+                    currentFont.family.includes(itemFamily)) {
+                    // 选中字体
+                    item.classList.add('selected');
+                    this.selectedFont = {
+                        family: itemFamily,
+                        name: item.dataset.fontName,
+                        weight: currentFont.weight || 400
+                    };
+                    this.selectedWeight = currentFont.weight || 400;
+                    
+                    // 选中对应的字重
+                    const weightDemo = item.querySelector(`[data-weight="${this.selectedWeight}"]`);
+                    if (weightDemo) {
+                        weightDemo.classList.add('selected');
+                    }
+                    
+                    // 启用确定按钮
+                    document.getElementById('fontSelectorConfirm').disabled = false;
+                    
+                    // 滚动到选中的字体
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        }
         
         this.modal.classList.add('show');
         document.body.style.overflow = 'hidden';

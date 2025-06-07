@@ -10,7 +10,7 @@
 
     info (
       content, {
-        percent,
+        percent = "380px",
         title = null,
         closable = false,
         showIcon = true,
@@ -84,7 +84,7 @@
 
     success (
       content, {
-        percent,
+        percent = "380px",
         title = null,
         closable = false,
         showIcon = true,
@@ -158,7 +158,7 @@
 
     warning (
       content, {
-        percent,
+        percent = "380px",
         title = null,
         closable = false,
         showIcon = true,
@@ -232,7 +232,7 @@
 
     error (
       content, {
-        percent,
+        percent = "380px",
         title = null,
         closable = false,
         showIcon = true,
@@ -306,7 +306,7 @@
 
     normal (
       content, {
-        percent,
+        percent = "380px",
         title = null,
         closable = false,
         showIcon = true,

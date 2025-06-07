@@ -4,7 +4,7 @@
  */
 $(document).ready(function() {
   // 初始化Alert组件
-  let alert = new Alert($('.canvas'));
+  let alert = window.$.alert;
   
   // 获取所有工具栏按钮并添加点击事件
   $('.toolbar-btn').on('click', function() {
@@ -45,11 +45,24 @@ $(document).ready(function() {
   // 字体选择器按钮点击事件 - Feature 3
   $('#fontSelectorTrigger').on('click', function() {
     if (window.fontSelectorModal) {
+      // 获取当前选中单元格的字体信息
+      const activeSection = $('#canvas .section.active');
+      const activeCells = activeSection.find('td[data-cell-active="true"]');
+      let currentFont = null;
+      
+      if (activeCells.length > 0) {
+        const firstCell = activeCells.first();
+        const fontFamily = firstCell.css('font-family');
+        const fontWeight = firstCell.css('font-weight');
+        
+        currentFont = {
+          family: fontFamily ? fontFamily.split(',')[0].replace(/["']/g, '').trim() : null,
+          weight: fontWeight === 'bold' || fontWeight === '700' ? 700 : parseInt(fontWeight) || 400
+        };
+      }
+      
       window.fontSelectorModal.show(function(selectedFont) {
         // 应用选中的字体到当前选中的单元格或文本
-        const activeSection = $('#canvas .section.active');
-        const activeCells = activeSection.find('td[data-cell-active="true"]');
-        
         if (activeCells.length > 0) {
           // 应用字体到选中的单元格
           activeCells.css('font-family', selectedFont.family);
@@ -58,11 +71,14 @@ $(document).ready(function() {
           // 更新按钮显示的字体名称
           $('#fontSelectorTrigger .font-selector-text').text(selectedFont.name);
           
+          // 同步工具栏按钮状态
+          window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+          
           console.log('应用字体:', selectedFont.name, '到', activeCells.length, '个单元格');
         } else {
           alert.warning('请先选择要应用字体的单元格');
         }
-      });
+      }, currentFont);
     }
   });
 
@@ -232,17 +248,17 @@ $(document).ready(function() {
         {
           style: 'font-weight',
           values: ['700', 'bold'],
-          buttonClass: 'fa-bold'
+          buttonClass: 'font-bold'
         },
         {
           style: 'font-style',
           values: ['italic'],
-          buttonClass: 'fa-italic'
+          buttonClass: 'font-italic'
         },
         {
           style: 'text-decoration',
-          values: ['underline'],
-          buttonClass: 'fa-underline'
+          values: (value) => value && value.includes('underline'),
+          buttonClass: 'font-underline'
         },
         {
           style: 'border',
@@ -253,37 +269,49 @@ $(document).ready(function() {
       // 水平对齐按钮组（互斥）
       horizontalAlign: [
         {
-          style: 'text-align',
-          values: ['left'],
-          buttonClass: 'font-align-left'
+          style: 'justify-content',
+          values: ['flex-start'],
+          buttonClass: 'font-align-left',
+          fallbackStyle: 'text-align',
+          fallbackValues: ['left']
         },
         {
-          style: 'text-align',
+          style: 'justify-content',
           values: ['center'],
-          buttonClass: 'font-align-center'
+          buttonClass: 'font-align-center',
+          fallbackStyle: 'text-align',
+          fallbackValues: ['center']
         },
         {
-          style: 'text-align',
-          values: ['right'],
-          buttonClass: 'font-align-right'
+          style: 'justify-content',
+          values: ['flex-end'],
+          buttonClass: 'font-align-right',
+          fallbackStyle: 'text-align',
+          fallbackValues: ['right']
         }
       ],
       // 垂直对齐按钮组（互斥）
       verticalAlign: [
         {
-          style: 'vertical-align',
-          values: ['top'],
-          buttonClass: 'font-align-vertical-top'
+          style: 'align-items',
+          values: ['flex-start'],
+          buttonClass: 'font-align-vertical-top',
+          fallbackStyle: 'vertical-align',
+          fallbackValues: ['top']
         },
         {
-          style: 'vertical-align',
-          values: ['middle'],
-          buttonClass: 'font-align-vertical-center'
+          style: 'align-items',
+          values: ['center'],
+          buttonClass: 'font-align-vertical-center',
+          fallbackStyle: 'vertical-align',
+          fallbackValues: ['middle']
         },
         {
-          style: 'vertical-align',
-          values: ['bottom'],
-          buttonClass: 'font-align-vertical-bottom'
+          style: 'align-items',
+          values: ['flex-end'],
+          buttonClass: 'font-align-vertical-bottom',
+          fallbackStyle: 'vertical-align',
+          fallbackValues: ['bottom']
         }
       ]
     };
@@ -300,13 +328,32 @@ $(document).ready(function() {
         const $button = $(`.toolbar-btn.${mapping.buttonClass}`);
         if (!$button.length) return;
 
-        const currentStyle = element.css(mapping.style);
+        // 对于文本对齐相关的样式，需要检查cell-content div的样式
+        let targetElement = element;
+        if (groupName === 'horizontalAlign' || groupName === 'verticalAlign') {
+          const $cellContent = element.find('.cell-content');
+          if ($cellContent.length > 0) {
+            targetElement = $cellContent;
+          }
+        }
+
+        const currentStyle = targetElement.css(mapping.style);
         let shouldBeActive = false;
 
         if (typeof mapping.values === 'function') {
           shouldBeActive = mapping.values(currentStyle);
         } else {
           shouldBeActive = mapping.values.some(value => currentStyle === value);
+        }
+
+        // 如果主样式没有匹配，检查fallback样式
+        if (!shouldBeActive && mapping.fallbackStyle && mapping.fallbackValues) {
+          const fallbackStyle = targetElement.css(mapping.fallbackStyle);
+          if (typeof mapping.fallbackValues === 'function') {
+            shouldBeActive = mapping.fallbackValues(fallbackStyle);
+          } else {
+            shouldBeActive = mapping.fallbackValues.some(value => fallbackStyle === value);
+          }
         }
 
         // 如果是互斥组（非standalone），先移除组内所有按钮的激活状态
@@ -331,6 +378,36 @@ $(document).ready(function() {
       const currentColor = element.css('color');
     }
     
+    // 处理字体选择器
+    const $fontSelector = $('#fontSelectorTrigger .font-selector-text');
+    if ($fontSelector.length) {
+      const currentFontFamily = element.css('font-family');
+      if (currentFontFamily) {
+        // 从字体族中提取主要字体名称
+        const fontName = currentFontFamily.split(',')[0].replace(/["']/g, '').trim();
+        $fontSelector.text(fontName);
+      }
+    }
+    
+    // 处理字号选择器
+    const $fontSizeSelect = $('.font-size-select');
+    if ($fontSizeSelect.length) {
+      const currentFontSize = element.css('font-size');
+      if (currentFontSize) {
+        const fontSize = parseInt(currentFontSize);
+        // 检查是否有对应的选项
+        const $option = $fontSizeSelect.find(`option[value="${fontSize}"]`);
+        if ($option.length > 0) {
+          $fontSizeSelect.val(fontSize);
+        } else {
+          // 如果没有对应选项，添加一个自定义选项
+          const customOption = `<option value="${fontSize}">${fontSize}px</option>`;
+          $fontSizeSelect.find('option[value="custom"]').before(customOption);
+          $fontSizeSelect.val(fontSize);
+        }
+      }
+    }
+    
     // 处理背景颜色按钮
     const $bgColorBtn = $('.toolbar-btn.bg-palette');
     if ($bgColorBtn.length) {
@@ -351,14 +428,14 @@ $(document).ready(function() {
     }
   }
 
-// 确保 viewEditor 对象存在
-window.viewEditor = window.viewEditor || {};
+  // 确保 viewEditor 对象存在
+  window.viewEditor = window.viewEditor || {};
 
-// 定义工具栏模块
-window.viewEditor.toolbar = {
-  // 同步工具栏按钮状态方法
-  syncToolbarButtonStates: syncToolbarButtonStates,
-};
+  // 定义工具栏模块
+  window.viewEditor.toolbar = {
+    // 同步工具栏按钮状态方法
+    syncToolbarButtonStates: syncToolbarButtonStates,
+  };
   
   // 修改原有的粗体按钮点击事件处理
   $('.toolbar-btn.font-bold').on('click', function() {
@@ -725,8 +802,21 @@ window.viewEditor.toolbar = {
     const activeCells = activeSection.find('td[data-cell-active="true"]');
     
     if (activeCells.length > 0) {
+      // 移除其他对齐按钮的active状态
+      $('.toolbar-btn.font-align-center, .toolbar-btn.font-align-right').removeClass('active');
+      $(this).addClass('active');
+      
       activeCells.each(function() {
-        $(this).css('text-align', 'left');
+        const $cell = $(this);
+        const $cellContent = $cell.find('.cell-content');
+        if ($cellContent.length) {
+          $cellContent.css({
+            'display': 'flex',
+            'justify-content': 'flex-start'
+          });
+        } else {
+          $cell.css('text-align', 'left');
+        }
       });
       
       window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
@@ -738,8 +828,21 @@ window.viewEditor.toolbar = {
     const activeCells = activeSection.find('td[data-cell-active="true"]');
     
     if (activeCells.length > 0) {
+      // 移除其他对齐按钮的active状态
+      $('.toolbar-btn.font-align-left, .toolbar-btn.font-align-right').removeClass('active');
+      $(this).addClass('active');
+      
       activeCells.each(function() {
-        $(this).css('text-align', 'center');
+        const $cell = $(this);
+        const $cellContent = $cell.find('.cell-content');
+        if ($cellContent.length) {
+          $cellContent.css({
+            'display': 'flex',
+            'justify-content': 'center'
+          });
+        } else {
+          $cell.css('text-align', 'center');
+        }
       });
       
       window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
@@ -751,8 +854,21 @@ window.viewEditor.toolbar = {
     const activeCells = activeSection.find('td[data-cell-active="true"]');
     
     if (activeCells.length > 0) {
+      // 移除其他对齐按钮的active状态
+      $('.toolbar-btn.font-align-left, .toolbar-btn.font-align-center').removeClass('active');
+      $(this).addClass('active');
+      
       activeCells.each(function() {
-        $(this).css('text-align', 'right');
+        const $cell = $(this);
+        const $cellContent = $cell.find('.cell-content');
+        if ($cellContent.length) {
+          $cellContent.css({
+            'display': 'flex',
+            'justify-content': 'flex-end'
+          });
+        } else {
+          $cell.css('text-align', 'right');
+        }
       });
       
       window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
@@ -766,7 +882,16 @@ window.viewEditor.toolbar = {
     
     if (activeCells.length > 0) {
       activeCells.each(function() {
-        $(this).css('vertical-align', 'top');
+        const $cell = $(this);
+        const $cellContent = $cell.find('.cell-content');
+        if ($cellContent.length) {
+          $cellContent.css({
+            'display': 'flex',
+            'align-items': 'flex-start'
+          });
+        } else {
+          $cell.css('vertical-align', 'top');
+        }
       });
       
       window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
@@ -779,7 +904,16 @@ window.viewEditor.toolbar = {
     
     if (activeCells.length > 0) {
       activeCells.each(function() {
-        $(this).css('vertical-align', 'middle');
+        const $cell = $(this);
+        const $cellContent = $cell.find('.cell-content');
+        if ($cellContent.length) {
+          $cellContent.css({
+            'display': 'flex',
+            'align-items': 'center'
+          });
+        } else {
+          $cell.css('vertical-align', 'middle');
+        }
       });
       
       window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
@@ -792,7 +926,16 @@ window.viewEditor.toolbar = {
     
     if (activeCells.length > 0) {
       activeCells.each(function() {
-        $(this).css('vertical-align', 'bottom');
+        const $cell = $(this);
+        const $cellContent = $cell.find('.cell-content');
+        if ($cellContent.length) {
+          $cellContent.css({
+            'display': 'flex',
+            'align-items': 'flex-end'
+          });
+        } else {
+          $cell.css('vertical-align', 'bottom');
+        }
       });
       
       window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
@@ -827,23 +970,76 @@ window.viewEditor.toolbar = {
     const mergeInfo = getMergeInfo(activeCells);
     const firstCell = activeCells.first();
     
+    // 计算合并后的总宽度
+    let totalWidth = 0;
+    const firstCellRow = firstCell.parent().index();
+    const firstCellCol = firstCell.index();
+    const table = firstCell.closest('table');
+    
+    // 计算被合并列的原始宽度总和
+    for (let col = firstCellCol; col < firstCellCol + mergeInfo.colspan; col++) {
+      const cellInFirstRow = table.find('tr').first().find('td, th').eq(col);
+      if (cellInFirstRow.length) {
+        totalWidth += cellInFirstRow.outerWidth();
+      }
+    }
+    
     // 合并文本内容
     let mergedContent = '';
     activeCells.each(function() {
-      const cellContent = $(this).text().trim();
+      const $cell = $(this);
+      const $contentDiv = $cell.find('.cell-content');
+      const cellContent = $contentDiv.length ? $contentDiv.text().trim() : $cell.text().trim();
       if (cellContent) {
         mergedContent += (mergedContent ? ' ' : '') + cellContent;
       }
     });
     
-    // 设置合并属性
+    // 设置合并属性和宽度
     firstCell.attr({
       'colspan': mergeInfo.colspan,
       'rowspan': mergeInfo.rowspan
-    }).text(mergedContent);
+    }).css('width', totalWidth + 'px');
+    
+    // 设置合并后的内容
+    const $firstCellContent = firstCell.find('.cell-content');
+    if ($firstCellContent.length) {
+      $firstCellContent.text(mergedContent);
+    } else {
+      firstCell.text(mergedContent);
+    }
+    
+    // 注意：合并单元格时不修改colgroup的列宽度
+    // colgroup的列宽度只在手动拖拽调整时才会改变
+    
+    // 确保其他行对应列的宽度保持一致
+    // 先记录每列的原始宽度
+    const columnWidths = [];
+    const firstRow = table.find('tr').first();
+    firstRow.find('td, th').each(function(index) {
+      columnWidths[index] = $(this).outerWidth();
+    });
+    
+    table.find('tr').each(function(rowIndex) {
+      if (rowIndex !== firstCellRow) {
+        $(this).find('td, th').each(function(colIndex) {
+          const cell = $(this);
+          // 只对非合并单元格设置宽度，且不在被合并的列范围内
+          if (!cell.attr('colspan') && !cell.attr('data-merged') && 
+              (colIndex < firstCellCol || colIndex >= firstCellCol + mergeInfo.colspan)) {
+            if (columnWidths[colIndex]) {
+              cell.css('width', columnWidths[colIndex] + 'px');
+            }
+          }
+        });
+      }
+    });
     
     // 隐藏其他被合并的单元格
     activeCells.not(firstCell).hide().attr('data-merged', 'true');
+    
+    // 为合并后的单元格添加拖拽手柄
+    addResizeHandlesToCell(firstCell);
     
     // 清除选择
     activeCells.removeAttr('data-cell-active').css({
@@ -884,10 +1080,56 @@ window.viewEditor.toolbar = {
   // 监听单元格选择变化，更新拆分按钮状态
   $(document).on('cell-selection-changed', function() {
     updateSplitCellsButtonState();
+    updateNewlineButtonIcon();
   });
+  
+  // 更新换行按钮图标
+  function updateNewlineButtonIcon() {
+    const activeSection = $('#canvas .section.active');
+    const activeCells = activeSection.find('td[data-cell-active="true"]');
+    const $newlineBtn = $('.toolbar-btn.newline');
+    
+    if (activeCells.length === 0) {
+      // 没有选中单元格时，显示默认图标（不换行）
+      $newlineBtn.find('i').removeClass('fa-align-justify').addClass('fa-align-left');
+      $newlineBtn.attr('title', '禁止换行');
+      return;
+    }
+    
+    // 检查第一个选中单元格的white-space属性
+    const firstCell = activeCells.first();
+    const whiteSpace = firstCell.css('white-space');
+    
+    if (whiteSpace === 'normal') {
+      // 当前是换行状态，显示换行图标
+      $newlineBtn.find('i').removeClass('fa-align-left').addClass('fa-align-justify');
+      $newlineBtn.attr('title', '允许换行');
+      $newlineBtn.addClass('active');
+    } else {
+      // 当前是不换行状态，显示不换行图标
+      $newlineBtn.find('i').removeClass('fa-align-justify').addClass('fa-align-left');
+      $newlineBtn.attr('title', '禁止换行');
+      $newlineBtn.removeClass('active');
+    }
+  }
   
   // 初始化时更新按钮状态
   updateSplitCellsButtonState();
+  updateNewlineButtonIcon();
+  
+  // 监听单元格点击事件，更新换行按钮状态
+  $(document).on('click', '.ef-table-component td, .ef-table-component th', function() {
+    // 延迟执行，确保单元格选择状态已更新
+    setTimeout(updateNewlineButtonIcon, 10);
+  });
+  
+
+  // 表格拖拽调整功能已移至 view_table.js 中统一实现
+  // 这里保留 addResizeHandlesToCell 函数的空实现以保持兼容性
+  function addResizeHandlesToCell($cell) {
+    // 功能已迁移到 view_table.js，此处为空实现
+    // 实际的拖拽手柄添加和事件绑定由 view_table.js 的 initTableResize() 函数处理
+  }
 
   // 单元格拆分功能
   $('.toolbar-btn.split-cells').on('click', function() {
@@ -948,50 +1190,96 @@ window.viewEditor.toolbar = {
     const activeSection = $('#canvas .section.active');
     const activeCells = activeSection.find('td[data-cell-active="true"]');
     
-    if (activeCells.length > 0) {
-      // 记录撤销重做状态
-      if (window.undoRedoManager) {
-        window.undoRedoManager.recordAction('toggle_wrap', {
-          cellCount: activeCells.length
-        });
-      }
-      
-      activeCells.each(function() {
-        const currentWrap = $(this).css('white-space');
-        if (currentWrap === 'nowrap') {
-          $(this).css('white-space', 'normal');
-        } else {
-          $(this).css('white-space', 'nowrap');
-        }
-      });
-      
-      window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
+    if (activeCells.length === 0) {
+      alert.warning('请先选择表格单元格');
+      return;
     }
+    
+    // 记录撤销重做状态
+    if (window.undoRedoManager) {
+      window.undoRedoManager.recordAction('toggle_whitespace', {
+        cellCount: activeCells.length
+      });
+    }
+    
+    // 切换 white-space 属性
+    activeCells.each(function() {
+      const $cell = $(this);
+      const currentWhiteSpace = $cell.css('white-space');
+      
+      if (currentWhiteSpace === 'nowrap') {
+        $cell.css('white-space', 'normal');
+      } else {
+        $cell.css('white-space', 'nowrap');
+      }
+    });
+    
+    // 更新换行按钮图标
+    updateNewlineButtonIcon();
+    
+    // 同步工具栏按钮状态
+    window.viewEditor.toolbar.syncToolbarButtonStates(activeCells.first());
   });
   
-  // 辅助函数：检查选中的单元格是否连续
+  // 辅助函数：检查选中的单元格是否连续（考虑合并单元格）
   function areSelectedCellsContinuous(cells) {
     if (cells.length <= 1) return true;
     
     const positions = [];
+    const table = cells.first().closest('table');
+    
+    // 收集所有选中单元格的逻辑位置信息
     cells.each(function() {
       const $cell = $(this);
       const row = $cell.parent().index();
       const col = $cell.index();
-      positions.push({row, col, element: $cell});
+      const colspan = parseInt($cell.attr('colspan')) || 1;
+      const rowspan = parseInt($cell.attr('rowspan')) || 1;
+      
+      // 为合并单元格的每个逻辑位置添加记录
+      for (let r = row; r < row + rowspan; r++) {
+        for (let c = col; c < col + colspan; c++) {
+          positions.push({row: r, col: c, element: $cell});
+        }
+      }
     });
     
-    // 按行列排序
-    positions.sort((a, b) => a.row - b.row || a.col - b.col);
+    // 按行列排序并去重
+    const uniquePositions = [];
+    const positionSet = new Set();
+    positions.forEach(pos => {
+      const key = `${pos.row}-${pos.col}`;
+      if (!positionSet.has(key)) {
+        positionSet.add(key);
+        uniquePositions.push(pos);
+      }
+    });
+    
+    uniquePositions.sort((a, b) => a.row - b.row || a.col - b.col);
     
     // 检查是否形成矩形区域
-    const minRow = Math.min(...positions.map(p => p.row));
-    const maxRow = Math.max(...positions.map(p => p.row));
-    const minCol = Math.min(...positions.map(p => p.col));
-    const maxCol = Math.max(...positions.map(p => p.col));
+    const minRow = Math.min(...uniquePositions.map(p => p.row));
+    const maxRow = Math.max(...uniquePositions.map(p => p.row));
+    const minCol = Math.min(...uniquePositions.map(p => p.col));
+    const maxCol = Math.max(...uniquePositions.map(p => p.col));
     
     const expectedCount = (maxRow - minRow + 1) * (maxCol - minCol + 1);
-    return positions.length === expectedCount;
+    
+    // 检查矩形区域内的每个位置是否都被覆盖
+    const coveredPositions = new Set();
+    uniquePositions.forEach(pos => {
+      coveredPositions.add(`${pos.row}-${pos.col}`);
+    });
+    
+    for (let r = minRow; r <= maxRow; r++) {
+      for (let c = minCol; c <= maxCol; c++) {
+        if (!coveredPositions.has(`${r}-${c}`)) {
+          return false;
+        }
+      }
+    }
+    
+    return true;
   }
   
   // 辅助函数：获取合并信息

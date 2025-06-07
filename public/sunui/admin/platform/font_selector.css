@@ -74,9 +74,9 @@
 }
 
 .font-category-tabs {
-    position: absolute;
-    left: -140px;
-    top: 20%;
+    position: relative;
+    left: -8px;
+    top: -15%;
     width: 120px;
     background: #f8f9fa;
     border-radius: 6px;
