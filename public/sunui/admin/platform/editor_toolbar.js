@@ -430,12 +430,14 @@ $(document).ready(function() {
 
   // 确保 viewEditor 对象存在
   window.viewEditor = window.viewEditor || {};
+  // 确保 toolbar 对象存在
+  window.viewEditor.toolbar = window.viewEditor.toolbar || {};
 
   // 定义工具栏模块
-  window.viewEditor.toolbar = {
+  Object.assign(window.viewEditor.toolbar, {
     // 同步工具栏按钮状态方法
     syncToolbarButtonStates: syncToolbarButtonStates,
-  };
+  });
   
   // 修改原有的粗体按钮点击事件处理
   $('.toolbar-btn.font-bold').on('click', function() {
