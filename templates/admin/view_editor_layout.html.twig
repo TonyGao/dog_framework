@@ -13,6 +13,9 @@
 {% block javascripts %}
 	{{ parent() }}
 	<script src="{{ asset('layout.js', 'admin') }}"></script>
+	<script src="{{ asset('platform/view_editor_core.js', 'admin') }}"></script>
+  <script src="{{ asset('platform/view_editor_table.js', 'admin') }}"></script>
+  <script src="{{ asset('platform/view_editor_components.js', 'admin') }}"></script>
   <script src="{{ asset('platform/view_editor.js', 'admin') }}"></script>
   <script src="{{ asset('platform/editor_toolbar.js', 'admin') }}"></script>
 	<script src="{{ asset('platform/color_picker.js', 'admin') }}"></script>
