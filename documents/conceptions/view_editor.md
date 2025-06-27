@@ -104,3 +104,67 @@
 ```twig
 {% for row in table_data %}...{% endfor %}
 ```
+
+# 表格组件逻辑
+
+## 关于选取单元格的逻辑
+
+### 当有合并单元格的情况
+
+<!-- 给我做一个markdown表格 -->
+| td1 | td2 |
+|-----|-----|
+| td3 | td4 |
+
+示例1
+
+当td1和td3合并后:
+td1的坐标是(0, 0), colspan=1, rowspan=2
+td2的坐标(0, 1), colspan=1, rowspan=1
+td3的坐标(1, 0), colspan=1, rowspan=1 display: none
+td4的坐标(1, 1), colspan=1, rowspan=1
+
+| td1 & td3  | td2 |
+|-----------|-----|
+| td1 & td3 | td4 |
+
+当鼠标先点击td1，然后滑动到td2，实际上作用的是td1（因为td3已经隐藏），在td2释放鼠标，这时td1和td2具有data-cell-active="true"的属性了。实际上td3和td4性应该设置为data-cell-active="true"。基本逻辑是：当鼠标到td1时，判断colspan和rowspan，colspan=1 说明td1影响的横向单元格只有自己，rowspan=2 说明td1影响的纵向单元格有自己和下面的一个单元格，根据表格的坐标，推断出来td1，即(0,0)，下面的单元格是(1,0)，将这两个单元格的data-cell-active设置为true。另外，当td1存在这个rowspan=2，并且又是以这个td1为起点，那么鼠标在滑动到其他列时，那其他列应该参照这个起始的td1一样，(x, 0)，(x, 1) 都应该设置为data-cell-active="true"。
+
+示例2
+
+当td2和td4合并后:
+td1的坐标是(0, 0), colspan=1, rowspan=1
+td2的坐标(0, 1), colspan=1, rowspan=2
+td3的坐标(1, 0), colspan=1, rowspan=1
+td4的坐标(1, 1), colspan=1, rowspan=1 display: none
+
+| td1  | td2 & td4 |
+|------|-----------|
+| td3  | td2 & td4 |
+
+当鼠标先点击td1，然后滑动到td2，这时td1和td2都会设置data-cell-active="true"。鼠标滑动到td2时，判断出来它的rowspan=2，那么所有鼠标经过的被标记为data-cell-active="true"的坐标为(0,x)的单元格都应该将其对应的(1, x)的单元格设置为data-cell-active="true"。同时，td2坐标为(0,1)，rowspan=2, 那么它对应的(1,1)的单元格也应该设置为data-cell-active="true"。
+
+示例3
+
+| td1  | td2 | td3 |
+|------|-----|-----|
+| td4  | td5 | td6 |
+
+合并td2和td5后
+
+| td1  | td2 & td5 | td3 |
+|------|-----------|-----|
+| td4  | td2 & td5 | td6 |
+
+当鼠标先点击td1，然后滑动到td2，再滑动到td3，这时td1, td2, td3都会设置data-cell-active="true"。参照示例2的逻辑，td5也会设置为data-cell-active="true"。当鼠标滑动到td3时，参照示例1的逻辑，td6也会设置为data-cell-active="true"。并且因为td2与td5的合并，影响了两行，所以td4也应该data-cell-active="true"。
+
+从上边三个示例，可以得出以下结论，当鼠标选取滑动时经过存在纵向合并的单元格时，合并单元格的行和鼠标选取的列形成的矩形或方形内的所有<td>都应该设置为data-cell-active="true"。
+
+## 数据源绑定
+
+在“数据源”页签中，数据源目前是从单一模型读取的字段列表，可以点击字段列表的“标签”或“值”向表格、Grid或其他容器放置其名称与变量占位符，变量占位符是在Twig视图中的变量。
+
+当未绑定模型时上方有<div class="model-status text-primary mb-3">暂未绑定模型</div> 用来供用户点击，单击这个dom后弹出模态窗体用来供用户选择模型，选择模型后，该dom显示为选定模型的名称。
+
+点击左侧“标签”的
+
