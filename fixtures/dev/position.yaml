@@ -1,0 +1,10 @@
+App\Entity\Organization\Position:
+    position_{1..15}:
+        name: <randomElement(['总经理', '副总经理', '人事经理', '财务经理', '技术总监', '产品经理', '销售经理', '市场经理', '运营经理', '客服经理', '研发工程师', '测试工程师', 'UI设计师', '前端工程师', '后端工程师', '数据分析师', '项目经理', '质量经理', '采购经理', '行政专员'])>
+        code: <regexify('[A-Z]{2}[0-9]{3}')>
+        responsibility: <text(200)>
+        requirement: <text(150)>
+        headcount: <numberBetween(1, 10)>
+        state: <boolean()>
+        sortOrder: <numberBetween(1, 100)>
+        remark: 30%? <text(100)>

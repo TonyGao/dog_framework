@@ -3,6 +3,7 @@ $(document).ready(function () {
   let $canvas = $('.canvas');
   makeComponentDraggable = window.viewEditor.makeComponentDraggable;
   showSelectionBorder = window.viewEditor.showSelectionBorder;
+  reinitializeDroppables = window.viewEditor.reinitializeDroppables;
 
   // 生成唯一ID的函数
   function generateUniqueId () {
