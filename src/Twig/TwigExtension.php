@@ -37,6 +37,7 @@ class TwigExtension extends AbstractExtension
             new TwigFunction('getStdClassFields', [$this, 'getStdClassFields']),
             new TwigFunction('instanceof', [$this, 'isInstanceof']),
             new TwigFunction('get_session_id', [$this, 'getSessionId']),
+            new TwigFunction('generateRandomString', [$this, 'generateRandomString']),
         ];
     }
 
@@ -94,5 +95,18 @@ class TwigExtension extends AbstractExtension
     {
         /** @var SessionInterface $session */
         return $this->session->getId();
+    }
+
+    public function generateRandomString(int $length = 9): string
+    {
+        $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        
+        return $randomString;
     }
 }
