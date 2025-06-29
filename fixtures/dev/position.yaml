@@ -1,10 +1,917 @@
+App\Entity\Organization\Corporation:
+    corporation_{1}:
+        name: '华夏集团'
+        alias: '华夏集团'
+        code: <regexify('[A-Z]{3}[0-9]{3}')>
+        remark: <chineseText(200)>
+        president: <name()>
+        address: <chineseAddress()>
+        phone: <chineseMobileNumber()>
+        email: <chineseEmail()>
+        website: <chineseUrl()>
+        state: true
+        sortOrder: <numberBetween(1, 10)>
+
+# 公司数据
+App\Entity\Organization\Company:
+    corporation:
+        name: '华夏集团'
+        code: 'HZJ001'
+        address: '北京市海淀区'
+        phone: <chineseMobileNumber()>
+        email: <chineseEmail()>
+        website: <chineseUrl()>
+        description: <chineseText(200)>
+        state: true
+        sortOrder: <numberBetween(1, 20)>
+    company_{1..5}:
+        name: '<city()>分公司'
+        alias: '<city()>分公司'
+        code: <regexify('[A-Z]{2}[0-9]{4}')>
+        remark: <chineseText(150)>
+        repetitionNumHandling: 'insert'
+        state: true
+        loginIndependent: false
+        sortOrder: <numberBetween(1, 20)>
+        parent: '@corporation'
+
+# 部门数据
+App\Entity\Organization\Department:
+    # 清理缓存（在开始生成部门前）
+    cache_cleaner:
+        name: '<clearDepartmentCache()>'
+        alias: 'cache_cleaner'
+        code: 'CACHE001'
+        type: 'system'
+        state: false
+        sortOrder: -1
+        company: '@corporation'
+    
+    # 集团节点（作为树的根节点）
+    dept_corporation:
+        name: '华夏集团'
+        alias: '华夏集团'
+        code: 'HZJ001'
+        type: 'corperations'
+        state: true
+        sortOrder: 0
+        company: '@corporation'
+    
+    # 公司节点（对应所有Company实体）
+    dept_company_{1..5}:
+        name: '<city()>分公司'
+        alias: '<city()>分公司'
+        code: '<regexify("[A-Z]{2}001")>'
+        type: 'company'
+        state: true
+        sortOrder: <current()>
+        company: '@company_<current()>'
+        parent: '@dept_corporation'
+    
+    # 一级部门
+    dept_1:
+        name: '人力资源部'
+        alias: '人力资源部'
+        code: 'HR001'
+        type: 'department'
+        state: true
+        sortOrder: 1
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_company_<numberBetween(1, 5)>'
+    dept_2:
+        name: '财务部'
+        alias: '财务部'
+        code: 'FIN001'
+        type: 'department'
+        state: true
+        sortOrder: 2
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_company_<numberBetween(1, 5)>'
+    dept_3:
+        name: '技术部'
+        alias: '技术部'
+        code: 'TECH001'
+        type: 'department'
+        state: true
+        sortOrder: 3
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_company_<numberBetween(1, 5)>'
+    dept_4:
+        name: '市场部'
+        alias: '市场部'
+        code: 'MKT001'
+        type: 'department'
+        state: true
+        sortOrder: 4
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_company_<numberBetween(1, 5)>'
+    dept_5:
+        name: '销售部'
+        alias: '销售部'
+        code: 'SALES001'
+        type: 'department'
+        state: true
+        sortOrder: 5
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_company_<numberBetween(1, 5)>'
+    dept_6:
+        name: '运营部'
+        alias: '运营部'
+        code: 'OPS001'
+        type: 'department'
+        state: true
+        sortOrder: 6
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_company_<numberBetween(1, 5)>'
+    dept_7:
+        name: '法务部'
+        alias: '法务部'
+        code: 'LEGAL001'
+        type: 'department'
+        state: true
+        sortOrder: 7
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_company_<numberBetween(1, 5)>'
+    dept_8:
+        name: '行政部'
+        alias: '行政部'
+        code: 'ADMIN001'
+        type: 'department'
+        state: true
+        sortOrder: 8
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_company_<numberBetween(1, 5)>'
+    dept_9:
+        name: '采购部'
+        alias: '采购部'
+        code: 'PROC001'
+        type: 'department'
+        state: true
+        sortOrder: 9
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_company_<numberBetween(1, 5)>'
+    dept_10:
+        name: '质量部'
+        alias: '质量部'
+        code: 'QA001'
+        type: 'department'
+        state: true
+        sortOrder: 10
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_company_<numberBetween(1, 5)>'
+    
+    # 二级部门
+    # 人力资源部下属部门
+    dept_2_1:
+        name: '招聘组'
+        alias: '招聘组'
+        code: 'HR002'
+        type: 'department'
+        state: true
+        sortOrder: 1
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_1'
+    dept_2_2:
+        name: '培训组'
+        alias: '培训组'
+        code: 'HR003'
+        type: 'department'
+        state: true
+        sortOrder: 2
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_1'
+    dept_2_3:
+        name: '薪酬组'
+        alias: '薪酬组'
+        code: 'HR004'
+        type: 'department'
+        state: true
+        sortOrder: 3
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_1'
+    # 财务部下属部门
+    dept_2_4:
+        name: '会计组'
+        alias: '会计组'
+        code: 'FIN002'
+        type: 'department'
+        state: true
+        sortOrder: 4
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2'
+    dept_2_5:
+        name: '出纳组'
+        alias: '出纳组'
+        code: 'FIN003'
+        type: 'department'
+        state: true
+        sortOrder: 5
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2'
+    dept_2_6:
+        name: '审计组'
+        alias: '审计组'
+        code: 'FIN004'
+        type: 'department'
+        state: true
+        sortOrder: 6
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2'
+    # 技术部下属部门
+    dept_2_7:
+        name: '开发组'
+        alias: '开发组'
+        code: 'TECH002'
+        type: 'department'
+        state: true
+        sortOrder: 7
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_3'
+    dept_2_8:
+        name: '测试组'
+        alias: '测试组'
+        code: 'TECH003'
+        type: 'department'
+        state: true
+        sortOrder: 8
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_3'
+    dept_2_9:
+        name: '运维组'
+        alias: '运维组'
+        code: 'TECH004'
+        type: 'department'
+        state: true
+        sortOrder: 9
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_3'
+    # 市场部下属部门
+    dept_2_10:
+        name: '市场策划组'
+        alias: '市场策划组'
+        code: 'MKT002'
+        type: 'department'
+        state: true
+        sortOrder: 10
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_4'
+    dept_2_11:
+        name: '品牌推广组'
+        alias: '品牌推广组'
+        code: 'MKT003'
+        type: 'department'
+        state: true
+        sortOrder: 11
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_4'
+    dept_2_12:
+        name: '市场调研组'
+        alias: '市场调研组'
+        code: 'MKT004'
+        type: 'department'
+        state: true
+        sortOrder: 12
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_4'
+    # 销售部下属部门
+    dept_2_13:
+        name: '华北销售组'
+        alias: '华北销售组'
+        code: 'SALES002'
+        type: 'department'
+        state: true
+        sortOrder: 13
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_5'
+    dept_2_14:
+        name: '华南销售组'
+        alias: '华南销售组'
+        code: 'SALES003'
+        type: 'department'
+        state: true
+        sortOrder: 14
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_5'
+    dept_2_15:
+        name: '华东销售组'
+        alias: '华东销售组'
+        code: 'SALES004'
+        type: 'department'
+        state: true
+        sortOrder: 15
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_5'
+    # 运营部下属部门
+    dept_2_16:
+        name: '客服组'
+        alias: '客服组'
+        code: 'OPS002'
+        type: 'department'
+        state: true
+        sortOrder: 16
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_6'
+    dept_2_17:
+        name: '物流组'
+        alias: '物流组'
+        code: 'OPS003'
+        type: 'department'
+        state: true
+        sortOrder: 17
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_6'
+    dept_2_18:
+        name: '仓储组'
+        alias: '仓储组'
+        code: 'OPS004'
+        type: 'department'
+        state: true
+        sortOrder: 18
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_6'
+    # 法务部下属部门
+    dept_2_19:
+        name: '合同组'
+        alias: '合同组'
+        code: 'LEGAL002'
+        type: 'department'
+        state: true
+        sortOrder: 19
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_7'
+    dept_2_20:
+        name: '知识产权组'
+        alias: '知识产权组'
+        code: 'LEGAL003'
+        type: 'department'
+        state: true
+        sortOrder: 20
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_7'
+    # 行政部下属部门
+    dept_2_21:
+        name: '办公室'
+        alias: '办公室'
+        code: 'ADMIN002'
+        type: 'department'
+        state: true
+        sortOrder: 21
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_8'
+    dept_2_22:
+        name: '后勤组'
+        alias: '后勤组'
+        code: 'ADMIN003'
+        type: 'department'
+        state: true
+        sortOrder: 22
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_8'
+    # 采购部下属部门
+    dept_2_23:
+        name: '原材料采购组'
+        alias: '原材料采购组'
+        code: 'PROC002'
+        type: 'department'
+        state: true
+        sortOrder: 23
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_9'
+    dept_2_24:
+        name: '设备采购组'
+        alias: '设备采购组'
+        code: 'PROC003'
+        type: 'department'
+        state: true
+        sortOrder: 24
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_9'
+    # 质量部下属部门
+    dept_2_25:
+        name: '质检组'
+        alias: '质检组'
+        code: 'QA002'
+        type: 'department'
+        state: true
+        sortOrder: 25
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_10'
+    
+    # 三级部门
+    # 招聘组下属部门
+    dept_3_1:
+        name: '校园招聘小组'
+        alias: '校园招聘小组'
+        code: 'HR005'
+        type: 'department'
+        state: true
+        sortOrder: 1
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_1'
+    dept_3_2:
+        name: '社会招聘小组'
+        alias: '社会招聘小组'
+        code: 'HR006'
+        type: 'department'
+        state: true
+        sortOrder: 2
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_1'
+    # 培训组下属部门
+    dept_3_3:
+        name: '新员工培训小组'
+        alias: '新员工培训小组'
+        code: 'HR007'
+        type: 'department'
+        state: true
+        sortOrder: 3
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_2'
+    dept_3_4:
+        name: '技能培训小组'
+        alias: '技能培训小组'
+        code: 'HR008'
+        type: 'department'
+        state: true
+        sortOrder: 4
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_2'
+    # 会计组下属部门
+    dept_3_5:
+        name: '成本会计小组'
+        alias: '成本会计小组'
+        code: 'FIN005'
+        type: 'department'
+        state: true
+        sortOrder: 5
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_4'
+    dept_3_6:
+        name: '管理会计小组'
+        alias: '管理会计小组'
+        code: 'FIN006'
+        type: 'department'
+        state: true
+        sortOrder: 6
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_4'
+    # 开发组下属部门
+    dept_3_7:
+        name: '前端开发小组'
+        alias: '前端开发小组'
+        code: 'TECH005'
+        type: 'department'
+        state: true
+        sortOrder: 7
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_7'
+    dept_3_8:
+        name: '后端开发小组'
+        alias: '后端开发小组'
+        code: 'TECH006'
+        type: 'department'
+        state: true
+        sortOrder: 8
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_7'
+    dept_3_9:
+        name: '移动开发小组'
+        alias: '移动开发小组'
+        code: 'TECH007'
+        type: 'department'
+        state: true
+        sortOrder: 9
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_7'
+    # 测试组下属部门
+    dept_3_10:
+        name: '功能测试小组'
+        alias: '功能测试小组'
+        code: 'TECH008'
+        type: 'department'
+        state: true
+        sortOrder: 10
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_8'
+    dept_3_11:
+        name: '性能测试小组'
+        alias: '性能测试小组'
+        code: 'TECH009'
+        type: 'department'
+        state: true
+        sortOrder: 11
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_8'
+    dept_3_12:
+        name: '自动化测试小组'
+        alias: '自动化测试小组'
+        code: 'TECH010'
+        type: 'department'
+        state: true
+        sortOrder: 12
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_8'
+    # 运维组下属部门
+    dept_3_13:
+        name: '系统运维小组'
+        alias: '系统运维小组'
+        code: 'TECH011'
+        type: 'department'
+        state: true
+        sortOrder: 13
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_9'
+    dept_3_14:
+        name: '网络运维小组'
+        alias: '网络运维小组'
+        code: 'TECH012'
+        type: 'department'
+        state: true
+        sortOrder: 14
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_9'
+    # 市场策划组下属部门
+    dept_3_15:
+        name: '活动策划小组'
+        alias: '活动策划小组'
+        code: 'MKT005'
+        type: 'department'
+        state: true
+        sortOrder: 15
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_10'
+    dept_3_16:
+        name: '产品策划小组'
+        alias: '产品策划小组'
+        code: 'MKT006'
+        type: 'department'
+        state: true
+        sortOrder: 16
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_10'
+    # 品牌推广组下属部门
+    dept_3_17:
+        name: '线上推广小组'
+        alias: '线上推广小组'
+        code: 'MKT007'
+        type: 'department'
+        state: true
+        sortOrder: 17
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_11'
+    dept_3_18:
+        name: '线下推广小组'
+        alias: '线下推广小组'
+        code: 'MKT008'
+        type: 'department'
+        state: true
+        sortOrder: 18
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_11'
+    # 华北销售组下属部门
+    dept_3_19:
+        name: '北京销售小组'
+        alias: '北京销售小组'
+        code: 'SALES005'
+        type: 'department'
+        state: true
+        sortOrder: 19
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_13'
+    dept_3_20:
+        name: '天津销售小组'
+        alias: '天津销售小组'
+        code: 'SALES006'
+        type: 'department'
+        state: true
+        sortOrder: 20
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_13'
+    dept_3_21:
+        name: '河北销售小组'
+        alias: '河北销售小组'
+        code: 'SALES007'
+        type: 'department'
+        state: true
+        sortOrder: 21
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_13'
+    # 华南销售组下属部门
+    dept_3_22:
+        name: '广州销售小组'
+        alias: '广州销售小组'
+        code: 'SALES008'
+        type: 'department'
+        state: true
+        sortOrder: 22
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_14'
+    dept_3_23:
+        name: '深圳销售小组'
+        alias: '深圳销售小组'
+        code: 'SALES009'
+        type: 'department'
+        state: true
+        sortOrder: 23
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_14'
+    dept_3_24:
+        name: '珠海销售小组'
+        alias: '珠海销售小组'
+        code: 'SALES010'
+        type: 'department'
+        state: true
+        sortOrder: 24
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_14'
+    # 华东销售组下属部门
+    dept_3_25:
+        name: '上海销售小组'
+        alias: '上海销售小组'
+        code: 'SALES011'
+        type: 'department'
+        state: true
+        sortOrder: 25
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_15'
+    dept_3_26:
+        name: '杭州销售小组'
+        alias: '杭州销售小组'
+        code: 'SALES012'
+        type: 'department'
+        state: true
+        sortOrder: 26
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_15'
+    dept_3_27:
+        name: '南京销售小组'
+        alias: '南京销售小组'
+        code: 'SALES013'
+        type: 'department'
+        state: true
+        sortOrder: 27
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_15'
+    # 客服组下属部门
+    dept_3_28:
+        name: '售前客服小组'
+        alias: '售前客服小组'
+        code: 'OPS005'
+        type: 'department'
+        state: true
+        sortOrder: 28
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_16'
+    dept_3_29:
+        name: '售后客服小组'
+        alias: '售后客服小组'
+        code: 'OPS006'
+        type: 'department'
+        state: true
+        sortOrder: 29
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_16'
+    dept_3_30:
+        name: '投诉处理小组'
+        alias: '投诉处理小组'
+        code: 'OPS007'
+        type: 'department'
+        state: true
+        sortOrder: 30
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_16'
+    # 物流组下属部门
+    dept_3_31:
+        name: '配送小组'
+        alias: '配送小组'
+        code: 'OPS008'
+        type: 'department'
+        state: true
+        sortOrder: 31
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_17'
+    dept_3_32:
+        name: '运输小组'
+        alias: '运输小组'
+        code: 'OPS009'
+        type: 'department'
+        state: true
+        sortOrder: 32
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_17'
+    # 仓储组下属部门
+    dept_3_33:
+        name: '入库小组'
+        alias: '入库小组'
+        code: 'OPS010'
+        type: 'department'
+        state: true
+        sortOrder: 33
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_18'
+    dept_3_34:
+        name: '出库小组'
+        alias: '出库小组'
+        code: 'OPS011'
+        type: 'department'
+        state: true
+        sortOrder: 34
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_18'
+    dept_3_35:
+        name: '库存管理小组'
+        alias: '库存管理小组'
+        code: 'OPS012'
+        type: 'department'
+        state: true
+        sortOrder: 35
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_18'
+    # 合同组下属部门
+    dept_3_36:
+        name: '销售合同小组'
+        alias: '销售合同小组'
+        code: 'LEGAL004'
+        type: 'department'
+        state: true
+        sortOrder: 36
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_19'
+    dept_3_37:
+        name: '采购合同小组'
+        alias: '采购合同小组'
+        code: 'LEGAL005'
+        type: 'department'
+        state: true
+        sortOrder: 37
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_19'
+    # 知识产权组下属部门
+    dept_3_38:
+        name: '专利申请小组'
+        alias: '专利申请小组'
+        code: 'LEGAL006'
+        type: 'department'
+        state: true
+        sortOrder: 38
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_20'
+    dept_3_39:
+        name: '商标注册小组'
+        alias: '商标注册小组'
+        code: 'LEGAL007'
+        type: 'department'
+        state: true
+        sortOrder: 39
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_20'
+    # 办公室下属部门
+    dept_3_40:
+        name: '文秘小组'
+        alias: '文秘小组'
+        code: 'ADMIN004'
+        type: 'department'
+        state: true
+        sortOrder: 40
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_21'
+    dept_3_41:
+        name: '档案管理小组'
+        alias: '档案管理小组'
+        code: 'ADMIN005'
+        type: 'department'
+        state: true
+        sortOrder: 41
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_21'
+    # 后勤组下属部门
+    dept_3_42:
+        name: '保洁小组'
+        alias: '保洁小组'
+        code: 'ADMIN006'
+        type: 'department'
+        state: true
+        sortOrder: 42
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_22'
+    dept_3_43:
+        name: '安保小组'
+        alias: '安保小组'
+        code: 'ADMIN007'
+        type: 'department'
+        state: true
+        sortOrder: 43
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_22'
+    dept_3_44:
+        name: '食堂管理小组'
+        alias: '食堂管理小组'
+        code: 'ADMIN008'
+        type: 'department'
+        state: true
+        sortOrder: 44
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_22'
+    # 原材料采购组下属部门
+    dept_3_45:
+        name: '钢材采购小组'
+        alias: '钢材采购小组'
+        code: 'PROC004'
+        type: 'department'
+        state: true
+        sortOrder: 45
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_23'
+    dept_3_46:
+        name: '化工原料采购小组'
+        alias: '化工原料采购小组'
+        code: 'PROC005'
+        type: 'department'
+        state: true
+        sortOrder: 46
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_23'
+    # 设备采购组下属部门
+    dept_3_47:
+        name: '生产设备采购小组'
+        alias: '生产设备采购小组'
+        code: 'PROC006'
+        type: 'department'
+        state: true
+        sortOrder: 47
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_24'
+    dept_3_48:
+        name: '办公设备采购小组'
+        alias: '办公设备采购小组'
+        code: 'PROC007'
+        type: 'department'
+        state: true
+        sortOrder: 48
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_24'
+    # 质检组下属部门
+    dept_3_49:
+        name: '产品质检小组'
+        alias: '产品质检小组'
+        code: 'QA003'
+        type: 'department'
+        state: true
+        sortOrder: 49
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_25'
+    dept_3_50:
+        name: '原料质检小组'
+        alias: '原料质检小组'
+        code: 'QA004'
+        type: 'department'
+        state: true
+        sortOrder: 50
+        company: '@company_<numberBetween(1, 5)>'
+        parent: '@dept_2_25'
+
+# 岗位级别数据
+App\Entity\Organization\PositionLevel:
+    position_level_{1..5}:
+        name: '<randomElement(["初级", "中级", "高级", "专家级", "资深级"])>'
+        code: 'L0<current()>'
+        description: <chineseText(80)>
+        levelOrder: <current()>
+        state: true
+        sortOrder: <numberBetween(1, 30)>
+
+# 岗位数据
 App\Entity\Organization\Position:
-    position_{1..15}:
-        name: <randomElement(['总经理', '副总经理', '人事经理', '财务经理', '技术总监', '产品经理', '销售经理', '市场经理', '运营经理', '客服经理', '研发工程师', '测试工程师', 'UI设计师', '前端工程师', '后端工程师', '数据分析师', '项目经理', '质量经理', '采购经理', '行政专员'])>
-        code: <regexify('[A-Z]{2}[0-9]{3}')>
-        responsibility: <text(200)>
-        requirement: <text(150)>
-        headcount: <numberBetween(1, 10)>
-        state: <boolean()>
+    position_{1..100}:
+        name: '<jobTitle()>'
+        alias: '<jobTitle()>'
+        code: '<regexify("POS[0-9]{3}")>'
+        description: <chineseText(100)>
+        requirement: <chineseText(150)>
+        state: true
         sortOrder: <numberBetween(1, 100)>
-        remark: 30%? <text(100)>
+        department: '@dept_3_<numberBetween(1, 50)>'
+        level: '@position_level_<numberBetween(1, 5)>'
+        company: '@company_<numberBetween(1, 5)>'
+
+# 员工数据
+App\Entity\Organization\Employee:
+    employee_{1..200}:
+        employeeNo: 'EMP<current()>'
+        username: 'user<current()>'
+        password: '<password()>'
+        name: <chineseName()>
+        alias: <chineseName()>
+        code: '<regexify("EMP[0-9]{4}")>'
+        gender: '<randomElement(["male", "female"])>'
+        birthday: <dateTimeBetween('-40 years', '-20 years')>
+        phone: <chineseMobileNumber()>
+        email: <chineseEmail()>
+        address: <chineseAddress()>
+        idCard: <regexify('[1-9][0-9]{5}(19|20)[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[0-9]{3}[0-9Xx]')>
+        entryDate: <dateTimeBetween('-5 years', 'now')>
+        state: true
+        sortOrder: <numberBetween(1, 200)>
+        position: '@position_<numberBetween(1, 100)>'
+        department: '@dept_3_<numberBetween(1, 50)>'
+        company: '@company_<numberBetween(1, 5)>'

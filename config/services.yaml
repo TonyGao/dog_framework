@@ -83,7 +83,9 @@ services:
                 php-cs-fixer: '%kernel.project_dir%/vendor/bin/php-cs-fixer fix'
                 prettier: '%kernel.project_dir%/node_modules/.bin/prettier --write'
                 twigcs: '%kernel.project_dir%/vendor/bin/twigcs'
-    App\Lib\DataFixtures\Faker\Provider\ChinseseNameProvider:
+    # 批量注册所有 Faker Provider
+    App\Lib\DataFixtures\Faker\Provider\:
+        resource: '../src/Lib/DataFixtures/Faker/Provider/'
         tags: ['hautelook_alice.provider']
     App\Service\Platform\ParameterService:
         arguments:
