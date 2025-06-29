@@ -243,7 +243,10 @@ EOF
                 return;
             }
             
-            foreach ($entityClasses as $entityClass) {
+            // 按照依赖关系排序，先清空依赖表，再清空被依赖表
+            $sortedClasses = $this->sortEntitiesByDependency($entityClasses);
+            
+            foreach ($sortedClasses as $entityClass) {
                 $this->truncateEntityTable($entityClass, $io);
             }
         } catch (\Exception $e) {
@@ -266,6 +269,32 @@ EOF
         }
         
         return array_unique($entityClasses);
+    }
+
+    /**
+     * 根据依赖关系对实体类进行排序
+     * 返回按照清空顺序排列的实体类数组（依赖表在前，被依赖表在后）
+     */
+    private function sortEntitiesByDependency(array $entityClasses): array
+    {
+        // 定义组织架构实体的依赖关系优先级
+        // 数字越小优先级越高（越先清空）
+        $dependencyOrder = [
+            'App\\Entity\\Organization\\Position' => 1,        // 岗位依赖其他所有表
+            'App\\Entity\\Organization\\Department' => 2,     // 部门被岗位依赖
+            'App\\Entity\\Organization\\PositionLevel' => 3, // 岗位级别被岗位依赖
+            'App\\Entity\\Organization\\Company' => 4,       // 公司被部门和岗位依赖
+            'App\\Entity\\Organization\\Corporation' => 5,   // 集团被公司依赖
+        ];
+        
+        // 按照依赖顺序排序
+        usort($entityClasses, function($a, $b) use ($dependencyOrder) {
+            $orderA = $dependencyOrder[$a] ?? 999; // 未定义的实体放在最后
+            $orderB = $dependencyOrder[$b] ?? 999;
+            return $orderA <=> $orderB;
+        });
+        
+        return $entityClasses;
     }
 
     /**
