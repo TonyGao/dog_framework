@@ -1,0 +1,132 @@
+<div class="ef-drawer-container" style="z-index: 1001; display: none;" id="{{ drawerId }}">
+    <div class="ef-drawer-mask" maskid="{{ drawerId }}"></div>
+    <div class="ef-drawer" style="right: -600px; width: 600px;">
+        <div class="ef-drawer-header ef-drawer-header-gradient">
+            <div class="ef-drawer-title">
+                {{ title }}
+            </div>
+            <div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn">
+                <span class="ef-icon-hover">
+                    <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                    </svg>
+                </span>
+            </div>
+        </div>
+        <div class="ef-drawer-body" style="padding: 20px; overflow-y: auto;">
+            {{ form_start(form, {'attr': {'class': 'ef-form', 'id': 'position-form-' ~ position.id}}) }}
+                <div class="ef-form-section">
+                    <div class="ef-form-section-title">基本信息</div>
+                    <div class="ef-form-row">
+                        <div class="ef-form-col">
+                            {{ form_row(form.name) }}
+                        </div>
+                        <div class="ef-form-col">
+                            {{ form_row(form.code) }}
+                        </div>
+                    </div>
+                    <div class="ef-form-row">
+                        <div class="ef-form-col">
+                            {{ form_row(form.department) }}
+                        </div>
+                        <div class="ef-form-col">
+                            {{ form_row(form.type) }}
+                        </div>
+                    </div>
+                    <div class="ef-form-row">
+                        <div class="ef-form-col">
+                            {{ form_row(form.level) }}
+                        </div>
+                        <div class="ef-form-col">
+                            {{ form_row(form.parent) }}
+                        </div>
+                    </div>
+                    <div class="ef-form-row">
+                        <div class="ef-form-col">
+                            {{ form_row(form.headcount) }}
+                        </div>
+                        <div class="ef-form-col">
+                            {{ form_row(form.sortOrder) }}
+                        </div>
+                    </div>
+                    <div class="ef-form-row">
+                        <div class="ef-form-col">
+                            {{ form_row(form.state) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ef-form-section">
+                    <div class="ef-form-section-title">详细信息</div>
+                    <div class="ef-form-row">
+                        <div class="ef-form-col">
+                            {{ form_row(form.responsibility) }}
+                        </div>
+                    </div>
+                    <div class="ef-form-row">
+                        <div class="ef-form-col">
+                            {{ form_row(form.requirement) }}
+                        </div>
+                    </div>
+                    <div class="ef-form-row">
+                        <div class="ef-form-col">
+                            {{ form_row(form.remark) }}
+                        </div>
+                    </div>
+                </div>
+            {{ form_end(form, {'render_rest': false}) }}
+        </div>
+        <div class="ef-drawer-footer">
+            <button class="cancelDrawer btn secondary medium" type="button">取消</button>
+            <button class="btn primary medium" type="button" onclick="submitPositionForm({{ position.id }})">保存</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function submitPositionForm(positionId) {
+    const form = document.getElementById('position-form-' + positionId);
+    if (form) {
+        const formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 显示成功消息
+                showMessage(data.message, 'success');
+                // 关闭抽屉
+                hideDrawer('drawer' + positionId);
+                // 刷新页面或更新数据
+                location.reload();
+            } else {
+                // 显示错误消息
+                showMessage(data.message, 'error');
+                if (data.errors && data.errors.length > 0) {
+                    data.errors.forEach(error => {
+                        showMessage(error, 'error');
+                    });
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('提交失败，请重试', 'error');
+        });
+    }
+}
+
+// 简单的消息显示函数
+function showMessage(message, type) {
+    // 这里可以根据你的UI框架来实现消息显示
+    // 暂时使用alert
+    if (type === 'error') {
+        alert('错误: ' + message);
+    } else {
+        alert(message);
+    }
+}
+</script>
