@@ -1,6 +1,1 @@
-public/fonts/google_fonts/*.ttf filter=lfs diff=lfs merge=lfs -text
-public/fonts/google_fonts/*.zip filter=lfs diff=lfs merge=lfs -text
-public/fonts/organized_fonts/**/*.ttf filter=lfs diff=lfs merge=lfs -text
-public/fonts/organized_fonts/**/*.otf filter=lfs diff=lfs merge=lfs -text
-public/fonts/organized_fonts/**/*.woff filter=lfs diff=lfs merge=lfs -text
-public/fonts/organized_fonts/**/*.woff2 filter=lfs diff=lfs merge=lfs -text
+
