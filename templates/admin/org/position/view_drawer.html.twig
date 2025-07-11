@@ -1,0 +1,168 @@
+<div class="ef-drawer-container" style="z-index: 1001; display: none;" id="{{ drawerId }}">
+    <div class="ef-drawer-mask" maskid="{{ drawerId }}"></div>
+    <div class="ef-drawer" style="right: -650px; width: 650px; box-shadow: -4px 0 20px rgba(0,0,0,0.15);">
+        <div class="ef-drawer-header ef-drawer-header-gradient">
+            <div class="ef-drawer-title">
+                <i class="fa-solid fa-user-tie" style="margin-right: 12px; font-size: 18px;"></i>
+                {{ position.name }}
+                <span style="font-size: 14px; font-weight: 400; margin-left: 8px; opacity: 0.8;">岗位详情</span>
+            </div>
+            <div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn">
+                <span class="ef-icon-hover">
+                    <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                    </svg>
+                </span>
+            </div>
+        </div>
+        <div class="ef-drawer-body ef-drawer-body-view">
+            <!-- 基本信息卡片 -->
+            <div class="ef-card" style="margin: 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; background: white;">
+                <div class="ef-card-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 6px 6px 0 0;">
+                     <div class="ef-card-title" style="font-size: 14px; font-weight: 600; color: #1e293b; display: flex; align-items: center;">
+                         <i class="fa-solid fa-info-circle" style="margin-right: 6px; color: #3b82f6; font-size: 13px;"></i>
+                         基本信息
+                     </div>
+                 </div>
+                 <div class="ef-card-body" style="padding: 16px;">
+                     <div class="ef-detail-view" style="display: grid; gap: 8px;">
+                        <div class="ef-detail-row" style="display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
+                            <div class="ef-detail-label" style="font-weight: 500; color: #64748b; font-size: 13px;">岗位名称</div>
+                            <div class="ef-detail-value" style="font-weight: 600; color: #1e293b; font-size: 14px;">{{ position.name }}</div>
+                        </div>
+                        <div class="ef-detail-row" style="display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
+                            <div class="ef-detail-label" style="font-weight: 500; color: #64748b; font-size: 13px;">岗位编码</div>
+                            <div class="ef-detail-value" style="color: #1e293b; font-size: 13px;">{{ position.code }}</div>
+                        </div>
+                        <div class="ef-detail-row" style="display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
+                            <div class="ef-detail-label" style="font-weight: 500; color: #64748b; font-size: 13px;">所属部门</div>
+                            <div class="ef-detail-value" style="color: #1e293b; font-size: 13px;">{{ position.department ? position.department.name : '<span style="color: #94a3b8; font-style: italic;">无</span>' }}</div>
+                        </div>
+                        <div class="ef-detail-row" style="display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
+                            <div class="ef-detail-label" style="font-weight: 500; color: #64748b; font-size: 13px;">岗位类型</div>
+                            <div class="ef-detail-value" style="color: #1e293b; font-size: 13px;">{{ position.type ? position.type.stringValue : '<span style="color: #94a3b8; font-style: italic;">无</span>' }}</div>
+                        </div>
+                        <div class="ef-detail-row" style="display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
+                            <div class="ef-detail-label" style="font-weight: 500; color: #64748b; font-size: 13px;">岗位级别</div>
+                            <div class="ef-detail-value" style="color: #1e293b; font-size: 13px;">{{ position.level ? position.level.name : '<span style="color: #94a3b8; font-style: italic;">无</span>' }}</div>
+                        </div>
+                        <div class="ef-detail-row" style="display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
+                            <div class="ef-detail-label" style="font-weight: 500; color: #64748b; font-size: 13px;">上级岗位</div>
+                            <div class="ef-detail-value" style="color: #1e293b; font-size: 13px;">{{ position.parent ? position.parent.name : '<span style="color: #94a3b8; font-style: italic;">无</span>' }}</div>
+                        </div>
+                        <div class="ef-detail-row" style="display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
+                            <div class="ef-detail-label" style="font-weight: 500; color: #64748b; font-size: 13px;">编制人数</div>
+                            <div class="ef-detail-value" style="color: #1e293b; font-size: 13px; font-weight: 500;">{{ position.headcount ?: '<span style="color: #94a3b8; font-style: italic;">未设置</span>' }}</div>
+                        </div>
+                        <div class="ef-detail-row" style="display: grid; grid-template-columns: 80px 1fr; gap: 10px; align-items: center; padding: 6px 0;">
+                            <div class="ef-detail-label" style="font-weight: 500; color: #64748b; font-size: 13px;">状态</div>
+                            <div class="ef-detail-value">
+                                {% if position.state %}
+                                    <span class="ef-badge ef-badge-success" style="background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; padding: 3px 10px; border-radius: 16px; font-size: 11px; font-weight: 500;">✓ 启用</span>
+                                {% else %}
+                                    <span class="ef-badge ef-badge-danger" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 3px 10px; border-radius: 16px; font-size: 11px; font-weight: 500;">✗ 停用</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if position.responsibility %}
+            <!-- 岗位职责卡片 -->
+            <div class="ef-card" style="margin: 0 12px 12px 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; background: white;">
+                <div class="ef-card-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 6px 6px 0 0;">
+                    <div class="ef-card-title" style="font-size: 14px; font-weight: 600; color: #1e293b; display: flex; align-items: center;">
+                        <i class="fa-solid fa-tasks" style="margin-right: 6px; color: #8b5cf6; font-size: 13px;"></i>
+                        岗位职责
+                    </div>
+                </div>
+                <div class="ef-card-body" style="padding: 16px;">
+                    <div class="ef-detail-content" style="line-height: 1.5; color: #374151; font-size: 13px; background: #f9fafb; padding: 12px; border-radius: 4px; border-left: 3px solid #8b5cf6;">
+                        {{ position.responsibility|nl2br }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if position.requirement %}
+            <!-- 任职要求卡片 -->
+            <div class="ef-card" style="margin: 0 12px 12px 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; background: white;">
+                <div class="ef-card-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 6px 6px 0 0;">
+                    <div class="ef-card-title" style="font-size: 14px; font-weight: 600; color: #1e293b; display: flex; align-items: center;">
+                        <i class="fa-solid fa-graduation-cap" style="margin-right: 6px; color: #f59e0b; font-size: 13px;"></i>
+                        任职要求
+                    </div>
+                </div>
+                <div class="ef-card-body" style="padding: 16px;">
+                    <div class="ef-detail-content" style="line-height: 1.5; color: #374151; font-size: 13px; background: #fffbeb; padding: 12px; border-radius: 4px; border-left: 3px solid #f59e0b;">
+                        {{ position.requirement|nl2br }}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- 岗位人员卡片 -->
+            <div class="ef-card" style="margin: 0 12px 12px 12px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; background: white;">
+                <div class="ef-card-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 6px 6px 0 0;">
+                    <div class="ef-card-title" style="font-size: 14px; font-weight: 600; color: #1e293b; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="display: flex; align-items: center;">
+                            <i class="fa-solid fa-users" style="margin-right: 6px; color: #10b981; font-size: 13px;"></i>
+                            岗位人员
+                        </span>
+                        <span style="background: #dbeafe; color: #1d4ed8; padding: 3px 10px; border-radius: 16px; font-size: 11px; font-weight: 500;">{{ employees|length }} 人</span>
+                    </div>
+                </div>
+                <div class="ef-card-body" style="padding: 0;">
+                    {% if employees|length > 0 %}
+                        <div class="ef-table ef-table-size-medium" style="border: none;">
+                            <div class="ef-table-container">
+                                <table class="ef-table-element" style="border-collapse: collapse; width: 100%;">
+                                    <thead>
+                                        <tr class="ef-table-tr" style="background: #f8fafc;">
+                                            <th class="ef-table-th" style="padding: 8px 16px; font-weight: 600; color: #374151; font-size: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">员工姓名</th>
+                                            <th class="ef-table-th" style="padding: 8px 16px; font-weight: 600; color: #374151; font-size: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">工号</th>
+                                            <th class="ef-table-th" style="padding: 8px 16px; font-weight: 600; color: #374151; font-size: 12px; text-align: left; border-bottom: 1px solid #e2e8f0;">入职日期</th>
+                                            <th class="ef-table-th" style="padding: 8px 16px; font-weight: 600; color: #374151; font-size: 12px; text-align: center; border-bottom: 1px solid #e2e8f0;">状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for employee in employees %}
+                                            <tr class="ef-table-tr" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8fafc'" onmouseout="this.style.backgroundColor='transparent'">
+                                                <td class="ef-table-td" style="padding: 8px 16px; color: #1e293b; font-size: 13px; font-weight: 500; border-bottom: 1px solid #f1f5f9;">{{ employee.name }}</td>
+                                                <td class="ef-table-td" style="padding: 8px 16px; color: #64748b; font-size: 12px; font-family: 'Monaco', 'Menlo', monospace; border-bottom: 1px solid #f1f5f9;">{{ employee.employeeNo }}</td>
+                                                <td class="ef-table-td" style="padding: 8px 16px; color: #64748b; font-size: 12px; border-bottom: 1px solid #f1f5f9;">{{ employee.hireDate ? employee.hireDate|date('Y-m-d') : '<span style="color: #94a3b8; font-style: italic;">未设置</span>' }}</td>
+                                                <td class="ef-table-td" style="padding: 8px 16px; text-align: center; border-bottom: 1px solid #f1f5f9;">
+                                                    {% if employee.status == 'active' %}
+                                                        <span class="ef-badge ef-badge-success" style="background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; padding: 3px 10px; border-radius: 16px; font-size: 11px; font-weight: 500;">✓ 在职</span>
+                                                    {% else %}
+                                                        <span class="ef-badge ef-badge-danger" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; padding: 3px 10px; border-radius: 16px; font-size: 11px; font-weight: 500;">✗ 离职</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="ef-empty-state" style="padding: 30px 16px; text-align: center;">
+                            <div class="ef-empty-state-content">
+                                <i class="fa-solid fa-user-slash" style="font-size: 28px; color: #cbd5e1; margin-bottom: 8px;"></i>
+                                <div class="ef-empty-state-text" style="color: #64748b; font-size: 13px; font-weight: 500;">暂无员工数据</div>
+                                <div style="color: #94a3b8; font-size: 11px; margin-top: 3px;">该岗位尚未分配员工</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="ef-drawer-footer ef-drawer-footer-view">
+            <button class="cancelDrawer btn secondary medium" type="button" style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; padding: 6px 14px; border-radius: 6px; font-weight: 500; transition: all 0.2s; cursor: pointer; display: flex; align-items: center; justify-content: center; min-height: 32px; font-size: 13px;" onmouseover="this.style.background='#f1f5f9'; this.style.borderColor='#cbd5e1'" onmouseout="this.style.background='#f8fafc'; this.style.borderColor='#e2e8f0'">关闭</button>
+            <a href="/admin/org/position/edit/{{ position.id }}" class="ef-button ef-button-small ef-button-edit edit-button" data-id="{{ position.id }}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 6px 16px; border-radius: 6px; font-weight: 500; transition: all 0.2s; cursor: pointer; display: flex; align-items: center; justify-content: center; min-height: 32px; text-decoration: none; font-size: 13px;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                <i class="fa-solid fa-edit" style="margin-right: 6px; font-size: 12px;"></i>
+                编辑
+            </a>
+        </div>
+    </div>
+</div>

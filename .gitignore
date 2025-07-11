@@ -30,3 +30,7 @@
 node_modules/
 node_modules/**/*
 ###< 忽略 node_modules
+
+###> 忽略字体文件，要支持所有字体格式
+*.woff2 *.ttf *.eot *.svg *.otf filter=lfs diff=lfs merge=lfs -text
+###< 忽略字体文件
