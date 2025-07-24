@@ -73,6 +73,12 @@ class Entity
     #[ORM\Column(type: "string", length: 80)]
     private $dataTableName;
 
+    /**
+     * 表格配置信息（列显示、排序、宽度等）
+     */
+    #[ORM\Column(type: "json", nullable: true)]
+    private $gridConfig = null;
+
     #[ORM\OneToMany(
         targetEntity: EntityProperty::class,
         mappedBy: "entity",
@@ -278,6 +284,26 @@ class Entity
     public function setDescription($description)
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * Get 表格配置信息
+     */
+    public function getGridConfig()
+    {
+        return $this->gridConfig;
+    }
+
+    /**
+     * Set 表格配置信息
+     *
+     * @return  self
+     */
+    public function setGridConfig($gridConfig)
+    {
+        $this->gridConfig = $gridConfig;
 
         return $this;
     }

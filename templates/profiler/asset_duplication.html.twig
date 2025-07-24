@@ -1,0 +1,163 @@
+{# templates/profiler/asset_duplication.html.twig #}
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set hasDup = collector.hasDuplicates %}
+    {% if hasDup %}
+        {% set icon %}
+            <span class="icon">🧩</span>
+            <span class="sf-toolbar-value">Duplicate!</span>
+        {% endset %}
+
+        {% set text %}
+            <div>
+                <b>Duplicate JS:</b> {{ collector.jsDuplicates|length }}
+            </div>
+            <div>
+                <b>Duplicate CSS:</b> {{ collector.cssDuplicates|length }}
+            </div>
+            {% if collector.jsDuplicates or collector.cssDuplicates %}
+                <div style="margin-top: 5px; font-size: 11px; color: #666;">
+                    点击查看详细位置信息
+                </div>
+            {% endif %}
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+<span class="label {{ collector.hasDuplicates ? 'label-status-warning' : '' }}">
+    <span class="icon">🧩</span>
+    <strong>Duplicate Assets</strong>
+</span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Duplicate Assets</h2>
+
+    {% if not collector.hasDuplicates %}
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 200px; text-align: center;">
+            <p style="font-size: 16px; color: #666; margin: 0;">No duplicate JS or CSS files found.</p>
+        </div>
+    {% endif %}
+
+    {% if collector.cssDuplicates %}
+        <h3>Duplicate CSS</h3>
+        {% for file, data in collector.cssDuplicates %}
+            <div style="margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; border-radius: 4px;">
+                <h4 style="margin: 0 0 10px 0; color: #d32f2f;">{{ file }} <small style="color: #666;">×{{ data.count }}</small></h4>
+                
+                {% if data.analysis is defined and data.analysis %}
+                    <div style="margin-bottom: 10px; padding: 8px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 3px;">
+                        <strong style="color: #856404;">分析:</strong> <span style="color: #856404;">{{ data.analysis }}</span>
+                    </div>
+                {% endif %}
+                
+                {% if data.is_consecutive is defined and data.is_consecutive %}
+                    <div style="margin-bottom: 10px; padding: 8px; background-color: #ffebee; border: 1px solid #f8bbd9; border-radius: 3px;">
+                        <strong style="color: #c62828;">⚠️ 连续重复:</strong> <span style="color: #c62828;">在同一模板中发现连续的重复引用</span>
+                    </div>
+                {% endif %}
+                
+                {% if data.same_template_duplicates is defined and data.same_template_duplicates|length > 0 %}
+                    <div style="margin-bottom: 10px; padding: 8px; background-color: #e8f5e8; border: 1px solid #c8e6c9; border-radius: 3px;">
+                        <strong style="color: #2e7d32;">📍 同模板重复:</strong>
+                        {% for template, duplicates in data.same_template_duplicates %}
+                            <div style="margin-left: 10px; color: #2e7d32;">
+                                {{ template }} ({{ duplicates|length }}次)
+                                {% if duplicates[0].line_number is defined %}
+                                    - 行号: {% for dup in duplicates %}{{ dup.line_number }}{% if not loop.last %}, {% endif %}{% endfor %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div style="margin-left: 20px;">
+                    {% for occurrence in data.occurrences %}
+                        {% set priorityColor = occurrence.priority == 'high' ? '#d32f2f' : (occurrence.priority == 'medium' ? '#f57c00' : '#666') %}
+                        {% set sourceTypeText = occurrence.source_type == 'base_template' ? '基础模板' : (occurrence.source_type == 'layout_template' ? '布局模板' : '页面模板') %}
+                        
+                        <div style="margin-bottom: 8px; padding: 5px; background-color: #f5f5f5; border-radius: 3px; border-left: 3px solid {{ priorityColor }};">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <strong>位置:</strong>
+                                <span style="font-size: 11px; color: {{ priorityColor }}; font-weight: bold;">{{ sourceTypeText }} ({{ occurrence.priority|upper }})</span>
+                            </div>
+                            {% if occurrence.context %}
+                                <span style="color: #1976d2;">{{ occurrence.context }}</span>
+                                {% if occurrence.line_number is defined %}
+                                    <span style="color: #666; margin-left: 10px;">行号: {{ occurrence.line_number }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span style="color: #666;">未知模板 (位置: {{ occurrence.position }})</span>
+                            {% endif %}
+                            <br>
+                            <code style="font-size: 12px; color: #666;">{{ occurrence.full_tag|slice(0, 100) }}{% if occurrence.full_tag|length > 100 %}...{% endif %}</code>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if collector.jsDuplicates %}
+        <h3>Duplicate JS</h3>
+        {% for file, data in collector.jsDuplicates %}
+            <div style="margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; border-radius: 4px;">
+                <h4 style="margin: 0 0 10px 0; color: #d32f2f;">{{ file }} <small style="color: #666;">×{{ data.count }}</small></h4>
+                
+                {% if data.analysis is defined and data.analysis %}
+                    <div style="margin-bottom: 10px; padding: 8px; background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 3px;">
+                        <strong style="color: #856404;">分析:</strong> <span style="color: #856404;">{{ data.analysis }}</span>
+                    </div>
+                {% endif %}
+                
+                {% if data.is_consecutive is defined and data.is_consecutive %}
+                    <div style="margin-bottom: 10px; padding: 8px; background-color: #ffebee; border: 1px solid #f8bbd9; border-radius: 3px;">
+                        <strong style="color: #c62828;">⚠️ 连续重复:</strong> <span style="color: #c62828;">在同一模板中发现连续的重复引用</span>
+                    </div>
+                {% endif %}
+                
+                {% if data.same_template_duplicates is defined and data.same_template_duplicates|length > 0 %}
+                    <div style="margin-bottom: 10px; padding: 8px; background-color: #e8f5e8; border: 1px solid #c8e6c9; border-radius: 3px;">
+                        <strong style="color: #2e7d32;">📍 同模板重复:</strong>
+                        {% for template, duplicates in data.same_template_duplicates %}
+                            <div style="margin-left: 10px; color: #2e7d32;">
+                                {{ template }} ({{ duplicates|length }}次)
+                                {% if duplicates[0].line_number is defined %}
+                                    - 行号: {% for dup in duplicates %}{{ dup.line_number }}{% if not loop.last %}, {% endif %}{% endfor %}
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                <div style="margin-left: 20px;">
+                    {% for occurrence in data.occurrences %}
+                        {% set priorityColor = occurrence.priority == 'high' ? '#d32f2f' : (occurrence.priority == 'medium' ? '#f57c00' : '#666') %}
+                        {% set sourceTypeText = occurrence.source_type == 'base_template' ? '基础模板' : (occurrence.source_type == 'layout_template' ? '布局模板' : '页面模板') %}
+                        
+                        <div style="margin-bottom: 8px; padding: 5px; background-color: #f5f5f5; border-radius: 3px; border-left: 3px solid {{ priorityColor }};">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <strong>位置:</strong>
+                                <span style="font-size: 11px; color: {{ priorityColor }}; font-weight: bold;">{{ sourceTypeText }} ({{ occurrence.priority|upper }})</span>
+                            </div>
+                            {% if occurrence.context %}
+                                <span style="color: #1976d2;">{{ occurrence.context }}</span>
+                                {% if occurrence.line_number is defined %}
+                                    <span style="color: #666; margin-left: 10px;">行号: {{ occurrence.line_number }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span style="color: #666;">未知模板 (位置: {{ occurrence.position }})</span>
+                            {% endif %}
+                            <br>
+                            <code style="font-size: 12px; color: #666;">{{ occurrence.full_tag|slice(0, 100) }}{% if occurrence.full_tag|length > 100 %}...{% endif %}</code>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

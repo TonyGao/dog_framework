@@ -43,14 +43,14 @@ class PositionType extends AbstractType
             ])
             ->add('type', EntityType::class, [
                 'class' => OptionValue::class,
-                'choice_label' => 'name',
+                'choice_label' => 'stringValue',
                 'label' => '岗位类型',
                 'required' => false,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('o')
-                        ->where('o.optionKey = :key')
+                        ->where('o.code = :key')
                         ->setParameter('key', 'position_type')
-                        ->orderBy('o.sortOrder', 'ASC');
+                        ->orderBy('o.orderNum', 'ASC');
                 },
             ])
             ->add('level', EntityType::class, [

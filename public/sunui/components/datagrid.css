@@ -191,6 +191,128 @@ input[type=number] {
   /* 移除max-content和min-width限制，使其与表格容器保持一致 */
 }
 
+/* 确保toolbar和ef-spin宽度保持一致 */
+.ef-table .toolbar {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ef-table .ef-spin {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 当表格设置了max-width时，确保toolbar和ef-spin都遵循相同的宽度限制 */
+.ef-table[style*="max-width"] .toolbar,
+.ef-table[style*="max-width"] .ef-spin {
+  max-width: inherit;
+  overflow-x: auto;
+}
+
+/* 确保在响应式布局中toolbar和ef-spin宽度一致 */
+@media (max-width: 768px) {
+  .ef-table .toolbar,
+  .ef-table .ef-spin {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* 防止抽屉弹出时影响页面布局 */
+body.ef-drawer-open {
+  overflow: hidden;
+  padding-right: 0;
+}
+
+/* 确保表格在抽屉打开时保持原有宽度 */
+.ef-table {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.ef-table .ef-table-element {
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* 防止表格容器在抽屉打开时变宽 */
+.ef-table-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+/* toolbar圆角样式 */
+.ef-table .toolbar {
+  border-radius: 8px 8px 0 0;
+}
+
+/* 分页栏圆角样式 */
+.ef-pagination-bar {
+  border-radius: 0 0 8px 8px;
+}
+
+/* 表头文字居中 */
+.ef-table-cell.ef-table-cell-align-center {
+  justify-content: center;
+}
+
+/* 操作列按钮样式 */
+.ef-table .ef-button-group .ef-button {
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #ddd;
+  font-size: 12px;
+  padding: 4px 8px;
+  margin: 0 2px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.ef-table .ef-button-group .ef-button:hover {
+  background-color: #e6e6e6;
+  color: #333;
+  border-color: #bbb;
+}
+
+.ef-table .ef-button-group .ef-button.ef-button-view {
+  background-color: #f5f5f5;
+  color: #666;
+  border-color: #ddd;
+}
+
+.ef-table .ef-button-group .ef-button.ef-button-view:hover {
+  background-color: #e6e6e6;
+  color: #333;
+  border-color: #bbb;
+}
+
+.ef-table .ef-button-group .ef-button.ef-button-edit {
+  background-color: #f5f5f5;
+  color: #666;
+  border-color: #ddd;
+}
+
+.ef-table .ef-button-group .ef-button.ef-button-edit:hover {
+  background-color: #e6e6e6;
+  color: #333;
+  border-color: #bbb;
+}
+
+.ef-table .ef-button-group .ef-button.ef-button-delete {
+  background-color: #f5f5f5;
+  color: #666;
+  border-color: #ddd;
+}
+
+.ef-table .ef-button-group .ef-button.ef-button-delete:hover {
+  background-color: #e6e6e6;
+  color: #333;
+  border-color: #bbb;
+}
+
 /* 这里是针对过滤器的样式 */
 
 /* 过滤器弹窗专用样式 */
