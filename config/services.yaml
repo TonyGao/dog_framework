@@ -90,6 +90,12 @@ services:
     App\Service\Platform\ParameterService:
         arguments:
             $parameterBag: '@parameter_bag'
+    # Profiler插件 资源重复 collector
+    App\DataCollector\AssetDuplicationCollector:
+        arguments:
+            $twigCollector: '@data_collector.twig'
+        tags:
+            - { name: data_collector, template: '@App/profiler/asset_duplication.html.twig', id: app.asset_duplication_collector }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

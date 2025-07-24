@@ -1,0 +1,36 @@
+{# templates/test/asset_duplication_test.html.twig #}
+{% extends "base.html.twig" %}
+
+{% block title %}Asset Duplication Test{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {# 故意重复引入相同的CSS文件 #}
+    <link rel="stylesheet" type="text/css" href="{{ asset('sunui/components/datagrid.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('layout.css', 'admin') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {# 故意重复引入相同的JS文件 #}
+    <script src="{{ asset('sunui/components/datagrid.js') }}"></script>
+    <script src="{{ asset('lib/jQuery/jquery-3.6.0.min.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+{# templates/test/asset_duplication_test.html.twig - body section #}
+<div class="container">
+    <h1>Asset Duplication Test Page</h1>
+    <p>这个页面用于测试 Asset Duplication Collector 的功能。</p>
+    <p>请打开 Symfony Web Profiler 查看重复资源的详细信息。</p>
+    
+    {# 在页面中再次引入一些资源 #}
+    <div>
+        {# 再次引入相同的CSS #}
+        <link rel="stylesheet" type="text/css" href="{{ asset('sunui/components/datagrid.css') }}">
+        
+        {# 再次引入相同的JS #}
+        <script src="{{ asset('sunui/components/datagrid.js') }}"></script>
+    </div>
+</div>
+{% endblock %}

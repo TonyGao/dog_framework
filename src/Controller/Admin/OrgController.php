@@ -10,6 +10,7 @@ use App\Entity\Organization\Department;
 use App\Entity\Organization\Corporation;
 use App\Entity\Organization\Position;
 use App\Entity\Organization\PositionLevel;
+use App\Entity\Platform\Entity;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Form\Organization\OrgDepartmentType;
 use App\Form\Organization\PositionType;
@@ -443,23 +444,64 @@ class OrgController extends BaseController
   #[Route('/admin/org/position', name: 'org_position')]
   public function positionList(Request $request, EntityManagerInterface $em): Response
   {
-    $positions = $em->getRepository(Position::class)->findAll();
-    $positionLevels = $em->getRepository(PositionLevel::class)->findAll();
+    // 如果是AJAX请求，返回分页数据
+    if ($request->isXmlHttpRequest()) {
+      $page = $request->query->getInt('page', 1);
+      $pageSize = $request->query->getInt('pageSize', 20);
+      $offset = ($page - 1) * $pageSize;
 
-    // 准备表格数据
-    $tableData = [];
-    foreach ($positions as $position) {
-      $tableData[] = [
-        'id' => $position->getId(),
-        'name' => $position->getName(),
-        'code' => $position->getCode(),
-        'department' => $position->getDepartment() ? $position->getDepartment()->getName() : '',
-        'level' => $position->getLevel() ? $position->getLevel()->getName() : '',
-        'parent' => $position->getParent() ? $position->getParent()->getName() : '',
-        'headcount' => $position->getHeadcount(),
-        'state' => $position->getState() ? '启用' : '停用',
-      ];
+      $repository = $em->getRepository(Position::class);
+      
+      // 获取表格配置
+      $entityRepo = $em->getRepository(Entity::class);
+      $entity = $entityRepo->findOneBy(['className' => 'Position']);
+      $gridConfig = $entity ? $entity->getGridConfig() : null;
+      
+      // 获取总数
+      $totalItems = $repository->createQueryBuilder('p')
+        ->select('COUNT(p.id)')
+        ->getQuery()
+        ->getSingleScalarResult();
+
+      // 获取分页数据
+      $positions = $repository->createQueryBuilder('p')
+        ->leftJoin('p.department', 'd')
+        ->leftJoin('p.level', 'l')
+        ->leftJoin('p.parent', 'parent')
+        ->setFirstResult($offset)
+        ->setMaxResults($pageSize)
+        ->getQuery()
+        ->getResult();
+
+      // 准备表格数据
+      $tableData = [];
+      foreach ($positions as $position) {
+        $tableData[] = [
+          'id' => $position->getId(),
+          'name' => $position->getName(),
+          'code' => $position->getCode(),
+          'department' => $position->getDepartment() ? $position->getDepartment()->getName() : '',
+          'level' => $position->getLevel() ? $position->getLevel()->getName() : '',
+          'parent' => $position->getParent() ? $position->getParent()->getName() : '',
+          'headcount' => $position->getHeadcount(),
+          'state' => $position->getState() ? '启用' : '停用',
+        ];
+      }
+
+      return $this->json([
+        'data' => $tableData,
+        'pagination' => [
+          'currentPage' => $page,
+          'pageSize' => $pageSize,
+          'totalItems' => $totalItems,
+          'totalPages' => ceil($totalItems / $pageSize)
+        ],
+        'gridConfig' => $gridConfig
+      ]);
     }
+
+    // 初始页面加载，只返回空数据和配置
+    $positionLevels = $em->getRepository(PositionLevel::class)->findAll();
 
     // 定义表格列配置
     $columns = [
@@ -473,7 +515,7 @@ class OrgController extends BaseController
     ];
 
     return $this->render('admin/org/position/index.html.twig', [
-      'tableData' => $tableData,
+      'tableData' => [], // 初始为空，通过AJAX加载
       'columns' => $columns,
       'positionLevels' => $positionLevels
     ]);
@@ -694,5 +736,48 @@ class OrgController extends BaseController
         'departmentInputId' => $departmentInputId
       ]);
     }
+  }
+
+  /**
+   * 返回岗位查看/编辑的drawer HTML
+   */
+  #[Route('/admin/org/position/drawer', name: 'api_org_position_drawer', methods: ['POST'])]
+  public function positionDrawer(Request $request, EntityManagerInterface $em): Response
+  {
+    $payload = $request->toArray();
+    $positionId = $payload['positionId'] ?? null;
+    $action = $payload['action'] ?? 'view'; // view 或 edit
+    
+    if (!$positionId) {
+      throw $this->createNotFoundException('岗位ID不能为空');
+    }
+    
+    $position = $em->getRepository(Position::class)->find($positionId);
+    
+    if (!$position) {
+      throw $this->createNotFoundException('岗位不存在');
+    }
+    
+    // 获取该岗位下的员工
+    $employees = $em->getRepository('App\Entity\Organization\Employee')->findBy(['position' => $position]);
+    
+    if ($action === 'edit') {
+      $form = $this->createForm(PositionType::class, $position, [
+        'action' => $this->generateUrl('org_position_edit', ['id' => $positionId])
+      ]);
+      
+      return $this->render('admin/org/position/edit_drawer.html.twig', [
+        'position' => $position,
+        'form' => $form->createView(),
+        'employees' => $employees,
+        'drawerId' => 'position-drawer-' . $positionId
+      ]);
+    }
+    
+    return $this->render('admin/org/position/view_drawer.html.twig', [
+      'position' => $position,
+      'employees' => $employees,
+      'drawerId' => 'position-drawer-' . $positionId
+    ]);
   }
 }

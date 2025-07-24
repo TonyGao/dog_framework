@@ -40,7 +40,7 @@
 
 .ef-drawer-header .ef-drawer-title {
   margin-right: auto;
-  color: rgb(29,33,41);
+  color: rgb(255 255 255);
   font-weight: 500;
   font-size: 16px;
   text-align: left;
@@ -48,7 +48,7 @@
 
 .ef-drawer-header .ef-drawer-close-btn {
   margin-left: 8px;
-  color: rgb(29,33,41);
+  color: rgb(255 255 255);
   font-size: 12px;
   cursor: pointer;
 }

@@ -14,6 +14,8 @@
     {% set maxWidth = options.maxWidth|default('100%') %}
     {% set minHeight = options.minHeight|default('300px') %}
     {% set pagination = options.pagination|default(false) %}
+    {% set serverSide = options.serverSide|default(false) %}
+    {% set dataUrl = options.dataUrl|default('') %}
     {% set pageSize = options.pageSize|default(10) %}
     {% set currentPage = options.currentPage|default(1) %}
     {% set totalPages = options.totalPages|default(1) %}
@@ -23,7 +25,7 @@
     {% set viewUrlPrefix = options.viewUrlPrefix|default('#') %}
     {% set deleteUrlPrefix = options.deleteUrlPrefix|default('#') %}
     
-    <div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id="{{ gridId }}" data-auto-fit-content="{{ autoFitContent ? 'true' : 'false' }}" style="max-width: {{ maxWidth }}; min-height: {{ minHeight }};">
+    <div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id="{{ gridId }}" data-auto-fit-content="{{ autoFitContent ? 'true' : 'false' }}" {% if serverSide %}data-server-side="true" data-data-url="{{ dataUrl }}"{% endif %} style="max-width: {{ maxWidth }}; min-height: {{ minHeight }};">
         {% if options.toolbarButtons is defined and options.toolbarButtons|length > 0 %}
             {{ ui.toolBar(options.toolbarButtons, { 'parentId': gridId }) }}
         {% endif %}
@@ -179,11 +181,12 @@
             </div>
         </div>
         
-        {% if pagination and tableData|length > 0 %}
-        <div class="ef-pagination-bar">
+        {% if pagination %}
+        <div class="ef-pagination-bar" data-total-items="{{ options.totalItems|default(tableData|length) }}">
             <div class="ef-pagination-left">
                 <select class="ef-page-size">
                     <option value="10"{% if pageSize == 10 %} selected{% endif %}>10</option>
+                    <option value="20"{% if pageSize == 20 %} selected{% endif %}>20</option>
                     <option value="50"{% if pageSize == 50 %} selected{% endif %}>50</option>
                     <option value="100"{% if pageSize == 100 %} selected{% endif %}>100</option>
                     <option value="500"{% if pageSize == 500 %} selected{% endif %}>500</option>
