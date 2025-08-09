@@ -1,0 +1,215 @@
+<?php
+
+namespace App\Service\Platform;
+
+use App\Entity\Platform\DataSource;
+use App\Entity\Platform\DataGrid;
+use App\Component\Database\Bridge\DataSource as BridgeDataSource;
+use App\Component\Database\Bridge\DoctrineDataSet;
+use App\Component\Database\View\DataGrid as ViewDataGrid;
+use Doctrine\ORM\EntityManagerInterface;
+
+class DataGridService
+{
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
+    /**
+     * 根据实体类名查找对应的 DataGrid 配置
+     *
+     * @param string $entityClass
+     * @return DataGrid|null
+     */
+    public function findDataGridByEntityClass(string $entityClass): ?DataGrid
+    {
+        $dataSourceRepo = $this->entityManager->getRepository(DataSource::class);
+        $dataSource = $dataSourceRepo->findOneBy([
+            'resource' => $entityClass,
+            'type' => 'entity'
+        ]);
+
+        if (!$dataSource) {
+            return null;
+        }
+
+        $dataGridRepo = $this->entityManager->getRepository(DataGrid::class);
+        return $dataGridRepo->findOneBy(['dataSource' => $dataSource]);
+    }
+
+    /**
+     * 创建 ViewDataGrid 实例
+     *
+     * @param string $entityClass
+     * @param int $page
+     * @param int $pageSize
+     * @return ViewDataGrid|null
+     */
+    public function createViewDataGrid(string $entityClass, int $page = 1, int $pageSize = 20): ?ViewDataGrid
+    {
+        $dataGrid = $this->findDataGridByEntityClass($entityClass);
+        if (!$dataGrid) {
+            return null;
+        }
+
+        $dataSource = $dataGrid->getDataSource();
+        if (!$dataSource || $dataSource->getType() !== 'entity') {
+            return null;
+        }
+
+        // 创建 DoctrineDataSet
+        $doctrineDataSet = new DoctrineDataSet($this->entityManager, $dataSource->getResource());
+        
+        // 设置分页
+        $offset = ($page - 1) * $pageSize;
+        $doctrineDataSet->setOffset($offset);
+        $doctrineDataSet->setLimit($pageSize);
+
+        // 创建 Bridge DataSource
+        $bridgeDataSource = new BridgeDataSource($doctrineDataSet);
+
+        // 创建 ViewDataGrid
+        $viewDataGrid = new ViewDataGrid($bridgeDataSource);
+
+        // 从配置中添加列
+        $config = $dataGrid->getDefaultConfigData();
+        if ($config && isset($config['columns'])) {
+            foreach ($config['columns'] as $column) {
+                if (isset($column['label']) && isset($column['field'])) {
+                    $viewDataGrid->addColumn($column['label'], $column['field']);
+                }
+            }
+        }
+
+        // 设置默认排序
+        if ($config && isset($config['defaultSort'])) {
+            $sortConfig = $config['defaultSort'];
+            if (isset($sortConfig['field']) && isset($sortConfig['direction'])) {
+                $viewDataGrid->setSort($sortConfig['field'], $sortConfig['direction']);
+            }
+        }
+
+        return $viewDataGrid;
+    }
+
+    /**
+     * 获取表格数据和配置
+     *
+     * @param string $entityClass
+     * @param int $page
+     * @param int $pageSize
+     * @return array
+     */
+    public function getTableData(string $entityClass, int $page = 1, int $pageSize = 20): array
+    {
+        $viewDataGrid = $this->createViewDataGrid($entityClass, $page, $pageSize);
+        
+        if (!$viewDataGrid) {
+            return [
+                'data' => [],
+                'totalItems' => 0,
+                'totalPages' => 0,
+                'currentPage' => $page,
+                'pageSize' => $pageSize,
+                'gridConfig' => null
+            ];
+        }
+
+        // 先获取总数，再获取数据，避免 QueryBuilder 被修改
+        $totalItems = $viewDataGrid->getTotalCount();
+        $data = $viewDataGrid->getData();
+        $dataGrid = $this->findDataGridByEntityClass($entityClass);
+        
+        // 转换数据为数组格式
+        $tableData = [];
+        foreach ($data as $item) {
+            $row = [];
+            $config = $dataGrid->getDefaultConfigData();
+            if ($config && isset($config['columns'])) {
+                foreach ($config['columns'] as $column) {
+                    if (isset($column['field'])) {
+                        $field = $column['field'];
+                        $value = $this->getFieldValue($item, $field, $column);
+                        $row[$field] = $value;
+                    }
+                }
+            }
+            $tableData[] = $row;
+        }
+
+        return [
+            'data' => $tableData,
+            'totalItems' => $totalItems,
+            'totalPages' => ceil($totalItems / $pageSize),
+            'currentPage' => $page,
+            'pageSize' => $pageSize,
+            'gridConfig' => $dataGrid ? $dataGrid->getDefaultConfigData() : null
+        ];
+    }
+
+    /**
+     * 获取字段值
+     *
+     * @param object $item
+     * @param string $field
+     * @param array $column
+     * @return mixed
+     */
+    private function getFieldValue(object $item, string $field, array $column)
+    {
+        $getter = 'get' . ucfirst($field);
+        if (!method_exists($item, $getter)) {
+            return null;
+        }
+
+        $value = $item->$getter();
+
+        // 根据列配置处理不同类型的值
+        if (isset($column['type'])) {
+            switch ($column['type']) {
+                case 'relation':
+                    if (is_object($value)) {
+                        $displayField = $column['displayField'] ?? 'name';
+                        $displayGetter = 'get' . ucfirst($displayField);
+                        if (method_exists($value, $displayGetter)) {
+                            return $value->$displayGetter();
+                        }
+                    }
+                    return $value ? (string) $value : '';
+                    
+                case 'boolean':
+                    if (is_bool($value)) {
+                        $trueText = $column['trueText'] ?? '是';
+                        $falseText = $column['falseText'] ?? '否';
+                        return $value ? $trueText : $falseText;
+                    }
+                    return $value;
+                    
+                case 'datetime':
+                    if ($value instanceof \DateTimeInterface) {
+                        return $value->format('Y-m-d H:i:s');
+                    }
+                    return $value;
+                    
+                case 'actions':
+                    // 操作列返回 ID 用于前端生成操作按钮
+                    return $item->getId();
+                    
+                default:
+                    return $value;
+            }
+        }
+
+        // 默认处理逻辑
+        if (is_object($value) && method_exists($value, 'getName')) {
+            return $value->getName();
+        } elseif (is_bool($value)) {
+            return $value ? '启用' : '停用';
+        }
+
+        return $value;
+    }
+}

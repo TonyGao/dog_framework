@@ -1,4 +1,12 @@
+# DataSource 实体
+
+* 负责描述数据来源（Entity, SQL, API, 外部JSON等）
+* 可单独管理和复用
+* 类似Delphi的TDataSource，负责数据的获取和缓存。
+
 # Datagrid 将被设计成高度可配置的完成CRUD的组件
+
+可以多个 DataGrid 共用一个 DataSource，不同的角色看到同意哦数据源的不同视图。
 
 它的核心功能是：
 
