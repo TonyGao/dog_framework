@@ -51,9 +51,21 @@ class DoctrineDataSet implements DataSetInterface
      */
     public function getTotalCount(): int
     {
-        $query = $this->buildQuery();
-        $this->queryBuilder->select('COUNT(e.id)'); // 假设每个实体有id字段
-        return (int) $query->getSingleScalarResult();
+        // 克隆 QueryBuilder 以避免影响原始查询
+        $countQueryBuilder = clone $this->queryBuilder;
+        $countQueryBuilder->select('COUNT(e.id)'); // 假设每个实体有id字段
+        
+        // 应用过滤条件但不应用分页和排序
+        if ($this->filters) {
+            $this->applyFiltersToQueryBuilder($countQueryBuilder, $this->filters);
+        }
+        
+        try {
+            $result = $countQueryBuilder->getQuery()->getSingleScalarResult();
+            return (int) $result;
+        } catch (\Doctrine\ORM\NoResultException $e) {
+            return 0;
+        }
     }
 
     /**
@@ -129,7 +141,20 @@ class DoctrineDataSet implements DataSetInterface
      */
     private function applyFilters(): void
     {
-        $conditions = $this->filters->getConditions();
+        if ($this->filters) {
+            $this->applyFiltersToQueryBuilder($this->queryBuilder, $this->filters);
+        }
+    }
+
+    /**
+     * 应用过滤条件到指定的 QueryBuilder
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param FilterGroup $filters
+     */
+    private function applyFiltersToQueryBuilder(QueryBuilder $queryBuilder, FilterGroup $filters): void
+    {
+        $conditions = $filters->getConditions();
         foreach ($conditions as $index => $condition) {
             $parameterName = 'filter_' . $index;
             $field = 'e.' . $condition->getField();
@@ -138,26 +163,26 @@ class DoctrineDataSet implements DataSetInterface
 
             switch ($operator) {
                 case '=':
-                    $this->queryBuilder->andWhere($field . ' = :' . $parameterName);
+                    $queryBuilder->andWhere($field . ' = :' . $parameterName);
                     break;
                 case '>':
-                    $this->queryBuilder->andWhere($field . ' > :' . $parameterName);
+                    $queryBuilder->andWhere($field . ' > :' . $parameterName);
                     break;
                 case '<':
-                    $this->queryBuilder->andWhere($field . ' < :' . $parameterName);
+                    $queryBuilder->andWhere($field . ' < :' . $parameterName);
                     break;
                 case 'LIKE':
-                    $this->queryBuilder->andWhere($field . ' LIKE :' . $parameterName);
+                    $queryBuilder->andWhere($field . ' LIKE :' . $parameterName);
                     break;
                 case 'IN':
-                    $this->queryBuilder->andWhere($field . ' IN (:' . $parameterName . ')');
+                    $queryBuilder->andWhere($field . ' IN (:' . $parameterName . ')');
                     break;
                 // 可以根据需求扩展更多操作符
                 default:
                     throw new \InvalidArgumentException("Unsupported operator: " . $operator);
             }
 
-            $this->queryBuilder->setParameter($parameterName, $value);
+            $queryBuilder->setParameter($parameterName, $value);
         }
     }
 }

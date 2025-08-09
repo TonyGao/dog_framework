@@ -1,0 +1,8 @@
+App\Entity\Platform\DataSource:
+  position_datasource:
+    name: 'Position DataSource'
+    type: 'entity'
+    resource: 'App\\Entity\\Organization\\Position'
+    query: null
+    params: null
+    databaseConnection: null

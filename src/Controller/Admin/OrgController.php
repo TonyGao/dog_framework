@@ -444,62 +444,6 @@ class OrgController extends BaseController
   #[Route('/admin/org/position', name: 'org_position')]
   public function positionList(Request $request, EntityManagerInterface $em): Response
   {
-    // 如果是AJAX请求，返回分页数据
-    if ($request->isXmlHttpRequest()) {
-      $page = $request->query->getInt('page', 1);
-      $pageSize = $request->query->getInt('pageSize', 20);
-      $offset = ($page - 1) * $pageSize;
-
-      $repository = $em->getRepository(Position::class);
-      
-      // 获取表格配置
-      $entityRepo = $em->getRepository(Entity::class);
-      $entity = $entityRepo->findOneBy(['className' => 'Position']);
-      $gridConfig = $entity ? $entity->getGridConfig() : null;
-      
-      // 获取总数
-      $totalItems = $repository->createQueryBuilder('p')
-        ->select('COUNT(p.id)')
-        ->getQuery()
-        ->getSingleScalarResult();
-
-      // 获取分页数据
-      $positions = $repository->createQueryBuilder('p')
-        ->leftJoin('p.department', 'd')
-        ->leftJoin('p.level', 'l')
-        ->leftJoin('p.parent', 'parent')
-        ->setFirstResult($offset)
-        ->setMaxResults($pageSize)
-        ->getQuery()
-        ->getResult();
-
-      // 准备表格数据
-      $tableData = [];
-      foreach ($positions as $position) {
-        $tableData[] = [
-          'id' => $position->getId(),
-          'name' => $position->getName(),
-          'code' => $position->getCode(),
-          'department' => $position->getDepartment() ? $position->getDepartment()->getName() : '',
-          'level' => $position->getLevel() ? $position->getLevel()->getName() : '',
-          'parent' => $position->getParent() ? $position->getParent()->getName() : '',
-          'headcount' => $position->getHeadcount(),
-          'state' => $position->getState() ? '启用' : '停用',
-        ];
-      }
-
-      return $this->json([
-        'data' => $tableData,
-        'pagination' => [
-          'currentPage' => $page,
-          'pageSize' => $pageSize,
-          'totalItems' => $totalItems,
-          'totalPages' => ceil($totalItems / $pageSize)
-        ],
-        'gridConfig' => $gridConfig
-      ]);
-    }
-
     // 初始页面加载，只返回空数据和配置
     $positionLevels = $em->getRepository(PositionLevel::class)->findAll();
 

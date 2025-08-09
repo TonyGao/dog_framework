@@ -1,0 +1,68 @@
+App\Entity\Platform\DataGrid:
+  position_datagrid:
+    name: 'Position DataGrid'
+    description: '岗位管理数据表格配置'
+    dataSource: '@position_datasource'
+    defaultConfigData:
+      columns:
+        - field: 'id'
+          label: 'ID'
+          visible: true
+          width: 80
+          sortable: true
+        - field: 'name'
+          label: '岗位名称'
+          visible: true
+          width: 150
+          sortable: true
+        - field: 'code'
+          label: '岗位编码'
+          visible: true
+          width: 120
+          sortable: true
+        - field: 'department'
+          label: '所属部门'
+          visible: true
+          width: 150
+          sortable: false
+          type: 'relation'
+          displayField: 'name'
+        - field: 'level'
+          label: '岗位级别'
+          visible: true
+          width: 120
+          sortable: false
+          type: 'relation'
+          displayField: 'name'
+        - field: 'state'
+          label: '状态'
+          visible: true
+          width: 80
+          sortable: true
+          type: 'boolean'
+          trueText: '启用'
+          falseText: '禁用'
+        - field: 'sortOrder'
+          label: '排序'
+          visible: false
+          width: 80
+          sortable: true
+        - field: 'createdAt'
+          label: '创建时间'
+          visible: false
+          width: 150
+          sortable: true
+          type: 'datetime'
+        - field: 'actions'
+          label: '操作'
+          visible: true
+          width: 150
+          sortable: false
+          type: 'actions'
+      sort:
+        - field: 'sortOrder'
+          order: 'asc'
+        - field: 'id'
+          order: 'desc'
+      pageSize: 20
+      pageSizeOptions: [10, 20, 50, 100]

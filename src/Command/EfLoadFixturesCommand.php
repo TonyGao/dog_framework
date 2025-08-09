@@ -149,9 +149,12 @@ EOF
         $movedFiles = [];
         $files = glob($this->fixturesPath . '/*.yaml');
         
+        // 分析依赖关系，找出需要保留的文件
+        $keepFiles = $this->analyzeDependencies($keepFile, $io);
+        
         foreach ($files as $file) {
             $filename = basename($file);
-            if ($filename !== $keepFile) {
+            if (!in_array($filename, $keepFiles)) {
                 $tempFile = $this->tempPath . '/' . $filename;
                 $this->filesystem->rename($file, $tempFile);
                 $movedFiles[] = $filename;
@@ -297,6 +300,108 @@ EOF
         return $entityClasses;
     }
 
+    /**
+     * 分析文件依赖关系，返回需要保留的文件列表
+     */
+    private function analyzeDependencies(string $targetFile, SymfonyStyle $io): array
+    {
+        $keepFiles = [$targetFile]; // 目标文件必须保留
+        $dependencies = $this->findFileDependencies($targetFile);
+        
+        if (!empty($dependencies)) {
+            $keepFiles = array_merge($keepFiles, $dependencies);
+            $io->text("检测到依赖文件: " . implode(', ', $dependencies));
+        }
+        
+        return array_unique($keepFiles);
+    }
+    
+    /**
+     * 查找文件中的依赖引用
+     */
+    private function findFileDependencies(string $filename): array
+    {
+        $dependencies = [];
+        $filePath = $this->fixturesPath . '/' . $filename;
+        
+        if (!$this->filesystem->exists($filePath)) {
+            return $dependencies;
+        }
+        
+        try {
+            $yamlContent = Yaml::parseFile($filePath);
+            $references = $this->extractReferences($yamlContent);
+            
+            // 根据引用查找对应的文件
+            foreach ($references as $reference) {
+                $dependencyFile = $this->findFileContainingReference($reference);
+                if ($dependencyFile && !in_array($dependencyFile, $dependencies)) {
+                    $dependencies[] = $dependencyFile;
+                }
+            }
+        } catch (\Exception $e) {
+            // 解析失败时忽略依赖分析
+        }
+        
+        return $dependencies;
+    }
+    
+    /**
+     * 从 YAML 内容中提取所有 @ 引用
+     */
+    private function extractReferences(array $yamlContent): array
+    {
+        $references = [];
+        
+        array_walk_recursive($yamlContent, function($value) use (&$references) {
+            if (is_string($value) && strpos($value, '@') === 0) {
+                $references[] = substr($value, 1); // 去掉 @ 符号
+            }
+        });
+        
+        return array_unique($references);
+    }
+    
+    /**
+     * 查找包含指定引用的文件
+     */
+    private function findFileContainingReference(string $reference): ?string
+    {
+        $files = glob($this->fixturesPath . '/*.yaml');
+        
+        foreach ($files as $file) {
+            try {
+                $yamlContent = Yaml::parseFile($file);
+                if ($this->containsReference($yamlContent, $reference)) {
+                    return basename($file);
+                }
+            } catch (\Exception $e) {
+                // 解析失败时跳过该文件
+                continue;
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * 检查 YAML 内容是否包含指定的引用定义
+     */
+    private function containsReference(array $yamlContent, string $reference): bool
+    {
+        foreach ($yamlContent as $entityClass => $entities) {
+            if (is_array($entities)) {
+                foreach ($entities as $entityName => $entityData) {
+                    if ($entityName === $reference) {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return false;
+    }
+    
     /**
      * 清空指定实体对应的数据表
      */

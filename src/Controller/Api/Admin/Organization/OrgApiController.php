@@ -4,6 +4,9 @@ namespace App\Controller\Api\Admin\Organization;
 
 use App\Entity\Organization\Company;
 use App\Entity\Organization\Department;
+use App\Entity\Organization\Position;
+use App\Entity\Platform\Entity;
+use App\Service\Platform\DataGridService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -111,5 +114,21 @@ class OrgApiController extends AbstractController
 
     $content = $serializer->serialize($data, 'json', ['groups' => ['api']]);
     return ApiResponse::success($content, '200', 'success');
+  }
+
+  #[Route('/api/admin/org/position/list', name: 'api_org_position_list', methods: ['GET'])]
+  public function positionList(Request $request, DataGridService $dataGridService): JsonResponse
+  {
+    $page = $request->query->getInt('page', 1);
+    $pageSize = $request->query->getInt('pageSize', 20);
+
+    // 使用新的 DataGridService 获取表格数据和配置
+    $result = $dataGridService->getTableData(
+      'App\\Entity\\Organization\\Position',
+      $page,
+      $pageSize
+    );
+
+    return $this->json($result);
   }
 }
