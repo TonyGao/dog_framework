@@ -19,7 +19,7 @@ class AssetDuplicationCollector extends DataCollector implements LateDataCollect
         $this->twigCollector = $twigCollector;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         // 存储请求和响应，在 lateCollect 中处理
         $this->request = $request;

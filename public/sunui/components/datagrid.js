@@ -676,6 +676,9 @@ $(document).ready(function () {
             },
             dataType: 'json',
             success: function(response) {
+                // 移除加载蒙版
+                hideLoadingState($table);
+                
                 // 清空表格内容
                 $tbody.empty();
                 
@@ -708,6 +711,9 @@ $(document).ready(function () {
                 $table.data('page-size', pageSize);
             },
             error: function(xhr, status, error) {
+                // 移除加载蒙版
+                hideLoadingState($table);
+                
                 console.error('加载数据失败:', error);
                 showErrorState($table, '加载数据失败，请稍后重试');
             }
@@ -868,18 +874,54 @@ $(document).ready(function () {
     
     // 显示加载状态
     function showLoadingState($table) {
+        // 移除之前的加载蒙版（如果存在）
+        hideLoadingState($table);
+        
         const $tbody = $table.find('tbody');
-        const colCount = $table.find('thead th').length;
-        $tbody.html(`
-            <tr class="ef-table-tr">
-                <td class="ef-table-td" colspan="${colCount}">
-                    <div class="ef-table-loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px;">
-                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 16px; color: #666;"></i>
-                        <span style="color: #666;">正在加载数据...</span>
-                    </div>
-                </td>
-            </tr>
+        
+        // 创建加载蒙版
+        const $overlay = $(`
+            <div class="ef-table-loading-overlay" style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(255, 255, 255, 0.8);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 10;
+                backdrop-filter: blur(1px);
+            ">
+                <div style="
+                    background: white;
+                    padding: 24px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                ">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 12px; color: #1890ff;"></i>
+                    <span style="color: #666; font-size: 14px;">正在加载数据...</span>
+                </div>
+            </div>
         `);
+        
+        // 确保 tbody 有相对定位
+        if ($tbody.css('position') === 'static') {
+            $tbody.css('position', 'relative');
+        }
+        
+        // 添加蒙版到 tbody
+        $tbody.append($overlay);
+    }
+    
+    // 隐藏加载状态
+    function hideLoadingState($table) {
+        $table.find('tbody .ef-table-loading-overlay').remove();
     }
     
     // 显示空数据状态

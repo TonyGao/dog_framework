@@ -19,7 +19,7 @@ class FormFieldBuilderService extends BaseService
         $this->em = $em;
     }
 
-    public function buildFields(FormBuilderInterface $builder, string $entityClass, callable $customOptionsCallback = null): void
+    public function buildFields(FormBuilderInterface $builder, string $entityClass, ?callable $customOptionsCallback = null): void
     {
         $reflectionClass = new \ReflectionClass($entityClass);
         $repo = $this->em->getRepository(Entity::class);

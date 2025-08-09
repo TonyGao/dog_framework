@@ -369,7 +369,7 @@ class EntityService extends BaseService
    * @param object|null $parent
    * @return object|null
    */
-  private function handleEPGSave($entity, string $type, $parent = null)
+  private function handleEPGSave($entity, string $type, mixed $parent = null)
   {
     // 将 Entity 转换成指定类型的数据格式
     $data = $this->convertEntityToPropertyGroupData($entity, $type, $parent);
@@ -459,7 +459,7 @@ class EntityService extends BaseService
    * $parentAtEPG --> $parent
    * $type  --> $type
    */
-  public function convertEntityToPropertyGroupData(Entity $entity, $type, $parent = null)
+  public function convertEntityToPropertyGroupData(Entity $entity, mixed $type, mixed $parent = null)
   {
     // 如果没有传入 $parent 参数，则使用 $entity->parentAtEPG
     $parentValue = $parent ?? $entity->parentAtEPG ?? null;
