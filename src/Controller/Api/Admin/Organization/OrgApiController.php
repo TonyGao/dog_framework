@@ -7,6 +7,7 @@ use App\Entity\Organization\Department;
 use App\Entity\Organization\Position;
 use App\Entity\Platform\Entity;
 use App\Service\Platform\DataGridService;
+use App\Service\Platform\CacheConfig;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -122,11 +123,14 @@ class OrgApiController extends AbstractController
     $page = $request->query->getInt('page', 1);
     $pageSize = $request->query->getInt('pageSize', 20);
 
-    // 使用新的 DataGridService 获取表格数据和配置
+    // 使用 DataGridService 获取表格数据和配置
+    // 岗位数据启用缓存机制，缓存时间为1小时
+    // 岗位数据不经常变更，但经常查询，适合使用较长的缓存时间
     $result = $dataGridService->getTableData(
       'App\\Entity\\Organization\\Position',
       $page,
-      $pageSize
+      $pageSize,
+      'cached 1 hour'  // 语义化缓存配置：缓存1小时
     );
 
     return $this->json($result);

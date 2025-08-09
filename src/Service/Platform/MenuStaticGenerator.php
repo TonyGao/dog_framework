@@ -29,7 +29,7 @@ class MenuStaticGenerator extends BaseService
     $this->projectDir = $projectDir;
   }
 
-  public function generateStaticMenu(SymfonyStyle $io = null): void
+  public function generateStaticMenu(?SymfonyStyle $io = null): void
   {
     $menuTwig = $this->projectDir .'/templates/admin/static/menu.html.twig';
 

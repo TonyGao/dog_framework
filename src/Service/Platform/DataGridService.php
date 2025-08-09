@@ -8,14 +8,27 @@ use App\Component\Database\Bridge\DataSource as BridgeDataSource;
 use App\Component\Database\Bridge\DoctrineDataSet;
 use App\Component\Database\View\DataGrid as ViewDataGrid;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Psr\Cache\CacheItemPoolInterface;
+use App\Service\Platform\CacheConfig;
 
 class DataGridService
 {
     private EntityManagerInterface $entityManager;
+    private CacheItemPoolInterface $cache;
+    
+    // 缓存过期时间（秒）
+    private const CACHE_TTL = 3600; // 1小时
+    
+    // 缓存键前缀
+    private const CACHE_PREFIX = 'datagrid_';
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, CacheItemPoolInterface $cache)
     {
         $this->entityManager = $entityManager;
+        $this->cache = $cache;
     }
 
     /**
@@ -98,12 +111,68 @@ class DataGridService
     /**
      * 获取表格数据和配置
      *
+     * @param string $entityClass 实体类名
+     * @param int $page 页码
+     * @param int $pageSize 每页大小
+     * @param CacheConfig|string|null $cacheConfig 缓存配置，支持CacheConfig对象或语义化字符串
+     * @return array
+     */
+    public function getTableData(string $entityClass, int $page = 1, int $pageSize = 20, $cacheConfig = null): array
+    {
+        // 如果传入的是字符串，转换为CacheConfig对象
+        if (is_string($cacheConfig)) {
+            $cacheConfig = CacheConfig::fromString($cacheConfig);
+        }
+        
+        if ($cacheConfig && $cacheConfig->isEnabled()) {
+            return $this->getCachedTableData($entityClass, $page, $pageSize, $cacheConfig->getTtl());
+        }
+        
+        return $this->getTableDataInternal($entityClass, $page, $pageSize);
+    }
+    
+    /**
+     * 获取缓存的表格数据
+     *
+     * @param string $entityClass
+     * @param int $page
+     * @param int $pageSize
+     * @param int|null $cacheTtl 缓存时间（秒），null使用默认值
+     * @return array
+     */
+    private function getCachedTableData(string $entityClass, int $page, int $pageSize, ?int $cacheTtl = null): array
+    {
+        $cacheKey = $this->generateCacheKey($entityClass, $page, $pageSize);
+        
+        // 先尝试获取缓存
+        $cacheItem = $this->cache->getItem($cacheKey);
+        
+        if ($cacheItem->isHit()) {
+            return $cacheItem->get();
+        }
+        
+        // 缓存未命中，获取数据并缓存
+        $data = $this->getTableDataInternal($entityClass, $page, $pageSize);
+        
+        $cacheItem->set($data);
+        $cacheItem->expiresAfter($cacheTtl ?? self::CACHE_TTL);
+        
+        // 注意：当前缓存池不支持标签功能
+        
+        $this->cache->save($cacheItem);
+        
+        return $data;
+    }
+    
+    /**
+     * 内部获取表格数据的方法
+     *
      * @param string $entityClass
      * @param int $page
      * @param int $pageSize
      * @return array
      */
-    public function getTableData(string $entityClass, int $page = 1, int $pageSize = 20): array
+    private function getTableDataInternal(string $entityClass, int $page = 1, int $pageSize = 20): array
     {
         $viewDataGrid = $this->createViewDataGrid($entityClass, $page, $pageSize);
         
@@ -211,5 +280,45 @@ class DataGridService
         }
 
         return $value;
+    }
+    
+    /**
+     * 生成缓存键
+     *
+     * @param string $entityClass
+     * @param int $page
+     * @param int $pageSize
+     * @return string
+     */
+    private function generateCacheKey(string $entityClass, int $page, int $pageSize): string
+    {
+        // 使用类名的最后一部分和哈希来缩短键名
+        $className = substr(strrchr($entityClass, '\\'), 1);
+        $hash = substr(md5($entityClass), 0, 8);
+        return self::CACHE_PREFIX . $className . '_' . $hash . '_p' . $page . '_s' . $pageSize;
+    }
+    
+    /**
+     * 清除指定实体的缓存
+     *
+     * @param string $entityClass
+     * @return void
+     */
+    public function clearEntityCache(string $entityClass): void
+    {
+        // 由于不支持标签，需要手动清除相关缓存项
+        // 这里可以根据需要实现具体的清除逻辑
+        // 暂时使用清除所有缓存的方式
+        $this->cache->clear();
+    }
+    
+    /**
+     * 清除所有 DataGrid 缓存
+     *
+     * @return void
+     */
+    public function clearAllCache(): void
+    {
+        $this->cache->clear();
     }
 }

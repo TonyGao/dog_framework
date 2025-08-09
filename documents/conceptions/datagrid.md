@@ -76,3 +76,194 @@
 * 选择字段名后，会触发比较表达式（如果有）的编辑和选择，比如「=」
 * 选择逻辑表达式后会进入字段值的选择或者输入
 * 点击删除按钮可以删除对应的整个字段表达式
+
+# DataGridService 通用缓存机制使用指南
+
+## 概述
+
+DataGridService 现在支持通用的缓存机制，可以通过参数灵活控制是否启用缓存以及缓存时长。这使得开发者可以根据数据的特性来决定缓存策略。
+
+## 方法签名
+
+```php
+public function getTableData(
+    string $entityClass,
+    int $page = 1,
+    int $pageSize = 20,
+    bool $useCache = false,
+    ?int $cacheTtl = null
+): array
+```
+
+### 参数说明
+
+* `$entityClass`: 实体类名
+* `$page`: 页码（从1开始）
+* `$pageSize`: 每页数据量
+* `$useCache`: 是否启用缓存（默认false）
+* `$cacheTtl`: 缓存时间（秒），null时使用默认值（3600秒）
+
+## 使用场景和示例
+
+### 1. 不经常变更的数据（推荐长时间缓存）
+
+适用于：岗位、部门、公司等组织架构数据
+
+```php
+// 岗位数据 - 缓存1小时
+$result = $dataGridService->getTableData(
+    'App\\Entity\\Organization\\Position',
+    $page,
+    $pageSize,
+    true,  // 启用缓存
+    3600   // 缓存1小时
+);
+
+// 部门数据 - 缓存30分钟
+$result = $dataGridService->getTableData(
+    'App\\Entity\\Organization\\Department',
+    $page,
+    $pageSize,
+    true,  // 启用缓存
+    1800   // 缓存30分钟
+);
+```
+
+### 2. 经常变更的数据（短时间缓存或不缓存）
+
+适用于：用户活动记录、订单数据、实时统计等
+
+```php
+// 用户活动记录 - 短时间缓存
+$result = $dataGridService->getTableData(
+    'App\\Entity\\User\\ActivityLog',
+    $page,
+    $pageSize,
+    true,  // 启用缓存
+    300    // 缓存5分钟
+);
+
+// 实时数据 - 不使用缓存
+$result = $dataGridService->getTableData(
+    'App\\Entity\\Realtime\\Statistics',
+    $page,
+    $pageSize,
+    false  // 不使用缓存
+);
+```
+
+### 3. 中等频率变更的数据（中等时间缓存）
+
+适用于：配置数据、字典数据等
+
+```php
+// 系统配置 - 缓存15分钟
+$result = $dataGridService->getTableData(
+    'App\\Entity\\System\\Config',
+    $page,
+    $pageSize,
+    true,  // 启用缓存
+    900    // 缓存15分钟
+);
+```
+
+## 缓存管理
+
+### 清除特定实体的缓存
+
+```php
+// 清除岗位相关的所有缓存
+$dataGridService->clearEntityCache('App\\Entity\\Organization\\Position');
+
+// 清除部门相关的所有缓存
+$dataGridService->clearEntityCache('App\\Entity\\Organization\\Department');
+```
+
+### 清除所有缓存
+
+```php
+// 清除DataGridService的所有缓存
+$dataGridService->clearAllCache();
+```
+
+## 性能优化建议
+
+### 1. 缓存时间设置原则
+
+* **静态数据**（如岗位、部门）：1-24小时
+* **半静态数据**（如配置、字典）：15分钟-1小时
+* **动态数据**（如日志、统计）：1-10分钟或不缓存
+* **实时数据**：不使用缓存
+
+### 2. 缓存键的设计
+
+缓存键自动包含以下信息：
+* 实体类名（简化后）
+* 页码
+* 每页数据量
+* MD5哈希（避免键名过长）
+
+### 3. 内存使用优化
+
+* 合理设置缓存时间，避免缓存过多数据
+* 定期清理不需要的缓存
+* 监控缓存命中率
+
+## 实际应用示例
+
+### 在Controller中的使用
+
+```php
+#[Route('/api/admin/org/position/list', name: 'api_org_position_list')]
+public function positionList(Request $request, DataGridService $dataGridService): JsonResponse
+{
+    $page = $request->query->getInt('page', 1);
+    $pageSize = $request->query->getInt('pageSize', 20);
+
+    // 岗位数据不经常变更，使用长时间缓存
+    $result = $dataGridService->getTableData(
+        'App\\Entity\\Organization\\Position',
+        $page,
+        $pageSize,
+        true,  // 启用缓存
+        3600   // 缓存1小时
+    );
+
+    return $this->json($result);
+}
+
+#[Route('/api/admin/log/activity', name: 'api_log_activity')]
+public function activityLog(Request $request, DataGridService $dataGridService): JsonResponse
+{
+    $page = $request->query->getInt('page', 1);
+    $pageSize = $request->query->getInt('pageSize', 20);
+
+    // 活动日志经常变更，使用短时间缓存
+    $result = $dataGridService->getTableData(
+        'App\\Entity\\Log\\ActivityLog',
+        $page,
+        $pageSize,
+        true,  // 启用缓存
+        300    // 缓存5分钟
+    );
+
+    return $this->json($result);
+}
+```
+
+## 注意事项
+
+1. **缓存一致性**：当数据发生变更时，记得清除相关缓存
+2. **内存管理**：避免设置过长的缓存时间导致内存占用过高
+3. **并发安全**：当前实现是线程安全的
+4. **错误处理**：缓存失败时会自动降级到直接查询数据库
+
+## 监控和调试
+
+可以通过日志或性能监控工具来观察：
+* 缓存命中率
+* 查询响应时间
+* 内存使用情况
+* 缓存清除频率
+
+这些指标可以帮助你优化缓存策略，提升应用性能。

@@ -9,7 +9,7 @@ when@dev:
                 type: stream
                 path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
-                channels: ["!event"]
+                channels: ["!event", "!deprecation"]
             # uncomment to get logging in your browser
             # you may have to allow bigger header sizes in your Web server configuration
             #firephp:
@@ -21,7 +21,13 @@ when@dev:
             console:
                 type: console
                 process_psr_3_messages: false
-                channels: ["!event", "!doctrine", "!console"]
+                channels: ["!event", "!doctrine", "!console", "!deprecation"]
+            # Deprecation warnings handler - logs to separate file
+            deprecation:
+                type: stream
+                path: "%kernel.logs_dir%/deprecation.log"
+                level: warning
+                channels: [deprecation]
 
 when@test:
     monolog:
@@ -46,6 +52,7 @@ when@prod:
                 handler: nested
                 excluded_http_codes: [404, 405]
                 buffer_size: 50 # How many messages should be saved? Prevent memory leaks
+                channels: ["!deprecation"]
             nested:
                 type: stream
                 path: php://stderr
@@ -54,8 +61,10 @@ when@prod:
             console:
                 type: console
                 process_psr_3_messages: false
-                channels: ["!event", "!doctrine"]
+                channels: ["!event", "!doctrine", "!deprecation"]
+            # Deprecation warnings in production - log to file only, not stderr
             deprecation:
                 type: stream
                 channels: [deprecation]
-                path: php://stderr
+                path: "%kernel.logs_dir%/deprecation.log"
+                level: error

@@ -97,5 +97,9 @@ services:
         tags:
             - { name: data_collector, template: '@App/profiler/asset_duplication.html.twig', id: app.asset_duplication_collector }
 
+    # 将 DataGridService 设为 public，用于测试
+    App\Service\Platform\DataGridService:
+        public: true
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

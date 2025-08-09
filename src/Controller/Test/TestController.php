@@ -5,7 +5,7 @@ namespace App\Controller\Test;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class TestController extends AbstractController
@@ -16,9 +16,7 @@ class TestController extends AbstractController
   ) {
   }
 
-  /**
-   * @Route("/test/{element}", methods="GET", name="element_page")
-   */
+  #[Route('/test/{element}', methods: ['GET'], name: 'element_page')]
   public function element(Request $request, $element): Response
   {
     $session = $this->requestStack->getSession();
@@ -27,9 +25,7 @@ class TestController extends AbstractController
     return $this->render($template);
   }
 
-  /**
-   * @Route("/", methods="GET", name="index_page")
-   */
+  #[Route('/', methods: ['GET'], name: 'index_page')]
   public function index(Request $request): Response
   {
     return $this->render('test/test.html.twig');
