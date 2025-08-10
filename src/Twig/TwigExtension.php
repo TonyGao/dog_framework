@@ -24,7 +24,7 @@ class TwigExtension extends AbstractExtension
         $this->session->set('active', 'active');
     }
 
-    public function getTests() {
+    public function getTests(): array {
         return array(
             new TwigTest('instanceof', array($this, 'isInstanceOf')),
          );

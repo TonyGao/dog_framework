@@ -5,7 +5,7 @@ namespace App\Controller\Api\Admin\Platform;
 use App\Service\Utils\AlimtTranslationService; // 假设您已有的翻译服务
 use App\Controller\Api\ApiResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class UtilsApiController extends AbstractController

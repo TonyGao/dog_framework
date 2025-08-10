@@ -30,7 +30,7 @@ class HeaderStateSubscriber implements EventSubscriberInterface
         $this->twig->addGlobal('sideMenuState', $sideMenuState);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER => ['onKernelController', 100],

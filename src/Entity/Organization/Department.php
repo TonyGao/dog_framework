@@ -541,4 +541,25 @@ class Department implements GedmoNode
 	{
 		return $this->tEST;
 	}
+
+	/**
+	 * Set sibling node
+	 */
+	public function setSibling(self $node): void
+	{
+		// This method is required by Gedmo\Tree\Node interface
+		// Implementation depends on your specific tree manipulation needs
+		// For now, we'll leave it empty as it's typically handled by Gedmo internally
+	}
+
+	/**
+	 * Get sibling node
+	 */
+	public function getSibling(): ?self
+	{
+		// This method is required by Gedmo\Tree\Node interface
+		// Implementation depends on your specific tree manipulation needs
+		// For now, we'll return null as it's typically handled by Gedmo internally
+		return null;
+	}
 }

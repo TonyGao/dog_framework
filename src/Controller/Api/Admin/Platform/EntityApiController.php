@@ -10,7 +10,7 @@ use Symfony\Component\Finder\Finder;
 use App\Service\Entity\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class EntityApiController extends AbstractController
