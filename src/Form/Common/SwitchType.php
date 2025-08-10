@@ -14,7 +14,7 @@ class SwitchType extends BaseFormType
   /**
    * {@inheritdoc}
    */
-  public function buildForm(FormBuilderInterface $builder, array $options)
+  public function buildForm(FormBuilderInterface $builder, array $options): void
   {
     $builder->setData($options['data'] ?? false);
     $builder->addViewTransformer(new BooleanToStringTransformer($options['value'], $options['false_values']));
@@ -23,7 +23,7 @@ class SwitchType extends BaseFormType
   /**
    * {@inheritdoc}
    */
-  public function buildView(FormView $view, FormInterface $form, array $options)
+  public function buildView(FormView $view, FormInterface $form, array $options): void
   {
     $view->vars = array_replace($view->vars, [
       'value' => $options['value'],
@@ -34,7 +34,7 @@ class SwitchType extends BaseFormType
   /**
    * {@inheritdoc}
    */
-  public function configureOptions(OptionsResolver $resolver)
+  public function configureOptions(OptionsResolver $resolver): void
   {
     $emptyData = function (FormInterface $form, $viewData) {
       return $viewData;

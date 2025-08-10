@@ -4,7 +4,7 @@ namespace App\Controller\Api\Admin\Platform;
 
 use App\Controller\Api\ApiResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\RouterInterface;
 

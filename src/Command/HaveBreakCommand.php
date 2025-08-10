@@ -21,12 +21,15 @@ class HaveBreakCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Displays a persistent notification on macOS every hour.');
     }
 
+    /**
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         while (true) {
@@ -37,8 +40,6 @@ class HaveBreakCommand extends Command
             // 等待一小时（3600秒）
             sleep(3600);
         }
-
-        return Command::SUCCESS;
     }
 
     private function sendNotification(string $message, string $title, string $subtitle)

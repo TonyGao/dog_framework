@@ -17,7 +17,7 @@ use App\Form\Organization\PositionType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\Organization\CorporationFormType;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * 组织架构管理

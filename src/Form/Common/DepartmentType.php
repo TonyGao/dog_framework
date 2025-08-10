@@ -21,7 +21,7 @@ class DepartmentType extends BaseFormType
   /**
    * {@inheritdoc}
    */
-  public function buildForm(FormBuilderInterface $builder, array $options)
+  public function buildForm(FormBuilderInterface $builder, array $options): void
   {
     $builder->setData($options['data'] ?? false)
       ->addModelTransformer($this->departmentTypeTransfer);
@@ -31,7 +31,7 @@ class DepartmentType extends BaseFormType
   /**
    * {@inheritdoc}
    */
-  public function configureOptions(OptionsResolver $resolver)
+  public function configureOptions(OptionsResolver $resolver): void
   {
     $resolver->setDefaults([
       'class' => Department::class,

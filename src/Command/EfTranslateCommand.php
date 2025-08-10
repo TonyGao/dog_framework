@@ -15,8 +15,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class EfTranslateCommand extends Command
 {
-    protected static $defaultName = 'ef:translate';
-
     private $translationService;
 
     public function __construct(AlimtTranslationService $translationService)
@@ -25,7 +23,7 @@ class EfTranslateCommand extends Command
         $this->translationService = $translationService;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Translate text using Alimt')
@@ -34,7 +32,7 @@ class EfTranslateCommand extends Command
             ->addArgument('targetLanguage', InputArgument::OPTIONAL, 'Target language code', 'en');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $sourceText = $input->getArgument('sourceText');
         $sourceLanguage = $input->getArgument('sourceLanguage');
