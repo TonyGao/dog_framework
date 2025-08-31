@@ -1,0 +1,342 @@
+/* 岗位抽屉组件样式 - Arco Design 风格 */
+/* 只保留ef-drawer-body内的样式，并添加.ef-drawer-body前缀以避免影响其他重名DOM */
+
+/* 内容区域样式 */
+.ef-drawer-body .ef-section {
+    margin-bottom: 24px;
+}
+
+.ef-drawer-body .ef-section:last-child {
+    margin-bottom: 0;
+}
+
+.ef-drawer-body .ef-section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d2129;
+    gap: 8px;
+}
+
+.ef-drawer-body .ef-section-header i {
+    color: #165dff;
+}
+
+/* 详情视图样式 */
+.ef-drawer-body .ef-detail-view {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ef-drawer-body .ef-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 24px;
+    align-items: start;
+}
+
+/* Detail view two columns layout */
+.ef-drawer-body .ef-detail-two-columns {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ef-drawer-body .ef-detail-row-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.ef-drawer-body .ef-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ef-drawer-body .ef-detail-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ef-drawer-body .ef-detail-label {
+    font-size: 14px;
+    color: #86909c;
+    font-weight: 500;
+}
+
+.ef-drawer-body .ef-detail-value {
+    font-size: 14px;
+    color: #1d2129;
+    word-break: break-word;
+}
+
+/* 徽章样式 */
+.ef-drawer-body .ef-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.ef-drawer-body .ef-badge-success {
+    background: #f0f9ff;
+    color: #0e7a0d;
+    border: 1px solid #b7eb8f;
+}
+
+.ef-drawer-body .ef-badge-danger {
+    background: #fff2f0;
+    color: #d4380d;
+    border: 1px solid #ffccc7;
+}
+
+.ef-drawer-body .ef-badge-secondary {
+    background: #f2f3f5;
+    color: #4e5969;
+    border: 1px solid #d9d9d9;
+}
+
+/* 表格样式 */
+.ef-drawer-body .ef-table {
+    width: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+}
+
+.ef-drawer-body .ef-table-element {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+}
+
+.ef-drawer-body .ef-table-th {
+    background: #f7f8fa;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2129;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ef-drawer-body .ef-table-td {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #4e5969;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ef-drawer-body .ef-table-tr:last-child .ef-table-td {
+    border-bottom: none;
+}
+
+.ef-drawer-body .ef-table-tr:hover {
+    background: #f7f8fa;
+}
+
+/* 空状态样式 */
+.ef-drawer-body .ef-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    color: #86909c;
+    text-align: center;
+}
+
+.ef-drawer-body .ef-empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #c9cdd4;
+}
+
+.ef-drawer-body .ef-empty-state-text {
+    font-size: 14px;
+    color: #86909c;
+}
+
+/* 手风琴样式 */
+.ef-drawer-body .ef-accordion {
+    border: 1px solid #f0f0f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.ef-drawer-body .ef-accordion-item {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ef-drawer-body .ef-accordion-item:last-child {
+    border-bottom: none;
+}
+
+.ef-drawer-body .ef-accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: #f7f8fa;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ef-drawer-body .ef-accordion-header:hover {
+    background: #f2f3f5;
+}
+
+.ef-drawer-body .ef-accordion-title {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2129;
+}
+
+.ef-drawer-body .ef-accordion-arrow {
+    color: #86909c;
+    transition: transform 0.2s;
+}
+
+.ef-drawer-body .ef-accordion-item[data-accordion-expanded="true"] .ef-accordion-arrow {
+    transform: rotate(180deg);
+}
+
+.ef-drawer-body .ef-accordion-content {
+    padding: 20px;
+    background: #ffffff;
+}
+
+/* 表单样式 */
+.ef-drawer-body .ef-form {
+    width: 100%;
+}
+
+.ef-drawer-body .ef-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 20px;
+}
+
+.ef-drawer-body .ef-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ef-drawer-body .ef-form-group-full {
+    grid-column: 1 / -1;
+}
+
+.ef-drawer-body .ef-form-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1d2129;
+}
+
+.ef-drawer-body .ef-form-input,
+.ef-drawer-body .ef-form-select,
+.ef-drawer-body .ef-form-textarea {
+    padding: 8px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #1d2129;
+    background: #ffffff;
+    transition: all 0.2s;
+}
+
+.ef-drawer-body .ef-form-input:focus,
+.ef-drawer-body .ef-form-select:focus,
+.ef-drawer-body .ef-form-textarea:focus {
+    border-color: #165dff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+}
+
+.ef-drawer-body .ef-form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .ef-drawer-body .ef-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .ef-drawer-body .ef-detail-row-group {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .ef-drawer-body .ef-form-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+    .ef-drawer-body .ef-detail-label {
+        color: #a0a0a0;
+    }
+    
+    .ef-drawer-body .ef-detail-value {
+        color: #ffffff;
+    }
+    
+    .ef-drawer-body .ef-section-header {
+        color: #ffffff;
+    }
+    
+    .ef-drawer-body .ef-table-element {
+        background: #1a1a1a;
+    }
+    
+    .ef-drawer-body .ef-table-th {
+        background: #2a2a2a;
+        color: #ffffff;
+        border-color: #3a3a3a;
+    }
+    
+    .ef-drawer-body .ef-table-td {
+        color: #ffffff;
+        border-color: #3a3a3a;
+    }
+    
+    .ef-drawer-body .ef-table-tr:hover {
+        background: #2a2a2a;
+    }
+    
+    .ef-drawer-body .ef-accordion-header {
+        background: #2a2a2a;
+        color: #ffffff;
+    }
+    
+    .ef-drawer-body .ef-accordion-header:hover {
+        background: #3a3a3a;
+    }
+    
+    .ef-drawer-body .ef-accordion-content {
+        background: #1a1a1a;
+    }
+    
+    .ef-drawer-body .ef-form-input,
+    .ef-drawer-body .ef-form-select,
+    .ef-drawer-body .ef-form-textarea {
+        background: #2a2a2a;
+        border-color: #3a3a3a;
+        color: #ffffff;
+    }
+}

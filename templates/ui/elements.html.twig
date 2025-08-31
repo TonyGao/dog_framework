@@ -1,4 +1,4 @@
-{# templates/ui/ui.html.twig #}
+{# templates/ui/elements.html.twig #}
 {% macro button(type, size, label, icon = null, state = '', shape = '', extraClass = '') %}
     {% include 'ui/buttons/button.html.twig' with {
         type: type,
@@ -29,3 +29,84 @@
         extraClass: extraClass
     } %}
 {% endmacro %}
+
+{% macro table(columns = [], data = [], size = 'large', border = true, hover = true, pagination = null, extraClass = '') %}
+    <div class="ef-table ef-table-size-{{ size }}{% if border %} ef-table-border{% endif %}{% if hover %} ef-table-hover{% endif %}{% if extraClass %} {{ extraClass }}{% endif %}">
+        <div class="ef-spin">
+            <div class="ef-table-container">
+                <div class="ef-scrollbar ef-scrollbar-type-embed" style="height: 100%;">
+                    <div class="ef-scrollbar-container ef-table-content ef-table-content-scroll-x">
+                        <table class="ef-table-element" cellpadding="0" cellspacing="0">
+                            {% if columns|length > 0 %}
+                                <colgroup>
+                                    {% for column in columns %}
+                                        <col{% if column.width is defined %} style="width: {{ column.width }}"{% endif %}>
+                                    {% endfor %}
+                                </colgroup>
+                            {% endif %}
+                            
+                            {% if columns|length > 0 %}
+                                <thead>
+                                    <tr class="ef-table-tr">
+                                        {% for column in columns %}
+                                            <th class="ef-table-th">
+                                                <span class="ef-table-cell ef-table-cell-align-{{ column.align|default('left') }}">
+                                                    <span class="ef-table-th-title">{{ column.title|default(column.key) }}</span>
+                                                </span>
+                                            </th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                            {% endif %}
+                            
+                            <tbody>
+                                {% for row in data %}
+                                    <tr class="ef-table-tr">
+                                        {% for column in columns %}
+                                            <td class="ef-table-td">
+                                                <span class="ef-table-cell ef-table-cell-align-{{ column.align|default('left') }}">
+                                                    <span class="ef-table-td-content">
+                                                        {% if column.render is defined %}
+                                                            {{ column.render(row[column.key], row)|raw }}
+                                                        {% else %}
+                                                            {{ row[column.key]|default('') }}
+                                                        {% endif %}
+                                                    </span>
+                                                </span>
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            {% if pagination is not null %}
+                <div class="ef-table-pagination ef-table-pagination-right">
+                    <div class="ef-pagination ef-pagination-size-{{ pagination.size|default('medium') }}">
+                        <ul class="ef-pagination-list">
+                            <span class="ef-pagination-item ef-pagination-item-previous{% if pagination.current <= 1 %} ef-pagination-item-disabled{% endif %}">
+                                <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-left" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                                    <path d="M32 8.4 16.444 23.956 32 39.513"></path>
+                                </svg>
+                            </span>
+                            
+                            {% for page in 1..pagination.total %}
+                                <li class="ef-pagination-item{% if page == pagination.current %} ef-pagination-item-active{% endif %}" pages="{{ page }}">{{ page }}</li>
+                            {% endfor %}
+                            
+                            <span class="ef-pagination-item ef-pagination-item-next{% if pagination.current >= pagination.total %} ef-pagination-item-disabled{% endif %}">
+                                <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-right" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                                    <path d="m16 39.513 15.556-15.557L16 8.4"></path>
+                                </svg>
+                            </span>
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endmacro %}
+

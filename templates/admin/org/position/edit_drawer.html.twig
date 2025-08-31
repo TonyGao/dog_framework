@@ -1,353 +1,82 @@
-<div class="ef-drawer-body ef-drawer-body-edit">
-    <div class="ef-accordion">
-        <!-- 基本信息编辑 -->
-        <div class="ef-accordion-item" data-accordion-expanded="true">
-            <div class="ef-accordion-header" onclick="toggleAccordionItem(this)">
-                <div class="ef-accordion-title">
-                    <i class="fas fa-edit" style="margin-right: 8px; color: #3b82f6;"></i>
-                    基本信息编辑
-                </div>
-                <i class="fas fa-chevron-down ef-accordion-arrow"></i>
+<link rel="stylesheet" href="{{ asset('sunui/components/position-drawer.css') }}">
+<div class="ef-drawer-container" style="z-index: 1001; display: none;" id="{{ drawerId }}">
+    <div class="ef-drawer-mask" maskid="{{ drawerId }}"></div>
+    <div class="ef-drawer" style="right: -650px; width: 650px; box-shadow: -4px 0 20px rgba(0,0,0,0.15);">
+        <div class="ef-drawer-header">
+            <div class="ef-drawer-title">
+                <i class="fa-solid fa-edit" style="margin-right: 12px; font-size: 18px;"></i>
+                编辑岗位
+                <span style="font-size: 14px; font-weight: 400; margin-left: 8px; opacity: 0.8;">{{ position.name }}</span>
             </div>
-            <div class="ef-accordion-content">
+            <div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn">
+                <span class="ef-icon-hover">
+                    <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                    </svg>
+                </span>
+            </div>
+        </div>
+        <div class="ef-drawer-body">
+            <div class="ef-drawer-content">
+                {% import 'ui/template/ui.html.twig' as ui %}
                 {{ form_start(form, {'attr': {'id': 'position-edit-form', 'class': 'ef-form'}}) }}
-                <div class="ef-form-grid">
-                    <div class="ef-form-group">
-                        {{ form_label(form.name, '岗位名称', {'label_attr': {'class': 'ef-form-label'}}) }}
-                        {{ form_widget(form.name, {'attr': {'class': 'ef-form-input'}}) }}
-                    </div>
-                    <div class="ef-form-group">
-                        {{ form_label(form.code, '岗位编码', {'label_attr': {'class': 'ef-form-label'}}) }}
-                        {{ form_widget(form.code, {'attr': {'class': 'ef-form-input'}}) }}
-                    </div>
-                    <div class="ef-form-group">
-                        {{ form_label(form.department, '所属部门', {'label_attr': {'class': 'ef-form-label'}}) }}
-                        {{ form_widget(form.department, {'attr': {'class': 'ef-form-select'}}) }}
-                    </div>
-                    <div class="ef-form-group">
-                        {{ form_label(form.level, '岗位级别', {'label_attr': {'class': 'ef-form-label'}}) }}
-                        {{ form_widget(form.level, {'attr': {'class': 'ef-form-select'}}) }}
-                    </div>
-                    <div class="ef-form-group ef-form-group-full">
-                        {{ form_label(form.description, '岗位描述', {'label_attr': {'class': 'ef-form-label'}}) }}
-                        {{ form_widget(form.description, {'attr': {'class': 'ef-form-textarea', 'rows': 3}}) }}
-                    </div>
-                    <div class="ef-form-group">
-                        {{ form_label(form.status, '状态', {'label_attr': {'class': 'ef-form-label'}}) }}
-                        {{ form_widget(form.status, {'attr': {'class': 'ef-form-select'}}) }}
-                    </div>
-                </div>
+                    {{ form_widget(form) }}
+                    {{ ui.formSubmitButton() }}
                 {{ form_end(form) }}
             </div>
         </div>
-        
-        <!-- 在职员工 -->
-        <div class="ef-accordion-item">
-            <div class="ef-accordion-header" onclick="toggleAccordionItem(this)">
-                <div class="ef-accordion-title">
-                    <i class="fas fa-users" style="margin-right: 8px; color: #8b5cf6;"></i>
-                    在职员工 ({{ employees|length }})
-                </div>
-                <i class="fas fa-chevron-down ef-accordion-arrow"></i>
-            </div>
-            <div class="ef-accordion-content">
-                {% if employees|length > 0 %}
-                    <div class="ef-table">
-                        <table class="ef-table-element">
-                            <thead>
-                                <tr class="ef-table-tr">
-                                    <th class="ef-table-th">员工姓名</th>
-                                    <th class="ef-table-th">工号</th>
-                                    <th class="ef-table-th">入职日期</th>
-                                    <th class="ef-table-th">状态</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for employee in employees %}
-                                    <tr class="ef-table-tr">
-                                        <td class="ef-table-td">{{ employee.name }}</td>
-                                        <td class="ef-table-td">{{ employee.code ?? '无' }}</td>
-                                        <td class="ef-table-td">{{ employee.hireDate ? employee.hireDate|date('Y-m-d') : '无' }}</td>
-                                        <td class="ef-table-td">
-                                            {% if employee.status == 'active' %}
-                                                <span class="ef-badge ef-badge-success">在职</span>
-                                            {% else %}
-                                                <span class="ef-badge ef-badge-secondary">离职</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <div class="ef-empty-state">
-                        <i class="fas fa-users-slash"></i>
-                        <div class="ef-empty-state-text">该岗位暂无在职员工</div>
-                    </div>
-                {% endif %}
-            </div>
+        <div class="ef-drawer-footer">
+            <button class="cancelDrawer ef-drawer-btn ef-drawer-btn-secondary" type="button" onclick="closeDrawer()">取消</button>
         </div>
     </div>
 </div>
 
-<div class="ef-drawer-footer">
-    <button type="button" class="ef-btn ef-btn-secondary" onclick="closeDrawer('{{ drawerId }}')">
-        <i class="fas fa-times" style="margin-right: 6px;"></i>
-        取消
-    </button>
-    <button type="button" class="ef-btn ef-btn-primary" onclick="submitPositionForm()">
-        <i class="fas fa-save" style="margin-right: 6px;"></i>
-        保存
-    </button>
-</div>
-
-<style>
-/* 手风琴样式 */
-.ef-accordion {
-    margin: 12px;
-}
-
-.ef-accordion-item {
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.ef-accordion-header {
-    padding: 16px 20px;
-    background: #f8fafc;
-    border-radius: 8px 8px 0 0;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background-color 0.2s;
-    user-select: none;
-}
-
-.ef-accordion-header:hover {
-    background: #f1f5f9;
-}
-
-.ef-accordion-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1e293b;
-    display: flex;
-    align-items: center;
-}
-
-.ef-accordion-arrow {
-    transition: transform 0.2s;
-    color: #64748b;
-}
-
-.ef-accordion-item[data-accordion-expanded="true"] .ef-accordion-arrow {
-    transform: rotate(180deg);
-}
-
-.ef-accordion-content {
-    padding: 20px;
-    display: none;
-    border-top: 1px solid #e2e8f0;
-}
-
-.ef-accordion-item[data-accordion-expanded="true"] .ef-accordion-content {
-    display: block;
-}
-
-/* 表单样式 */
-.ef-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-
-.ef-form-group {
-    display: flex;
-    flex-direction: column;
-}
-
-.ef-form-group-full {
-    grid-column: 1 / -1;
-}
-
-.ef-form-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 6px;
-}
-
-.ef-form-input,
-.ef-form-select,
-.ef-form-textarea {
-    padding: 8px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 14px;
-    transition: border-color 0.2s;
-}
-
-.ef-form-input:focus,
-.ef-form-select:focus,
-.ef-form-textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.ef-form-textarea {
-    resize: vertical;
-    min-height: 80px;
-}
-
-/* 表格样式 */
-.ef-table {
-    width: 100%;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
-}
-
-.ef-table-element {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.ef-table-th {
-    background: #f8fafc;
-    padding: 12px 16px;
-    text-align: left;
-    font-weight: 600;
-    color: #374151;
-    font-size: 13px;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.ef-table-td {
-    padding: 12px 16px;
-    color: #64748b;
-    font-size: 13px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.ef-table-tr:hover {
-    background: #f8fafc;
-}
-
-/* 徽章样式 */
-.ef-badge {
-    padding: 4px 12px;
-    border-radius: 16px;
-    font-size: 12px;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.ef-badge-success {
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #bbf7d0;
-}
-
-.ef-badge-secondary {
-    background: #f1f5f9;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
-}
-
-/* 空状态样式 */
-.ef-empty-state {
-    text-align: center;
-    padding: 40px 20px;
-    color: #9ca3af;
-}
-
-.ef-empty-state i {
-    font-size: 48px;
-    margin-bottom: 16px;
-    display: block;
-    color: #cbd5e1;
-}
-
-.ef-empty-state-text {
-    font-size: 14px;
-    font-weight: 500;
-    color: #64748b;
-}
-
-/* 按钮样式 */
-.ef-drawer-footer {
-    padding: 16px 20px;
-    border-top: 1px solid #e2e8f0;
-    background: #f8fafc;
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-}
-
-.ef-btn {
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    border: none;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    transition: all 0.2s;
-}
-
-.ef-btn-primary {
-    background: #3b82f6;
-    color: white;
-}
-
-.ef-btn-primary:hover {
-    background: #2563eb;
-}
-
-.ef-btn-secondary {
-    background: #f1f5f9;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
-}
-
-.ef-btn-secondary:hover {
-    background: #e2e8f0;
-}
-
-</style>
+// 初始化表单验证
+{{ ui.formValid() }}
 
 <script>
-function toggleAccordionItem(header) {
-    const item = header.closest('.ef-accordion-item');
-    const content = item.querySelector('.ef-accordion-content');
-    const isExpanded = item.getAttribute('data-accordion-expanded') === 'true';
+// 抽屉打开时添加body类，防止页面布局变化
+function addDrawerOpenClass() {
+    $('body').addClass('ef-drawer-open');
+}
+
+// 抽屉关闭时移除body类
+function removeDrawerOpenClass() {
+    $('body').removeClass('ef-drawer-open');
+}
+
+// 监听抽屉显示事件
+$(document).ready(function() {
+    // 当前抽屉显示时添加类
+    addDrawerOpenClass();
     
-    if (isExpanded) {
-        item.setAttribute('data-accordion-expanded', 'false');
-        content.style.display = 'none';
-    } else {
-        item.setAttribute('data-accordion-expanded', 'true');
-        content.style.display = 'block';
-    }
+    // 监听关闭按钮点击
+    $('.ef-drawer-close-btn').on('click', function() {
+        removeDrawerOpenClass();
+    });
+    
+    // 监听遮罩层点击
+    $('.ef-drawer-overlay').on('click', function() {
+        removeDrawerOpenClass();
+    });
+});
+
+// 表单提交成功后的回调
+function onFormSubmitSuccess() {
+    // 提交成功后关闭抽屉并刷新页面
+    removeDrawerOpenClass();
+    $().hideDrawer('{{ drawerId }}');
+    
+    // 显示成功消息
+    alert('岗位信息保存成功！');
+    
+    // 刷新页面
+    window.location.reload();
 }
 
-function submitPositionForm() {
-    const form = document.getElementById('position-edit-form');
-    if (form) {
-        form.submit();
-    }
-}
-
-function closeDrawer(drawerId) {
-    $().hideDrawer(drawerId);
+// 关闭抽屉
+function closeDrawer() {
+    removeDrawerOpenClass();
+    $().hideDrawer('{{ drawerId }}');
 }
 </script>

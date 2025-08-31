@@ -14,94 +14,62 @@
 	<script>
 		// 岗位管理drawer功能
 		function openPositionViewDrawer(positionId) {
-			fetch('/admin/org/position/drawer', {
+			// 防止重复点击，先移除已存在的drawer
+			$('#position-drawer-' + positionId).remove();
+			// 移除所有其他打开的drawer
+			$('[id^="position-drawer-"]').remove();
+			
+			ajax({
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-Requested-With': 'XMLHttpRequest'
-				},
-				body: JSON.stringify({
+				url: '/admin/org/position/drawer',
+				data: {
 					positionId: positionId,
 					action: 'view'
-				})
-			})
-			.then(response => response.text())
-			.then(html => {
-				// 移除已存在的drawer
-				const existingDrawer = document.getElementById('position-drawer-' + positionId);
-				if (existingDrawer) {
-					existingDrawer.remove();
+				},
+				contentType: 'application/json',
+				dataType: 'html',
+				success: function(html) {
+					// 添加新的drawer到页面
+					$('body').append(html);
+					
+					// 显示drawer
+					$().showDrawer('position-drawer-' + positionId);
+				},
+				error: function(xhr, status, error) {
+					console.error('Error loading position drawer:', error);
+					alert('加载岗位详情失败，请重试');
 				}
-				
-				// 添加新的drawer到页面
-				document.body.insertAdjacentHTML('beforeend', html);
-				
-				// 显示drawer
-				$().showDrawer('position-drawer-' + positionId);
-			})
-			.catch(error => {
-				console.error('Error loading position drawer:', error);
-				alert('加载岗位详情失败，请重试');
 			});
 		}
 		
 		function openPositionEditDrawer(positionId) {
-			fetch('/admin/org/position/drawer', {
+			// 防止重复点击，先移除已存在的drawer
+			$('#position-drawer-' + positionId).remove();
+			// 移除所有其他打开的drawer
+			$('[id^="position-drawer-"]').remove();
+			
+			ajax({
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-Requested-With': 'XMLHttpRequest'
-				},
-				body: JSON.stringify({
+				url: '/admin/org/position/drawer',
+				data: {
 					positionId: positionId,
 					action: 'edit'
-				})
-			})
-			.then(response => response.text())
-			.then(html => {
-				// 移除已存在的drawer
-				const existingDrawer = document.getElementById('position-drawer-' + positionId);
-				if (existingDrawer) {
-					existingDrawer.remove();
+				},
+				contentType: 'application/json',
+				dataType: 'html',
+				success: function(html) {
+					// 添加新的drawer到页面
+					$('body').append(html);
+					
+					// 显示drawer
+					$().showDrawer('position-drawer-' + positionId);
+				},
+				error: function(xhr, status, error) {
+					console.error('Error loading position edit drawer:', error);
+					alert('加载岗位编辑失败，请重试');
 				}
-				
-				// 添加新的drawer到页面
-				document.body.insertAdjacentHTML('beforeend', html);
-				
-				// 显示drawer
-				$().showDrawer('position-drawer-' + positionId);
-			})
-			.catch(error => {
-				console.error('Error loading position edit drawer:', error);
-				alert('加载岗位编辑失败，请重试');
 			});
 		}
-		
-		// 修改datagrid的查看和编辑按钮行为
-		document.addEventListener('DOMContentLoaded', function() {
-			// 重写查看按钮点击事件
-			document.addEventListener('click', function(e) {
-				if (e.target.closest('.ef-button-view')) {
-					e.preventDefault();
-					const button = e.target.closest('.ef-button-view');
-					const row = button.closest('tr');
-					const positionId = row.getAttribute('data-id');
-					if (positionId) {
-						openPositionViewDrawer(positionId);
-					}
-				}
-				
-				if (e.target.closest('.ef-button-edit')) {
-					e.preventDefault();
-					const button = e.target.closest('.ef-button-edit');
-					const row = button.closest('tr');
-					const positionId = row.getAttribute('data-id');
-					if (positionId) {
-						openPositionEditDrawer(positionId);
-					}
-				}
-			});
-		});
 	</script>
 {% endblock %}
 
