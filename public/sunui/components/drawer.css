@@ -13,7 +13,8 @@
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(29, 33, 41, .6);
+  background-color: rgba(31, 35, 41, 0.6);
+  backdrop-filter: blur(2px);
 }
 
 .ef-drawer {
@@ -22,9 +23,11 @@
   flex-direction: column;
   width: 100%;
   height: 100%; 
-  overflow: auto;
+  overflow: hidden;
   line-height: 1.5715;
   background-color: #fff;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+  border-radius: 8px 0 0 8px;
 }
 
 .ef-drawer-header {
@@ -33,24 +36,56 @@
   align-items: center;
   box-sizing: border-box;
   width: 100%;
-  height: 48px;
-  padding: 0 16px;
-  border-bottom: 1px solid rgb(229,230,235);
+  height: 46px;
+  padding: 0 20px;
+  background: linear-gradient(135deg, #3370ff 0%, #2563eb 100%);
+  border-bottom: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.ef-drawer-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+  pointer-events: none;
 }
 
 .ef-drawer-header .ef-drawer-title {
   margin-right: auto;
-  color: rgb(255 255 255);
-  font-weight: 500;
-  font-size: 16px;
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
   text-align: left;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 1;
 }
 
 .ef-drawer-header .ef-drawer-close-btn {
   margin-left: 8px;
-  color: rgb(255 255 255);
-  font-size: 12px;
+  color: white;
+  font-size: 14px;
   cursor: pointer;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.15);
+  transition: all 0.2s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.ef-drawer-header .ef-drawer-close-btn:hover {
+  background: rgba(255,255,255,0.25);
+  transform: scale(1.05);
 }
 
 .ef-icon-hover {
@@ -80,21 +115,201 @@
   flex: 1;
   box-sizing: border-box;
   height: 100%;
-  padding: 12px 0px;
-  overflow: auto;
-  color: rgb(29, 33, 41);
+  padding: 0;
+  overflow: hidden;
+  color: #1f2329;
   width: 100%;
+  background: #f8fafc;
+}
 
-  /* 以下两行实现水平和垂直居中 */
-  align-self: center;
-  justify-self: center;
+.ef-drawer-content {
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.ef-drawer-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ef-drawer-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.ef-drawer-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.ef-drawer-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .ef-drawer-footer {
   flex-shrink: 0;
   box-sizing: border-box;
-  padding: 16px;
+  padding: 8px 20px;
   text-align: right;
-  border-top: 1px solid rgb(229,230,235);
+  border-top: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+}
+
+/* 抽屉按钮样式 */
+.ef-drawer-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  min-width: 80px;
+}
+
+.ef-drawer-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.3s;
+}
+
+.ef-drawer-btn:hover::before {
+  left: 100%;
+}
+
+.ef-drawer-btn-primary {
+  background: linear-gradient(135deg, #3370ff 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(51, 112, 255, 0.2);
+}
+
+.ef-drawer-btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(51, 112, 255, 0.3);
+}
+
+.ef-drawer-btn-secondary {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.ef-drawer-btn-secondary:hover {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #475569;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.ef-drawer-btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+}
+
+.ef-drawer-btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* 抽屉内容区域样式 */
+.ef-drawer-section {
+  margin-bottom: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.ef-drawer-section-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #1f2329;
+  font-size: 14px;
+}
+
+.ef-drawer-section-header i {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #3370ff 0%, #2563eb 100%);
+  color: white;
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+.ef-drawer-section-body {
+  padding: 16px;
+}
+
+/* 表单样式 */
+.ef-drawer-form-group {
+  margin-bottom: 16px;
+}
+
+.ef-drawer-form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.ef-drawer-form-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  background: white;
+}
+
+.ef-drawer-form-input:focus {
+  outline: none;
+  border-color: #3370ff;
+  box-shadow: 0 0 0 3px rgba(51, 112, 255, 0.1);
+}
+
+.ef-drawer-form-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  background: white;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.ef-drawer-form-textarea:focus {
+  outline: none;
+  border-color: #3370ff;
+  box-shadow: 0 0 0 3px rgba(51, 112, 255, 0.1);
 }
 

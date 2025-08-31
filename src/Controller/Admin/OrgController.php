@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Form\Organization\CorporationFormType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
 /**
  * 组织架构管理
  */
@@ -536,7 +535,6 @@ class OrgController extends BaseController
 
     if ($form->isSubmitted() && $form->isValid()) {
       $position = $form->getData();
-      $em->persist($position);
       $em->flush();
 
       $this->addFlash('success', '岗位更新成功');

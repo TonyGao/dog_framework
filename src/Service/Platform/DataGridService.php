@@ -306,10 +306,34 @@ class DataGridService
      */
     public function clearEntityCache(string $entityClass): void
     {
-        // 由于不支持标签，需要手动清除相关缓存项
-        // 这里可以根据需要实现具体的清除逻辑
-        // 暂时使用清除所有缓存的方式
-        $this->cache->clear();
+        // 生成该实体类的缓存键前缀
+        $className = substr(strrchr($entityClass, '\\'), 1);
+        $hash = substr(md5($entityClass), 0, 8);
+        $keyPrefix = self::CACHE_PREFIX . $className . '_' . $hash;
+        
+        // 尝试使用反射获取缓存池的内部存储
+        try {
+            $reflection = new \ReflectionClass($this->cache);
+            if ($reflection->hasProperty('values')) {
+                $valuesProperty = $reflection->getProperty('values');
+                $valuesProperty->setAccessible(true);
+                $values = $valuesProperty->getValue($this->cache);
+                
+                $deletedCount = 0;
+                foreach (array_keys($values) as $key) {
+                    if (strpos($key, $keyPrefix) === 0) {
+                        $this->cache->deleteItem($key);
+                        $deletedCount++;
+                    }
+                }
+            } else {
+                // 如果无法访问内部存储，清除所有缓存
+                $this->cache->clear();
+            }
+        } catch (\Exception $e) {
+            // 如果精确清除失败，回退到清除所有缓存
+            $this->cache->clear();
+        }
     }
     
     /**

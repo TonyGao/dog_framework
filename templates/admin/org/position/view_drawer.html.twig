@@ -1,7 +1,8 @@
+<link rel="stylesheet" href="{{ asset('sunui/components/position-drawer.css') }}">
 <div class="ef-drawer-container" style="z-index: 1001; display: none;" id="{{ drawerId }}">
     <div class="ef-drawer-mask" maskid="{{ drawerId }}"></div>
     <div class="ef-drawer" style="right: -650px; width: 650px; box-shadow: -4px 0 20px rgba(0,0,0,0.15);">
-        <div class="ef-drawer-header ef-drawer-header-gradient">
+        <div class="ef-drawer-header">
             <div class="ef-drawer-title">
                 <i class="fa-solid fa-user-tie" style="margin-right: 12px; font-size: 18px;"></i>
                 {{ position.name }}
@@ -15,51 +16,59 @@
                 </span>
             </div>
         </div>
-        <div class="ef-drawer-body ef-drawer-body-view">
-            <div class="ef-drawer-content-scroll">
+        <div class="ef-drawer-body">
+            <div class="ef-drawer-content">
                 <!-- 基本信息 -->
                 <div class="ef-section">
                     <div class="ef-section-header">
                         <i class="fa-solid fa-info-circle"></i>
                         <span>基本信息</span>
                     </div>
-                    <div class="ef-detail-view">
-                        <div class="ef-detail-row">
-                            <div class="ef-detail-label">岗位名称</div>
-                            <div class="ef-detail-value">{{ position.name }}</div>
+                    <div class="ef-detail-view ef-detail-two-columns">
+                        <div class="ef-detail-row-group">
+                            <div class="ef-detail-item">
+                                <div class="ef-detail-label">岗位名称</div>
+                                <div class="ef-detail-value">{{ position.name }}</div>
+                            </div>
+                            <div class="ef-detail-item">
+                                <div class="ef-detail-label">岗位编码</div>
+                                <div class="ef-detail-value">{{ position.code ?: '无' }}</div>
+                            </div>
                         </div>
-                        <div class="ef-detail-row">
-                            <div class="ef-detail-label">岗位编码</div>
-                            <div class="ef-detail-value">{{ position.code ?: '无' }}</div>
+                        <div class="ef-detail-row-group">
+                            <div class="ef-detail-item">
+                                <div class="ef-detail-label">所属部门</div>
+                                <div class="ef-detail-value">{{ position.department ? position.department.name : '无' }}</div>
+                            </div>
+                            <div class="ef-detail-item">
+                                <div class="ef-detail-label">岗位类型</div>
+                                <div class="ef-detail-value">{{ position.type ? position.type.stringValue : '无' }}</div>
+                            </div>
                         </div>
-                        <div class="ef-detail-row">
-                            <div class="ef-detail-label">所属部门</div>
-                            <div class="ef-detail-value">{{ position.department ? position.department.name : '无' }}</div>
+                        <div class="ef-detail-row-group">
+                            <div class="ef-detail-item">
+                                <div class="ef-detail-label">岗位级别</div>
+                                <div class="ef-detail-value">{{ position.level ? position.level.name : '无' }}</div>
+                            </div>
+                            <div class="ef-detail-item">
+                                <div class="ef-detail-label">上级岗位</div>
+                                <div class="ef-detail-value">{{ position.parent ? position.parent.name : '无' }}</div>
+                            </div>
                         </div>
-                        <div class="ef-detail-row">
-                            <div class="ef-detail-label">岗位类型</div>
-                            <div class="ef-detail-value">{{ position.type ? position.type.stringValue : '无' }}</div>
-                        </div>
-                        <div class="ef-detail-row">
-                            <div class="ef-detail-label">岗位级别</div>
-                            <div class="ef-detail-value">{{ position.level ? position.level.name : '无' }}</div>
-                        </div>
-                        <div class="ef-detail-row">
-                            <div class="ef-detail-label">上级岗位</div>
-                            <div class="ef-detail-value">{{ position.parent ? position.parent.name : '无' }}</div>
-                        </div>
-                        <div class="ef-detail-row">
-                            <div class="ef-detail-label">编制人数</div>
-                            <div class="ef-detail-value">{{ position.headcount ?: '未设置' }}</div>
-                        </div>
-                        <div class="ef-detail-row">
-                            <div class="ef-detail-label">状态</div>
-                            <div class="ef-detail-value">
-                                {% if position.state %}
-                                    <span class="ef-badge ef-badge-success">✓ 启用</span>
-                                {% else %}
-                                    <span class="ef-badge ef-badge-danger">✗ 停用</span>
-                                {% endif %}
+                        <div class="ef-detail-row-group">
+                            <div class="ef-detail-item">
+                                <div class="ef-detail-label">编制人数</div>
+                                <div class="ef-detail-value">{{ position.headcount ?: '未设置' }}</div>
+                            </div>
+                            <div class="ef-detail-item">
+                                <div class="ef-detail-label">状态</div>
+                                <div class="ef-detail-value">
+                                    {% if position.state %}
+                                        <span class="ef-badge ef-badge-success">✓ 启用</span>
+                                    {% else %}
+                                        <span class="ef-badge ef-badge-danger">✗ 停用</span>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -138,313 +147,19 @@
                 </div>
             </div>
         </div>
-        <div class="ef-drawer-footer ef-drawer-footer-view">
-            <button class="cancelDrawer ef-drawer-btn ef-drawer-btn-close" type="button">关闭</button>
-            <a href="/admin/org/position/edit/{{ position.id }}" class="ef-drawer-btn ef-drawer-btn-edit edit-button" data-id="{{ position.id }}">
-                <i class="fa-solid fa-edit"></i>
-                编辑
-            </a>
+        <div class="ef-drawer-footer">
+            <button class="cancelDrawer ef-drawer-btn ef-drawer-btn-secondary" type="button">关闭</button>
+            <button type="button" class="ef-drawer-btn ef-drawer-btn-primary edit-button" onclick="openPositionEditDrawer({{ position.id }})">
+                    <i class="fa-solid fa-edit"></i>
+                    编辑
+                </button>
         </div>
     </div>
 </div>
 
-<style>
-/* 抽屉容器样式 */
-.ef-drawer-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1001;
-}
-
-/* 华丽的抽屉头部样式 */
-.ef-drawer-header.ef-drawer-header-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    color: white;
-    padding: 20px 24px;
-    border-bottom: none;
-    position: relative;
-    overflow: hidden;
-}
 
 
 
-.ef-drawer-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: white;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    position: relative;
-    z-index: 1;
-}
-
-.ef-drawer-close-btn {
-    position: relative;
-    z-index: 1;
-    background: rgba(255,255,255,0.2);
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-}
-
-.ef-drawer-close-btn:hover {
-    background: rgba(255,255,255,0.3);
-    transform: rotate(90deg);
-}
-
-/* 抽屉主体样式 */
-.ef-drawer-body {
-    height: calc(100vh - 140px);
-    overflow: hidden;
-}
-
-.ef-drawer-content-scroll {
-    height: 100%;
-    overflow-y: auto;
-    padding: 0;
-    scrollbar-width: thin;
-    scrollbar-color: #cbd5e1 #f1f5f9;
-}
-
-.ef-drawer-content-scroll::-webkit-scrollbar {
-    width: 6px;
-}
-
-.ef-drawer-content-scroll::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-.ef-drawer-content-scroll::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 3px;
-}
-
-.ef-drawer-content-scroll::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-/* 华丽的抽屉底部样式 */
-.ef-drawer-footer.ef-drawer-footer-view {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    border-top: 1px solid #e2e8f0;
-    padding: 16px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-    position: relative;
-}
-
-.ef-drawer-footer.ef-drawer-footer-view::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, #667eea 50%, transparent 100%);
-}
-
-/* 抽屉按钮样式 */
-.ef-drawer-btn {
-    width: 120px;
-    height: 40px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-decoration: none;
-    position: relative;
-    overflow: hidden;
-}
-
-.ef-drawer-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.5s;
-}
-
-.ef-drawer-btn:hover::before {
-    left: 100%;
-}
-
-.ef-drawer-btn-close {
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    color: #64748b;
-    border: 1px solid #cbd5e1;
-}
-
-.ef-drawer-btn-close:hover {
-    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
-    color: #475569;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.ef-drawer-btn-edit {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-}
-
-.ef-drawer-btn-edit:hover {
-    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-/* 内容区域样式 */
-.ef-section {
-    margin: 12px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    overflow: hidden;
-    border: 1px solid #e2e8f0;
-}
-
-.ef-section-header {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    padding: 12px 16px;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    color: #1e293b;
-    font-size: 14px;
-}
-
-.ef-section-header i {
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 6px;
-    font-size: 12px;
-}
-
-/* 详情视图样式 */
-.ef-detail-view {
-    padding: 16px;
-    display: grid;
-    gap: 12px;
-}
-
-.ef-detail-row {
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    gap: 16px;
-    align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.ef-detail-row:last-child {
-    border-bottom: none;
-}
-
-.ef-detail-label {
-    font-weight: 600;
-    color: #64748b;
-    font-size: 14px;
-}
-
-.ef-detail-value {
-    color: #1e293b;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.ef-detail-content {
-    padding: 12px;
-    line-height: 1.6;
-    color: #374151;
-    font-size: 14px;
-    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
-    border-left: 4px solid #667eea;
-    margin: 0;
-}
-
-/* 徽章样式 */
-.ef-badge {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.ef-badge-success {
-    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-    color: #166534;
-    border: 1px solid #86efac;
-}
-
-.ef-badge-danger {
-    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
-    color: #dc2626;
-    border: 1px solid #f87171;
-}
-
-/* 表格样式 */
-.ef-table-element {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-/* 空状态样式 */
-.ef-empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #9ca3af;
-    margin: 20px;
-}
-
-.ef-empty-state i {
-    font-size: 64px;
-    margin-bottom: 20px;
-    display: block;
-    color: #cbd5e1;
-    opacity: 0.7;
-}
-
-.ef-empty-state-text {
-    font-size: 16px;
-    font-weight: 600;
-    color: #64748b;
-    margin-bottom: 8px;
-}
-
-.ef-empty-state-desc {
-    font-size: 14px;
-    color: #94a3b8;
-}
-</style>
 
 <script>
 // 抽屉打开时添加body类，防止页面布局变化

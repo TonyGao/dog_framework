@@ -1,6 +1,12 @@
 parameters:
     app.key_debug: '%env(KEY_DEBUG)%'
     page_limit: 12
+    # 缓存监听器配置
+    app.cache_watched_entities:
+        - 'App\Entity\Organization\Position'
+        - 'App\Entity\Organization\Department'
+        - 'App\Entity\Organization\Company'
+        # 可以继续添加其他需要监听的实体
     entity_gen_stuff:
         use_imports:
             - 'App\Entity\Traits\CommonTrait'
@@ -96,6 +102,16 @@ services:
             $twigCollector: '@data_collector.twig'
         tags:
             - { name: data_collector, template: '@App/profiler/asset_duplication.html.twig', id: app.asset_duplication_collector }
+    
+    # 通用实体缓存监听器
+    App\EventListener\Entity\UniversalEntityCacheListener:
+        arguments:
+            $dataGridService: '@App\Service\Platform\DataGridService'
+            $watchedEntities: '%app.cache_watched_entities%'
+        tags:
+            - { name: doctrine.event_listener, event: postPersist }
+            - { name: doctrine.event_listener, event: postUpdate }
+            - { name: doctrine.event_listener, event: postRemove }
 
     # 将 DataGridService 设为 public，用于测试
     App\Service\Platform\DataGridService:
