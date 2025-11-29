@@ -29,9 +29,9 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
 
 	use CommonTrait;
 
-	#[ORM\Id]
-	#[ORM\Column(type: "uuid", unique: true)]
-	private $id;
+    #[ORM\Id]
+    #[ORM\Column(type: "uuid", unique: true)]
+    private ?Uuid $id = null;
 
 	/**
 	 * 用户名
@@ -114,10 +114,10 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
 	}
 
 
-	public function getId(): ?int
-	{
-		return $this->id;
-	}
+    public function getId(): ?Uuid
+    {
+        return $this->id;
+    }
 
 
 	/**
@@ -169,13 +169,13 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
 	}
 
 
-	/**
-	 * @see PasswordAuthenticatedUserInterface
-	 */
-	public function getPassword(): string
-	{
-		return $this->password;
-	}
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
 
 
 	public function setPassword(string $password): self
@@ -197,14 +197,14 @@ class OrgUser implements UserInterface, PasswordAuthenticatedUserInterface
 		return null;
 	}
 
-	/**
-	 * @see UserInterface
-	 */
-	public function eraseCredentials()
-	{
-		// If you store any temporary, sensitive data on the user, clear it here
-		// $this->plainPassword = null;
-	}
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        $this->plainPassword = null;
+    }
 
 
 	/**

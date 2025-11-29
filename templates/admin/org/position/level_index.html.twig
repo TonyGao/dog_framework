@@ -30,14 +30,15 @@
     <div class="ef-page-content">
         <div class="ef-card">
             <div class="ef-card-body">
+                {# TODO: 替换下方 URL 为实际接口地址 #}
                 {{ grid.dataGrid(
                     tableData,
                     columns,
                     {
-                        createUrl: '#', {# 这里需要替换为实际的创建岗位级别的URL #}
-                        editUrlPrefix: '#', {# 这里需要替换为实际的编辑岗位级别的URL前缀 #}
-                        viewUrlPrefix: '#', {# 这里需要替换为实际的查看岗位级别的URL前缀 #}
-                        deleteUrlPrefix: '#', {# 这里需要替换为实际的删除岗位级别的URL前缀 #}
+                        createUrl: '#',
+                        editUrlPrefix: '#',
+                        viewUrlPrefix: '#',
+                        deleteUrlPrefix: '#',
                         toolbarButtons: [
                             { type: 'create', text: '新增级别', icon: 'fa-solid fa-plus-circle', id: 'add-level-button' },
                             { type: 'delete', text: '批量删除', icon: 'fa-solid fa-minus-circle', id: 'batch-delete-button' },

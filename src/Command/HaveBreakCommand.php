@@ -27,10 +27,7 @@ class HaveBreakCommand extends Command
             ->setDescription('Displays a persistent notification on macOS every hour.');
     }
 
-    /**
-     * @return int
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         while (true) {
             $this->sendNotification("该休息了！", "休息提醒", "请点击此通知以关闭");
@@ -40,6 +37,8 @@ class HaveBreakCommand extends Command
             // 等待一小时（3600秒）
             sleep(3600);
         }
+
+        return Command::SUCCESS; // 理论上不会到达此处
     }
 
     private function sendNotification(string $message, string $title, string $subtitle)
