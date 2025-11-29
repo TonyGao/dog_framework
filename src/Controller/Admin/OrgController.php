@@ -681,14 +681,28 @@ class OrgController extends BaseController
   }
 
   /**
-   * 返回岗位查看/编辑的drawer HTML
+   * 返回岗位查看/编辑/新增的drawer HTML
    */
   #[Route('/admin/org/position/drawer', name: 'api_org_position_drawer', methods: ['POST'])]
   public function positionDrawer(Request $request, EntityManagerInterface $em): Response
   {
     $payload = $request->toArray();
     $positionId = $payload['positionId'] ?? null;
-    $action = $payload['action'] ?? 'view'; // view 或 edit
+    $action = $payload['action'] ?? 'view'; // view、edit 或 create
+    
+    // 如果是创建操作，不需要positionId
+    if ($action === 'create') {
+      $position = new Position();
+      $form = $this->createForm(PositionType::class, $position, [
+        'action' => $this->generateUrl('org_position_new')
+      ]);
+      
+      return $this->render('admin/org/position/create_drawer.html.twig', [
+        'position' => $position,
+        'form' => $form->createView(),
+        'drawerId' => 'position-drawer-new'
+      ]);
+    }
     
     if (!$positionId) {
       throw $this->createNotFoundException('岗位ID不能为空');
@@ -722,4 +736,5 @@ class OrgController extends BaseController
       'drawerId' => 'position-drawer-' . $positionId
     ]);
   }
+
 }

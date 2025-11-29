@@ -682,9 +682,17 @@ $(document).ready(function () {
                 // 清空表格内容
                 $tbody.empty();
                 
+                // 获取表格配置，优先从服务端返回的gridConfig中读取
+                const showRowNumber = response.gridConfig && response.gridConfig.showRowNumber !== undefined 
+                    ? response.gridConfig.showRowNumber 
+                    : ($table.data('show-row-number') === 'true');
+                const showCheckbox = response.gridConfig && response.gridConfig.showCheckbox !== undefined 
+                    ? response.gridConfig.showCheckbox 
+                    : ($table.data('show-checkbox') === 'true');
+                
                 // 如果有表格配置，先更新表头
                 if (response.gridConfig && response.gridConfig.columns) {
-                    updateTableHeader($table, response.gridConfig.columns);
+                    updateTableHeader($table, response.gridConfig.columns, showRowNumber, showCheckbox);
                 }
                 
                 if (response.data && response.data.length > 0) {
@@ -693,7 +701,10 @@ $(document).ready(function () {
                     
                     // 渲染数据行
                     response.data.forEach(function(item, index) {
-                        const row = columns ? buildDynamicRow(item, index + 1, columns) : buildPositionRow(item);
+                        // 计算正确的全局序号：(当前页-1) * 每页大小 + 当前索引 + 1
+                        const globalRowNumber = (page - 1) * pageSize + index + 1;
+                        // 总是使用buildDynamicRow函数，确保复选框和序号列正确显示
+                        const row = columns ? buildDynamicRow(item, globalRowNumber, columns, showRowNumber, showCheckbox) : buildDynamicRow(item, globalRowNumber, [], showRowNumber, showCheckbox);
                         $tbody.append(row);
                     });
                 } else {
@@ -729,7 +740,7 @@ $(document).ready(function () {
                 <td>${position.description || ''}</td>
                 <td>${position.department ? position.department.name : ''}</td>
                 <td>${position.level || ''}</td>
-                <td>${position.status === 1 ? '启用' : '禁用'}</td>
+                <td>${position.state || ''}</td>
                 <td>
                     <button type="button" class="btn secondary small" onclick="openPositionViewDrawer('${position.id}')">
                         <i class="fa-solid fa-eye"></i> 查看
@@ -743,35 +754,47 @@ $(document).ready(function () {
     }
     
     // 构建动态行HTML
-    function buildDynamicRow(rowData, rowNumber, columns) {
+    function buildDynamicRow(rowData, rowNumber, columns, showRowNumber = true, showCheckbox = false) {
         let cellsHtml = '';
 
-        // 添加行号列
-        cellsHtml += `<td class="ef-table-td">
-            <span class="ef-table-cell ef-table-cell-align-center">
-                <span class="ef-table-td-content">${rowNumber}</span>
-            </span>
-        </td>`;
+        // 添加行号列（如果启用）
+        if (showRowNumber) {
+            cellsHtml += `<td class="ef-table-td">
+                <span class="ef-table-cell ef-table-cell-align-center">
+                    <span class="ef-table-td-content">${rowNumber}</span>
+                </span>
+            </td>`;
+        }
         
-        // 添加选择框列
-        cellsHtml += `<td class="ef-table-td">
-            <div class="ef-checkbox">
-                <input type="checkbox" id="checkbox${rowData.id}" value="${rowData.id}">
-                <label for="checkbox${rowData.id}"></label>
-            </div>
-        </td>`;
+        // 添加选择框列（如果启用）
+        if (showCheckbox) {
+            cellsHtml += `<td class="ef-table-td">
+              <span class="ef-table-cell ef-table-cell-align-center">
+				<label aria-disabled="false" class="ef-checkbox">
+                    <input type="checkbox" id="checkbox${rowData.id}" class="ef-checkbox-target" value="0">
+                    <span class="ef-icon-hover ef-checkbox-icon-hover">
+						<div class="ef-checkbox-icon"></div>
+					</span>
+				</label>
+              </span>
+            </td>`;
+        }
 
         // 根据配置动态生成列
-        columns.forEach(column => {
-            if (!column.visible || column.field === 'actions') return;
+        if (columns && columns.length > 0) {
+            columns.forEach(column => {
+                if (!column.visible || column.field === 'actions') return;
 
-            let cellContent = '';
-            const value = rowData[column.field];
+                let cellContent = '';
+                const value = rowData[column.field];
 
             switch (column.type) {
                 case 'boolean':
-                    const isTrue = value === true || value === 1 || value === '1';
-                    const text = isTrue ? (column.trueText || '是') : (column.falseText || '否');
+                    // 检查值是否等于trueText，因为后端DataGridService已经将布尔值转换为文本
+                    const trueText = column.trueText || '是';
+                    const falseText = column.falseText || '否';
+                    const isTrue = value === trueText || value === true || value === 1 || value === '1';
+                    const text = isTrue ? trueText : falseText;
                     const badgeClass = isTrue ? 'ef-badge ef-badge-success' : 'ef-badge ef-badge-secondary';
                     cellContent = `<span class="${badgeClass}">${text}</span>`;
                     break;
@@ -790,17 +813,36 @@ $(document).ready(function () {
                     cellContent = value || '';
             }
 
-            const alignment = column.type === 'boolean' || column.field === 'id' ? 'ef-table-cell-align-center' : 'ef-table-cell-align-left';
-            cellsHtml += `<td class="ef-table-td">
-                <span class="ef-table-cell ${alignment}">
-                    <span class="ef-table-td-content">${cellContent}</span>
-                </span>
-            </td>`;
-        });
+                const alignment = column.type === 'boolean' || column.field === 'id' ? 'ef-table-cell-align-center' : 'ef-table-cell-align-left';
+                cellsHtml += `<td class="ef-table-td">
+                    <span class="ef-table-cell ${alignment}">
+                        <span class="ef-table-td-content">${cellContent}</span>
+                    </span>
+                </td>`;
+            });
+        } else {
+            // 如果没有列配置，显示默认的岗位数据列
+            const defaultFields = ['id', 'name', 'description', 'department', 'level', 'state'];
+            defaultFields.forEach(field => {
+                let cellContent = '';
+                if (field === 'department' && rowData[field] && typeof rowData[field] === 'object') {
+                    cellContent = rowData[field].name || '';
+                } else {
+                    cellContent = rowData[field] || '';
+                }
+                
+                const alignment = field === 'id' ? 'ef-table-cell-align-center' : 'ef-table-cell-align-left';
+                cellsHtml += `<td class="ef-table-td">
+                    <span class="ef-table-cell ${alignment}">
+                        <span class="ef-table-td-content">${cellContent}</span>
+                    </span>
+                </td>`;
+            });
+        }
 
         // 添加操作列
-        const actionsColumn = columns.find(col => col.field === 'actions');
-        if (actionsColumn && actionsColumn.visible) {
+        const actionsColumn = columns && columns.find(col => col.field === 'actions');
+        if ((actionsColumn && actionsColumn.visible) || (!columns || columns.length === 0)) {
             cellsHtml += `<td class="ef-table-td">
                 <span class="ef-table-cell ef-table-cell-align-center">
                     <span class="ef-table-td-content">
@@ -819,7 +861,7 @@ $(document).ready(function () {
     }
     
     // 更新表头
-    function updateTableHeader($table, columns) {
+    function updateTableHeader($table, columns, showRowNumber = true, showCheckbox = false) {
         const $thead = $table.find('thead');
         if ($thead.length === 0) return;
 
@@ -828,25 +870,34 @@ $(document).ready(function () {
 
         let headersHtml = '';
         
-        // 添加行号列头
-        headersHtml += `<th class="ef-table-th">
-            <span class="ef-table-cell ef-table-cell-align-center">#</span>
-        </th>`;
+        // 添加行号列头（如果启用）
+        if (showRowNumber) {
+            headersHtml += `<th class="ef-table-th">
+                <span class="ef-table-cell ef-table-cell-align-center">#</span>
+            </th>`;
+        }
         
-        // 添加选择框列头
-        headersHtml += `<th class="ef-table-th">
-            <div class="ef-checkbox check-all">
-                <input type="checkbox" id="selectAll" value="0">
-                <label for="selectAll"></label>
-            </div>
-        </th>`;
+        // 添加选择框列头（如果启用）
+        if (showCheckbox) {
+            headersHtml += `<th class="ef-table-th">
+              <span class="ef-table-cell ef-table-cell-align-center">
+				<label aria-disabled="false" class="ef-checkbox check-all">
+                    <input type="checkbox" id="selectAll" class="ef-checkbox-target" value="0">
+                    <span class="ef-icon-hover ef-checkbox-icon-hover">
+						<div class="ef-checkbox-icon"></div>
+					</span>
+				</label>
+              </span>
+            </th>`;
+        }
 
         // 根据配置动态生成列头
-        columns.forEach(column => {
-            if (!column.visible) return;
+        if (columns && columns.length > 0) {
+            columns.forEach(column => {
+                if (!column.visible) return;
 
-            const alignment = column.type === 'boolean' || column.field === 'id' || column.field === 'actions' ? 'ef-table-cell-align-center' : 'ef-table-cell-align-center';
-            const sortable = column.sortable;
+                const alignment = column.type === 'boolean' || column.field === 'id' || column.field === 'actions' ? 'ef-table-cell-align-center' : 'ef-table-cell-align-center';
+                const sortable = column.sortable;
             
             let headerContent = '';
             if (sortable) {
@@ -866,8 +917,29 @@ $(document).ready(function () {
                     </span>`;
             }
             
-            headersHtml += `<th class="ef-table-th" data-field="${column.field}">${headerContent}</th>`;
-        });
+                headersHtml += `<th class="ef-table-th" data-field="${column.field}">${headerContent}</th>`;
+            });
+        } else {
+            // 如果没有列配置，显示默认的表头
+            const defaultHeaders = [
+                { field: 'id', label: 'ID' },
+                { field: 'name', label: '岗位名称' },
+                { field: 'description', label: '岗位描述' },
+                { field: 'department', label: '所属部门' },
+                { field: 'level', label: '岗位级别' },
+                { field: 'state', label: '状态' },
+                { field: 'actions', label: '操作' }
+            ];
+            
+            defaultHeaders.forEach(header => {
+                const alignment = header.field === 'id' || header.field === 'actions' ? 'ef-table-cell-align-center' : 'ef-table-cell-align-center';
+                const headerContent = `
+                    <span class="ef-table-cell ${alignment}">
+                        <span class="ef-table-th-title">${header.label}</span>
+                    </span>`;
+                headersHtml += `<th class="ef-table-th" data-field="${header.field}">${headerContent}</th>`;
+            });
+        }
 
         $headerRow.html(headersHtml);
     }
@@ -1023,6 +1095,85 @@ $(document).ready(function () {
         });
     });
     
+    // 批量删除功能
+    function batchDelete($table, deleteUrl, confirmMessage = '确定要删除选中的项目吗？') {
+        const selectedIds = getSelectedIds($table);
+        
+        if (selectedIds.length === 0) {
+            alert('请先选择要删除的项目');
+            return;
+        }
+        
+        if (!confirm(confirmMessage + `\n\n将删除 ${selectedIds.length} 个项目`)) {
+            return;
+        }
+        
+        // 显示加载状态
+        showLoadingState($table);
+        
+        // 发送删除请求
+        $.ajax({
+            url: deleteUrl,
+            type: 'POST',
+            data: {
+                ids: selectedIds
+            },
+            dataType: 'json',
+            success: function(response) {
+                hideLoadingState($table);
+                
+                if (response.success) {
+                    // 删除成功，刷新表格
+                    const currentPage = $table.data('current-page') || 1;
+                    goToPage($table, currentPage, true);
+                    
+                    // 取消全选状态
+                    const $selectAll = $table.find('.check-all input');
+                    if ($selectAll.length > 0 && $selectAll.attr('value') === '1') {
+                        $selectAll.closest('.check-all').trigger('click');
+                    }
+                    
+                    alert(`成功删除 ${selectedIds.length} 个项目`);
+                } else {
+                    alert('删除失败：' + (response.message || '未知错误'));
+                }
+            },
+            error: function(xhr, status, error) {
+                hideLoadingState($table);
+                console.error('删除请求失败:', error);
+                alert('删除失败，请稍后重试');
+            }
+        });
+    }
+    
+    // 获取选中的ID列表
+    function getSelectedIds($table) {
+        const selectedIds = [];
+        $table.find('tbody .ef-checkbox input:checked').each(function() {
+            const id = $(this).val();
+            if (id && id !== '0') {
+                selectedIds.push(id);
+            }
+        });
+        return selectedIds;
+    }
+    
+    // 监听批量删除按钮点击事件
+    $(document).on('click', '[data-action="batch-delete"]', function() {
+        const $button = $(this);
+        const $table = $button.closest('.ef-table');
+        const deleteUrl = $button.data('delete-url');
+        const confirmMessage = $button.data('confirm-message');
+        
+        if (!deleteUrl) {
+            console.error('批量删除按钮缺少 data-delete-url 属性');
+            alert('配置错误：缺少删除URL');
+            return;
+        }
+        
+        batchDelete($table, deleteUrl, confirmMessage);
+    });
+
     // 公共API：设置表格数据并刷新分页
     window.efDataGrid = {
         setData: function(tableId, data, totalItems) {
@@ -1055,6 +1206,18 @@ $(document).ready(function () {
             const $table = $('#' + tableId);
             const currentPage = $table.data('current-page') || 1;
             goToPage($table, currentPage, true);
+        },
+        
+        // 批量删除API
+        batchDelete: function(tableId, deleteUrl, confirmMessage) {
+            const $table = $('#' + tableId);
+            batchDelete($table, deleteUrl, confirmMessage);
+        },
+        
+        // 获取选中项API
+        getSelectedIds: function(tableId) {
+            const $table = $('#' + tableId);
+            return getSelectedIds($table);
         }
     };
     

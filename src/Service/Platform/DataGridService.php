@@ -112,12 +112,11 @@ class DataGridService
      * 获取表格数据和配置
      *
      * @param string $entityClass 实体类名
-     * @param int $page 页码
-     * @param int $pageSize 每页大小
+     * @param array $configOverrides 配置覆盖数组，包含page、pageSize、showCheckbox、showRowNumber等参数
      * @param CacheConfig|string|null $cacheConfig 缓存配置，支持CacheConfig对象或语义化字符串
      * @return array
      */
-    public function getTableData(string $entityClass, int $page = 1, int $pageSize = 20, $cacheConfig = null): array
+    public function getTableData(string $entityClass, array $configOverrides = [], $cacheConfig = null): array
     {
         // 如果传入的是字符串，转换为CacheConfig对象
         if (is_string($cacheConfig)) {
@@ -125,24 +124,23 @@ class DataGridService
         }
         
         if ($cacheConfig && $cacheConfig->isEnabled()) {
-            return $this->getCachedTableData($entityClass, $page, $pageSize, $cacheConfig->getTtl());
+            return $this->getCachedTableData($entityClass, $configOverrides, $cacheConfig->getTtl());
         }
         
-        return $this->getTableDataInternal($entityClass, $page, $pageSize);
+        return $this->getTableDataInternal($entityClass, $configOverrides);
     }
     
     /**
      * 获取缓存的表格数据
      *
      * @param string $entityClass
-     * @param int $page
-     * @param int $pageSize
+     * @param array $configOverrides 配置数组
      * @param int|null $cacheTtl 缓存时间（秒），null使用默认值
      * @return array
      */
-    private function getCachedTableData(string $entityClass, int $page, int $pageSize, ?int $cacheTtl = null): array
+    private function getCachedTableData(string $entityClass, array $configOverrides = [], ?int $cacheTtl = null): array
     {
-        $cacheKey = $this->generateCacheKey($entityClass, $page, $pageSize);
+        $cacheKey = $this->generateCacheKey($entityClass, $configOverrides);
         
         // 先尝试获取缓存
         $cacheItem = $this->cache->getItem($cacheKey);
@@ -152,7 +150,7 @@ class DataGridService
         }
         
         // 缓存未命中，获取数据并缓存
-        $data = $this->getTableDataInternal($entityClass, $page, $pageSize);
+        $data = $this->getTableDataInternal($entityClass, $configOverrides);
         
         $cacheItem->set($data);
         $cacheItem->expiresAfter($cacheTtl ?? self::CACHE_TTL);
@@ -168,12 +166,15 @@ class DataGridService
      * 内部获取表格数据的方法
      *
      * @param string $entityClass
-     * @param int $page
-     * @param int $pageSize
+     * @param array $configOverrides 配置覆盖数组，包含page、pageSize、showCheckbox、showRowNumber等参数
      * @return array
      */
-    private function getTableDataInternal(string $entityClass, int $page = 1, int $pageSize = 20): array
+    private function getTableDataInternal(string $entityClass, array $configOverrides = []): array
     {
+        // 从configOverrides中提取分页参数，设置默认值
+        $page = $configOverrides['page'] ?? 1;
+        $pageSize = $configOverrides['pageSize'] ?? 20;
+        
         $viewDataGrid = $this->createViewDataGrid($entityClass, $page, $pageSize);
         
         if (!$viewDataGrid) {
@@ -196,9 +197,9 @@ class DataGridService
         $tableData = [];
         foreach ($data as $item) {
             $row = [];
-            $config = $dataGrid->getDefaultConfigData();
-            if ($config && isset($config['columns'])) {
-                foreach ($config['columns'] as $column) {
+            $dbConfig = $dataGrid->getDefaultConfigData();
+            if ($dbConfig && isset($dbConfig['columns'])) {
+                foreach ($dbConfig['columns'] as $column) {
                     if (isset($column['field'])) {
                         $field = $column['field'];
                         $value = $this->getFieldValue($item, $field, $column);
@@ -209,13 +210,55 @@ class DataGridService
             $tableData[] = $row;
         }
 
+        // 获取基础配置
+        $gridConfig = $dataGrid ? $dataGrid->getDefaultConfigData() : [];
+        
+        // 如果没有数据库配置，设置默认配置结构
+        if (empty($gridConfig)) {
+            $gridConfig = [
+                'columns' => [],
+                'sort' => [],
+                'pageSize' => 20,
+                'pageSizeOptions' => [10, 20, 50, 100],
+                'showCheckbox' => false,
+                'showRowNumber' => false
+            ];
+        }
+        
+        // 应用代码传入的配置覆盖（优先级更高）
+        $gridConfig = array_merge($gridConfig, $configOverrides);
+        
+        // 确保必要的配置字段有默认值（只在不存在时设置）
+        if (!isset($gridConfig['pageSize'])) {
+            $gridConfig['pageSize'] = 20;
+        }
+        if (!isset($gridConfig['pageSizeOptions'])) {
+            $gridConfig['pageSizeOptions'] = [10, 20, 50, 100];
+        }
+        if (!isset($gridConfig['columns'])) {
+            $gridConfig['columns'] = [];
+        }
+        if (!isset($gridConfig['sort'])) {
+            $gridConfig['sort'] = [];
+        }
+        if (!isset($gridConfig['showCheckbox'])) {
+            $gridConfig['showCheckbox'] = false;
+        }
+        if (!isset($gridConfig['showRowNumber'])) {
+            $gridConfig['showRowNumber'] = false;
+        }
+        
+        // 更新分页参数（使用配置中的值）
+        $page = $gridConfig['page'] ?? $page;
+        $pageSize = $gridConfig['pageSize'];
+
         return [
             'data' => $tableData,
             'totalItems' => $totalItems,
             'totalPages' => ceil($totalItems / $pageSize),
             'currentPage' => $page,
             'pageSize' => $pageSize,
-            'gridConfig' => $dataGrid ? $dataGrid->getDefaultConfigData() : null
+            'gridConfig' => $gridConfig
         ];
     }
 
@@ -276,7 +319,7 @@ class DataGridService
         if (is_object($value) && method_exists($value, 'getName')) {
             return $value->getName();
         } elseif (is_bool($value)) {
-            return $value ? '启用' : '停用';
+            return $value ? '启用' : '禁用';
         }
 
         return $value;
@@ -286,16 +329,25 @@ class DataGridService
      * 生成缓存键
      *
      * @param string $entityClass
-     * @param int $page
-     * @param int $pageSize
+     * @param array $configOverrides
      * @return string
      */
-    private function generateCacheKey(string $entityClass, int $page, int $pageSize): string
+    private function generateCacheKey(string $entityClass, array $configOverrides = []): string
     {
         // 使用类名的最后一部分和哈希来缩短键名
         $className = substr(strrchr($entityClass, '\\'), 1);
         $hash = substr(md5($entityClass), 0, 8);
-        return self::CACHE_PREFIX . $className . '_' . $hash . '_p' . $page . '_s' . $pageSize;
+        
+        $key = self::CACHE_PREFIX . $className . '_' . $hash;
+        
+        // 添加配置参数到缓存键中
+        if (!empty($configOverrides)) {
+            ksort($configOverrides); // 确保键的顺序一致
+            $configHash = substr(md5(serialize($configOverrides)), 0, 8);
+            $key .= '_cfg' . $configHash;
+        }
+        
+        return $key;
     }
     
     /**
