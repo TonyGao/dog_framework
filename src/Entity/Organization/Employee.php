@@ -26,7 +26,7 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
-    private $id;
+    private ?Uuid $id = null;
 
     /**
      * 工号
@@ -310,7 +310,7 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Get the value of id
      */
-    public function getId()
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
@@ -320,7 +320,7 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @return  self
      */
-    public function setId($id)
+    public function setId(?Uuid $id): self
     {
         $this->id = $id;
 
@@ -420,7 +420,7 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see PasswordAuthenticatedUserInterface
      */
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -454,9 +454,11 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         // 如果存储了任何临时的、敏感的数据，可以在这里清除
+        // 示例：清空明文密码
+        // $this->plainPassword = null;
     }
 
     /**
