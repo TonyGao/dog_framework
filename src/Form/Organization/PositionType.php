@@ -33,7 +33,8 @@ class PositionType extends AbstractType
                 'class' => Department::class,
                 'choice_label' => 'name',
                 'label' => '所属部门',
-                'required' => true,
+                'required' => false,
+                'placeholder' => '-- 请选择所属部门 --',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('d')
                         ->where('d.type = :type')

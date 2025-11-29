@@ -124,15 +124,93 @@ class OrgApiController extends AbstractController
     $pageSize = $request->query->getInt('pageSize', 20);
 
     // 使用 DataGridService 获取表格数据和配置
-    // 岗位数据启用缓存机制，缓存时间为1小时
-    // 岗位数据不经常变更，但经常查询，适合使用较长的缓存时间
+    // 可以通过 $configOverrides 参数覆盖默认配置
     $result = $dataGridService->getTableData(
       'App\\Entity\\Organization\\Position',
-      $page,
-      $pageSize,
-      'cached 1 hour'  // 语义化缓存配置：缓存1小时
+      [
+        'page' => $page,
+        'pageSize' => $pageSize
+      ],
+      'cached 1 hour'
     );
 
     return $this->json($result);
+  }
+
+  /**
+   * 批量删除岗位
+   */
+  #[Route('/api/admin/org/position/batch-delete', name: 'api_org_position_batch_delete', methods: ['POST'])]
+  public function batchDeletePosition(Request $request, EntityManagerInterface $em): ApiResponse
+  {
+    $ids = $request->request->get('ids', []);
+    
+    if (empty($ids) || !is_array($ids)) {
+      return ApiResponse::error(
+        json_encode([]),
+        400,
+        '请选择要删除的岗位'
+      );
+    }
+    
+    try {
+      $deletedCount = 0;
+      $errors = [];
+      
+      foreach ($ids as $id) {
+        $position = $em->getRepository(Position::class)->find($id);
+        
+        if (!$position) {
+          $errors[] = "岗位ID {$id} 不存在";
+          continue;
+        }
+        
+        // 检查是否有员工关联到此岗位
+        $employeeCount = $em->getRepository('App\\Entity\\Organization\\Employee')
+          ->count(['position' => $position]);
+        
+        if ($employeeCount > 0) {
+          $errors[] = "岗位 '{$position->getName()}' 下还有 {$employeeCount} 名员工，无法删除";
+          continue;
+        }
+        
+        // 检查是否有下级岗位
+        $childPositions = $em->getRepository(Position::class)
+          ->findBy(['parent' => $position]);
+        
+        if (!empty($childPositions)) {
+          $errors[] = "岗位 '{$position->getName()}' 下还有下级岗位，无法删除";
+          continue;
+        }
+        
+        $em->remove($position);
+        $deletedCount++;
+      }
+      
+      if ($deletedCount > 0) {
+        $em->flush();
+      }
+      
+      $message = "成功删除 {$deletedCount} 个岗位";
+      if (!empty($errors)) {
+        $message .= "，但有 " . count($errors) . " 个岗位删除失败";
+      }
+      
+      return ApiResponse::success(
+        json_encode([
+          'deletedCount' => $deletedCount,
+          'errors' => $errors
+        ]),
+        200,
+        $message
+      );
+      
+    } catch (\Exception $e) {
+      return ApiResponse::error(
+        json_encode([]),
+        500,
+        '删除失败：' . $e->getMessage()
+      );
+    }
   }
 }

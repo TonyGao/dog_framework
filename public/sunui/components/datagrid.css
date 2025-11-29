@@ -177,6 +177,10 @@ input[type=number] {
   padding: 0 15px;
 }
 
+.ef-table-cell .ef-checkbox {
+  padding-left: 0;
+}
+
 /* 确保表格容器不会强制表格扩展 */
 .ef-table[data-auto-fit-content="true"] .ef-table-container,
 .ef-table[data-auto-fit-content="true"] .ef-scrollbar,

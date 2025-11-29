@@ -1,0 +1,81 @@
+<link rel="stylesheet" href="{{ asset('sunui/components/position-drawer.css') }}">
+<div class="ef-drawer-container" style="z-index: 1001; display: none;" id="{{ drawerId }}">
+    <div class="ef-drawer-mask" maskid="{{ drawerId }}"></div>
+    <div class="ef-drawer" style="right: -650px; width: 650px; box-shadow: -4px 0 20px rgba(0,0,0,0.15);">
+        <div class="ef-drawer-header">
+            <div class="ef-drawer-title">
+                <i class="fa-solid fa-plus" style="margin-right: 12px; font-size: 18px;"></i>
+                新增岗位
+            </div>
+            <div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn">
+                <span class="ef-icon-hover">
+                    <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                    </svg>
+                </span>
+            </div>
+        </div>
+        <div class="ef-drawer-body">
+            <div class="ef-drawer-content">
+                {% import 'ui/template/ui.html.twig' as ui %}
+                {{ form_start(form, {'attr': {'id': 'position-create-form', 'class': 'ef-form'}}) }}
+                    {{ form_widget(form) }}
+                    {{ ui.formSubmitButton() }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+        <div class="ef-drawer-footer">
+            <button class="cancelDrawer ef-drawer-btn ef-drawer-btn-secondary" type="button" onclick="closeDrawer()">取消</button>
+        </div>
+    </div>
+</div>
+
+// 初始化表单验证
+{{ ui.formValid() }}
+
+<script>
+// 抽屉打开时添加body类，防止页面布局变化
+function addDrawerOpenClass() {
+    $('body').addClass('ef-drawer-open');
+}
+
+// 抽屉关闭时移除body类
+function removeDrawerOpenClass() {
+    $('body').removeClass('ef-drawer-open');
+}
+
+// 监听抽屉显示事件
+$(document).ready(function() {
+    // 当前抽屉显示时添加类
+    addDrawerOpenClass();
+    
+    // 监听关闭按钮点击
+    $('.ef-drawer-close-btn').on('click', function() {
+        removeDrawerOpenClass();
+    });
+    
+    // 监听遮罩层点击
+    $('.ef-drawer-overlay').on('click', function() {
+        removeDrawerOpenClass();
+    });
+});
+
+// 表单提交成功后的回调
+function onFormSubmitSuccess() {
+    // 提交成功后关闭抽屉并刷新页面
+    removeDrawerOpenClass();
+    $().hideDrawer('{{ drawerId }}');
+    
+    // 显示成功消息
+    alert('岗位创建成功！');
+    
+    // 刷新页面
+    window.location.reload();
+}
+
+// 关闭抽屉
+function closeDrawer() {
+    removeDrawerOpenClass();
+    $().hideDrawer('{{ drawerId }}');
+}
+</script>

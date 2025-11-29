@@ -70,6 +70,39 @@
 				}
 			});
 		}
+		
+		function openPositionCreateDrawer() {
+			// 移除所有其他打开的drawer
+			$('[id^="position-drawer-"]').remove();
+			
+			ajax({
+				method: 'POST',
+				url: '/admin/org/position/drawer',
+				data: {
+					action: 'create'
+				},
+				contentType: 'application/json',
+				dataType: 'html',
+				success: function(html) {
+					// 添加新的drawer到页面
+					$('body').append(html);
+					
+					// 显示drawer
+					$().showDrawer('position-drawer-new');
+				},
+				error: function(xhr, status, error) {
+					console.error('Error loading position create drawer:', error);
+					alert('加载新增岗位失败，请重试');
+				}
+			});
+		}
+		
+		// 为新增岗位按钮绑定点击事件
+		$(document).ready(function() {
+			$('#add-position-button').on('click', function() {
+				openPositionCreateDrawer();
+			});
+		});
 	</script>
 {% endblock %}
 
@@ -84,6 +117,7 @@
                         editUrlPrefix: path('org_position_edit', {'id': 'placeholder'})|replace({'placeholder': ''}),
                         viewUrlPrefix: path('org_position_view', {'id': 'placeholder'})|replace({'placeholder': ''}),
                         deleteUrlPrefix: path('org_position_delete', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                        batchDeleteUrl: path('api_org_position_batch_delete'),
                         toolbarButtons: [
                             { type: 'create', text: '新增岗位', icon: 'fa-solid fa-plus-circle', id: 'add-position-button' },
                             { type: 'delete', text: '批量删除', icon: 'fa-solid fa-minus-circle', id: 'batch-delete-button' },
