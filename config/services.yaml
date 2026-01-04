@@ -37,6 +37,32 @@ services:
             - '../src/Entity/'
             - '../src/Lib'
             - '../src/Kernel.php'
+    
+    # Register Generic ModelCatalog with specific models
+    Symfony\AI\Platform\Bridge\Generic\ModelCatalog:
+        arguments:
+            $models:
+                'qwen-plus':
+                    class: 'Symfony\AI\Platform\Bridge\Generic\CompletionsModel'
+                    capabilities:
+                        - !php/const Symfony\AI\Platform\Capability::INPUT_TEXT
+                        - !php/const Symfony\AI\Platform\Capability::OUTPUT_TEXT
+                'qwq-32b':
+                    class: 'Symfony\AI\Platform\Bridge\Generic\CompletionsModel'
+                    capabilities:
+                        - !php/const Symfony\AI\Platform\Capability::INPUT_TEXT
+                        - !php/const Symfony\AI\Platform\Capability::OUTPUT_TEXT
+                'deepseek/deepseek-r1-0528-qwen3-8b':
+                    class: 'Symfony\AI\Platform\Bridge\Generic\CompletionsModel'
+                    capabilities:
+                        - !php/const Symfony\AI\Platform\Capability::INPUT_TEXT
+                        - !php/const Symfony\AI\Platform\Capability::OUTPUT_TEXT
+                'nvidia/nemotron-3-nano':
+                    class: 'Symfony\AI\Platform\Bridge\Generic\CompletionsModel'
+                    capabilities:
+                        - !php/const Symfony\AI\Platform\Capability::INPUT_TEXT
+                        - !php/const Symfony\AI\Platform\Capability::OUTPUT_TEXT
+
     App\Asset\EfVersioningStrategy:
         arguments:
             - '%kernel.environment%'
@@ -98,24 +124,15 @@ services:
             $parameterBag: '@parameter_bag'
     # Profiler插件 资源重复 collector
     App\DataCollector\AssetDuplicationCollector:
-        arguments:
-            $twigCollector: '@data_collector.twig'
         tags:
-            - { name: data_collector, template: '@App/profiler/asset_duplication.html.twig', id: app.asset_duplication_collector }
-    
-    # 通用实体缓存监听器
+            - { name: 'data_collector', template: 'data_collector/asset_duplication.html.twig', id: 'asset_duplication' }
     App\EventListener\Entity\UniversalEntityCacheListener:
         arguments:
-            $dataGridService: '@App\Service\Platform\DataGridService'
             $watchedEntities: '%app.cache_watched_entities%'
         tags:
             - { name: doctrine.event_listener, event: postPersist }
             - { name: doctrine.event_listener, event: postUpdate }
             - { name: doctrine.event_listener, event: postRemove }
-
-    # 将 DataGridService 设为 public，用于测试
     App\Service\Platform\DataGridService:
-        public: true
-
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+        arguments:
+            $cache: '@cache.app'

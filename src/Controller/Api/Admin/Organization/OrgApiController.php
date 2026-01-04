@@ -122,6 +122,7 @@ class OrgApiController extends AbstractController
   {
     $page = $request->query->getInt('page', 1);
     $pageSize = $request->query->getInt('pageSize', 20);
+    $filters = $request->query->all('filters');
 
     // 使用 DataGridService 获取表格数据和配置
     // 可以通过 $configOverrides 参数覆盖默认配置
@@ -129,9 +130,10 @@ class OrgApiController extends AbstractController
       'App\\Entity\\Organization\\Position',
       [
         'page' => $page,
-        'pageSize' => $pageSize
+        'pageSize' => $pageSize,
+        'filters' => $filters
       ],
-      'cached 1 hour'
+      empty($filters) ? 'cached 1 hour' : null // Only cache if no filters
     );
 
     return $this->json($result);

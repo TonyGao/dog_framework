@@ -23,10 +23,10 @@ class FilterGroup
     /**
      * 添加一个过滤条件
      *
-     * @param FilterCondition $condition
+     * @param FilterCondition|FilterGroup $condition
      * @return $this
      */
-    public function addCondition(FilterCondition $condition): self
+    public function addCondition(FilterCondition|FilterGroup $condition): self
     {
         $this->conditions[] = $condition;
         return $this;
@@ -35,7 +35,7 @@ class FilterGroup
     /**
      * 获取所有过滤条件
      *
-     * @return FilterCondition[]
+     * @return array<FilterCondition|FilterGroup>
      */
     public function getConditions(): array
     {

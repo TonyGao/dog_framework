@@ -1,0 +1,11 @@
+<?php
+
+namespace App\Service\AI\Provider;
+
+class AliyunBailianProvider extends AbstractOpenAiProvider
+{
+    public function getName(): string
+    {
+        return 'aliyun';
+    }
+}

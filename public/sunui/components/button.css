@@ -5,79 +5,79 @@
 br {
   display: block;
   margin: 10px 0;
-  line-height:22px;
+  line-height: 22px;
   content: " ";
 }
 
 .btn.primary {
   color: #fff;
-  background-color: rgb(22,93,255);
+  background-color: rgb(22, 93, 255);
   border: 1px solid transparent;
 }
 
 .btn.primary:hover {
   color: #fff;
-  background-color: rgb(64,128,255);
+  background-color: rgb(64, 128, 255);
   border-color: transparent;
 }
 
 .btn.green {
   color: #fff;
-  background-color: rgb(0,180,42);
+  background-color: rgb(0, 180, 42);
   border-color: transparent;
 }
 
 .btn.green:hover {
   color: #fff;
-  background-color: rgb(35,195,67);
+  background-color: rgb(35, 195, 67);
   border-color: transparent;
 }
 
 .btn.orange {
   color: #fff;
-  background-color: rgb(255,125,0);
+  background-color: rgb(255, 125, 0);
   border-color: transparent;
 }
 
 .btn.orange:hover {
   color: #fff;
-  background-color: rgb(255,154,46);
+  background-color: rgb(255, 154, 46);
   border-color: transparent;
 }
 
 .btn.red {
   color: #fff;
-  background-color: rgb(245,63,63);
+  background-color: rgb(245, 63, 63);
   border-color: transparent;
 }
 
 .btn.red:hover {
   color: #fff;
-  background-color: rgb(247,101,96);
+  background-color: rgb(247, 101, 96);
   border-color: transparent;
 }
 
 .btn.secondary {
-  color: rgb(78,89,105);
-  background-color: rgb(242,243,245);
+  color: rgb(78, 89, 105);
+  background-color: rgb(242, 243, 245);
   border: 1px solid transparent;
 }
 
 .btn.secondary:hover {
-  color: rgb(78,89,105);
-  background-color: rgb(229,230,235);
+  color: rgb(78, 89, 105);
+  background-color: rgb(229, 230, 235);
   border-color: transparent;
 }
 
 .btn.outline {
-  color: rgb(22,93,255);
+  color: rgb(22, 93, 255);
   background-color: transparent;
-  border: 1px solid rgb(22,93,255);
+  border: 1px solid rgb(22, 93, 255);
 }
 
 .btn.outline:hover {
   color: #fff;
-  background-color: rgb(22,93,255);
+  background-color: rgb(22, 93, 255);
   border: 1px solid #fff;
 }
 
@@ -92,7 +92,7 @@ br {
   white-space: nowrap;
   outline: none;
   cursor: pointer;
-  transition: all .1s cubic-bezier(0,0,1,1);
+  transition: all .1s cubic-bezier(0, 0, 1, 1);
   -webkit-appearance: none;
 }
 
@@ -168,14 +168,14 @@ br {
 
 .btn.primary.disabled {
   color: #fff;
-  background-color: rgb(148,191,255);
+  background-color: rgb(148, 191, 255);
   border: 1px solid transparent;
   cursor: not-allowed;
 }
 
 .btn.secondary.disabled {
-  color: rgb(201,205,212);
-  background-color: rgb(247,248,250);
+  color: rgb(201, 205, 212);
+  background-color: rgb(247, 248, 250);
   border: 1px solid transparent;
   cursor: not-allowed;
 }
@@ -191,6 +191,7 @@ br {
   0% {
     transform: rotate(0);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -255,7 +256,7 @@ br {
   width: 22px;
   height: 22px;
   line-height: 1.48571429em;
-  color: rgba(0,0,0,.4);
+  color: rgba(0, 0, 0, .4);
   font-style: normal;
   font-weight: 700;
   -webkit-box-shadow: 0 0 0 1px transparent insert;
@@ -268,7 +269,7 @@ br {
 }
 
 .ef.buttons .primary.rightline {
-  border-right: 1px solid rgb(64,128,255);
+  border-right: 1px solid rgb(64, 128, 255);
 }
 
 .ef.buttons .secondary.rightline {
@@ -283,7 +284,7 @@ br {
   background-color: #e8e8e8;
   background-image: none;
   padding: 4px 15px;
-  color: rgba(0,0,0,.6);
+  color: rgba(0, 0, 0, .6);
   text-transform: none;
   font-weight: 700;
   border: 0 solid transparent;
@@ -295,10 +296,10 @@ br {
 .ef.labeled.btn {
   display: inline-flex;
   flex-direction: row;
-  background: 0 0!important;
-  padding: 0!important;
-  border: none!important;
-  box-shadow: none!important;
+  background: 0 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
   font-size: 1rem;
 }
 
@@ -318,7 +319,7 @@ br {
   color: #fff;
   text-shadow: none;
   background-image: none;
-  box-shadow: 0 0 0 0 rgb(34,36,38/15%) inset;
+  box-shadow: 0 0 0 0 rgb(34, 36, 38/15%) inset;
 }
 
 .ef.btn>.icon {
@@ -353,9 +354,9 @@ i.icon {
 }
 
 .ef.basic.red.label {
-  background: none #fff!important;
-  color: #db2828!important;
-  border-color: #db2828!important;
+  background: none #fff !important;
+  color: #db2828 !important;
+  border-color: #db2828 !important;
 }
 
 .ef.labeled.btn>.label {
@@ -367,10 +368,10 @@ i.icon {
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  margin: 0 0 0 -1px!important;
+  margin: 0 0 0 -1px !important;
   padding: '';
   font-size: .9em;
-  border-color: rgba(34,36,38,.15);
+  border-color: rgba(34, 36, 38, .15);
 }
 
 .ef[class*="left pointing"].label {
@@ -378,7 +379,8 @@ i.icon {
   margin-left: 0.6666em;
 }
 
-.ef.pointing.label, .ui[class*="pointing above"].label {
+.ef.pointing.label,
+.ui[class*="pointing above"].label {
   margin-top: 1em;
 }
 
@@ -388,8 +390,8 @@ i.icon {
 
 .ef.basic.label {
   background: none #fff;
-  border: 1px solid rgba(34,36,38,.15);
-  color: rgba(0,0,0,.87);
+  border: 1px solid rgba(34, 36, 38, .15);
+  color: rgba(0, 0, 0, .87);
   -webkit-box-shadow: none;
   box-shadow: none;
 }
@@ -427,7 +429,7 @@ i.icon {
   color: #fff;
   cursor: pointer;
   display: inline-block;
-  font-family: -apple-system,system-ui,"Segoe UI","Liberation Sans",sans-serif;
+  font-family: -apple-system, system-ui, "Segoe UI", "Liberation Sans", sans-serif;
   font-weight: 400;
   line-height: 1.15385;
   margin: 0;
@@ -451,7 +453,7 @@ i.icon {
   color: #39739d;
   cursor: pointer;
   display: inline-block;
-  font-family: -apple-system,system-ui,"Segoe UI","Liberation Sans",sans-serif;
+  font-family: -apple-system, system-ui, "Segoe UI", "Liberation Sans", sans-serif;
   font-size: 13px;
   font-weight: 400;
   line-height: 1.15385;
@@ -476,7 +478,7 @@ i.icon {
   box-sizing: border-box;
   color: #FFFFFF;
   cursor: pointer;
-  font-family: din-round,sans-serif;
+  font-family: din-round, sans-serif;
   font-weight: 700;
   letter-spacing: .8px;
   line-height: 20px;
@@ -513,7 +515,7 @@ i.icon {
 .btn.style4 {
   font-weight: 700;
   align-items: center;
-  background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
+  background-image: linear-gradient(144deg, #AF40FF, #5B42F3 50%, #00DDEB);
   border: 0;
   border-radius: 8px;
   box-shadow: rgb(151 65 252 / 20%) 0 15px 30px -5px;
@@ -529,5 +531,8 @@ i.icon {
   cursor: pointer;
 }
 
-
-
+a.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

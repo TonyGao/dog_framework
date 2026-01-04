@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Form\Organization\CorporationFormType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Controller\Api\ApiResponse;
 /**
  * 组织架构管理
  */
@@ -128,10 +129,12 @@ class OrgController extends BaseController
 
       $depRepo = $em->getRepository(Department::class);
       $department = $depRepo->findOneBy(['name' => $oldName]);
-      $department->setName($submitCompany->getName())
-        ->setAlias($submitCompany->getAlias());
-      $em->persist($department);
-      $em->flush();
+      if ($department) {
+        $department->setName($submitCompany->getName())
+          ->setAlias($submitCompany->getAlias());
+        $em->persist($department);
+        $em->flush();
+      }
 
       return $this->redirectToRoute('org_corporation');
     }
@@ -399,6 +402,22 @@ class OrgController extends BaseController
       $em->persist($departmentPost);
       $em->flush();
 
+      if ($request->isXmlHttpRequest()) {
+          $parentId = $departmentPost->getParent() ? $departmentPost->getParent()->getId() : ($departmentPost->getCompany() ? $departmentPost->getCompany()->getId() : null);
+          
+          $html = $this->renderView('admin/org/department_node.html.twig', [
+              'name' => $departmentPost->getName(),
+              'path' => $departmentPost->getPath(),
+              'id' => $departmentPost->getId()
+          ]);
+          
+          return ApiResponse::success([
+              'type' => 'new',
+              'parentId' => $parentId,
+              'html' => $html
+          ], 200, '部门创建成功');
+      }
+
       // 添加 flash 消息，通知前端缓存需要清理
       $this->addFlash('org.singleDepartment', 'clear');
       return $this->redirectToRoute('org_department');
@@ -425,10 +444,18 @@ class OrgController extends BaseController
       $em->persist($submitDepartment);
       $em->flush();
 
+      if ($request->isXmlHttpRequest()) {
+          return ApiResponse::success([
+              'type' => 'edit',
+              'id' => $submitDepartment->getId(),
+              'name' => $submitDepartment->getName()
+          ], 200, '部门修改成功');
+      }
+
       return $this->redirectToRoute('org_department');
     }
 
-    return $this->render('admin/platform/form_render.html.twig', [
+    return $this->render('admin/org/departmentEdit.html.twig', [
       'form' => $form->createView(),
     ]);
   }
@@ -457,10 +484,15 @@ class OrgController extends BaseController
       ['field' => 'state', 'label' => '状态'],
     ];
 
+    $page = $request->query->getInt('page', 1);
+    $pageSize = $request->query->getInt('pageSize', 20);
+
     return $this->render('admin/org/position/index.html.twig', [
       'tableData' => [], // 初始为空，通过AJAX加载
       'columns' => $columns,
-      'positionLevels' => $positionLevels
+      'positionLevels' => $positionLevels,
+      'currentPage' => $page,
+      'pageSize' => $pageSize
     ]);
   }
 
@@ -546,6 +578,78 @@ class OrgController extends BaseController
       'title' => '编辑岗位',
       'position' => $position
     ]);
+  }
+
+  /**
+   * 批量删除岗位
+   */
+  #[Route('/admin/org/position/batch-delete', name: 'org_position_batch_delete', methods: ['POST'])]
+  public function batchDeletePosition(Request $request, EntityManagerInterface $em): Response
+  {
+      $data = $request->toArray();
+      $ids = $data['ids'] ?? [];
+      $isSelectAll = $data['isSelectAll'] ?? false;
+      $excludedIds = $data['excludedIds'] ?? [];
+      
+      if (empty($ids) && !$isSelectAll) {
+          return ApiResponse::error('', 400, '请选择要删除的岗位');
+      }
+
+      $repo = $em->getRepository(Position::class);
+      $employeeRepo = $em->getRepository('App\Entity\Organization\Employee');
+      
+      if ($isSelectAll) {
+          $qb = $repo->createQueryBuilder('p')->select('p.id');
+          if (!empty($excludedIds)) {
+              $qb->where($qb->expr()->notIn('p.id', $excludedIds));
+          }
+          $result = $qb->getQuery()->getScalarResult();
+          $ids = array_column($result, 'id');
+          
+          if (empty($ids)) {
+               return ApiResponse::error('', 400, '没有可删除的岗位');
+          }
+      }
+
+      $deletedCount = 0;
+      $errorCount = 0;
+      $errors = [];
+
+      foreach ($ids as $id) {
+          $position = $repo->find($id);
+          if (!$position) continue;
+
+          // 检查是否有下级岗位
+          $hasChildren = $repo->findBy(['parent' => $position]);
+          if (count($hasChildren) > 0) {
+              $errorCount++;
+              $errors[] = "岗位 {$position->getName()} 存在下级岗位";
+              continue;
+          }
+
+          // 检查是否有员工关联
+          $hasEmployees = $employeeRepo->findBy(['position' => $position]);
+          if (count($hasEmployees) > 0) {
+              $errorCount++;
+              $errors[] = "岗位 {$position->getName()} 已有员工关联";
+              continue;
+          }
+
+          $position->setState(false);
+          $em->persist($position);
+          $deletedCount++;
+      }
+
+      if ($deletedCount > 0) {
+          $em->flush();
+      }
+
+      if ($errorCount > 0) {
+          $msg = "成功删除 {$deletedCount} 个岗位，{$errorCount} 个失败：" . implode('; ', $errors);
+          return ApiResponse::success(json_encode(['deleted' => $deletedCount, 'errors' => $errors]), 200, $msg);
+      }
+
+      return ApiResponse::success('', 200, "成功删除 {$deletedCount} 个岗位");
   }
 
   /**

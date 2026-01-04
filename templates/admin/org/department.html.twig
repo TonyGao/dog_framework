@@ -73,6 +73,60 @@
         leftTree.animate({"left":"0px"}, "slow").addClass('visible');
       }
     })
+
+    // Handle AJAX form submission for New/Edit Department
+    $(document).on('submit', '.right-content form', function(e) {
+        e.preventDefault();
+        const $form = $(this);
+        
+        $.ajax({
+            url: $form.attr('action'),
+            method: 'POST',
+            data: $form.serialize(),
+            success: function(response, status, xhr) {
+                const contentType = xhr.getResponseHeader("content-type") || "";
+                if (contentType.indexOf("json") !== -1) {
+                    if (response.code === 200) {
+                         // alert(response.message || '操作成功');
+                         const data = response.data;
+                         if (data.type === 'edit') {
+                              $('.org-text-content[id="' + data.id + '"]').text(data.name);
+                         } else if (data.type === 'new') {
+                              const parentId = data.parentId;
+                              if (parentId) {
+                                  const $parentText = $('.org-text-content[id="' + parentId + '"]');
+                                  if ($parentText.length) {
+                                      const $itemContent = $parentText.closest('.item-content');
+                                      const $li = $itemContent.parent('li');
+                                      let $ol = $li.children('ol.sub-tree-content');
+                                      
+                                      if ($ol.length === 0) {
+                                          $ol = $('<ol class="sub-tree-content"></ol>');
+                                          $li.append($ol);
+                                          const $arrow = $itemContent.find('.arrow-icon');
+                                          // Add caret if empty
+                                          if ($arrow.find('i').length === 0) {
+                                              $arrow.html('<i class="fa-solid fa-caret-right"></i>');
+                                          }
+                                      }
+                                      $ol.append(data.html);
+                                  }
+                              }
+                         }
+                         $('.right-content').html('<div style="padding: 20px;" class="alert alert-success">' + (response.message || '操作成功') + '</div>');
+                    } else {
+                        alert(response.message || '操作失败');
+                    }
+                } else {
+                    // HTML response (validation errors)
+                    $('.right-content').html(response);
+                }
+            },
+            error: function() {
+                alert('请求失败');
+            }
+        });
+    });
   })
   </script>
 {% endblock %}

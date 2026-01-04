@@ -1,0 +1,11 @@
+<?php
+
+namespace App\Service\AI\Provider;
+
+class LmStudioProvider extends AbstractOpenAiProvider
+{
+    public function getName(): string
+    {
+        return 'lm_studio';
+    }
+}

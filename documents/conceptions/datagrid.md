@@ -267,3 +267,20 @@ public function activityLog(Request $request, DataGridService $dataGridService):
 * 缓存清除频率
 
 这些指标可以帮助你优化缓存策略，提升应用性能。
+
+# 一个页面可能存在多个Datagrid，需要考虑支持多个Datagrid
+
+## 每个Datagrid组件都带一个id
+
+## 全选功能
+
+每个Datagrid组件都有一个全选复选框，用于选择所有数据行。当用户点击全选复选框时，会将当前页所有数据行的复选框选中。并且在前端实现以下逻辑来满足全选：
+
+1. 当前DataGrid全部checkbox都被选中。
+2. 以 DataGrid id 命名的变量 datagridAllSelected{id} 记录当前页是否全选。
+3. 请求体中后台会根据 datagridAllSelected{id} 来判断此DataGrid是否被全选。
+
+## 多选与翻页的实现
+
+在多选的Datagrid内子项的同时，支持翻页进行继续多选的操作，在回到已选定的页面后，之前选中的子项仍然保持选中状态。
+

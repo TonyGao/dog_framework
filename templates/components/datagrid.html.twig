@@ -24,8 +24,9 @@
     {% set editUrlPrefix = options.editUrlPrefix|default('#') %}
     {% set viewUrlPrefix = options.viewUrlPrefix|default('#') %}
     {% set deleteUrlPrefix = options.deleteUrlPrefix|default('#') %}
+    {% set updateUrlParams = options.updateUrlParams|default(false) %}
     
-    <div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id="{{ gridId }}" data-auto-fit-content="{{ autoFitContent ? 'true' : 'false' }}" {% if serverSide %}data-server-side="true" data-data-url="{{ dataUrl }}"{% endif %} style="max-width: {{ maxWidth }}; min-height: {{ minHeight }};">
+    <div class="ef-table ef-table-size-large ef-table-border ef-table-hover" id="{{ gridId }}" data-auto-fit-content="{{ autoFitContent ? 'true' : 'false' }}" {% if serverSide %}data-server-side="true" data-data-url="{{ dataUrl }}"{% endif %} {% if updateUrlParams %}data-update-url-params="true"{% endif %} data-page-size="{{ pageSize }}" data-current-page="{{ currentPage }}" style="max-width: {{ maxWidth }}; min-height: {{ minHeight }};">
         {% if options.toolbarButtons is defined and options.toolbarButtons|length > 0 %}
             {{ ui.toolBar(options.toolbarButtons, { 'parentId': gridId }) }}
         {% endif %}

@@ -621,7 +621,7 @@ body.ef-drawer-open {
   text-align: center;
   line-height: 20px;
   font-size: 14px;
-  padding: 3px;
+  padding: 0 3px 3px 3px;
   z-index: 999999;
 }
 
@@ -641,7 +641,7 @@ body.ef-drawer-open {
   text-align: center;
   line-height: 20px;
   font-size: 14px;
-  padding: 3px;
+  padding: 0 3px 3px 3px;
   z-index: 999999;
 }
 
@@ -660,7 +660,7 @@ body.ef-drawer-open {
   text-align: center;
   line-height: 20px;
   font-size: 14px;
-  padding: 3px;
+  padding: 0 3px 3px 3px;
   z-index: 999999;
 }
 

@@ -14,6 +14,9 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use App\Service\Platform\CacheConfig;
 
+use App\Component\Database\Bridge\FilterGroup;
+use App\Component\Database\Bridge\FilterCondition;
+
 class DataGridService
 {
     private EntityManagerInterface $entityManager;
@@ -177,6 +180,15 @@ class DataGridService
         
         $viewDataGrid = $this->createViewDataGrid($entityClass, $page, $pageSize);
         
+        // Apply dynamic filters if present in configOverrides
+        if ($viewDataGrid && isset($configOverrides['filters']) && is_array($configOverrides['filters'])) {
+            $filterGroup = $this->parseFilterData($configOverrides['filters']);
+            // Only set filters if we have conditions
+            if (!empty($filterGroup->getConditions())) {
+                $viewDataGrid->setFilters($filterGroup);
+            }
+        }
+        
         if (!$viewDataGrid) {
             return [
                 'data' => [],
@@ -260,6 +272,36 @@ class DataGridService
             'pageSize' => $pageSize,
             'gridConfig' => $gridConfig
         ];
+    }
+
+    private function parseFilterData(array $filtersData): FilterGroup
+    {
+        // Check if the input is a single group definition (has 'logic' and 'filters')
+        // Or a simple list of conditions (implicit AND group)
+        if (isset($filtersData['logic']) && isset($filtersData['filters']) && is_array($filtersData['filters'])) {
+            $group = new FilterGroup($filtersData['logic']);
+            $items = $filtersData['filters'];
+        } else {
+            // Default to AND group for a simple list
+            $group = new FilterGroup('AND');
+            $items = $filtersData;
+        }
+
+        foreach ($items as $item) {
+            if (isset($item['logic']) && isset($item['filters']) && is_array($item['filters'])) {
+                // Recursive group
+                $group->addCondition($this->parseFilterData($item));
+            } elseif (isset($item['field'], $item['operator'], $item['value'])) {
+                // Simple condition
+                $group->addCondition(new FilterCondition(
+                    $item['field'],
+                    $item['operator'],
+                    $item['value']
+                ));
+            }
+        }
+
+        return $group;
     }
 
     /**

@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Service\AI;
+
+interface AiProviderInterface
+{
+    /**
+     * Send a chat request to the AI model.
+     *
+     * @param array $messages Array of messages [['role' => 'user', 'content' => '...']]
+     * @param array $options Additional options (temperature, model, etc.)
+     * @return string The AI's response text
+     */
+    public function chat(array $messages, array $options = []): string;
+    
+    /**
+     * Get the provider name.
+     */
+    public function getName(): string;
+}

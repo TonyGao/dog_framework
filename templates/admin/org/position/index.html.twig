@@ -102,7 +102,103 @@
 			$('#add-position-button').on('click', function() {
 				openPositionCreateDrawer();
 			});
-		});
+
+			// 批量删除按钮绑定点击事件
+			$('#batch-delete-button').on('click', function() {
+				const gridId = 'position-grid';
+				const state = window.getGridState(gridId);
+				
+				let ids = Array.from(state.selectedIds);
+				let isSelectAll = state.isSelectAll;
+				let excludedIds = Array.from(state.excludedIds);
+
+				if (!isSelectAll && ids.length === 0) {
+                    let alert = new Alert($('.org-structure-container'));
+					alert.warning('请至少选择一项进行删除', { percent: '40%', title: "提示", closable: true });
+					return;
+				}
+
+                // 打开确认模态框
+                $('#batch-delete-modal').show();
+            });
+
+            // 绑定模态框取消按钮
+            $('#batch-delete-modal .cancel-btn, #batch-delete-modal .ef-modal-close-btn').on('click', function() {
+                $('#batch-delete-modal').hide();
+            });
+
+            // 绑定模态框确认按钮
+            $('#batch-delete-modal .confirm-btn').on('click', function() {
+                $('#batch-delete-modal').hide();
+                
+                const gridId = 'position-grid';
+                const state = window.getGridState(gridId);
+                
+                let ids = Array.from(state.selectedIds);
+                let isSelectAll = state.isSelectAll;
+                let excludedIds = Array.from(state.excludedIds);
+
+                let alert = new Alert($('.org-structure-container'));
+
+                ajax({
+                    url: "{{ path('org_position_batch_delete') }}",
+                    method: 'POST',
+                    data: {
+                        ids: ids,
+                        isSelectAll: isSelectAll,
+                        excludedIds: excludedIds
+                    },
+                    contentType: 'application/json',
+                    success: function(res) {
+                        if (res.code === 200) {
+                            if (res.status === 'warning') {
+                                alert.warning(res.message, { percent: '40%', title: "警告", closable: true });
+                            } else {
+                                alert.success(res.message || '删除成功', {
+                                    percent: '40%',
+                                    callback: function () {
+                                        // 刷新表格
+                                        const $searchForm = $('#' + gridId).closest('.org-structure-container').find('.ef-table-search-form');
+                                        if ($searchForm.length) {
+                                            $searchForm.submit();
+                                        } else {
+                                            window.location.reload();
+                                        }
+                                        
+                                        // 清空选择状态
+                                        state.selectedIds.clear();
+                                        state.excludedIds.clear();
+                                        state.isSelectAll = false;
+                                        state.allSelectedCurrentPage = false;
+                                        if (window.restoreSelections) {
+                                            window.restoreSelections($('#' + gridId));
+                                        }
+                                    }
+                                });
+                            }
+                        } else {
+                            alert.error(res.message || '删除失败', { percent: '40%', title: "错误", closable: true });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        let errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : error;
+                        alert.error('请求失败：' + errorMessage, { percent: '40%', title: "错误", closable: true });
+                    }
+                });
+            });
+
+            // 绑定高级搜索按钮
+            $('#filter-button').on('click', function() {
+                $('#modalposition-grid').show();
+            });
+
+            // 定义关闭模态框函数 (如果未定义)
+            if (typeof closeModal === 'undefined') {
+                window.closeModal = function(id) {
+                    $('#' + id).hide();
+                };
+            }
+        });
 	</script>
 {% endblock %}
 
@@ -117,7 +213,7 @@
                         editUrlPrefix: path('org_position_edit', {'id': 'placeholder'})|replace({'placeholder': ''}),
                         viewUrlPrefix: path('org_position_view', {'id': 'placeholder'})|replace({'placeholder': ''}),
                         deleteUrlPrefix: path('org_position_delete', {'id': 'placeholder'})|replace({'placeholder': ''}),
-                        batchDeleteUrl: path('api_org_position_batch_delete'),
+                        batchDeleteUrl: path('org_position_batch_delete'),
                         toolbarButtons: [
                             { type: 'create', text: '新增岗位', icon: 'fa-solid fa-plus-circle', id: 'add-position-button' },
                             { type: 'delete', text: '批量删除', icon: 'fa-solid fa-minus-circle', id: 'batch-delete-button' },
@@ -137,14 +233,336 @@
                         pagination: true,
                         serverSide: true,
                         dataUrl: path('api_org_position_list'),
-                        pageSize: 20,
-                        currentPage: 1,
+                        pageSize: pageSize|default(20),
+                        currentPage: currentPage|default(1),
                         totalPages: 1,
                         totalItems: 0,
                         showCheckbox: true,
-                        showRowNumber: true
+                        showRowNumber: true,
+                        updateUrlParams: true
                     }
                 ) }}
 		</div>
 	</div>
+
+    {# 批量删除确认模态框 #}
+    <div class="ef-modal-container" id="batch-delete-modal" style="z-index: 1001; display: none;">
+        <div class="ef-modal-mask"></div>
+        <div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+            <div class="ef-modal" style="width: 400px">
+                <div class="ef-modal-header">
+                    <div class="ef-modal-title ef-modal-title-align-left">
+                        确认删除
+                    </div>
+                    <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn">
+                        <span class="ef-icon-hover">
+                            <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                                <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                <div class="ef-modal-body">
+                    <div>确定要删除选中的岗位吗？此操作将标记岗位为停用状态，不可恢复。</div>
+                </div>
+                <div class="ef-modal-footer">
+                    <button class="btn secondary small cancel-btn" type="button">取消</button>
+                    <button class="btn primary small confirm-btn" type="button">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# 高级搜索模态框 - AI 智能搜索版 #}
+    {% macro filterBodyContent(columns) %}
+        <div class="ef-ai-search-container" style="display: flex; height: 500px; padding: 0;">
+            {# Left Sidebar: Available Fields #}
+            <div class="ef-ai-search-sidebar" style="width: 200px; border-right: 1px solid #eee; padding: 15px; background: #fafafa; overflow-y: auto;">
+                <div style="font-weight: bold; margin-bottom: 10px; color: #666;">可用字段</div>
+                <div class="ef-field-list">
+                    {% for col in columns %}
+                        {% if col.field is defined %}
+                        <div class="ef-field-item" style="padding: 5px 0; font-size: 13px; color: #333; cursor: pointer;" onclick="$('#ai-search-input').val($('#ai-search-input').val() + ' ' + '{{ col.label }}'); $('#ai-search-input').focus();">
+                            <i class="fa-solid fa-tag" style="color: #1890ff; margin-right: 5px;"></i> {{ col.label }}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Right Main Area #}
+            <div class="ef-ai-search-main" style="flex: 1; display: flex; flex-direction: column; padding: 15px;">
+                
+                {# Chat History #}
+                <div id="ai-chat-history" style="flex: 1; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-bottom: 15px; background: #fff;">
+                    <div class="ai-message" style="margin-bottom: 15px; display: flex;">
+                        <div class="ai-avatar" style="width: 32px; height: 32px; background: #e6f7ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px;">
+                            <i class="fa-solid fa-robot" style="color: #1890ff;"></i>
+                        </div>
+                        <div class="ai-content" style="background: #f0f2f5; padding: 8px 12px; border-radius: 8px; max-width: 80%;">
+                            你好！我是您的 AI 搜索助手。请告诉我您想查找什么？<br>
+                            例如：“查找IT部门的经理”
+                        </div>
+                    </div>
+                </div>
+
+                {# Input Area #}
+                <div class="ef-ai-input-area" style="display: flex; margin-bottom: 15px;">
+                    <textarea id="ai-search-input" class="ef-input" 
+                        style="flex: 1; height: 60px; padding: 10px; resize: none; border-radius: 8px 0 0 8px; border-right: none;" 
+                        placeholder="请输入您的搜索条件..."></textarea>
+                    <button id="ai-send-btn" class="ef-button ef-button-primary" style="height: 60px; border-radius: 0 8px 8px 0; padding: 0 20px;" onclick="executeAiSearch()">
+                        <i class="fa-solid fa-paper-plane"></i> 发送
+                    </button>
+                </div>
+
+                {# Current Filters Display #}
+                <div class="ef-ai-current-filters" style="border-top: 1px solid #eee; padding-top: 10px;">
+                    <div style="font-size: 13px; color: #999; margin-bottom: 5px;">当前已识别条件 (待确认):</div>
+                    <div id="ai-filter-tags" style="display: flex; flex-wrap: wrap; gap: 8px; min-height: 30px; align-items: center;">
+                        <span style="color: #ccc; font-size: 12px; line-height: 30px;">(暂无条件)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // State
+            let currentAiFilters = [];
+
+            // Field Label Map
+            const fieldLabels = {
+                {% for col in columns %}
+                    {% if col.field is defined %}
+                        '{{ col.field }}': '{{ col.label }}',
+                    {% endif %}
+                {% endfor %}
+            };
+
+            // Helper: Append Message
+            function appendMessage(role, text) {
+                const history = $('#ai-chat-history');
+                const isAi = role === 'ai';
+                const avatar = isAi ? '<i class="fa-solid fa-robot" style="color: #1890ff;"></i>' : '<i class="fa-solid fa-user" style="color: #52c41a;"></i>';
+                const bg = isAi ? '#e6f7ff' : '#f6ffed'; // Light blue for AI, Light green for User
+                const contentBg = isAi ? '#f0f2f5' : '#d9f7be';
+                
+                const html = `
+                    <div class="ai-message" style="margin-bottom: 15px; display: flex; ${!isAi ? 'flex-direction: row-reverse;' : ''}">
+                        <div class="ai-avatar" style="width: 32px; height: 32px; background: ${bg}; border-radius: 50%; display: flex; align-items: center; justify-content: center; ${isAi ? 'margin-right: 10px;' : 'margin-left: 10px;'}">
+                            ${avatar}
+                        </div>
+                        <div class="ai-content" style="background: ${contentBg}; padding: 8px 12px; border-radius: 8px; max-width: 80%; font-size: 14px;">
+                            ${text}
+                        </div>
+                    </div>
+                `;
+                history.append(html);
+                history.scrollTop(history[0].scrollHeight);
+            }
+
+            // Helper: Render Filters
+            function renderAiFilters() {
+                const container = $('#ai-filter-tags');
+                container.empty();
+                
+                if (currentAiFilters.length === 0) {
+                    container.html('<span style="color: #ccc; font-size: 12px; line-height: 30px;">(暂无条件)</span>');
+                    return;
+                }
+                
+                // Clear All Button
+                container.append('<button class="ef-button small danger" style="margin-right: 10px; padding: 0 8px; height: 24px; line-height: 22px; font-size: 12px; border-radius: 4px; border: 1px solid #ffccc7; background: #fff1f0; color: #ff4d4f; cursor: pointer;" onclick="currentAiFilters=[]; renderAiFilters(); appendMessage(\'ai\', \'已清空所有条件。\');">清空</button>');
+
+                container.append(renderRecursive(currentAiFilters, 'AND', []));
+            }
+
+            function renderRecursive(filters, logic, path) {
+                if (!filters || !Array.isArray(filters) || filters.length === 0) return '';
+                
+                let html = '<div style="display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px;">';
+                
+                const isNested = path.length > 0;
+                if (isNested) {
+                    html += '<span style="color: #999; font-weight: bold; font-family: monospace; font-size: 14px;">(</span>';
+                }
+
+                filters.forEach((item, index) => {
+                    const currentPath = [...path, index];
+                    
+                    if (index > 0) {
+                        html += `<span style="color: #fa8c16; font-weight: bold; margin: 0 2px; font-size: 11px;">${logic}</span>`;
+                    }
+
+                    if (item.logic && item.filters) {
+                        html += renderRecursive(item.filters, item.logic, currentPath);
+                    } else {
+                        // Value formatting
+                        let displayValue = item.value;
+                        if (Array.isArray(displayValue)) {
+                            displayValue = displayValue.join(', ');
+                        }
+
+                        // Field label mapping
+                        const displayField = fieldLabels[item.field] || item.field;
+
+                        html += `
+                        <div class="ef-tag" style="background: #e6f7ff; border: 1px solid #91d5ff; color: #1890ff; padding: 2px 8px; border-radius: 4px; font-size: 12px; display: flex; align-items: center;">
+                            <span>${displayField} ${getOperatorLabel(item.operator)} ${displayValue}</span>
+                            <i class="fa-solid fa-times" style="margin-left: 5px; cursor: pointer; color: #ff4d4f;" onclick="removeAiFilter('${currentPath.join('-')}')"></i>
+                        </div>
+                        `;
+                    }
+                });
+
+                if (isNested) {
+                    html += '<span style="color: #999; font-weight: bold; font-family: monospace; font-size: 14px;">)</span>';
+                }
+                
+                html += '</div>';
+                return html;
+            }
+
+            function getOperatorLabel(op) {
+                const map = {
+                    'equals': '=',
+                    'not_equals': '!=',
+                    'contains': '包含',
+                    'not_contains': '不包含',
+                    'begins_with': '开头是',
+                    'ends_with': '结尾是',
+                    'greater_than': '>',
+                    'less_than': '<',
+                    'greater_than_or_equal': '>=',
+                    'less_than_or_equal': '<=',
+                    'is_null': '为空',
+                    'is_not_null': '不为空',
+                    'in': '是'
+                };
+                return map[op] || op;
+            }
+
+            function removeAiFilter(pathStr) {
+                const path = pathStr.split('-').map(Number);
+                
+                let target = currentAiFilters;
+                // Traverse to the parent group
+                for (let i = 0; i < path.length - 1; i++) {
+                    if (target[path[i]] && target[path[i]].filters) {
+                        target = target[path[i]].filters;
+                    } else {
+                         // Should not happen if path is valid
+                         return;
+                    }
+                }
+                
+                const indexToRemove = path[path.length - 1];
+                if (target && target.length > indexToRemove) {
+                    target.splice(indexToRemove, 1);
+                    
+                    // Cleanup empty groups could be added here if needed
+                    // But for now we just rely on renderRecursive skipping empty groups visually?
+                    // No, renderRecursive checks empty at start. If a group becomes empty, it returns ''.
+                    // However, we might have an empty object in the parent array.
+                    // Let's implement a deep cleanup if necessary, but keep it simple first.
+                }
+                
+                renderAiFilters();
+                appendMessage('ai', '已移除该条件。');
+            }
+
+            // Main Action
+            function executeAiSearch() {
+                const input = $('#ai-search-input').val();
+                if (!input || !input.trim()) {
+                    return;
+                }
+                
+                // UI Update
+                appendMessage('user', input);
+                $('#ai-search-input').val('');
+                
+                const $btn = $('#ai-send-btn');
+                const originalText = $btn.html();
+                $btn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
+                
+                $.ajax({
+                    url: '{{ path("api_admin_ai_parse_query") }}',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        text: input,
+                        entity: 'App\\Entity\\Organization\\Position',
+                        currentFilters: currentAiFilters
+                    }),
+                    success: function(response) {
+                        $btn.prop('disabled', false).html(originalText);
+                        
+                        if (response.filters) {
+                            currentAiFilters = response.filters;
+                            renderAiFilters();
+                            
+                            // Show thought process if available
+                            if (response.thought_process) {
+                                appendMessage('ai', '<div style="color: #666; font-style: italic; font-size: 12px; margin-bottom: 5px; border-left: 2px solid #ccc; padding-left: 8px;">' + response.thought_process + '</div>已更新搜索条件，请确认。');
+                            } else {
+                                appendMessage('ai', '已更新搜索条件，请确认。');
+                            }
+                        } else {
+                            appendMessage('ai', '未能识别出有效的查询条件，请换个说法试试。');
+                        }
+                    },
+                    error: function(xhr) {
+                         $btn.prop('disabled', false).html(originalText);
+                         const errorMsg = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : '未知错误';
+                         appendMessage('ai', '解析失败: ' + errorMsg);
+                    }
+                });
+            }
+
+            // Confirm & Apply
+            function applyAiFilters() {
+                if (currentAiFilters.length === 0) {
+                     new Alert().warning('当前没有有效的搜索条件');
+                     return;
+                }
+
+                closeModal('modalposition-grid');
+                // Apply filters to grid
+                const $grid = $('#position-grid');
+                $grid.data('filters', currentAiFilters);
+                
+                // Trigger reload
+                $grid.find('.ef-pagination-bar .refresh').click();
+            }
+
+            // Bind Enter key
+            $('#ai-search-input').on('keypress', function(e) {
+                if (e.which == 13 && !e.shiftKey) {
+                    e.preventDefault();
+                    executeAiSearch();
+                }
+            });
+        </script>
+    {% endmacro %}
+
+    {% set modalContent = _self.filterBodyContent(columns|default([])) %}
+    {% set modalFooter = '<button class="btn secondary small" type="button" onclick="closeModal(\'modalposition-grid\')">取消</button>
+                      <button id="ai-apply-btn" class="btn primary small" type="button" onclick="applyAiFilters()">
+                        <i class="fa-solid fa-check"></i> 确认并搜索
+                      </button>' %}
+    {% set modalOptions = {
+        zIndex: 1002,
+        wrapperClass: 'ai-search-modal-wrapper',
+        width: '800px',
+        onClose: 'closeModal(\'modalposition-grid\')'
+    } %}
+
+    {{ ui.modal(
+        'modalposition-grid',
+        '高级搜索 (AI 助手)',
+        modalContent,
+        modalFooter,
+        modalOptions
+    ) }}
 {% endblock %}

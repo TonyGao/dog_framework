@@ -116,6 +116,30 @@
             "ref": "e805aba9eff5372e2d149a9ff56566769e22819d"
         }
     },
+    "symfony/ai-bundle": {
+        "version": "0.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.1",
+            "ref": "917b2a3da78a22e9488e99e1847d1f019d18da76"
+        },
+        "files": [
+            "config/packages/ai.yaml"
+        ]
+    },
+    "symfony/ai-generic-platform": {
+        "version": "0.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "0.1",
+            "ref": "caf14516010eb8e0c284f1264322b2af6a012723"
+        },
+        "files": [
+            "config/packages/ai_generic_platform.yaml"
+        ]
+    },
     "symfony/console": {
         "version": "6.1",
         "recipe": {

@@ -941,25 +941,18 @@ $(document).ready(function () {
         const dataUrl = $table.data('data-url');
         const $paginationBar = $table.find('.ef-pagination-bar');
         const $tbody = $table.find('tbody');
-        const filters = $table.data('filters');
         
         // 显示加载状态
         showLoadingState($table);
-        
-        const requestData = {
-            page: page,
-            pageSize: pageSize
-        };
-
-        if (filters) {
-            requestData.filters = filters;
-        }
         
         // 发送AJAX请求
         $.ajax({
             url: dataUrl,
             type: 'GET',
-            data: requestData,
+            data: {
+                page: page,
+                pageSize: pageSize
+            },
             dataType: 'json',
             success: function(response) {
                 // 移除加载蒙版

@@ -1,0 +1,18 @@
+ai:
+    platform:
+        generic:
+            aliyun:
+                base_url: '%env(ALIYUN_BASE_URL)%'
+                api_key: '%env(ALIYUN_API_KEY)%'
+                completions_path: '/chat/completions'
+                embeddings_path: '/embeddings'
+                model_catalog: 'Symfony\AI\Platform\Bridge\Generic\ModelCatalog'
+            lmstudio:
+                base_url: '%env(LM_STUDIO_URL)%'
+                api_key: 'lm-studio'
+                completions_path: '/chat/completions'
+                embeddings_path: '/embeddings'
+                model_catalog: 'Symfony\AI\Platform\Bridge\Generic\ModelCatalog'
+
+    # Enable store if needed, currently just minimal config to avoid errors if packages exist
+    store: []

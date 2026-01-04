@@ -1,0 +1,330 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'components/datagrid.html.twig' as grid %}
+{% import 'ui/template/ui.html.twig' as ui %}
+
+{% block title %}岗位管理
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		// 岗位管理drawer功能
+		function openPositionViewDrawer(positionId) {
+			// 防止重复点击，先移除已存在的drawer
+			$('#position-drawer-' + positionId).remove();
+			// 移除所有其他打开的drawer
+			$('[id^="position-drawer-"]').remove();
+			
+			ajax({
+				method: 'POST',
+				url: '/admin/org/position/drawer',
+				data: {
+					positionId: positionId,
+					action: 'view'
+				},
+				contentType: 'application/json',
+				dataType: 'html',
+				success: function(html) {
+					// 添加新的drawer到页面
+					$('body').append(html);
+					
+					// 显示drawer
+					$().showDrawer('position-drawer-' + positionId);
+				},
+				error: function(xhr, status, error) {
+					console.error('Error loading position drawer:', error);
+					alert('加载岗位详情失败，请重试');
+				}
+			});
+		}
+		
+		function openPositionEditDrawer(positionId) {
+			// 防止重复点击，先移除已存在的drawer
+			$('#position-drawer-' + positionId).remove();
+			// 移除所有其他打开的drawer
+			$('[id^="position-drawer-"]').remove();
+			
+			ajax({
+				method: 'POST',
+				url: '/admin/org/position/drawer',
+				data: {
+					positionId: positionId,
+					action: 'edit'
+				},
+				contentType: 'application/json',
+				dataType: 'html',
+				success: function(html) {
+					// 添加新的drawer到页面
+					$('body').append(html);
+					
+					// 显示drawer
+					$().showDrawer('position-drawer-' + positionId);
+				},
+				error: function(xhr, status, error) {
+					console.error('Error loading position edit drawer:', error);
+					alert('加载岗位编辑失败，请重试');
+				}
+			});
+		}
+		
+		function openPositionCreateDrawer() {
+			// 移除所有其他打开的drawer
+			$('[id^="position-drawer-"]').remove();
+			
+			ajax({
+				method: 'POST',
+				url: '/admin/org/position/drawer',
+				data: {
+					action: 'create'
+				},
+				contentType: 'application/json',
+				dataType: 'html',
+				success: function(html) {
+					// 添加新的drawer到页面
+					$('body').append(html);
+					
+					// 显示drawer
+					$().showDrawer('position-drawer-new');
+				},
+				error: function(xhr, status, error) {
+					console.error('Error loading position create drawer:', error);
+					alert('加载新增岗位失败，请重试');
+				}
+			});
+		}
+		
+		// 为新增岗位按钮绑定点击事件
+		$(document).ready(function() {
+			$('#add-position-button').on('click', function() {
+				openPositionCreateDrawer();
+			});
+
+			// 批量删除按钮绑定点击事件
+			$('#batch-delete-button').on('click', function() {
+				const gridId = 'position-grid';
+				const state = window.getGridState(gridId);
+				
+				let ids = Array.from(state.selectedIds);
+				let isSelectAll = state.isSelectAll;
+				let excludedIds = Array.from(state.excludedIds);
+
+				if (!isSelectAll && ids.length === 0) {
+                    let alert = new Alert($('.org-structure-container'));
+					alert.warning('请至少选择一项进行删除', { percent: '40%', title: "提示", closable: true });
+					return;
+				}
+
+                // 打开确认模态框
+                $('#batch-delete-modal').show();
+            });
+
+            // 绑定模态框取消按钮
+            $('#batch-delete-modal .cancel-btn, #batch-delete-modal .ef-modal-close-btn').on('click', function() {
+                $('#batch-delete-modal').hide();
+            });
+
+            // 绑定模态框确认按钮
+            $('#batch-delete-modal .confirm-btn').on('click', function() {
+                $('#batch-delete-modal').hide();
+                
+                const gridId = 'position-grid';
+				const state = window.getGridState(gridId);
+				
+				let ids = Array.from(state.selectedIds);
+				let isSelectAll = state.isSelectAll;
+				let excludedIds = Array.from(state.excludedIds);
+
+                let alert = new Alert($('.org-structure-container'));
+
+				ajax({
+					url: "{{ path('org_position_batch_delete') }}",
+					method: 'POST',
+					data: {
+						ids: ids,
+						isSelectAll: isSelectAll,
+						excludedIds: excludedIds
+					},
+					contentType: 'application/json',
+					success: function(res) {
+						if (res.code === 200) {
+							if (res.status === 'warning') {
+                                alert.warning(res.message, { percent: '40%', title: "警告", closable: true });
+							} else {
+                                alert.success(res.message || '删除成功', {
+                                    percent: '40%',
+                                    callback: function () {
+                                        // 刷新表格
+                                        const $searchForm = $('#' + gridId).closest('.org-structure-container').find('.ef-table-search-form');
+                                        if ($searchForm.length) {
+                                            $searchForm.submit();
+                                        } else {
+                                            window.location.reload();
+                                        }
+                                        
+                                        // 清空选择状态
+                                        state.selectedIds.clear();
+                                        state.excludedIds.clear();
+                                        state.isSelectAll = false;
+                                        state.allSelectedCurrentPage = false;
+                                        if (window.restoreSelections) {
+                                            window.restoreSelections($('#' + gridId));
+                                        }
+                                    }
+                                });
+							}
+						} else {
+                            alert.error(res.message || '删除失败', { percent: '40%', title: "错误", closable: true });
+						}
+					},
+					error: function(xhr, status, error) {
+                        let errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : error;
+						alert.error('请求失败：' + errorMessage, { percent: '40%', title: "错误", closable: true });
+					}
+				});
+			});
+		});
+	</script>
+{% endblock %}
+
+{% block app_content_container %}
+	<div class="org-structure-container">
+		<div class="outside-wrapper" style="padding: 20px;">
+			{{ grid.dataGrid(
+                    tableData|default([]),
+                    columns|default([]),
+                    {
+                        createUrl: path('org_position_new'),
+                        editUrlPrefix: path('org_position_edit', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                        viewUrlPrefix: path('org_position_view', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                        deleteUrlPrefix: path('org_position_delete', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                        batchDeleteUrl: path('org_position_batch_delete'),
+                        toolbarButtons: [
+                            { type: 'create', text: '新增岗位', icon: 'fa-solid fa-plus-circle', id: 'add-position-button' },
+                            { type: 'delete', text: '批量删除', icon: 'fa-solid fa-minus-circle', id: 'batch-delete-button' },
+                            { type: 'filter', text: '高级搜索', icon: 'fa-solid fa-filter', id: 'filter-button', classes: 'search' }
+                        ],
+                        actionButtons: [
+                            { type: 'view', text: '查看', icon: 'fa-solid fa-eye' },
+                            { type: 'edit', text: '编辑', icon: 'fa-solid fa-edit' },
+                            { type: 'delete', text: '删除', icon: 'fa-solid fa-trash' }
+                        ],
+                        emptyText: '暂无岗位数据',
+                        sortable: true,
+                        maxWidth: '100%',
+                        minHeight: '500px',
+                        autoFitContent: false,
+                        gridId: 'position-grid',
+                        pagination: true,
+                        serverSide: true,
+                        dataUrl: path('api_org_position_list'),
+                        pageSize: pageSize|default(20),
+                        currentPage: currentPage|default(1),
+                        totalPages: 1,
+                        totalItems: 0,
+                        showCheckbox: true,
+                        showRowNumber: true,
+                        updateUrlParams: true
+                    }
+                ) }}
+		</div>
+	</div>
+
+    {# 批量删除确认模态框 #}
+    <div class="ef-modal-container" id="batch-delete-modal" style="z-index: 1001; display: none;">
+        <div class="ef-modal-mask"></div>
+        <div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+            <div class="ef-modal" style="width: 400px">
+                <div class="ef-modal-header">
+                    <div class="ef-modal-title ef-modal-title-align-left">
+                        确认删除
+                    </div>
+                    <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn">
+                        <span class="ef-icon-hover">
+                            <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                                <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                <div class="ef-modal-body">
+                    <div>确定要删除选中的岗位吗？此操作将标记岗位为停用状态，不可恢复。</div>
+                </div>
+                <div class="ef-modal-footer">
+                    <button class="btn secondary small cancel-btn" type="button">取消</button>
+                    <button class="btn primary small confirm-btn" type="button">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# 高级搜索模态框 #}
+    {% macro filterBodyContent() %}
+        <div class="ef-filter">
+            <div class="ef-row ef-row-align-start ef-row-justify-start">
+                <div class="ef-col-4 ef-entity-column">
+                    <div class="ef-filter-entity">
+                        <div class="ef-filter-entity-title ef-text-lighting yellow">岗位信息</div>
+                        <div class="ef-filter-entity-fields">
+                            <div class="ef-filter-entity-field" data-field="name">岗位名称</div>
+                            <div class="ef-filter-entity-field" data-field="code">岗位编码</div>
+                            <div class="ef-filter-entity-field" data-field="department">所属部门</div>
+                            <div class="ef-filter-entity-field" data-field="level">岗位级别</div>
+                            <div class="ef-filter-entity-field" data-field="parent">上级岗位</div>
+                            <div class="ef-filter-entity-field" data-field="headcount">编制人数</div>
+                            <div class="ef-filter-entity-field" data-field="state">状态</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ef-col-8 ef-filter-operator-column">
+                      <div class="ef-filter-operator-wrapper">
+                        <div class="ef-filter-entity-operator" data-operator="left_parenthesis">(</div>
+                        <div class="ef-filter-entity-operator" data-operator="right_parenthesis">)</div>
+                        <div class="ef-filter-entity-operator" data-operator="and">AND</div>
+                        <div class="ef-filter-entity-operator" data-operator="or">OR</div>
+                        <div class="ef-filter-entity-operator" data-operator="equals">=</div>
+                        <div class="ef-filter-entity-operator" data-operator="not_equals=">!=</div>
+                        <div class="ef-filter-entity-operator" data-operator="less_than">&lt;</div>
+                        <div class="ef-filter-entity-operator" data-operator="less_than_or_equal">&lt;=</div>
+                        <div class="ef-filter-entity-operator" data-operator="greater_than">&gt;</div>
+                        <div class="ef-filter-entity-operator" data-operator="greater_than_or_equal">&gt;=</div>
+                        <div class="ef-filter-entity-operator" data-operator="contains">包含</div>
+                        <div class="ef-filter-entity-operator" data-operator="not_contains">不包含</div>
+                        <div class="ef-filter-entity-operator" data-operator="begins_with">开头是</div>
+                        <div class="ef-filter-entity-operator" data-operator="ends_with">结尾是</div>
+                        <div class="ef-filter-entity-operator" data-operator="is_null">是空的</div>
+                        <div class="ef-filter-entity-operator" data-operator="is_not_null">不是空的</div>
+                        <div class="ef-filter-entity-operator" data-operator="between">介于</div>
+                        <div class="ef-filter-entity-operator" data-operator="not_between">不介于</div>
+                      </div>
+                </div>
+                <div class="ef-col-12 ef-filter-condition-editor" contenteditable="true">
+                    <div class="ef-filter-editor-wrapper">
+                        {# 初始为空，由JS初始化 #}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endmacro %}
+
+    {% set modalContent = _self.filterBodyContent() %}
+    {% set modalFooter = '<button class="btn secondary small" type="button" onclick="closeModal(\'modalposition-grid\')">取消</button>
+                      <button class="btn primary small" type="button" onclick="submitModal(\'modalposition-grid\')">搜索</button>' %}
+    {% set modalOptions = {
+        zIndex: 1002,
+        wrapperClass: 'filter-modal-wrapper',
+        width: '1000px',
+        onClose: 'closeModal(\'modalposition-grid\')'
+    } %}
+
+    {{ ui.modal(
+        'modalposition-grid',
+        '高级搜索',
+        modalContent,
+        modalFooter,
+        modalOptions
+    ) }}
+{% endblock %}

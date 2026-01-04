@@ -154,35 +154,144 @@ class DoctrineDataSet implements DataSetInterface
      */
     private function applyFiltersToQueryBuilder(QueryBuilder $queryBuilder, FilterGroup $filters): void
     {
-        $conditions = $filters->getConditions();
+        $expression = $this->buildExpression($queryBuilder, $filters);
+        if ($expression) {
+            $queryBuilder->andWhere($expression);
+        }
+    }
+
+    private function buildExpression(QueryBuilder $queryBuilder, FilterGroup $group)
+    {
+        $expr = $queryBuilder->expr();
+        $logic = strtoupper($group->getLogic());
+        $conditions = $group->getConditions();
+        
+        if (empty($conditions)) {
+            return null;
+        }
+
+        $predicates = [];
         foreach ($conditions as $index => $condition) {
-            $parameterName = 'filter_' . $index;
-            $field = 'e.' . $condition->getField();
-            $operator = $condition->getOperator();
-            $value = $condition->getValue();
-
-            switch ($operator) {
-                case '=':
-                    $queryBuilder->andWhere($field . ' = :' . $parameterName);
-                    break;
-                case '>':
-                    $queryBuilder->andWhere($field . ' > :' . $parameterName);
-                    break;
-                case '<':
-                    $queryBuilder->andWhere($field . ' < :' . $parameterName);
-                    break;
-                case 'LIKE':
-                    $queryBuilder->andWhere($field . ' LIKE :' . $parameterName);
-                    break;
-                case 'IN':
-                    $queryBuilder->andWhere($field . ' IN (:' . $parameterName . ')');
-                    break;
-                // 可以根据需求扩展更多操作符
-                default:
-                    throw new \InvalidArgumentException("Unsupported operator: " . $operator);
+            if ($condition instanceof FilterGroup) {
+                $nestedExpr = $this->buildExpression($queryBuilder, $condition);
+                if ($nestedExpr) {
+                    $predicates[] = $nestedExpr;
+                }
+            } elseif ($condition instanceof FilterCondition) {
+                $parameterName = 'filter_' . uniqid();
+                $predicate = $this->createPredicate($queryBuilder, $condition, $parameterName);
+                if ($predicate) {
+                    $predicates[] = $predicate;
+                }
             }
+        }
 
-            $queryBuilder->setParameter($parameterName, $value);
+        if (empty($predicates)) {
+            return null;
+        }
+
+        if ($logic === 'OR') {
+            return $expr->orX(...$predicates);
+        } else {
+            return $expr->andX(...$predicates);
+        }
+    }
+
+    private function createPredicate(QueryBuilder $queryBuilder, FilterCondition $condition, string $parameterName)
+    {
+        $fieldName = $condition->getField();
+        $rootAlias = $queryBuilder->getRootAliases()[0];
+        
+        // Handle Dot Notation for Relations (e.g. department.name)
+        if (str_contains($fieldName, '.')) {
+            $parts = explode('.', $fieldName);
+            $currentAlias = $rootAlias;
+            
+            // Iterate through relations (all parts except the last one)
+            for ($i = 0; $i < count($parts) - 1; $i++) {
+                $relation = $parts[$i];
+                $nextAlias = $currentAlias . '_' . $relation; // Unique alias based on path
+                
+                // Check if join already exists
+                $joinExists = false;
+                $joins = $queryBuilder->getDQLPart('join');
+                
+                // Joins are grouped by the alias they are joined to (or root alias)
+                foreach ($joins as $root => $joinList) {
+                    foreach ($joinList as $join) {
+                        /** @var \Doctrine\ORM\Query\Expr\Join $join */
+                        if ($join->getAlias() === $nextAlias) {
+                            $joinExists = true;
+                            break 2;
+                        }
+                    }
+                }
+                
+                if (!$joinExists) {
+                    $queryBuilder->leftJoin($currentAlias . '.' . $relation, $nextAlias);
+                }
+                $currentAlias = $nextAlias;
+            }
+            
+            $field = $currentAlias . '.' . end($parts);
+        } else {
+            $field = $rootAlias . '.' . $fieldName;
+        }
+
+        $operator = $condition->getOperator();
+        $value = $condition->getValue();
+        $expr = $queryBuilder->expr();
+
+        switch ($operator) {
+            case '=':
+            case 'equals':
+                $queryBuilder->setParameter($parameterName, $value);
+                return $expr->eq($field, ':' . $parameterName);
+            case '!=':
+            case 'not_equals':
+                $queryBuilder->setParameter($parameterName, $value);
+                return $expr->neq($field, ':' . $parameterName);
+            case '>':
+            case 'greater_than':
+                $queryBuilder->setParameter($parameterName, $value);
+                return $expr->gt($field, ':' . $parameterName);
+            case '<':
+            case 'less_than':
+                $queryBuilder->setParameter($parameterName, $value);
+                return $expr->lt($field, ':' . $parameterName);
+            case '>=':
+            case 'greater_than_or_equal':
+                $queryBuilder->setParameter($parameterName, $value);
+                return $expr->gte($field, ':' . $parameterName);
+            case '<=':
+            case 'less_than_or_equal':
+                $queryBuilder->setParameter($parameterName, $value);
+                return $expr->lte($field, ':' . $parameterName);
+            case 'LIKE':
+                $queryBuilder->setParameter($parameterName, $value);
+                return $expr->like($field, ':' . $parameterName);
+            case 'contains':
+                $queryBuilder->setParameter($parameterName, '%' . $value . '%');
+                return $expr->like($field, ':' . $parameterName);
+            case 'not_contains':
+                $queryBuilder->setParameter($parameterName, '%' . $value . '%');
+                return $expr->notLike($field, ':' . $parameterName);
+            case 'begins_with':
+                $queryBuilder->setParameter($parameterName, $value . '%');
+                return $expr->like($field, ':' . $parameterName);
+            case 'ends_with':
+                $queryBuilder->setParameter($parameterName, '%' . $value);
+                return $expr->like($field, ':' . $parameterName);
+            case 'IN':
+            case 'in':
+                $queryBuilder->setParameter($parameterName, $value);
+                return $expr->in($field, ':' . $parameterName);
+            case 'is_null':
+                return $expr->isNull($field);
+            case 'is_not_null':
+                return $expr->isNotNull($field);
+            default:
+                throw new \InvalidArgumentException("Unsupported operator: " . $operator);
         }
     }
 }
