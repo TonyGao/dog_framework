@@ -1,0 +1,75 @@
+{% macro render_tree(nodes, options) %}
+    {% import _self as self %}
+    {% set options = options|default({}) %}
+    {% set isRoot = options.isRoot|default(false) %}
+    
+    {% if nodes is not empty %}
+        <ol class="{{ isRoot ? 'ol-left-tree' : 'sub-tree-content' }}" {% if not isRoot and options.collapsed|default(false) %}style="display: none;"{% endif %}>
+            {% for node in nodes %}
+                <li>
+                    <div class="item-content scroll-item">
+                        <div class="arrow-icon">
+                            {% if node.__children is not empty %}
+                                <i class="fa-solid {{ options.collapsed|default(false) ? 'fa-caret-right' : 'fa-caret-down' }}"></i>
+                            {% else %}
+                                {# Placeholder for alignment if needed, or empty #}
+                            {% endif %}
+                        </div>
+                        <div class="org-icon">
+                            {% if options.checkbox|default(false) %}
+                                <label aria-disabled="false" class="ef-checkbox">
+                                    <input type="checkbox" class="ef-checkbox-target" value="{{ node.id }}">
+                                    <span class="ef-icon-hover ef-checkbox-icon-hover">
+                                        <div class="ef-checkbox-icon"></div>
+                                    </span>
+                                    <span class="ef-checkbox-label"></span>
+                                </label>
+                            {% elseif options.icon_map is defined and node.type is defined and options.icon_map[node.type] is defined %}
+                                <i class="{{ options.icon_map[node.type] }}"></i>
+                            {% elseif options.icon_context is defined and options.icon_macro is defined %}
+                                {{ attribute(options.icon_context, options.icon_macro, [node])|raw }}
+                            {% elseif options.icon_callback is defined %}
+                                {# Deprecated or specific use case #}
+                                {{ options.icon_callback(node)|raw }}
+                            {% else %}
+                                <i class="{{ options.icon|default('fa-solid fa-folder') }}"></i>
+                            {% endif %}
+                        </div>
+                        <div class="org-name">
+                            <div class="tree-text-content branch" 
+                                data-id="{{ node.id }}" 
+                                data-type="{{ node.type|default('') }}"
+                                {%- for key, value in node %}
+                                    {%- if key not in ['id', 'type', 'name', '__children', 'lvl', 'lft', 'rgt', 'root', 'parent', 'company', 'managedDepartments'] %}
+                                        {%- if value.timestamp is defined %}
+                                            {{- ' ' }}data-{{ key }}="{{ value|date('Y-m-d H:i:s') }}"
+                                        {%- elseif value is not iterable %}
+                                            {{- ' ' }}data-{{ key }}="{{ value }}"
+                                        {%- endif %}
+                                    {%- endif %}
+                                {%- endfor %}>
+                                {{ node.name }}
+                            </div>
+                        </div>
+                        {% if options.draggable|default(false) %}
+                            <div class="node-tail-icon">
+                                <div class="ef-group-field-handler">
+                                    <div class="ef-group-filed-handler-wrapper ui-sortable-handle">
+                                        <div class="circle">
+                                            <i class="fa-solid fa-arrows-up-down-left-right"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if node.__children is not empty %}
+                         <span class="tree-indent" {% if options.collapsed|default(false) %}style="display: none;"{% endif %}></span>
+                         {{ self.render_tree(node.__children, options|merge({'isRoot': false})) }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ol>
+    {% endif %}
+{% endmacro %}

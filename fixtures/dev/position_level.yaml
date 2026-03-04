@@ -1,0 +1,47 @@
+# 岗位级别数据
+App\Entity\Organization\PositionLevel:
+    position_level_1:
+        name: '初级'
+        code: 'L01'
+        description: '初级员工，需要指导完成工作'
+        levelOrder: 1
+        salaryMin: 5000
+        salaryMax: 10000
+        state: true
+        orderNum: 1
+    position_level_2:
+        name: '中级'
+        code: 'L02'
+        description: '中级员工，可独立完成常规任务'
+        levelOrder: 2
+        salaryMin: 10000
+        salaryMax: 20000
+        state: true
+        orderNum: 2
+    position_level_3:
+        name: '高级'
+        code: 'L03'
+        description: '高级员工，解决复杂问题，指导新人'
+        levelOrder: 3
+        salaryMin: 20000
+        salaryMax: 35000
+        state: true
+        orderNum: 3
+    position_level_4:
+        name: '专家级'
+        code: 'L04'
+        description: '领域专家，负责关键技术决策'
+        levelOrder: 4
+        salaryMin: 35000
+        salaryMax: 60000
+        state: true
+        orderNum: 4
+    position_level_5:
+        name: '资深级'
+        code: 'L05'
+        description: '行业资深人士，战略层面规划'
+        levelOrder: 5
+        salaryMin: 60000
+        salaryMax: 100000
+        state: true
+        orderNum: 5

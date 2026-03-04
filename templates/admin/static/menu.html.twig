@@ -85,8 +85,8 @@ scrollBtnDisplay = sideMenuState == 'shrunk' ? 'flex' : 'none' %}
               </a>
 
               <a
-                class=" link item-menu-content {{'/admin/org/grade'== app.request.requestUri ? 'current' : '' }}"
-                href="/admin/org/grade"
+                class=" link item-menu-content {{'/admin/org/position/level'== app.request.requestUri ? 'current' : '' }}"
+                href="/admin/org/position/level"
               >
                 <div class="link-icon">
                   <i class="fa-solid fa-layer-group"></i>
@@ -118,15 +118,15 @@ scrollBtnDisplay = sideMenuState == 'shrunk' ? 'flex' : 'none' %}
                   style="{{'#'== app.request.requestUri ? 'display: none;' : '' }}"
                 >
                   <a
-                    class=" link item-menu-content {{'/admin/hr/employee'== app.request.requestUri ? 'current' : '' }}"
-                    href="/admin/hr/employee"
+                    class=" link item-menu-content {{'/employee/list'== app.request.requestUri ? 'current' : '' }}"
+                    href="/employee/list"
                   >
                     <div class="link-icon">
                       <i class="fa-solid fa-address-card"></i>
                     </div>
                     <div class="link-text">
                       <div class="link-text-content" style="max-width: 83%">
-                        人员信息
+                        花名册
                       </div>
                     </div>
                   </a>

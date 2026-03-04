@@ -13,12 +13,14 @@ use App\Entity\Organization\PositionLevel;
 use App\Entity\Platform\Entity;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Form\Organization\OrgDepartmentType;
+use App\Form\Organization\PositionLevelType;
 use App\Form\Organization\PositionType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\Organization\CorporationFormType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Controller\Api\ApiResponse;
+use App\Service\Platform\DataGridService;
 /**
  * 组织架构管理
  */
@@ -500,7 +502,7 @@ class OrgController extends BaseController
    * 新建岗位
    */
   #[Route('/admin/org/position/new', name: 'org_position_new')]
-  public function createPosition(Request $request, EntityManagerInterface $em): Response
+  public function createPosition(Request $request, EntityManagerInterface $em, DataGridService $dataGridService): Response
   {
     $position = new Position();
 
@@ -536,6 +538,7 @@ class OrgController extends BaseController
       $position = $form->getData();
       $em->persist($position);
       $em->flush();
+      $dataGridService->clearEntityCache(Position::class);
 
       $this->addFlash('success', '岗位创建成功');
       return $this->redirectToRoute('org_position');
@@ -551,7 +554,7 @@ class OrgController extends BaseController
    * 编辑岗位
    */
   #[Route('/admin/org/position/edit/{id}', name: 'org_position_edit')]
-  public function editPosition(Request $request, EntityManagerInterface $em, string $id): Response
+  public function editPosition(Request $request, EntityManagerInterface $em, string $id, DataGridService $dataGridService): Response
   {
     $position = $em->getRepository(Position::class)->find($id);
 
@@ -568,6 +571,7 @@ class OrgController extends BaseController
     if ($form->isSubmitted() && $form->isValid()) {
       $position = $form->getData();
       $em->flush();
+      $dataGridService->clearEntityCache(Position::class);
 
       $this->addFlash('success', '岗位更新成功');
       return $this->redirectToRoute('org_position');
@@ -584,7 +588,7 @@ class OrgController extends BaseController
    * 批量删除岗位
    */
   #[Route('/admin/org/position/batch-delete', name: 'org_position_batch_delete', methods: ['POST'])]
-  public function batchDeletePosition(Request $request, EntityManagerInterface $em): Response
+  public function batchDeletePosition(Request $request, EntityManagerInterface $em, DataGridService $dataGridService): Response
   {
       $data = $request->toArray();
       $ids = $data['ids'] ?? [];
@@ -642,6 +646,7 @@ class OrgController extends BaseController
 
       if ($deletedCount > 0) {
           $em->flush();
+          $dataGridService->clearEntityCache(Position::class);
       }
 
       if ($errorCount > 0) {
@@ -656,7 +661,7 @@ class OrgController extends BaseController
    * 删除岗位
    */
   #[Route('/admin/org/position/delete/{id}', name: 'org_position_delete', methods: ['POST'])]
-  public function deletePosition(Request $request, EntityManagerInterface $em, string $id): Response
+  public function deletePosition(Request $request, EntityManagerInterface $em, string $id, DataGridService $dataGridService): Response
   {
     $position = $em->getRepository(Position::class)->find($id);
 
@@ -680,6 +685,7 @@ class OrgController extends BaseController
 
     $em->remove($position);
     $em->flush();
+    $dataGridService->clearEntityCache(Position::class);
 
     $this->addFlash('success', '岗位删除成功');
     return $this->redirectToRoute('org_position');
@@ -710,35 +716,138 @@ class OrgController extends BaseController
    * 岗位级别管理
    */
   #[Route('/admin/org/position/level', name: 'org_position_level')]
-  public function positionLevelList(Request $request, EntityManagerInterface $em): Response
+  public function positionLevelList(Request $request): Response
   {
-    $positionLevels = $em->getRepository(PositionLevel::class)->findBy([], ['levelOrder' => 'ASC']);
-
-    // 准备表格数据
-    $tableData = [];
-    foreach ($positionLevels as $level) {
-      $tableData[] = [
-        'id' => $level->getId(),
-        'name' => $level->getName(),
-        'code' => $level->getCode(),
-        'levelOrder' => $level->getLevelOrder(),
-        'salaryRange' => ($level->getSalaryMin() ? $level->getSalaryMin() : '0') . ' - ' . ($level->getSalaryMax() ? $level->getSalaryMax() : '0'),
-        'state' => $level->getState() ? '启用' : '停用',
-      ];
-    }
-
     // 定义表格列配置
     $columns = [
       ['field' => 'name', 'label' => '级别名称'],
       ['field' => 'code', 'label' => '级别编码'],
       ['field' => 'levelOrder', 'label' => '级别序号'],
-      ['field' => 'salaryRange', 'label' => '薪资范围'],
+      ['field' => 'salaryMin', 'label' => '薪资下限'],
+      ['field' => 'salaryMax', 'label' => '薪资上限'],
       ['field' => 'state', 'label' => '状态'],
     ];
 
+    $page = $request->query->getInt('page', 1);
+    $pageSize = $request->query->getInt('pageSize', 20);
+
     return $this->render('admin/org/position/level_index.html.twig', [
-      'tableData' => $tableData,
-      'columns' => $columns
+      'tableData' => [],
+      'columns' => $columns,
+      'currentPage' => $page,
+      'pageSize' => $pageSize
+    ]);
+  }
+
+  /**
+   * 新建岗位级别
+   */
+  #[Route('/admin/org/position/level/new', name: 'org_position_level_new')]
+  public function createPositionLevel(Request $request, EntityManagerInterface $em, DataGridService $dataGridService): Response
+  {
+    $positionLevel = new PositionLevel();
+    $form = $this->createForm(PositionLevelType::class, $positionLevel, [
+      'action' => $this->generateUrl('org_position_level_new')
+    ]);
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+      $positionLevel = $form->getData();
+      $em->persist($positionLevel);
+      $em->flush();
+      $dataGridService->clearEntityCache(PositionLevel::class);
+
+      $this->addFlash('success', '岗位级别创建成功');
+      return $this->redirectToRoute('org_position_level');
+    }
+    
+    return $this->render('admin/org/position/level_form.html.twig', [
+      'form' => $form->createView(),
+      'title' => '新建岗位级别'
+    ]);
+  }
+
+  /**
+   * 编辑岗位级别
+   */
+  #[Route('/admin/org/position/level/edit/{id}', name: 'org_position_level_edit')]
+  public function editPositionLevel(Request $request, EntityManagerInterface $em, string $id, DataGridService $dataGridService): Response
+  {
+    $positionLevel = $em->getRepository(PositionLevel::class)->find($id);
+
+    if (!$positionLevel) {
+      throw $this->createNotFoundException('岗位级别不存在');
+    }
+
+    $form = $this->createForm(PositionLevelType::class, $positionLevel, [
+      'action' => $this->generateUrl('org_position_level_edit', ['id' => $id])
+    ]);
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+      $em->flush();
+      $dataGridService->clearEntityCache(PositionLevel::class);
+      $this->addFlash('success', '岗位级别更新成功');
+      return $this->redirectToRoute('org_position_level');
+    }
+
+    return $this->render('admin/org/position/level_form.html.twig', [
+      'form' => $form->createView(),
+      'title' => '编辑岗位级别'
+    ]);
+  }
+
+  /**
+   * 返回岗位级别查看/编辑/新增的drawer HTML
+   */
+  #[Route('/admin/org/position/level/drawer', name: 'api_org_position_level_drawer', methods: ['POST'])]
+  public function positionLevelDrawer(Request $request, EntityManagerInterface $em): Response
+  {
+    $payload = $request->toArray();
+    $levelId = $payload['levelId'] ?? null;
+    $action = $payload['action'] ?? 'view'; // view、edit 或 create
+    
+    // 如果是创建操作
+    if ($action === 'create') {
+      $positionLevel = new PositionLevel();
+      $form = $this->createForm(PositionLevelType::class, $positionLevel, [
+        'action' => $this->generateUrl('org_position_level_new')
+      ]);
+      
+      return $this->render('admin/org/position/level_create_drawer.html.twig', [
+        'positionLevel' => $positionLevel,
+        'form' => $form->createView(),
+        'drawerId' => 'position-level-drawer-new'
+      ]);
+    }
+    
+    if (!$levelId) {
+      throw $this->createNotFoundException('岗位级别ID不能为空');
+    }
+    
+    $positionLevel = $em->getRepository(PositionLevel::class)->find($levelId);
+    
+    if (!$positionLevel) {
+      throw $this->createNotFoundException('岗位级别不存在');
+    }
+    
+    if ($action === 'edit') {
+      $form = $this->createForm(PositionLevelType::class, $positionLevel, [
+        'action' => $this->generateUrl('org_position_level_edit', ['id' => $levelId])
+      ]);
+      
+      return $this->render('admin/org/position/level_edit_drawer.html.twig', [
+        'positionLevel' => $positionLevel,
+        'form' => $form->createView(),
+        'drawerId' => 'position-level-drawer-' . $levelId
+      ]);
+    }
+    
+    return $this->render('admin/org/position/level_view_drawer.html.twig', [
+      'positionLevel' => $positionLevel,
+      'drawerId' => 'position-level-drawer-' . $levelId
     ]);
   }
 

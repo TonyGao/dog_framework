@@ -1,0 +1,181 @@
+{% extends 'base.html.twig' %}
+{% import 'components/tree.html.twig' as treeComponent %}
+
+{% block title %}Tree Component Test{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="{{ asset('platform/treeLayout.css', 'admin') }}"/>
+    <style>
+        .test-tree-container {
+            width: 400px;
+            height: 600px;
+            border: 1px solid #ddd;
+            margin: 20px;
+            padding: 20px;
+            overflow: auto;
+            background: #fff;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1>Tree Component Test</h1>
+            <p>This is a test of the reusable tree component extracted from the codebase.</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    Department Tree Example
+                </div>
+                <div class="card-body">
+                    <div class="test-tree-container common-tree-wrapper org-structure-container left-tree">
+                        {{ treeComponent.render_tree(tree, {
+                            'isRoot': true, 
+                            'icon_map': {
+                                'corperations': 'fa-solid fa-building',
+                                'company': 'fa-solid fa-building-user',
+                                'department': 'fa-solid fa-user-group',
+                                'root': 'fa-solid fa-database',
+                                'namespace': 'fa-regular fa-folder',
+                                'entity': 'fa-solid fa-table',
+                                'group': 'fa-solid fa-layer-group',
+                                'property': 'fa-solid fa-font'
+                            }
+                        }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    Entity/Model Tree Example (Mock Data)
+                </div>
+                <div class="card-body">
+                    <div class="test-tree-container common-tree-wrapper org-structure-container left-tree">
+                        {{ treeComponent.render_tree(mockTree, {
+                            'isRoot': true, 
+                            'icon_map': {
+                                'root': 'fa-solid fa-database',
+                                'namespace': 'fa-regular fa-folder',
+                                'entity': 'fa-solid fa-table',
+                                'group': 'fa-solid fa-layer-group',
+                                'property': 'fa-solid fa-font'
+                            }
+                        }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    Menu Tree Example (Draggable + Checkbox)
+                </div>
+                <div class="card-body">
+                    <div class="test-tree-container common-tree-wrapper org-structure-container left-tree menu-tree-example">
+                        {{ treeComponent.render_tree(mockMenuTree, {
+                            'isRoot': true, 
+                            'checkbox': true,
+                            'draggable': true,
+                            'icon_map': {
+                                'root': 'fa-solid fa-bars',
+                                'menu': 'fa-solid fa-file-lines'
+                            }
+                        }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                     Instructions
+                </div>
+                <div class="card-body">
+                    <p>To use this component:</p>
+                    <pre>
+{% verbatim %}
+{% import 'components/tree.html.twig' as treeComponent %}
+
+&lt;div class="common-tree-wrapper org-structure-container left-tree"&gt;
+    {{ treeComponent.render_tree(tree, {
+        'isRoot': true,
+        'icon_map': {
+            'department': 'fa-solid fa-user-group',
+            'entity': 'fa-solid fa-table'
+        },
+        'checkbox': true,  // Optional: Enable checkboxes
+        'draggable': true  // Optional: Enable drag handle
+    }) }}
+&lt;/div&gt;
+{% endverbatim %}
+                    </pre>
+                    <p>Options:</p>
+                    <ul>
+                        <li><code>isRoot</code>: Set to true for the top-level call.</li>
+                        <li><code>collapsed</code>: Set to true to start collapsed (internal recursion).</li>
+                        <li><code>icon</code>: Default icon class (e.g., 'fa-solid fa-folder').</li>
+                        <li><code>icon_map</code>: Mapping of node types to icon classes.</li>
+                        <li><code>checkbox</code>: Set to true to show checkboxes (requires EF checkbox CSS/JS).</li>
+                        <li><code>draggable</code>: Set to true to show drag handles (requires jQuery UI Sortable).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            // Initialize Sortable for the menu tree
+            $(".menu-tree-example .sub-tree-content").sortable({
+                connectWith: ".sub-tree-content",
+                handle: ".ef-group-filed-handler-wrapper",
+                placeholder: "sortable-placeholder",
+                tolerance: "pointer",
+                items: "> li",
+                start: function (event, ui) {
+                    var parentWidth = ui.item.closest('.sub-tree-content').width();
+                    ui.placeholder.css({
+                        'min-width': parentWidth,
+                        'min-height': '20px'
+                    });
+                    ui.item.css('min-width', parentWidth);
+                    ui.item.addClass("dragging");
+                    $(".sortable-placeholder").css({
+                        "height": ui.helper.outerHeight()
+                    });
+                },
+                stop: function (event, ui) {
+                    ui.item.removeClass("dragging");
+                }
+            }).disableSelection();
+
+            // Checkbox change listener
+            $(document).on("change", ".menu-tree-example .ef-checkbox-target", function () {
+                const $checkbox = $(this);
+                const $nodeName = $checkbox.closest(".item-original").find(".tree-text-content");
+                const menuId = $nodeName.attr('id');
+                const menuName = $nodeName.text();
+                
+                console.log("Checkbox changed:", menuId, menuName, $checkbox.is(':checked'));
+            });
+        });
+    </script>
+{% endblock %}

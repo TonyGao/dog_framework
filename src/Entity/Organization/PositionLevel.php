@@ -94,6 +94,9 @@ class PositionLevel
     #[ORM\Column(type: 'boolean', options: ['default' => 1])]
     private $state = true;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $sortOrder;
+
     public function __construct()
     {
         // 自动生成 UUID
@@ -256,6 +259,18 @@ class PositionLevel
     public function setState($state)
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    public function getSortOrder(): ?int
+    {
+        return $this->sortOrder;
+    }
+
+    public function setSortOrder(?int $sortOrder): self
+    {
+        $this->sortOrder = $sortOrder;
 
         return $this;
     }

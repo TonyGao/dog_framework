@@ -1,0 +1,538 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}员工异动办理{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Global & Layout */
+        .app-content-container {
+            overflow-y: auto !important;
+        }
+
+        .transfer-container {
+            padding: 24px;
+            padding-bottom: 48px;
+            background-color: #f8fafc;
+            min-height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #0f172a;
+            display: flex;
+            flex-direction: column;
+            flex: 1 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .breadcrumb i { font-size: 12px; }
+        .breadcrumb span.active { color: #0f172a; font-weight: 500; }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Card Styles */
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title i { color: #3b82f6; }
+
+        /* Employee Info Compact */
+        .employee-summary {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 20px;
+        }
+        .emp-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px #e2e8f0;
+        }
+        .emp-details h3 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .emp-meta {
+            font-size: 13px;
+            color: #64748b;
+            display: flex;
+            gap: 12px;
+        }
+        .emp-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 24px; /* Increased for better separation and alignment */
+        }
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+        
+        /* Button Style Radio Group */
+        .ef-radio-button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ef-radio-button-group .ef-radio {
+            margin-right: 0;
+            padding: 8px 16px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            justify-content: center;
+            min-width: 80px;
+        }
+
+        .ef-radio-button-group .ef-radio .ef-icon-hover {
+            display: none;
+        }
+
+        .ef-radio-button-group .ef-radio .ef-radio-label {
+            margin-left: 0;
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .ef-radio-button-group .ef-radio.ef-radio-checked {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #2563eb;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+
+        .ef-radio-button-group .ef-radio.ef-radio-checked .ef-radio-label {
+            color: #2563eb;
+        }
+
+        /* Comparison Grid */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 40px 1fr;
+            gap: 12px;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+        .comparison-col h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #94a3b8;
+            margin-bottom: 16px;
+            font-weight: 600;
+            height: 18px; /* Fixed height for header alignment */
+        }
+        .arrow-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 34px; /* Header height + margin */
+            height: 100%;
+            color: #cbd5e1;
+        }
+        
+        /* Alignment Fixes */
+        .readonly-field {
+            padding: 0 12px;
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            border-radius: 4px; /* Match ef-input radius */
+            color: #64748b;
+            font-size: 14px;
+            height: 32px; /* Match ef-input medium height */
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        /* Fix Select Icon Spacing */
+        .ef-select-view-suffix {
+            padding-right: 8px;
+        }
+
+        /* Timeline/Process */
+        .process-list {
+            position: relative;
+            padding-left: 20px;
+        }
+        .process-list::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 10px;
+            bottom: 20px;
+            width: 2px;
+            background: #f1f5f9;
+        }
+        .process-item {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .process-dot {
+            position: absolute;
+            left: -20px;
+            top: 2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            border: 4px solid #e2e8f0;
+            z-index: 1;
+        }
+        .process-item.active .process-dot {
+            border-color: #3b82f6;
+        }
+        .process-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 2px;
+        }
+        .process-desc {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        /* Overwrite button sizes */
+        .btn.medium {
+            padding: 6px 16px;
+            font-size: 13px;
+            height: 32px;
+            line-height: 1.5;
+        }
+
+        /* Helper */
+        .text-hint {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+    </style>
+{% endblock %}
+
+{% block app_content_container %}
+<div class="transfer-container">
+    {# Breadcrumb #}
+    <div class="page-header">
+        <div class="breadcrumb">
+            <i class="fa-solid fa-house"></i>
+            <span>首页</span>
+            <i class="fa-solid fa-chevron-right" style="font-size: 10px; color: #cbd5e1;"></i>
+            <span>人事管理</span>
+            <i class="fa-solid fa-chevron-right" style="font-size: 10px; color: #cbd5e1;"></i>
+            <span class="active">员工异动办理</span>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        {# Left Column: Form #}
+        <div class="left-col">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fa-regular fa-id-card"></i> 基本信息
+                </div>
+                
+                <div class="employee-summary">
+                    <img src="{{ employee.avatar }}" class="emp-avatar" alt="Avatar">
+                    <div class="emp-details">
+                        <h3>{{ employee.name }} <span style="font-size: 13px; color: #94a3b8; font-weight: normal;">({{ employee.employeeNo }})</span></h3>
+                        <div class="emp-meta">
+                            <span><i class="fa-regular fa-calendar"></i> 入职: {{ employee.hireDate }}</span>
+                            <span><i class="fa-regular fa-building"></i> {{ employee.department }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">异动类型</label>
+                    <span class="ef-radio-group ef-radio-group-size-undefined ef-radio-group-direction-horizontal ef-radio-button-group">
+                        <label class="ef-radio ef-radio-checked" radioId="transfer_type">
+                            <input type="radio" class="ef-radio-target" name="type" value="transfer" checked>
+                            <span class="ef-icon-hover ef-radio-icon-hover">
+                                <span class="ef-radio-icon"></span>
+                            </span>
+                            <span class="ef-radio-label">岗位调整</span>
+                        </label>
+                        <label class="ef-radio" radioId="transfer_type">
+                            <input type="radio" class="ef-radio-target" name="type" value="promotion">
+                            <span class="ef-icon-hover ef-radio-icon-hover">
+                                <span class="ef-radio-icon"></span>
+                            </span>
+                            <span class="ef-radio-label">晋升</span>
+                        </label>
+                        <label class="ef-radio" radioId="transfer_type">
+                            <input type="radio" class="ef-radio-target" name="type" value="demotion">
+                            <span class="ef-icon-hover ef-radio-icon-hover">
+                                <span class="ef-radio-icon"></span>
+                            </span>
+                            <span class="ef-radio-label">降职</span>
+                        </label>
+                        <label class="ef-radio" radioId="transfer_type">
+                            <input type="radio" class="ef-radio-target" name="type" value="loan">
+                            <span class="ef-icon-hover ef-radio-icon-hover">
+                                <span class="ef-radio-icon"></span>
+                            </span>
+                            <span class="ef-radio-label">借调</span>
+                        </label>
+                    </span>
+                </div>
+
+                <div class="comparison-grid">
+                    <div class="comparison-col">
+                        <h4>原信息 (Current)</h4>
+                        <div class="form-group">
+                            <label class="form-label">部门</label>
+                            <div class="readonly-field">{{ employee.department }}</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">职位</label>
+                            <div class="readonly-field">{{ employee.position }}</div>
+                        </div>
+                         <div class="form-group">
+                            <label class="form-label">职级</label>
+                            <div class="readonly-field">{{ employee.rank }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="arrow-col">
+                        <i class="fa-solid fa-arrow-right-long" style="font-size: 20px;"></i>
+                    </div>
+
+                    <div class="comparison-col">
+                        <h4>新信息 (Target)</h4>
+                        {# Department Select #}
+                        <div class="form-group">
+                            <label class="form-label">新部门 <span style="color:red">*</span></label>
+                            <span class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
+                                  style="width: 100%;"
+                                  chosen="false"
+                                  id="deptSelect"
+                                  contentId="deptContent">
+                                <input class="ef-select-view-input" placeholder="请选择部门...">
+                                <span class="ef-select-view-value ef-select-view-value-hidden"></span>
+                                <span class="ef-select-view-suffix">
+                                    <span class="ef-select-view-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
+                                            <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
+                                        </svg>
+                                    </span>
+                                </span>
+                            </span>
+                        </div>
+
+                        {# Position Select #}
+                        <div class="form-group">
+                            <label class="form-label">新职位 <span style="color:red">*</span></label>
+                            <span class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
+                                  style="width: 100%;"
+                                  chosen="false"
+                                  id="posSelect"
+                                  contentId="posContent">
+                                <input class="ef-select-view-input" placeholder="请选择职位...">
+                                <span class="ef-select-view-value ef-select-view-value-hidden"></span>
+                                <span class="ef-select-view-suffix">
+                                    <span class="ef-select-view-icon">
+                                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
+                                            <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
+                                        </svg>
+                                    </span>
+                                </span>
+                            </span>
+                        </div>
+
+                        {# Rank Input #}
+                        <div class="form-group">
+                            <label class="form-label">新职级</label>
+                            <span class="ef-input-wrapper" style="width: 100%;">
+                                <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="例如: P8">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">生效日期 <span style="color:red">*</span></label>
+                    <span class="ef-input-wrapper" style="width: 200px;">
+                        <input class="ef-input ef-input-size-medium text" type="date">
+                    </span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">异动原因说明</label>
+                    <div class="ef-textarea-wrapper">
+                        <textarea class="ef-textarea resizeable" min-rows="10" max-rows="20" clearable="true" placeholder="请详细描述本次异动的原因、背景及期望达成的目标..."></textarea>
+                    </div>
+                    <div class="text-hint">此说明将作为审批的重要依据，请认真填写。</div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">附件上传</label>
+                    <div style="border: 1px dashed #cbd5e1; padding: 20px; border-radius: 6px; text-align: center; color: #64748b; background: #f8fafc; cursor: pointer;">
+                        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 24px; margin-bottom: 8px; color: #94a3b8;"></i>
+                        <div style="font-size: 13px;">点击或拖拽文件至此上传</div>
+                        <div style="font-size: 11px; color: #94a3b8;">支持 PDF, Word, JPG 等格式，最大 10MB</div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn secondary medium">取消</button>
+                <button class="btn primary medium"><i class="fa-regular fa-paper-plane"></i> 提交审批</button>
+            </div>
+        </div>
+
+        {# Right Column: Sidebar #}
+        <div class="right-col">
+            <div class="card">
+                <div class="card-title" style="font-size: 14px;">
+                    <i class="fa-solid fa-list-check"></i> 审批流程预览
+                </div>
+                <div class="process-list">
+                    <div class="process-item active">
+                        <div class="process-dot"></div>
+                        <div class="process-title">提交申请</div>
+                        <div class="process-desc">当前步骤</div>
+                    </div>
+                    <div class="process-item">
+                        <div class="process-dot"></div>
+                        <div class="process-title">直属经理审批</div>
+                        <div class="process-desc">待审批: 李四 (Manager)</div>
+                    </div>
+                    <div class="process-item">
+                        <div class="process-dot"></div>
+                        <div class="process-title">HRBP 审核</div>
+                        <div class="process-desc">待审批: 待定</div>
+                    </div>
+                    <div class="process-item">
+                        <div class="process-dot"></div>
+                        <div class="process-title">人事总监审批</div>
+                        <div class="process-desc">待审批: 王五 (Director)</div>
+                    </div>
+                     <div class="process-item">
+                        <div class="process-dot"></div>
+                        <div class="process-title">完成</div>
+                        <div class="process-desc">异动生效，系统自动更新信息</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="background: #eff6ff; border-color: #dbeafe;">
+                <div class="card-title" style="font-size: 14px; color: #1e40af; margin-bottom: 12px;">
+                    <i class="fa-solid fa-circle-info"></i> 注意事项
+                </div>
+                <ul style="font-size: 12px; color: #1e3a8a; padding-left: 20px; line-height: 1.6; margin: 0;">
+                    <li>异动生效日期一般为每月的1号或16号。</li>
+                    <li>跨部门调动需提前与接收部门负责人沟通确认。</li>
+                    <li>涉及薪资调整的异动，需附带薪酬调整审批单。</li>
+                    <li>提交后将无法修改，请仔细核对信息。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Select Dropdowns Content #}
+{# Department Select Dropdown #}
+<div class="ef-trigger-popup ef-trigger-position-bl"
+     trigger-placement="bl"
+     style="z-index: 1001; pointer-events: auto; width: 300px;"
+     id="deptContent"
+     parentId="deptSelect">
+    <div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+        <div class="ef-trigger-content">
+            <div class="ef-select-dropdown">
+                <div class="ef-scrollbar ef-scrollbar-type-embed">
+                    <div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
+                        <ul class="ef-select-dropdown-list">
+                            {% for dept in departments %}
+                            <li class="ef-select-option"><span class="ef-select-option-content">{{ dept }}</span></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Position Select Dropdown #}
+<div class="ef-trigger-popup ef-trigger-position-bl"
+     trigger-placement="bl"
+     style="z-index: 1001; pointer-events: auto; width: 300px;"
+     id="posContent"
+     parentId="posSelect">
+    <div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+        <div class="ef-trigger-content">
+            <div class="ef-select-dropdown">
+                <div class="ef-scrollbar ef-scrollbar-type-embed">
+                    <div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
+                        <ul class="ef-select-dropdown-list">
+                            {% for pos in positions %}
+                            <li class="ef-select-option"><span class="ef-select-option-content">{{ pos }}</span></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,834 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ 'employee.detail.title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Enable scrolling on the parent container */
+        .app-content-container {
+            overflow-y: auto !important;
+        }
+
+        .detail-container {
+            padding: 20px;
+            background-color: #f8fafc; /* Match list view bg */
+            min-height: 100%;
+            height: auto;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Card Common Styles */
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Left Profile Column */
+        .profile-card {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .profile-header {
+            text-align: center;
+        }
+
+        .profile-avatar-wrapper {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 0 0 1px #e2e8f0;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .english-name {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #22c55e;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .profile-role {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            gap: 12px;
+        }
+
+        .info-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .info-content {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .info-label {
+            display: block;
+            color: #94a3b8;
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        .info-value {
+            color: #334155;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-light {
+            background: #fff;
+            border-color: #e2e8f0;
+            color: #0f172a;
+        }
+        .btn-light:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        .btn-success-light {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #dcfce7;
+        }
+        .btn-success-light:hover {
+            background: #bbf7d0;
+        }
+
+        .document-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .doc-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #f1f5f9;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .doc-item:hover {
+            border-color: #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .doc-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .type-pdf { background: #fee2e2; color: #ef4444; }
+        .type-fig { background: #f3e8ff; color: #a855f7; }
+        .type-mp4 { background: #dcfce7; color: #22c55e; }
+
+        .doc-info {
+            flex: 1;
+        }
+        .doc-name {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 2px;
+        }
+        .doc-meta {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+        
+        /* Organization Section in Profile */
+        .org-section {
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .org-item {
+            margin-bottom: 12px;
+        }
+        .org-label {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .org-value {
+            font-size: 13px;
+            color: #334155;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .manager-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+        }
+
+        /* Right Dashboard Column */
+        .dashboard-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .stats-row-1 {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .payout-card {
+            grid-column: span 4; /* Or adjust based on design, design shows full width or split */
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .payout-info h3 {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+        .payout-amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 16px;
+        }
+        .payout-breakdown {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+        }
+        .breakdown-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #475569;
+        }
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .bg-purple { background: #8b5cf6; }
+        .bg-orange { background: #f97316; }
+        
+        .payout-bar {
+            height: 8px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            width: 100%;
+            margin-top: 20px;
+            overflow: hidden;
+            display: flex;
+        }
+        .bar-segment { height: 100%; }
+
+        .qr-placeholder {
+            width: 80px;
+            height: 80px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #0f172a;
+        }
+
+        .mini-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        
+        .mini-stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .mini-stat-title {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .mini-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mini-stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .split-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Active Tasks */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .task-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 3px solid transparent;
+        }
+        .task-content h4 {
+            margin: 0 0 4px 0;
+            font-size: 13px;
+            color: #334155;
+            font-weight: 600;
+        }
+        .task-meta {
+            font-size: 11px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Activity Log */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .activity-item {
+            display: grid;
+            grid-template-columns: 80px 1fr 60px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            align-items: center;
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        .activity-time {
+            font-size: 12px;
+            color: #64748b;
+        }
+        .activity-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #334155;
+            font-weight: 500;
+        }
+        .activity-icon {
+            color: #94a3b8;
+            font-size: 12px;
+        }
+        .activity-status {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Detail Info Grid */
+        .detail-info-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        .detail-group-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .detail-field {
+            margin-bottom: 12px;
+        }
+        .detail-field-label {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+        .detail-field-value {
+            font-size: 13px;
+            color: #334155;
+            font-weight: 500;
+        }
+        
+        /* Subordinates List */
+        .subordinate-avatars {
+            display: flex;
+            margin-top: 8px;
+        }
+        .sub-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            margin-left: -8px;
+        }
+        .sub-avatar:first-child {
+            margin-left: 0;
+        }
+        .sub-more {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #64748b;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+            margin-left: -8px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block app_content_container %}
+<div class="detail-container">
+    {# Top Header #}
+    <div style="max-width: 1400px; margin: 0 auto 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 10px; color: #64748b; font-size: 14px;">
+            <a href="{{ path('employee_list') }}" style="border:none; background:transparent; cursor:pointer; color:#64748b; text-decoration: none;"><i class="fa-solid fa-chevron-left"></i></a>
+            <span style="color: #cbd5e1;">|</span>
+            <span>{{ 'employee.detail.breadcrumb.employee'|trans }}</span>
+            <span style="color: #cbd5e1;">/</span>
+            <span style="color: #0f172a; font-weight: 500;">{{ 'employee.detail.breadcrumb.detail'|trans }}</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button class="btn-action" style="background: #0f172a; color: #fff; border: none; padding: 8px 16px;">
+                <i class="fa-solid fa-ban" style="margin-right: 6px;"></i> {{ 'employee.detail.action.deactivate'|trans }}
+            </button>
+            <button class="btn-action btn-light" style="width: 36px; height: 36px; padding: 0;">
+                <i class="fa-regular fa-comment-dots"></i>
+            </button>
+            <button class="btn-action btn-light" style="width: 36px; height: 36px; padding: 0;">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+        {# Left Column: Profile #}
+        <div class="card profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar-wrapper">
+                    <img src="{{ employee.avatar }}" class="profile-avatar" alt="Avatar">
+                </div>
+                <div class="profile-name">
+                    {{ employee.name }}
+                </div>
+                {% if employee.englishName %}
+                <div class="english-name">{{ employee.englishName }}</div>
+                {% endif %}
+                <div class="profile-role">{{ employee.position }}</div>
+                <div class="status-badge">
+                    <span class="status-dot"></span> {{ ('employee.status_value.' ~ employee.status|lower)|trans }}
+                </div>
+            </div>
+
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="info-icon"><i class="fa-regular fa-id-card"></i></div>
+                    <div class="info-content">
+                        <span class="info-label">{{ 'employee.detail.profile.id'|trans }}</span>
+                        <div class="info-value">{{ employee.employeeNo }}</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fa-regular fa-calendar"></i></div>
+                    <div class="info-content">
+                        <span class="info-label">{{ 'employee.detail.profile.date_joined'|trans }}</span>
+                        <div class="info-value">{{ employee.hireDate }}</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fa-regular fa-envelope"></i></div>
+                    <div class="info-content">
+                        <span class="info-label">{{ 'employee.detail.profile.email'|trans }}</span>
+                        <div class="info-value" title="{{ employee.email }}">{{ employee.email }}</div>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
+                    <div class="info-content">
+                        <span class="info-label">{{ 'employee.detail.profile.phone'|trans }}</span>
+                        <div class="info-value">{{ employee.mobile }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="org-section">
+                <div class="org-item">
+                    <div class="org-label">{{ 'employee.detail.profile.company'|trans }}</div>
+                    <div class="org-value"><i class="fa-regular fa-building" style="color: #94a3b8;"></i> {{ employee.company }}</div>
+                </div>
+                <div class="org-item">
+                    <div class="org-label">{{ 'employee.detail.profile.department'|trans }}</div>
+                    <div class="org-value"><i class="fa-solid fa-sitemap" style="color: #94a3b8;"></i> {{ employee.department }}</div>
+                </div>
+                <div class="org-item">
+                    <div class="org-label">{{ 'employee.detail.profile.manager'|trans }}</div>
+                    <div class="org-value">
+                        <img src="{{ employee.manager.avatar }}" class="manager-avatar" alt="">
+                        {{ employee.manager.name }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-action btn-light">
+                    <i class="fa-regular fa-calendar-check"></i> {{ 'employee.detail.action.calendar'|trans }}
+                </button>
+                <button class="btn-action btn-success-light">
+                    <i class="fa-brands fa-whatsapp"></i> {{ 'employee.detail.action.whatsapp'|trans }}
+                </button>
+            </div>
+
+            <div style="border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                <div class="card-title" style="font-size: 14px; margin-bottom: 15px;">{{ 'employee.detail.profile.contract_doc'|trans }}</div>
+                <div class="document-list">
+                    {% for doc in employee.documents %}
+                    <div class="doc-item">
+                        <div class="doc-icon type-{{ doc.type }}">{{ doc.type|upper }}</div>
+                        <div class="doc-info">
+                            <span class="doc-name">{{ doc.name }}</span>
+                            <span class="doc-meta">{{ doc.size }} • {{ doc.date }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        {# Right Column: Dashboard #}
+        <div class="dashboard-grid">
+            <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0;">{{ 'employee.detail.stats.title'|trans }}</h2>
+            
+            {# Total Payout #}
+            <div class="payout-card">
+                <div style="flex: 1;">
+                    <div class="payout-info">
+                        <h3>{{ 'employee.detail.stats.total_payout'|trans }}</h3>
+                        <div class="payout-amount">${{ employee.payout.total|number_format(0, '.', ',') }}</div>
+                        <div class="payout-breakdown">
+                            <div class="breakdown-item">
+                                <span class="dot bg-purple"></span> {{ 'employee.detail.stats.base_pay'|trans }} ${{ employee.payout.base|number_format(0, '.', ',') }}
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="dot bg-orange"></span> {{ 'employee.detail.stats.overtime'|trans }} ${{ employee.payout.overtime|number_format(0, '.', ',') }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="payout-bar">
+                        <div class="bar-segment bg-purple" style="width: 85%"></div>
+                        <div class="bar-segment bg-orange" style="width: 15%"></div>
+                    </div>
+                </div>
+                <div class="qr-placeholder">
+                    <i class="fa-solid fa-qrcode"></i>
+                </div>
+            </div>
+
+            {# Mini Stats #}
+            <div class="mini-stats-grid">
+                <div class="mini-stat-card">
+                    <div class="mini-stat-title">{{ 'employee.detail.stats.total_time'|trans }}</div>
+                    <div class="mini-stat-value">
+                        <div class="mini-stat-icon" style="background: #f97316;"><i class="fa-regular fa-clock"></i></div>
+                        {{ employee.timeWorked }}
+                    </div>
+                </div>
+                <div class="mini-stat-card">
+                    <div class="mini-stat-title">{{ 'employee.detail.stats.reimbursement'|trans }}</div>
+                    <div class="mini-stat-value">
+                        <div class="mini-stat-icon" style="background: #8b5cf6;"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                        ${{ employee.reimbursement|number_format(2) }}
+                        <span style="font-size: 12px; color: #3b82f6; font-weight: 500; margin-left: auto; cursor: pointer;">{{ 'employee.detail.stats.details'|trans }} (3)</span>
+                    </div>
+                </div>
+                <div class="mini-stat-card">
+                    <div class="mini-stat-title">{{ 'employee.detail.stats.achievement'|trans }}</div>
+                    <div class="mini-stat-value">
+                        <div class="mini-stat-icon" style="background: #10b981;"><i class="fa-solid fa-award"></i></div>
+                        {{ 'employee.detail.stats.veteran'|trans }}
+                    </div>
+                </div>
+            </div>
+
+            {# Location & KPI #}
+            <div class="card">
+                <div class="card-title">
+                    {{ 'employee.detail.info.title'|trans }}
+                    <button style="border:none; background:transparent; color:#94a3b8;"><i class="fa-solid fa-pen-to-square"></i></button>
+                </div>
+                
+                <div class="detail-info-section">
+                    {# Personal #}
+                    <div>
+                        <div class="detail-group-title">{{ 'employee.detail.info.personal.title'|trans }}</div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.personal.gender'|trans }}</div>
+                            <div class="detail-field-value">{{ ('employee.gender.' ~ employee.gender|lower)|trans }}</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.personal.dob'|trans }}</div>
+                            <div class="detail-field-value">{{ employee.birthDate }}</div>
+                        </div>
+                         <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.personal.id_card'|trans }}</div>
+                            <div class="detail-field-value">{{ employee.idCard }}</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.personal.address'|trans }}</div>
+                            <div class="detail-field-value">{{ employee.address }}</div>
+                        </div>
+                    </div>
+
+                    {# Education #}
+                    <div>
+                        <div class="detail-group-title">{{ 'employee.detail.info.education.title'|trans }}</div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.education.degree'|trans }}</div>
+                            <div class="detail-field-value">{{ ('employee.education.' ~ employee.education|lower)|trans }}</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.education.school'|trans }}</div>
+                            <div class="detail-field-value">{{ employee.school }}</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.education.major'|trans }}</div>
+                            <div class="detail-field-value">{{ employee.major }}</div>
+                        </div>
+                         <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.education.graduation'|trans }}</div>
+                            <div class="detail-field-value">{{ employee.graduationDate }}</div>
+                        </div>
+                    </div>
+                    
+                    {# Emergency Contact #}
+                    <div>
+                        <div class="detail-group-title">{{ 'employee.detail.info.emergency.title'|trans }}</div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.emergency.contact_name'|trans }}</div>
+                            <div class="detail-field-value">{{ employee.emergencyContact }}</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.emergency.phone'|trans }}</div>
+                            <div class="detail-field-value">{{ employee.emergencyPhone }}</div>
+                        </div>
+                    </div>
+                    
+                    {# Account & Relations #}
+                    <div>
+                         <div class="detail-group-title">{{ 'employee.detail.info.account.title'|trans }}</div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.account.username'|trans }}</div>
+                            <div class="detail-field-value">{{ employee.username }}</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.account.last_login'|trans }}</div>
+                            <div class="detail-field-value">{{ employee.lastLoginAt }}</div>
+                        </div>
+                        <div class="detail-field">
+                            <div class="detail-field-label">{{ 'employee.detail.info.account.direct_reports'|trans }}</div>
+                            <div class="subordinate-avatars">
+                                {% for sub in employee.subordinates %}
+                                <img src="{{ sub.avatar }}" class="sub-avatar" title="{{ sub.name }}">
+                                {% endfor %}
+                                <div class="sub-more">+3</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Active Task & Activity #}
+            <div class="split-row">
+                <div class="card">
+                    <div class="card-title">
+                        {{ 'employee.detail.task.active_title'|trans }}
+                        <button style="border:none; background:transparent; color:#94a3b8;"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+                    <div class="task-list">
+                        {% for task in employee.activeTasks %}
+                        <div class="task-item" style="border-left-color: {{ task.color }}">
+                            <div class="task-content">
+                                <h4>{{ task.title }}</h4>
+                                <div class="task-meta">
+                                    <i class="fa-regular fa-calendar"></i> {{ task.deadline }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">
+                        {{ 'employee.detail.activity.title'|trans }}
+                        <button style="border:none; background:transparent; color:#94a3b8;"><i class="fa-solid fa-ellipsis"></i></button>
+                    </div>
+                    <div class="activity-list">
+                        <div style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">{{ 'now'|date('M d, Y') }} (10hrs) {{ 'employee.detail.stats.overtime'|trans }} (2hrs)</div>
+                        {% for activity in employee.activityLog %}
+                        <div class="activity-item">
+                            <div class="activity-action">
+                                <i class="fa-regular fa-clock activity-icon"></i>
+                                {{ activity.action }}
+                            </div>
+                            <div class="activity-time">{{ activity.time }}</div>
+                            {% if activity.status %}
+                            <div class="activity-status" style="background: {{ activity.statusColor }}20; color: {{ activity.statusColor }};">
+                                {{ activity.status }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

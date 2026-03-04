@@ -1,0 +1,446 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ 'employee.onboarding.title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .onboarding-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .steps {
+            display: flex;
+            margin-bottom: 40px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .step-item {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+        }
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 50%;
+            background: #eee;
+            color: #999;
+            margin-bottom: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 2;
+        }
+        .step-title {
+            font-size: 14px;
+            color: #999;
+            transition: all 0.3s;
+        }
+        .step-item.active .step-number {
+            background: #1890ff;
+            color: #fff;
+        }
+        .step-item.active .step-title {
+            color: #333;
+            font-weight: bold;
+        }
+        .step-item.completed .step-number {
+            background: #52c41a;
+            color: #fff;
+        }
+        .step-item.completed .step-title {
+            color: #333;
+        }
+        .step-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: -50%;
+            width: 100%;
+            height: 1px;
+            background: #eee;
+            z-index: 0;
+        }
+        .form-section {
+            margin-bottom: 20px;
+        }
+        .form-section h3 {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #eee;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-row {
+            display: flex;
+            margin-bottom: 15px;
+            gap: 20px;
+        }
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-label {
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+        .form-control {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-control:focus {
+            border-color: #1890ff;
+            outline: none;
+        }
+        .form-actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .step-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        .step-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .success-message {
+            text-align: center;
+            padding: 40px 0;
+        }
+        .success-icon {
+            font-size: 60px;
+            color: #52c41a;
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block app_content_container %}
+<div style="background: #f0f2f5; height: 100%; overflow-y: auto; padding-top: 1px;">
+    <div class="onboarding-container">
+        <!-- Steps Navigation -->
+        <div class="steps">
+            <div class="step-item active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-title">{{ 'employee.onboarding.steps.basic_info'|trans }}</div>
+            </div>
+            <div class="step-item" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-title">{{ 'employee.onboarding.steps.job_info'|trans }}</div>
+            </div>
+            <div class="step-item" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-title">{{ 'employee.onboarding.steps.account_info'|trans }}</div>
+            </div>
+            <div class="step-item" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-title">{{ 'employee.onboarding.steps.complete'|trans }}</div>
+            </div>
+        </div>
+
+        <!-- Step 1: Basic Information -->
+        <div class="step-content active" id="step-1-content">
+            <div class="form-section">
+                <h3>{{ 'employee.onboarding.basic_info.title'|trans }}</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.field.name'|trans }} <span style="color:red">*</span></label>
+                        <input type="text" class="form-control" name="name" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.field.name'|trans}) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.basic_info.english_name'|trans }}</label>
+                        <input type="text" class="form-control" name="englishName" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.onboarding.basic_info.english_name'|trans}) }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.detail.info.personal.gender'|trans }} <span style="color:red">*</span></label>
+                        <select class="form-control" name="gender">
+                            <option value="male">{{ 'employee.gender.male'|trans }}</option>
+                            <option value="female">{{ 'employee.gender.female'|trans }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.detail.info.personal.dob'|trans }}</label>
+                        <input type="date" class="form-control" name="birthDate">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.basic_info.id_type'|trans }}</label>
+                        <select class="form-control" name="idType">
+                            <option value="id_card">身份证</option>
+                            <option value="passport">护照</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.basic_info.id_number'|trans }}</label>
+                        <input type="text" class="form-control" name="idCard" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.onboarding.basic_info.id_number'|trans}) }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.detail.profile.phone'|trans }} <span style="color:red">*</span></label>
+                        <input type="text" class="form-control" name="mobile" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.detail.profile.phone'|trans}) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.field.email'|trans }}</label>
+                        <input type="email" class="form-control" name="email" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.field.email'|trans}) }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.detail.info.personal.address'|trans }}</label>
+                        <input type="text" class="form-control" name="address" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.detail.info.personal.address'|trans}) }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>{{ 'employee.detail.info.education.title'|trans }}</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.detail.info.education.school'|trans }}</label>
+                        <input type="text" class="form-control" name="school" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.detail.info.education.school'|trans}) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.detail.info.education.major'|trans }}</label>
+                        <input type="text" class="form-control" name="major" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.detail.info.education.major'|trans}) }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.detail.info.education.degree'|trans }}</label>
+                        <select class="form-control" name="education">
+                            <option value="">{{ 'employee.onboarding.placeholder.select'|trans({'%label%': 'employee.detail.info.education.degree'|trans}) }}</option>
+                            <option value="bachelor">{{ 'employee.education.bachelor'|trans }}</option>
+                            <option value="master">{{ 'employee.education.master'|trans }}</option>
+                            <option value="phd">{{ 'employee.education.phd'|trans }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.detail.info.education.graduation'|trans }}</label>
+                        <input type="date" class="form-control" name="graduationDate">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>{{ 'employee.detail.info.emergency.title'|trans }}</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.detail.info.emergency.contact_name'|trans }}</label>
+                        <input type="text" class="form-control" name="emergencyContact" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.detail.info.emergency.contact_name'|trans}) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.detail.info.emergency.phone'|trans }}</label>
+                        <input type="text" class="form-control" name="emergencyPhone" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.detail.info.emergency.phone'|trans}) }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn outline medium round">{{ 'employee.onboarding.action.cancel'|trans }}</button>
+                <button class="btn primary medium round" onclick="nextStep(2)">{{ 'employee.onboarding.action.next'|trans }}</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Job Information -->
+        <div class="step-content" id="step-2-content">
+            <div class="form-section">
+                <h3>{{ 'employee.onboarding.job_info.title'|trans }}</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.job_info.employee_no'|trans }} <span style="color:red">*</span></label>
+                        <input type="text" class="form-control" name="employeeNo" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.onboarding.job_info.employee_no'|trans}) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.job_info.status'|trans }} <span style="color:red">*</span></label>
+                        <select class="form-control" name="status">
+                            <option value="active">{{ 'employee.status.active'|trans }}</option>
+                            <option value="inactive">{{ 'employee.status.inactive'|trans }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.job_info.hire_date'|trans }}</label>
+                        <input type="date" class="form-control" name="hireDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.job_info.company'|trans }}</label>
+                        <select class="form-control" name="company">
+                            <option value="">{{ 'employee.onboarding.placeholder.select'|trans({'%label%': 'employee.onboarding.job_info.company'|trans}) }}</option>
+                            <!-- Mock Data -->
+                            <option value="1">Company A</option>
+                            <option value="2">Company B</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.job_info.department'|trans }}</label>
+                        <select class="form-control" name="department">
+                            <option value="">{{ 'employee.onboarding.placeholder.select'|trans({'%label%': 'employee.onboarding.job_info.department'|trans}) }}</option>
+                            <!-- Mock Data -->
+                            <option value="1">Tech Dept</option>
+                            <option value="2">HR Dept</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.job_info.position'|trans }}</label>
+                        <select class="form-control" name="position">
+                            <option value="">{{ 'employee.onboarding.placeholder.select'|trans({'%label%': 'employee.onboarding.job_info.position'|trans}) }}</option>
+                            <!-- Mock Data -->
+                            <option value="1">Developer</option>
+                            <option value="2">Manager</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.job_info.manager'|trans }}</label>
+                        <select class="form-control" name="manager">
+                            <option value="">{{ 'employee.onboarding.placeholder.select'|trans({'%label%': 'employee.onboarding.job_info.manager'|trans}) }}</option>
+                            <!-- Mock Data -->
+                            <option value="1">John Doe</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn outline medium round" onclick="prevStep(1)">{{ 'employee.onboarding.action.prev'|trans }}</button>
+                <button class="btn primary medium round" onclick="nextStep(3)">{{ 'employee.onboarding.action.next'|trans }}</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Account Settings -->
+        <div class="step-content" id="step-3-content">
+            <div class="form-section">
+                <h3>{{ 'employee.onboarding.account_info.title'|trans }}</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.account_info.username'|trans }} <span style="color:red">*</span></label>
+                        <input type="text" class="form-control" name="username" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.onboarding.account_info.username'|trans}) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.account_info.password'|trans }} <span style="color:red">*</span></label>
+                        <input type="password" class="form-control" name="password" placeholder="{{ 'employee.onboarding.placeholder.input'|trans({'%label%': 'employee.onboarding.account_info.password'|trans}) }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.account_info.roles'|trans }}</label>
+                        <select class="form-control" name="roles" multiple>
+                            <option value="ROLE_USER" selected>User</option>
+                            <option value="ROLE_ADMIN">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">{{ 'employee.onboarding.account_info.is_active'|trans }}</label>
+                        <div style="padding-top: 8px;">
+                            <label><input type="checkbox" name="isActive" checked> {{ 'employee.status_value.active'|trans }}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn outline medium round" onclick="prevStep(2)">{{ 'employee.onboarding.action.prev'|trans }}</button>
+                <button class="btn primary medium round" onclick="nextStep(4)">{{ 'employee.onboarding.action.submit'|trans }}</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Complete -->
+        <div class="step-content" id="step-4-content">
+            <div class="success-message">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>{{ 'employee.onboarding.steps.complete'|trans }}!</h3>
+                <p style="color: #666; margin-top: 10px;">{{ 'employee.onboarding.complete_step.success'|trans }}</p>
+                
+                <div style="margin-top: 30px;">
+                    <a href="#" class="btn primary medium round">{{ 'employee.onboarding.complete_step.view_profile'|trans }}</a>
+                    <a href="#" class="btn outline medium round" onclick="location.reload()">{{ 'employee.onboarding.complete_step.onboard_another'|trans }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function nextStep(step) {
+        showStep(step);
+    }
+
+    function prevStep(step) {
+        showStep(step);
+    }
+
+    function showStep(step) {
+        // Update step indicators
+        const stepItems = document.querySelectorAll('.step-item');
+        stepItems.forEach(item => {
+            const itemStep = parseInt(item.dataset.step);
+            item.classList.remove('active');
+            item.classList.remove('completed');
+            
+            if (itemStep === step) {
+                item.classList.add('active');
+            } else if (itemStep < step) {
+                item.classList.add('completed');
+            }
+        });
+
+        // Show/Hide content
+        const stepContents = document.querySelectorAll('.step-content');
+        stepContents.forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        const targetContent = document.getElementById('step-' + step + '-content');
+        if (targetContent) {
+            targetContent.classList.add('active');
+        }
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    // Add click event to step items
+    document.addEventListener('DOMContentLoaded', function() {
+        const stepItems = document.querySelectorAll('.step-item');
+        stepItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Ideally prevent jumping ahead if validation isn't done, but for now allow navigation
+                const step = parseInt(this.dataset.step);
+                showStep(step);
+            });
+        });
+    });
+</script>
+{% endblock %}

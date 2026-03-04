@@ -1,0 +1,724 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block end_javascripts %}
+<script>
+    $(document).ready(function() {
+        // Devices Chart (Donut)
+        var devicesChart = echarts.init(document.getElementById('devicesChart'));
+        var devicesOption = {
+            color: ['#1890ff', '#fa8c16', '#ff4d4f'],
+            title: {
+                text: '100',
+                subtext: '{{ "dashboard.stats.overall"|trans }}',
+                left: 'center',
+                top: '38%',
+                textStyle: {
+                    fontSize: 20,
+                    fontWeight: 'bold',
+                    color: '#333'
+                },
+                subtextStyle: {
+                    fontSize: 12,
+                    color: '#999'
+                }
+            },
+            series: [
+                {
+                    name: '{{ "dashboard.stats.devices"|trans }}',
+                    type: 'pie',
+                    radius: ['70%', '90%'],
+                    avoidLabelOverlap: false,
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        label: {
+                            show: false
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: [
+                        { value: 80, name: '{{ "dashboard.charts.devices.macbook"|trans }}' },
+                        { value: 13, name: '{{ "dashboard.charts.devices.keyboard"|trans }}' },
+                        { value: 7, name: '{{ "dashboard.charts.devices.headphones"|trans }}' }
+                    ]
+                }
+            ]
+        };
+        devicesChart.setOption(devicesOption);
+
+        // Performance Chart (Stacked Horizontal Bar)
+        var performanceChart = echarts.init(document.getElementById('performanceChart'));
+        var performanceOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' }
+            },
+            legend: {
+                bottom: 0,
+                icon: 'circle',
+                itemWidth: 8,
+                itemHeight: 8,
+                textStyle: { color: '#999' }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '10%',
+                top: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                splitLine: { show: false },
+                axisLabel: { color: '#999' }
+            },
+            yAxis: {
+                type: 'category',
+                data: ['Justin Vetrovs', 'Ahmad Kenter', 'Marcus George', 'Davis Herwitz', 'Justin Vetrovs'],
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: { color: '#666', fontWeight: 500 }
+            },
+            series: [
+                {
+                    name: '{{ "dashboard.charts.perf.task_completed"|trans }}',
+                    type: 'bar',
+                    stack: 'total',
+                    barWidth: 12,
+                    itemStyle: { color: '#7b61ff', borderRadius: [10, 0, 0, 10] },
+                    data: [320, 302, 301, 334, 390]
+                },
+                {
+                    name: '{{ "dashboard.charts.perf.presence"|trans }}',
+                    type: 'bar',
+                    stack: 'total',
+                    itemStyle: { color: '#13c2c2' },
+                    data: [120, 132, 101, 134, 90]
+                },
+                {
+                    name: '{{ "dashboard.charts.perf.meeting"|trans }}',
+                    type: 'bar',
+                    stack: 'total',
+                    itemStyle: { color: '#52c41a', borderRadius: [0, 10, 10, 0] },
+                    data: [220, 182, 191, 234, 290]
+                }
+            ]
+        };
+        performanceChart.setOption(performanceOption);
+
+        // Income Chart (Bar with Dual Series)
+        var incomeChart = echarts.init(document.getElementById('incomeChart'));
+        var incomeOption = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: { type: 'shadow' }
+            },
+            legend: {
+                bottom: 0,
+                icon: 'circle',
+                itemWidth: 8,
+                itemHeight: 8,
+                textStyle: { color: '#999' }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '10%',
+                top: '10%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: [
+                    '{{ "dashboard.charts.months.jan"|trans }}',
+                    '{{ "dashboard.charts.months.feb"|trans }}',
+                    '{{ "dashboard.charts.months.mar"|trans }}',
+                    '{{ "dashboard.charts.months.apr"|trans }}',
+                    '{{ "dashboard.charts.months.may"|trans }}',
+                    '{{ "dashboard.charts.months.jun"|trans }}',
+                    '{{ "dashboard.charts.months.jul"|trans }}',
+                    '{{ "dashboard.charts.months.aug"|trans }}',
+                    '{{ "dashboard.charts.months.sep"|trans }}',
+                    '{{ "dashboard.charts.months.oct"|trans }}',
+                    '{{ "dashboard.charts.months.nov"|trans }}',
+                    '{{ "dashboard.charts.months.dec"|trans }}'
+                ],
+                axisLine: { show: false },
+                axisTick: { show: false },
+                axisLabel: { color: '#999' }
+            },
+            yAxis: {
+                type: 'value',
+                splitLine: { lineStyle: { type: 'dashed', color: '#eee' } },
+                axisLabel: { color: '#999' }
+            },
+            series: [
+                {
+                    name: '{{ "dashboard.charts.inc.income"|trans }}',
+                    type: 'bar',
+                    barGap: 0,
+                    barWidth: 10,
+                    itemStyle: { color: '#7b61ff', borderRadius: [5, 5, 0, 0] },
+                    data: [5000, 6000, 7000, 8000, 11000, 9000, 8000, 7000, 6000, 7500, 8500, 9500]
+                },
+                {
+                    name: '{{ "dashboard.charts.inc.expense"|trans }}',
+                    type: 'bar',
+                    barWidth: 10,
+                    itemStyle: { 
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: '#69c0ff' },
+                            { offset: 1, color: '#1890ff' }
+                        ]),
+                        borderRadius: [5, 5, 0, 0]
+                    },
+                    data: [3000, 3500, 4000, 4500, 6000, 5000, 4500, 4000, 3500, 4000, 4500, 5000]
+                }
+            ]
+        };
+        incomeChart.setOption(incomeOption);
+
+        // Resize charts on window resize
+        window.addEventListener('resize', function() {
+            devicesChart.resize();
+            performanceChart.resize();
+            incomeChart.resize();
+        });
+    });
+</script>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .dashboard-container {
+            padding: 24px;
+            background-color: #f8f9fa;
+            /* Removed min-height: 100vh to fix scrolling issue */
+            min-height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            overflow-y: auto;
+        }
+
+        /* Header Section */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .search-box {
+            position: relative;
+        }
+        .search-box input {
+            padding: 8px 16px 8px 36px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            width: 240px;
+            background: #fff;
+            font-size: 14px;
+        }
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fff;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+        .invite-btn {
+            padding: 8px 16px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .welcome-text h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            color: #1a1a1a;
+        }
+        .welcome-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .date-picker-btn {
+            padding: 8px 16px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .export-btn {
+            padding: 8px 16px;
+            background: #7b61ff;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .export-btn:hover {
+            background: #6a50e0;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .stat-title {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        .stat-value-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .stat-change {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .change-up { background: #e6fffa; color: #00bfa5; }
+        .change-down { background: #fff5f5; color: #ff4d4f; }
+        
+        .stat-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .chart-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            min-height: 350px;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            border-left: none;
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+        .chart-placeholder {
+            height: 250px;
+            background: #f8f9fa;
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+
+        /* Table Section */
+        .table-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .table-controls {
+            display: flex;
+            gap: 12px;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-fulltime { background: #e6fffa; color: #00bfa5; border: 1px solid #b2f5ea; }
+        .status-freelance { background: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
+        
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .action-btn {
+            color: #999;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .action-btn:hover { color: #333; }
+        
+        /* Overriding EF Table Styles for this page */
+        .ef-table-th { 
+            text-align: left;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 12px;
+            background: #fcfcfc;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        .ef-table-td { 
+            padding: 12px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            color: #334155;
+            font-size: 13px;
+            background: #fff;
+        }
+        .ef-table-hover tbody tr:hover td { background-color: #f8fafc; }
+    </style>
+{% endblock %}
+
+{% block app_content_container %}
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h1 class="page-title">{{ 'dashboard.title'|trans }}</h1>
+        <div class="header-actions">
+            <div class="search-box">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" placeholder="{{ 'dashboard.search_placeholder'|trans }}">
+            </div>
+            <button class="icon-btn"><i class="fa-regular fa-envelope"></i></button>
+            <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+            <button class="invite-btn"><i class="fa-solid fa-user-plus"></i> {{ 'dashboard.invite'|trans }}</button>
+        </div>
+    </div>
+
+    <!-- Welcome -->
+    <div class="welcome-section">
+        <div class="welcome-text">
+            <h2>{{ 'dashboard.welcome'|trans({'%name%': 'Justin Vetrovs'}) }}</h2>
+        </div>
+        <div class="welcome-actions">
+            <button class="date-picker-btn">
+                01 Sep - 15 Sep 2024 <i class="fa-solid fa-chevron-down"></i>
+            </button>
+            <button class="export-btn">
+                <i class="fa-solid fa-download"></i> {{ 'dashboard.export_data'|trans }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <!-- Total Employees -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-title">{{ 'dashboard.stats.total_employees'|trans }}</span>
+                <i class="fa-solid fa-ellipsis-vertical action-btn"></i>
+            </div>
+            <div class="stat-value-row">
+                <span class="stat-value">150</span>
+                <span class="stat-change change-up"><i class="fa-solid fa-arrow-trend-up"></i> 50</span>
+            </div>
+            <div class="stat-details">
+                <div class="detail-item">
+                    <span>{{ 'dashboard.stats.fulltime'|trans }}</span>
+                    <span style="font-weight:600">100</span>
+                </div>
+                <div class="detail-item">
+                    <span>{{ 'dashboard.stats.freelance'|trans }}</span>
+                    <span style="font-weight:600">50</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Overview -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-title">{{ 'dashboard.stats.attendance'|trans }}</span>
+                <i class="fa-solid fa-ellipsis-vertical action-btn"></i>
+            </div>
+            <div class="stat-value-row">
+                <span class="stat-value">90%</span>
+                <span class="stat-change change-up"><i class="fa-solid fa-arrow-trend-up"></i> 20%</span>
+            </div>
+            <div class="stat-details">
+                <div class="detail-item">
+                    <span><span style="color:#ff4d4f">●</span> {{ 'dashboard.stats.sick_leave'|trans }}</span>
+                </div>
+                <div class="detail-item">
+                    <span><span style="color:#1890ff">●</span> {{ 'dashboard.stats.day_off'|trans }}</span>
+                </div>
+                <div class="detail-item">
+                    <span><span style="color:#7b61ff">●</span> {{ 'dashboard.stats.on_time'|trans }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Today Used Devices -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <span class="stat-title">{{ 'dashboard.stats.devices'|trans }}</span>
+                <i class="fa-solid fa-ellipsis-vertical action-btn"></i>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <!-- Chart Placeholder -->
+                <div id="devicesChart" style="width: 140px; height: 140px;"></div>
+                <div class="stat-details" style="flex: 1; margin-left: 20px;">
+                    <div class="detail-item" style="background: none; padding: 2px 0;">
+                        <span><span style="color:#1890ff">●</span> {{ "dashboard.charts.devices.macbook"|trans }}</span>
+                        <b>80</b>
+                    </div>
+                    <div class="detail-item" style="background: none; padding: 2px 0;">
+                        <span><span style="color:#fa8c16">●</span> {{ "dashboard.charts.devices.keyboard"|trans }}</span>
+                        <b>13</b>
+                    </div>
+                    <div class="detail-item" style="background: none; padding: 2px 0;">
+                        <span><span style="color:#ff4d4f">●</span> {{ "dashboard.charts.devices.headphones"|trans }}</span>
+                        <b>07</b>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="chart-title">{{ 'dashboard.charts.performance'|trans }}</span>
+                <i class="fa-solid fa-ellipsis"></i>
+            </div>
+            <div id="performanceChart" style="width: 100%; height: 300px;"></div>
+        </div>
+        <div class="chart-card">
+            <div class="chart-header">
+                <span class="chart-title">{{ 'dashboard.charts.income'|trans }}</span>
+                <span style="font-size: 12px; color: #999; cursor: pointer;">{{ 'dashboard.charts.advance_filter'|trans }} <i class="fa-solid fa-chevron-right"></i></span>
+            </div>
+            <div id="incomeChart" style="width: 100%; height: 300px;"></div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-section">
+        <div class="table-header">
+            <span class="chart-title">{{ 'dashboard.table.all_employees'|trans }}</span>
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" placeholder="{{ 'dashboard.table.search_placeholder'|trans }}" style="width: 180px;">
+                </div>
+                <button class="icon-btn" style="width: auto; padding: 0 12px; font-size: 13px;">{{ 'dashboard.table.all_status'|trans }} <i class="fa-solid fa-chevron-down" style="margin-left: 6px;"></i></button>
+                <button class="icon-btn" style="width: auto; padding: 0 12px; font-size: 13px;">{{ 'dashboard.table.all_role'|trans }} <i class="fa-solid fa-chevron-down" style="margin-left: 6px;"></i></button>
+                <button class="icon-btn" style="width: auto; padding: 0 12px; font-size: 13px;"><i class="fa-solid fa-download" style="margin-right: 6px;"></i> {{ 'dashboard.table.export'|trans }}</button>
+            </div>
+        </div>
+
+        <div class="ef-table ef-table-size-medium ef-table-hover">
+            <div class="ef-table-container">
+                <table class="ef-table-element" style="width: 100%;">
+                    <thead>
+                        <tr class="ef-table-tr">
+                            <th class="ef-table-th" style="width: 50px;"><input type="checkbox"></th>
+                            <th class="ef-table-th">{{ 'dashboard.table.header.id'|trans }}</th>
+                            <th class="ef-table-th">{{ 'dashboard.table.header.name'|trans }}</th>
+                            <th class="ef-table-th">{{ 'dashboard.table.header.email'|trans }}</th>
+                            <th class="ef-table-th">{{ 'dashboard.table.header.role'|trans }}</th>
+                            <th class="ef-table-th">{{ 'dashboard.table.header.projects'|trans }}</th>
+                            <th class="ef-table-th">{{ 'dashboard.table.header.status'|trans }}</th>
+                            <th class="ef-table-th">{{ 'dashboard.table.header.action'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Row 1 -->
+                        <tr class="ef-table-tr">
+                            <td class="ef-table-td"><input type="checkbox"></td>
+                            <td class="ef-table-td">58386974</td>
+                            <td class="ef-table-td">
+                                <div class="user-cell">
+                                    <div class="user-avatar" style="background: #e6f7ff; color: #1890ff; display: flex; align-items: center; justify-content: center; font-size: 12px;">JV</div>
+                                    <span>Justin Vetrovs</span>
+                                </div>
+                            </td>
+                            <td class="ef-table-td">justinve@gmail.com</td>
+                            <td class="ef-table-td">Project Manager</td>
+                            <td class="ef-table-td"><span style="background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Team Projects</span></td>
+                            <td class="ef-table-td"><span class="status-badge status-fulltime">● Full-time</span></td>
+                            <td class="ef-table-td">
+                                <i class="fa-regular fa-eye action-btn"></i>
+                                <i class="fa-solid fa-ellipsis-vertical action-btn"></i>
+                            </td>
+                        </tr>
+                        <!-- Row 2 -->
+                        <tr class="ef-table-tr">
+                            <td class="ef-table-td"><input type="checkbox"></td>
+                            <td class="ef-table-td">47958597</td>
+                            <td class="ef-table-td">
+                                <div class="user-cell">
+                                    <div class="user-avatar" style="background: #f9f0ff; color: #722ed1; display: flex; align-items: center; justify-content: center; font-size: 12px;">AK</div>
+                                    <span>Ahmad Kenter</span>
+                                </div>
+                            </td>
+                            <td class="ef-table-td">kenterah@gmail.com</td>
+                            <td class="ef-table-td">Web Designer</td>
+                            <td class="ef-table-td"><span style="background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Head of Projects</span></td>
+                            <td class="ef-table-td"><span class="status-badge status-fulltime">● Full-time</span></td>
+                            <td class="ef-table-td">
+                                <i class="fa-regular fa-eye action-btn"></i>
+                                <i class="fa-solid fa-ellipsis-vertical action-btn"></i>
+                            </td>
+                        </tr>
+                        <!-- Row 3 -->
+                        <tr class="ef-table-tr">
+                            <td class="ef-table-td"><input type="checkbox"></td>
+                            <td class="ef-table-td">30583964</td>
+                            <td class="ef-table-td">
+                                <div class="user-cell">
+                                    <div class="user-avatar" style="background: #fff7e6; color: #fa8c16; display: flex; align-items: center; justify-content: center; font-size: 12px;">DH</div>
+                                    <span>Davis Herwitz</span>
+                                </div>
+                            </td>
+                            <td class="ef-table-td">davishe@gmail.com</td>
+                            <td class="ef-table-td">Marketing Coordinator</td>
+                            <td class="ef-table-td"><span style="background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Client & Team Work</span></td>
+                            <td class="ef-table-td"><span class="status-badge status-fulltime">● Full-time</span></td>
+                            <td class="ef-table-td">
+                                <i class="fa-regular fa-eye action-btn"></i>
+                                <i class="fa-solid fa-ellipsis-vertical action-btn"></i>
+                            </td>
+                        </tr>
+                        <!-- Row 4 -->
+                        <tr class="ef-table-tr">
+                            <td class="ef-table-td"><input type="checkbox"></td>
+                            <td class="ef-table-td">48276925</td>
+                            <td class="ef-table-td">
+                                <div class="user-cell">
+                                    <div class="user-avatar" style="background: #e6fffb; color: #13c2c2; display: flex; align-items: center; justify-content: center; font-size: 12px;">MG</div>
+                                    <span>Marcus George</span>
+                                </div>
+                            </td>
+                            <td class="ef-table-td">marcusg@gmail.com</td>
+                            <td class="ef-table-td">Product Designer</td>
+                            <td class="ef-table-td"><span style="background: #f0f0f0; padding: 2px 8px; border-radius: 4px; font-size: 12px;">Case Study</span></td>
+                            <td class="ef-table-td"><span class="status-badge status-freelance">● Freelance</span></td>
+                            <td class="ef-table-td">
+                                <i class="fa-regular fa-eye action-btn"></i>
+                                <i class="fa-solid fa-ellipsis-vertical action-btn"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

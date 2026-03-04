@@ -1,0 +1,25 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'ui/template/ui.html.twig' as ui %}
+
+{% block title %}{{ title|default('岗位级别') }}{% endblock %}
+
+{% block app_content_container %}
+<div class="ef-page-header">
+    <div class="ef-page-title">
+        <h1>{{ title|default('岗位级别') }}</h1>
+    </div>
+</div>
+
+<div class="ef-page-content">
+    <div class="ef-card">
+        <div class="ef-card-body">
+            {{ form_start(form, {'attr': {'class': 'ef-form'}}) }}
+                {{ form_widget(form) }}
+                {{ ui.formSubmitButton() }}
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+{{ ui.formValid() }}
+{% endblock %}

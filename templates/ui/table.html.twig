@@ -1,5 +1,5 @@
 <div class="ef-table ef-table-size-large ef-table-border ef-table-hover" style="width: fit-content; min-width: 600px;">
-    {% if toolbar %}
+    {% if toolbar is defined and toolbar %}
         {{ toolbar|raw }}
     {% endif %}
     <div class="ef-spin">

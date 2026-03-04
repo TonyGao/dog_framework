@@ -174,6 +174,8 @@ class Department implements GedmoNode
 	#[ORM\Column(type: 'string', length: 255, nullable: true, unique: true)]
 	private $tEST;
 
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $sortOrder;
 
 	public function __construct()
 	{
@@ -537,10 +539,22 @@ class Department implements GedmoNode
 	/**
 	 * test Getter
 	 */
-	public function getTEST(): string
+	public function getTEST(): ?string
 	{
 		return $this->tEST;
 	}
+
+    public function getSortOrder(): ?int
+    {
+        return $this->sortOrder;
+    }
+
+    public function setSortOrder(?int $sortOrder): self
+    {
+        $this->sortOrder = $sortOrder;
+
+        return $this;
+    }
 
 	/**
 	 * Set sibling node

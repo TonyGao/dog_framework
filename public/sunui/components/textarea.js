@@ -19,12 +19,12 @@ $().ready(function () {
 
     let clearable = true;
 
-    let fontSize = $('textarea').css('font-size');
-    let lineHeight = Math.floor(parseInt(fontSize.replace('px', '')) * 1.5);
-    let outerHeight = parseInt($('textarea').css('padding-top').replace('px', '')) +
-      parseInt($('textarea').css('padding-bottom').replace('px', ''));
-
     function calcHeight(obj) {
+      let fontSize = obj.css('font-size');
+      let lineHeight = Math.floor(parseInt(fontSize.replace('px', '')) * 1.5);
+      let outerHeight = parseInt(obj.css('padding-top').replace('px', '')) +
+        parseInt(obj.css('padding-bottom').replace('px', ''));
+
       let content = obj.val();
       let minRows = parseInt(obj.attr('min-rows')) ? parseInt(obj.attr('min-rows')) : 2;
       let maxRows = parseInt(obj.attr('max-rows')) ? parseInt(obj.attr('max-rows')) : null;
@@ -43,11 +43,19 @@ $().ready(function () {
       return newHeight;
     }
 
-    $("textarea.resizeable").on("keyup", function () {
+    // Initialize height
+    $("textarea.resizeable").each(function () {
+      $(this).height(calcHeight($(this)));
+    });
+
+    $("textarea.resizeable").on("input", function () {
       $(this).height(calcHeight($(this)));
     });
 
     $("textarea").on('input', _.debounce(function () {
+      if ($(this).hasClass('clear-btn-disabled')) {
+        return;
+      }
       if (flag) {
         let isLimited = $(this).attr('show-word-limit') !== undefined && $(this).attr('show-word-limit') !== false;
         clearable = $(this).attr('clearable') == 'true' ? true : false;
@@ -74,7 +82,9 @@ $().ready(function () {
         if ($(this).val().length == 0 && !clearable) {
           clearable = true;
           $(this).attr('clearable', 'true');
-          $(this).next().remove();
+          if ($(this).next().hasClass('ef-textarea-clear-btn')) {
+            $(this).next().remove();
+          }
         }
       }
     }, 100))

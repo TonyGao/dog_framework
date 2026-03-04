@@ -147,17 +147,6 @@
 					{'type': 'modify', 'text': '修改', 'id': 'modify'},
           {'type':'disable', 'text': '停用', 'id':'disable'},
 			]) }}
-      {# <div class="toolbar">
-        <div class="toolbar-box">
-          <div class="toolbar-wrap">
-            <div class="toolbar-content">
-              <button class="btn outline primary medium mini round icon" id="create"><i class="fa-regular fa-square-plus"></i>新建</button>
-              <button class="btn outline primary medium mini round icon"><i class="fa-regular fa-pen-to-square"></i>修改</button>
-              <button class="btn outline primary medium mini round icon"><i class="fa-solid fa-ban"></i>停用</button>
-            </div>
-          </div>
-        </div>
-      </div> #}
 			<div class="inside-wrapper">
 				<div class="left-tree visible">
 					<div class="left-tree-wrapper">
@@ -169,7 +158,7 @@
 								</span>
 							</span>
 						</div>
-						<div class="department-tree-wrapper">
+						<div class="department-tree-wrapper common-tree-wrapper">
               {{ departmentTree | raw }}
 						</div>
 					</div>

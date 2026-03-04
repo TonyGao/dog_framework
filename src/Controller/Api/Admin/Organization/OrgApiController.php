@@ -5,6 +5,7 @@ namespace App\Controller\Api\Admin\Organization;
 use App\Entity\Organization\Company;
 use App\Entity\Organization\Department;
 use App\Entity\Organization\Position;
+use App\Entity\Organization\PositionLevel;
 use App\Entity\Platform\Entity;
 use App\Service\Platform\DataGridService;
 use App\Service\Platform\CacheConfig;
@@ -80,8 +81,7 @@ class OrgApiController extends AbstractController
     Request $request,
     EntityManagerInterface $em,
     SerializerInterface $serializer
-  ): ApiResponse 
-  {
+  ): ApiResponse {
     $payload = $request->toArray();
     $repo = $em->getRepository(Department::class);
     $data = $repo->createQueryBuilder('d')
@@ -139,65 +139,93 @@ class OrgApiController extends AbstractController
     return $this->json($result);
   }
 
-  /**
-   * 批量删除岗位
-   */
-  #[Route('/api/admin/org/position/batch-delete', name: 'api_org_position_batch_delete', methods: ['POST'])]
-  public function batchDeletePosition(Request $request, EntityManagerInterface $em): ApiResponse
+  #[Route('/api/admin/org/position-level/list', name: 'api_org_position_level_list', methods: ['GET'])]
+  public function positionLevelList(Request $request, DataGridService $dataGridService): JsonResponse
   {
-    $ids = $request->request->get('ids', []);
-    
+    $page = $request->query->getInt('page', 1);
+    $pageSize = $request->query->getInt('pageSize', 20);
+    $filters = $request->query->all('filters');
+
+    $result = $dataGridService->getTableData(
+      'App\\Entity\\Organization\\PositionLevel',
+      [
+        'page' => $page,
+        'pageSize' => $pageSize,
+        'filters' => $filters,
+        'showCheckbox' => true,
+        'showRowNumber' => true
+      ],
+      empty($filters) ? 'cached 1 hour' : null
+    );
+
+    return $this->json($result);
+  }
+
+  /**
+   * 批量删除岗位级别
+   */
+  #[Route('/api/admin/org/position-level/batch-delete', name: 'api_org_position_level_batch_delete', methods: ['POST'])]
+  public function batchDeletePositionLevel(Request $request, EntityManagerInterface $em, DataGridService $dataGridService): ApiResponse
+  {
+    $ids = $request->request->all('ids');
+    if (empty($ids)) {
+      // Support JSON body as fallback
+      $payload = $request->toArray();
+      $ids = $payload['ids'] ?? [];
+    }
+
     if (empty($ids) || !is_array($ids)) {
       return ApiResponse::error(
         json_encode([]),
         400,
-        '请选择要删除的岗位'
+        '请选择要删除的岗位级别'
       );
     }
-    
+
     try {
       $deletedCount = 0;
       $errors = [];
-      
+
       foreach ($ids as $id) {
-        $position = $em->getRepository(Position::class)->find($id);
-        
-        if (!$position) {
-          $errors[] = "岗位ID {$id} 不存在";
+        $positionLevel = $em->getRepository(PositionLevel::class)->find($id);
+
+        if (!$positionLevel) {
+          $errors[] = "岗位级别ID {$id} 不存在";
           continue;
         }
-        
-        // 检查是否有员工关联到此岗位
-        $employeeCount = $em->getRepository('App\\Entity\\Organization\\Employee')
-          ->count(['position' => $position]);
-        
-        if ($employeeCount > 0) {
-          $errors[] = "岗位 '{$position->getName()}' 下还有 {$employeeCount} 名员工，无法删除";
+
+        // 检查是否有岗位关联到此级别
+        $positionCount = $em->getRepository(Position::class)
+          ->count(['level' => $positionLevel]);
+
+        if ($positionCount > 0) {
+          $errors[] = "级别 '{$positionLevel->getName()}' 下还有 {$positionCount} 个岗位，无法删除";
           continue;
         }
-        
-        // 检查是否有下级岗位
-        $childPositions = $em->getRepository(Position::class)
-          ->findBy(['parent' => $position]);
-        
-        if (!empty($childPositions)) {
-          $errors[] = "岗位 '{$position->getName()}' 下还有下级岗位，无法删除";
-          continue;
-        }
-        
-        $em->remove($position);
+
+        $em->remove($positionLevel);
         $deletedCount++;
       }
-      
+
       if ($deletedCount > 0) {
         $em->flush();
+        // 清除缓存，确保下次加载时获取最新数据
+        $dataGridService->clearEntityCache(PositionLevel::class);
       }
-      
-      $message = "成功删除 {$deletedCount} 个岗位";
+
+      $message = "成功删除 {$deletedCount} 个岗位级别";
       if (!empty($errors)) {
-        $message .= "，但有 " . count($errors) . " 个岗位删除失败";
+        $message .= "，但有 " . count($errors) . " 个级别删除失败";
       }
-      
+
+      if ($deletedCount === 0 && !empty($errors)) {
+        return ApiResponse::error(
+          json_encode(['errors' => $errors]),
+          400,
+          implode('; ', $errors)
+        );
+      }
+
       return ApiResponse::success(
         json_encode([
           'deletedCount' => $deletedCount,
@@ -206,7 +234,86 @@ class OrgApiController extends AbstractController
         200,
         $message
       );
-      
+
+    } catch (\Exception $e) {
+      return ApiResponse::error(
+        json_encode([]),
+        500,
+        '删除失败：' . $e->getMessage()
+      );
+    }
+  }
+
+  /**
+   * 批量删除岗位
+   */
+  #[Route('/api/admin/org/position/batch-delete', name: 'api_org_position_batch_delete', methods: ['POST'])]
+  public function batchDeletePosition(Request $request, EntityManagerInterface $em, DataGridService $dataGridService): ApiResponse
+  {
+    $ids = $request->request->get('ids', []);
+
+    if (empty($ids) || !is_array($ids)) {
+      return ApiResponse::error(
+        json_encode([]),
+        400,
+        '请选择要删除的岗位'
+      );
+    }
+
+    try {
+      $deletedCount = 0;
+      $errors = [];
+
+      foreach ($ids as $id) {
+        $position = $em->getRepository(Position::class)->find($id);
+
+        if (!$position) {
+          $errors[] = "岗位ID {$id} 不存在";
+          continue;
+        }
+
+        // 检查是否有员工关联到此岗位
+        $employeeCount = $em->getRepository('App\\Entity\\Organization\\Employee')
+          ->count(['position' => $position]);
+
+        if ($employeeCount > 0) {
+          $errors[] = "岗位 '{$position->getName()}' 下还有 {$employeeCount} 名员工，无法删除";
+          continue;
+        }
+
+        // 检查是否有下级岗位
+        $childPositions = $em->getRepository(Position::class)
+          ->findBy(['parent' => $position]);
+
+        if (!empty($childPositions)) {
+          $errors[] = "岗位 '{$position->getName()}' 下还有下级岗位，无法删除";
+          continue;
+        }
+
+        $em->remove($position);
+        $deletedCount++;
+      }
+
+      if ($deletedCount > 0) {
+        $em->flush();
+        // 清除缓存
+        $dataGridService->clearEntityCache(Position::class);
+      }
+
+      $message = "成功删除 {$deletedCount} 个岗位";
+      if (!empty($errors)) {
+        $message .= "，但有 " . count($errors) . " 个岗位删除失败";
+      }
+
+      return ApiResponse::success(
+        json_encode([
+          'deletedCount' => $deletedCount,
+          'errors' => $errors
+        ]),
+        200,
+        $message
+      );
+
     } catch (\Exception $e) {
       return ApiResponse::error(
         json_encode([]),

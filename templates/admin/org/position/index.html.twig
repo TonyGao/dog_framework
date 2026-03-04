@@ -192,6 +192,23 @@
                 $('#modalposition-grid').show();
             });
 
+            // 绑定表格内的查看和编辑按钮事件 (委托)
+            $(document).on('click', '.view-button', function(e) {
+                e.preventDefault();
+                const id = $(this).data('id');
+                if (id) {
+                    openPositionViewDrawer(id);
+                }
+            });
+            
+            $(document).on('click', '.edit-button', function(e) {
+                e.preventDefault();
+                const id = $(this).data('id');
+                if (id) {
+                    openPositionEditDrawer(id);
+                }
+            });
+
             // 定义关闭模态框函数 (如果未定义)
             if (typeof closeModal === 'undefined') {
                 window.closeModal = function(id) {
@@ -308,7 +325,7 @@
 
                 {# Input Area #}
                 <div class="ef-ai-input-area" style="display: flex; margin-bottom: 15px;">
-                    <textarea id="ai-search-input" class="ef-input" 
+                    <textarea id="ai-search-input" class="ef-input clear-btn-disabled" 
                         style="flex: 1; height: 60px; padding: 10px; resize: none; border-radius: 8px 0 0 8px; border-right: none;" 
                         placeholder="请输入您的搜索条件..."></textarea>
                     <button id="ai-send-btn" class="ef-button ef-button-primary" style="height: 60px; border-radius: 0 8px 8px 0; padding: 0 20px;" onclick="executeAiSearch()">

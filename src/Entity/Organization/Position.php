@@ -46,6 +46,9 @@ class Position
     #[ORM\Column(type: "string", length: 80, nullable: true)]
     private $code;
 
+    #[ORM\Column(type: 'string', length: 80, nullable: true)]
+    private $alias;
+
     /**
      * 所属部门
      * @Ef(
@@ -109,6 +112,9 @@ class Position
      */
     #[ORM\Column(type: 'text', nullable: true)]
     private $requirement;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private $description;
 
     /**
      * 编制人数
@@ -212,6 +218,18 @@ class Position
     public function setCode($code)
     {
         $this->code = $code;
+
+        return $this;
+    }
+
+    public function getAlias(): ?string
+    {
+        return $this->alias;
+    }
+
+    public function setAlias(?string $alias): self
+    {
+        $this->alias = $alias;
 
         return $this;
     }
@@ -332,6 +350,18 @@ class Position
     public function setRequirement($requirement)
     {
         $this->requirement = $requirement;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
 
         return $this;
     }

@@ -1031,10 +1031,10 @@ $(document).ready(function () {
                 <td>${position.level || ''}</td>
                 <td>${position.state || ''}</td>
                 <td>
-                    <button type="button" class="btn secondary small" onclick="openPositionViewDrawer('${position.id}')">
+                    <button type="button" class="btn secondary small view-button" data-id="${position.id}">
                         <i class="fa-solid fa-eye"></i> 查看
                     </button>
-                    <button type="button" class="btn secondary small" onclick="openPositionEditDrawer('${position.id}')">
+                    <button type="button" class="btn secondary small edit-button" data-id="${position.id}">
                         <i class="fa-solid fa-edit"></i> 编辑
                     </button>
                 </td>
@@ -1136,10 +1136,10 @@ $(document).ready(function () {
             cellsHtml += `<td class="ef-table-td">
                 <span class="ef-table-cell ef-table-cell-align-center">
                     <span class="ef-table-td-content">
-                        <button type="button" class="btn secondary small" onclick="openPositionViewDrawer('${rowData.id}')">
+                        <button type="button" class="btn secondary small view-button" data-id="${rowData.id}">
                             <i class="fa-solid fa-eye"></i> 查看
                         </button>
-                        <button type="button" class="btn secondary small" onclick="openPositionEditDrawer('${rowData.id}')">
+                        <button type="button" class="btn secondary small edit-button" data-id="${rowData.id}">
                             <i class="fa-solid fa-edit"></i> 编辑
                         </button>
                     </span>

@@ -127,11 +127,48 @@ class Corporation
 	#[ORM\Column(type: 'string', length: 180, nullable: true)]
 	private $email;
 
+    /**
+     * 状态
+     * @Ef(
+     *     group="corporation_base_info",
+     *     isBF=true
+     * )
+     */
+    #[ORM\Column(type: 'boolean', options: ['default' => true])]
+    private $state = true;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $sortOrder;
+
 	public function __construct()
 	{
 			// 自动生成 UUID
 			$this->id = Uuid::v4();
 	}
+
+    public function isState(): ?bool
+    {
+        return $this->state;
+    }
+
+    public function setState(bool $state): self
+    {
+        $this->state = $state;
+
+        return $this;
+    }
+
+    public function getSortOrder(): ?int
+    {
+        return $this->sortOrder;
+    }
+
+    public function setSortOrder(?int $sortOrder): self
+    {
+        $this->sortOrder = $sortOrder;
+
+        return $this;
+    }
 
 	/**
 	 * Get the value of id

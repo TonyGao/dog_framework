@@ -1,0 +1,211 @@
+employee:
+  list:
+    title: 员工花名册
+    search_department: 搜索部门
+    header: 员工列表
+    search_placeholder: 搜索...
+    selected: 已选择
+  stats:
+    total_employees: 员工总数
+    active_employees: 在职员工
+    total_departments: 部门总数
+    average_tenure: 平均司龄
+    year_unit: 年
+    increase_last_month: 较上月增长
+    decrease_yesterday: 较昨日减少
+    increase_last_year: 较去年增长
+  filter:
+    all: 全部员工
+    active: 在职
+    pending: 待验证
+  action:
+    filter: 筛选
+  view:
+    list: 列表视图
+    card: 卡片视图
+  field:
+    name: 姓名
+    email: 邮箱
+    employee_no: 工号
+    department: 部门
+    position: 职位
+    status: 状态
+    entry_date: 入职日期
+  status:
+    active: 在职
+    inactive: 离职
+    vacation: 休假
+  status_value:
+    active: 在职
+    inactive: 离职
+    vacation: 休假
+  gender:
+    male: 男
+    female: 女
+  education:
+    bachelor: 本科
+    master: 硕士
+    phd: 博士
+  detail:
+    title: 员工详情
+    breadcrumb:
+      employee: 员工
+      detail: 员工详情
+    action:
+      deactivate: 停用账号
+      calendar: 日历
+      whatsapp: WhatsApp
+    profile:
+      id: 工号
+      date_joined: 入职日期
+      email: 邮箱地址
+      phone: 手机号码
+      company: 所属公司
+      department: 所属部门
+      manager: 直属主管
+      contract_doc: 合同文档
+    stats:
+      title: 员工统计
+      total_payout: 总薪资
+      base_pay: 基本工资
+      overtime: 加班费
+      total_time: 总工时
+      reimbursement: 报销金额
+      details: 详情
+      achievement: 成就
+      veteran: 资深员工
+    info:
+      title: 详细信息
+      personal:
+        title: 个人信息
+        gender: 性别
+        dob: 出生日期
+        id_card: 身份证号
+        address: 家庭住址
+      education:
+        title: 教育与工作
+        degree: 学历
+        school: 毕业院校
+        major: 专业
+        graduation: 毕业时间
+      emergency:
+        title: 紧急联系人
+        contact_name: 联系人姓名
+        phone: 联系电话
+      account:
+        title: 账户与团队
+        username: 用户名
+        last_login: 最后登录
+        direct_reports: 下属员工
+    task:
+      active_title: 进行中的任务
+    activity:
+      title: 员工动态
+  onboarding:
+    title: 办理入职
+    steps:
+      basic_info: 基本信息
+      job_info: 职位信息
+      account_info: 账号设置
+      complete: 完成
+    basic_info:
+      title: 个人基本信息
+      english_name: 英文名
+      id_type: 证件类型
+      id_number: 证件号码
+    job_info:
+      title: 职位信息
+      employee_no: 工号
+      company: 所属公司
+      department: 所属部门
+      position: 岗位
+      manager: 直接上级
+      hire_date: 入职日期
+      status: 员工状态
+    account_info:
+      title: 账号设置
+      username: 用户名
+      password: 密码
+      roles: 用户角色
+      is_active: 账户是否启用
+    action:
+      next: 下一步
+      prev: 上一步
+      cancel: 取消
+      submit: 提交
+    placeholder:
+      input: 请输入%label%
+      select: 请选择%label%
+    complete_step:
+      success: 新员工已成功入职。
+      view_profile: 查看员工档案
+      onboard_another: 继续办理入职
+dashboard:
+  title: 仪表盘
+  search_placeholder: 快速搜索...
+  invite: 邀请
+  welcome: 早上好，%name%
+  export_data: 导出数据
+  stats:
+    total_employees: 员工总数
+    fulltime: 正式员工
+    freelance: 自由职业者
+    attendance: 考勤概览
+    sick_leave: 病假
+    day_off: 事假
+    on_time: 准时
+    devices: 今日使用设备
+    overall: 总计
+  charts:
+    performance: 员工绩效评分
+    income: 收支统计
+    advance_filter: 高级筛选
+    devices:
+      macbook: Macbook
+      keyboard: 键盘
+      headphones: 耳机
+    perf:
+      task_completed: 任务完成
+      presence: 出勤
+      meeting: 会议完成
+    inc:
+      income: 收入
+      expense: 支出
+    months:
+      jan: 1月
+      feb: 2月
+      mar: 3月
+      apr: 4月
+      may: 5月
+      jun: 6月
+      jul: 7月
+      aug: 8月
+      sep: 9月
+      oct: 10月
+      nov: 11月
+      dec: 12月
+  table:
+    all_employees: 所有员工
+    search_placeholder: 搜索员工...
+    all_status: 所有状态
+    all_role: 所有角色
+    export: 导出
+    header:
+      id: 工号
+      name: 姓名
+      email: 邮箱
+      role: 职位
+      projects: 项目
+      status: 状态
+      action: 操作
+pagination:
+  info: 显示第 %start% 到 %end% 条，共 %total% 条
+  per_page: "每页显示："
+layout:
+  user:
+    settings: 设置
+    language: 语言
+    logout: 退出登录
+  language:
+    zh: 中文
+    en: English
