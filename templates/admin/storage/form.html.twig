@@ -1,0 +1,92 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ title|default('存储配置') }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="{{ asset('corporation.css', 'admin') }}">
+{% endblock %}
+
+{% block app_content_container %}
+<div class="org-structure-container">
+    <div class="outside-wrapper" style="padding: 20px;">
+        <div class="ef-row" style="margin-bottom: 20px;">
+            <div class="ef-col">
+                <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #1d2129;">{{ title|default('存储配置') }}</h2>
+            </div>
+        </div>
+
+        {{ form_start(form, {'attr': {'class': 'ef-form'}}) }}
+            
+            <div class="ef-row" style="display: flex; gap: 40px;">
+                <div class="ef-col" style="flex: 1;">
+                    <div class="ef-card" style="border: 1px solid #e5e6eb; border-radius: 4px; padding: 20px;">
+                        <h4 style="margin-bottom: 20px; font-size: 16px; font-weight: 600;">基本信息</h4>
+                        {{ form_row(form.name) }}
+                        {{ form_row(form.adapterType) }}
+                        {{ form_row(form.isDefault) }}
+                        {{ form_row(form.cdnDomain) }}
+                    </div>
+                </div>
+                <div class="ef-col" style="flex: 1;">
+                    <div class="ef-card" style="border: 1px solid #e5e6eb; border-radius: 4px; padding: 20px;">
+                        <div id="local-config-section">
+                            <h4 style="margin-bottom: 20px; font-size: 16px; font-weight: 600;">Local 配置</h4>
+                            {{ form_row(form.root_path) }}
+                            {{ form_row(form.public_url) }}
+                        </div>
+
+                        <div id="s3-config-section" style="margin-top: 30px;">
+                            <h4 style="margin-bottom: 20px; font-size: 16px; font-weight: 600;">S3 配置</h4>
+                            {{ form_row(form.endpoint) }}
+                            {{ form_row(form.region) }}
+                            {{ form_row(form.bucket) }}
+                            {{ form_row(form.access_key) }}
+                            {{ form_row(form.secret_key) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ef-row" style="margin-top: 24px;">
+                <div class="ef-col">
+                    <div class="ef-space ef-space-horizontal">
+                        <div class="ef-space-item">
+                            <button class="btn primary medium">{{ button_label|default('保存') }}</button>
+                        </div>
+                        <div class="ef-space-item">
+                            <a href="{{ path('admin_storage_index') }}" class="btn secondary medium">返回</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{ form_end(form) }}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const typeSelect = document.getElementById('storage_config_adapterType');
+    const localSection = document.getElementById('local-config-section');
+    const s3Section = document.getElementById('s3-config-section');
+
+    function updateVisibility() {
+        if (!typeSelect) return;
+        const value = typeSelect.value;
+        if (value === 'local') {
+            localSection.style.display = 'block';
+            s3Section.style.display = 'none';
+        } else if (value === 's3') {
+            localSection.style.display = 'none';
+            s3Section.style.display = 'block';
+        }
+    }
+
+    if (typeSelect) {
+        typeSelect.addEventListener('change', updateVisibility);
+        updateVisibility();
+    }
+});
+</script>
+{% endblock %}

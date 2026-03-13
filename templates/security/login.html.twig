@@ -1,0 +1,577 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .login-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        /* Left Side */
+        .login-left {
+            flex: 1;
+            background-color: #2563eb; /* Solid Blue */
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 40px;
+            overflow: hidden;
+        }
+        
+        /* Abstract Geometric Shapes (CSS only) */
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+        .shape-1 {
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            top: -200px;
+            left: -200px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            transform: rotate(45deg);
+            bottom: -100px;
+            right: -100px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .branding-content {
+            position: relative;
+            z-index: 10;
+            max-width: 480px;
+            width: 100%;
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            margin-bottom: 40px;
+        }
+        
+        .branding-content h1 {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        
+        .branding-content p {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+        
+        .mockup-window {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            overflow: hidden;
+            width: 100%;
+            aspect-ratio: 16/10;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mockup-header {
+            background: #f1f5f9;
+            padding: 10px 16px;
+            display: flex;
+            gap: 6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e1;
+        }
+        
+        .mockup-body {
+            flex: 1;
+            display: flex;
+        }
+        
+        .mockup-sidebar {
+            width: 60px;
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .sidebar-item {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: #e2e8f0;
+        }
+        .sidebar-item.active {
+            background: #3b82f6;
+        }
+        
+        .mockup-main {
+            flex: 1;
+            padding: 20px;
+            background: #fff;
+        }
+        
+        .mockup-row {
+            height: 24px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .mockup-row:nth-child(1) { width: 40%; height: 32px; margin-bottom: 20px; background: #e2e8f0; }
+        .mockup-row:nth-child(2) { width: 100%; }
+        .mockup-row:nth-child(3) { width: 90%; }
+        .mockup-row:nth-child(4) { width: 95%; }
+        
+        /* Right Side */
+        .login-right {
+            flex: 1;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .login-form-wrapper {
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-form-wrapper h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 32px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .forgot-password {
+            font-size: 13px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #111827;
+            background-color: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            box-sizing: border-box; /* Fix sizing */
+        }
+        
+        .form-control:focus {
+            border-color: #2563eb;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            font-size: 14px;
+            color: #4b5563;
+            cursor: pointer;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background-color: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .signup-link {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .signup-link a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .divider {
+            position: relative;
+            text-align: center;
+            margin: 24px 0;
+        }
+        
+        .divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: #e5e7eb;
+            z-index: 1;
+        }
+        
+        .divider span {
+            background: #fff;
+            padding: 0 10px;
+            color: #9ca3af;
+            font-size: 13px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .btn-outline {
+            background-color: #fff;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-outline:hover {
+            background-color: #f9fafb;
+        }
+        
+        .google-icon {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .login-left {
+                display: none;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="login-container">
+    <div class="login-left">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        
+        <div class="branding-content">
+            <div class="logo-icon">
+                <i class="fa-solid fa-shapes"></i>
+            </div>
+            <h1>Designed for Individuals</h1>
+            <p>See the analytics and grow your data remotely, from anywhere!</p>
+            
+            <div class="visual-mockup">
+                <div class="mockup-window">
+                    <div class="mockup-header">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mockup-sidebar">
+                            <div class="sidebar-item active"></div>
+                            <div class="sidebar-item"></div>
+                            <div class="sidebar-item"></div>
+                        </div>
+                        <div class="mockup-main">
+                            <div class="mockup-row"></div>
+                            <div class="mockup-row"></div>
+                            <div class="mockup-row"></div>
+                            <div class="mockup-row"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="login-right">
+        <div class="login-form-wrapper">
+            <h2>Login</h2>
+            
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            <form method="post">
+                <div class="form-group">
+                    <label for="inputEmail" class="form-label">Email, Username or Employee No</label>
+                    <input type="text" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" placeholder="Email, Username or Employee No" autocomplete="username webauthn" required autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <div class="label-row">
+                        <label for="inputPassword" class="form-label" style="margin-bottom: 0;">Password</label>
+                        <a href="#" class="forgot-password">Reset Password</a>
+                    </div>
+                    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="**********" autocomplete="current-password" required>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" name="_remember_me" id="_remember_me">
+                    <label for="_remember_me">Remember Password</label>
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <button class="btn btn-primary btn-block" type="submit">
+                    Login
+                </button>
+                
+                <div class="signup-link">
+                    Don't have an account? <a href="#">Sign up</a>
+                </div>
+                
+                <div class="divider">
+                    <span>or</span>
+                </div>
+                
+                <button type="button" id="passkey-login" class="btn btn-outline btn-block" style="margin-bottom: 10px;">
+                    <i class="fas fa-fingerprint"></i> Sign in with Passkey
+                </button>
+
+                <button type="button" class="btn btn-outline btn-block">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="google-icon">
+                    Authorize with Google
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const passkeyBtn = document.getElementById('passkey-login');
+        const usernameInput = document.getElementById('inputEmail');
+
+        const bufferDecode = (value) => {
+            const m = value.length % 4;
+            return Uint8Array.from(atob(
+                value.replace(/-/g, "+")
+                     .replace(/_/g, "/")
+                     .padEnd(value.length + (m === 0 ? 0 : 4 - m), "=")
+            ), c => c.charCodeAt(0));
+        };
+
+        const bufferEncode = (value) => {
+            return btoa(String.fromCharCode.apply(null, new Uint8Array(value)))
+                .replace(/\+/g, "-")
+                .replace(/\//g, "_")
+                .replace(/=/g, "");
+        };
+
+        let conditionalController = null;
+
+        const authenticate = async (username, isConditional = false) => {
+            if (!isConditional) {
+                // If manual login, abort any pending conditional request
+                if (conditionalController) {
+                    conditionalController.abort();
+                    conditionalController = null;
+                }
+                passkeyBtn.disabled = true;
+                passkeyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            } else {
+                conditionalController = new AbortController();
+            }
+
+            try {
+                console.log('Starting authentication...', { username, isConditional });
+                // 1. Get request options
+                const body = username ? { username } : {};
+                const optionsResponse = await fetch('/login/webauthn/options', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (!optionsResponse.ok) throw new Error('Failed to get login options');
+                const options = await optionsResponse.json();
+                console.log('Options received:', options);
+
+                // 2. Decode options
+                options.challenge = bufferDecode(options.challenge);
+                if (options.allowCredentials) {
+                    options.allowCredentials = options.allowCredentials.map(c => {
+                        c.id = bufferDecode(c.id);
+                        return c;
+                    });
+                }
+
+                // 3. Get credential
+                const getOptions = { publicKey: options };
+                if (isConditional) {
+                    getOptions.mediation = 'conditional';
+                    getOptions.signal = conditionalController.signal;
+                }
+                
+                console.log('Calling navigator.credentials.get with:', getOptions);
+                const credential = await navigator.credentials.get(getOptions);
+                if (!credential) {
+                    console.log('No credential received (cancelled or not found)');
+                    return; 
+                }
+                console.log('Credential received:', credential);
+
+                // 4. Encode result
+                const credentialData = {
+                    id: credential.id,
+                    rawId: bufferEncode(credential.rawId),
+                    type: credential.type,
+                    response: {
+                        authenticatorData: bufferEncode(credential.response.authenticatorData),
+                        clientDataJSON: bufferEncode(credential.response.clientDataJSON),
+                        signature: bufferEncode(credential.response.signature),
+                        userHandle: credential.response.userHandle ? bufferEncode(credential.response.userHandle) : null
+                    }
+                };
+
+                // 5. Send to server
+                const resultResponse = await fetch('/login/webauthn/result', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(credentialData)
+                });
+
+                if (!resultResponse.ok) {
+                    const result = await resultResponse.json();
+                    throw new Error(result.errorMessage || 'Login failed');
+                }
+                
+                // Login success, redirect
+                const result = await resultResponse.json();
+                if (result.status === 'ok' && result.targetUrl) {
+                    window.location.href = result.targetUrl;
+                } else if (result.status === 'error') {
+                    throw new Error(result.errorMessage || 'Login failed');
+                } else {
+                    window.location.reload();
+                }
+
+            } catch (error) {
+                if (error.name === 'AbortError') return;
+                console.error(error);
+                if (!isConditional) {
+                    $.alert.error('Passkey login failed: ' + error.message, { closable: true });
+                    passkeyBtn.disabled = false;
+                    passkeyBtn.innerHTML = '<i class="fas fa-fingerprint"></i> Sign in with Passkey';
+                }
+            }
+        };
+
+        // Try Conditional UI on load
+        if (window.PublicKeyCredential && 
+            PublicKeyCredential.isConditionalMediationAvailable) {
+            PublicKeyCredential.isConditionalMediationAvailable().then(available => {
+                if (available) {
+                    authenticate('', true);
+                }
+            });
+        }
+
+        passkeyBtn.addEventListener('click', () => {
+            const username = usernameInput.value;
+            authenticate(username, false);
+        });
+    });
+</script>
+{% endblock %}

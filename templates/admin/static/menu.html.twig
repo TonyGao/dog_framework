@@ -246,6 +246,41 @@ scrollBtnDisplay = sideMenuState == 'shrunk' ? 'flex' : 'none' %}
               </div>
             </div>
           </a>
+
+          <div class="parent-menu">
+            <div class="item-menu-content scroll-item">
+              <div class="link-icon">
+                <i class="fa-solid fa-gears"></i>
+              </div>
+              <div class="link-text">
+                <div class="link-text-content" style="max-width: 83%">
+                  系统设置
+                </div>
+                <i
+                  class="fa-solid fa-chevron-down"
+                  style="transform: rotate(0deg)"
+                ></i>
+              </div>
+            </div>
+            <div
+              class="sub-menu-content"
+              style="{{'#'== app.request.requestUri ? 'display: none;' : '' }}"
+            >
+              <a
+                class=" link item-menu-content {{'/admin/storage'== app.request.requestUri ? 'current' : '' }}"
+                href="/admin/storage"
+              >
+                <div class="link-icon">
+                  <i class="fa-solid fa-server"></i>
+                </div>
+                <div class="link-text">
+                  <div class="link-text-content" style="max-width: 83%">
+                    存储配置
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

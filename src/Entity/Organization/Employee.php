@@ -49,6 +49,16 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     private $name;
 
     /**
+     * 头像
+     * @Ef(
+     *     group="employee_base_info",
+     *     isBF=true
+     * )
+     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private $avatar;
+
+    /**
      * 英文名
      * @Ef(
      *     group="employee_base_info",
@@ -219,6 +229,16 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $lastLoginAt;
+
+    /**
+     * 密码是否由用户自己修改过
+     * @Ef(
+     *     group="employee_account_info",
+     *     isBF=true
+     * )
+     */
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private $isPasswordModifiedByUser = false;
 
     /**
      * 账户是否启用
@@ -432,6 +452,17 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): self
+    {
+        $this->avatar = $avatar;
+        return $this;
+    }
+
     /**
      * @see UserInterface
      */
@@ -567,6 +598,18 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     public function getHireDate()
     {
         return $this->hireDate;
+    }
+
+    public function getIsPasswordModifiedByUser(): bool
+    {
+        return $this->isPasswordModifiedByUser;
+    }
+
+    public function setIsPasswordModifiedByUser(bool $isPasswordModifiedByUser): self
+    {
+        $this->isPasswordModifiedByUser = $isPasswordModifiedByUser;
+
+        return $this;
     }
 
     /**

@@ -30,6 +30,7 @@
 		{% block stylesheets %}
 		  <link rel="stylesheet" href="{{ asset('/fonts/fonts.css', 'static') }}">
 			<link rel="stylesheet" href="{{ asset('/lib/font-awesome-642/css/all.min.css', 'static') }}">
+			<link rel="stylesheet" href="{{ asset('/lib/cropper/cropper.min.css') }}">
 			<link rel="stylesheet" href="{{ asset('/lib/jquery-ui/jquery-ui.min.css', 'static') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('button.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('text-lighting.css', 'ui') }}">
@@ -92,6 +93,7 @@
 			<script src="{{ asset('modal.js', 'ui') }}"></script>
 			<script src="{{ asset('sunui/admin/platform/undo_redo_manager.js') }}"></script>
 			<script src="{{ asset('lib/echarts/echarts.min.js') }}"></script>
+			<script src="{{ asset('lib/cropper/cropper.min.js') }}"></script>
 			{# <script src="https://kit.fontawesome.com/ef1baf8144.js" crossorigin="anonymous"></script> #}
 			{{ encore_entry_script_tags('app') }}
 		{% endblock %}

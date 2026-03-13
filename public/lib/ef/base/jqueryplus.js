@@ -246,7 +246,7 @@
       };
 
       // 转换按键名称为标准格式
-      let key = e.key.toLowerCase();
+      let key = (e.key || '').toLowerCase();
       key = replacements[key] || key;
 
       // 功能键列表

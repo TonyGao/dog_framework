@@ -183,6 +183,9 @@ $(document).ready(function () {
       selectInput.children().find(".ef-select-view-icon").html(closeIon);
       selectInput.attr("chosen", "true");
 
+      // Trigger change event on the hidden input
+      selectInput.prev("input[component='select']").trigger("change");
+      
       selectContent.hide();
     });
 
@@ -198,10 +201,16 @@ $(document).ready(function () {
       .children(".ef-select-view-value")
       .addClass("ef-select-view-value-hidden");
     selectInput.children(".ef-select-view-value").html("");
+    
+    let selectIcon = `
+    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
+      <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
+    </svg>
+    `;
     selectInput.children().find(".ef-select-view-icon").html(selectIcon);
 
-    // 设置相应的 input[component='select'] 的值为空
-    selectInput.prev("input[component='select']").val("");
+    // 设置相应的 input[component='select'] 的值为空并触发change事件
+    selectInput.prev("input[component='select']").val("").trigger("change");
   });
 
   // 当在输入框输入时，将li元素遍历出来值并保存到原始数组中，并通过输入的内容模糊查询

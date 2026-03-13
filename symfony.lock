@@ -69,6 +69,19 @@
             "fixtures/.gitignore"
         ]
     },
+    "league/flysystem-bundle": {
+        "version": "3.6",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "913dc3d7a5a1af0d2b044c5ac3a16e2f851d7380"
+        },
+        "files": [
+            "config/packages/flysystem.yaml",
+            "var/storage/.gitignore"
+        ]
+    },
     "nelmio/alice": {
         "version": "3.13",
         "recipe": {
@@ -411,5 +424,18 @@
             "version": "0.6",
             "ref": "e4da12a48e8138479bd24a675321bcfd84950266"
         }
+    },
+    "web-auth/webauthn-symfony-bundle": {
+        "version": "5.2",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "3.0",
+            "ref": "a5dff33bd46575bea263af94069650af7742dcb6"
+        },
+        "files": [
+            "config/packages/webauthn.yaml",
+            "config/routes/webauthn_routes.yaml"
+        ]
     }
 }

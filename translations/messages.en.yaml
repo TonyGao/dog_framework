@@ -1,3 +1,6 @@
+action:
+  cancel: Cancel
+  confirm: Confirm
 employee:
   list:
     title: Employee Roster
@@ -19,6 +22,8 @@ employee:
     active: Active
     pending: Unverified
   action:
+    cancel: Cancel
+    confirm: Confirm
     filter: Filter
   view:
     list: List View
@@ -26,11 +31,16 @@ employee:
   field:
     name: Name
     email: Mail
+    mobile: Mobile
     employee_no: Employee No
     department: Department
     position: Role
     status: Status
     entry_date: Joining Date
+    gender: Gender
+    birth_date: Date of Birth
+    id_card: ID Card
+    english_name: English Name
   status:
     active: Active
     inactive: Inactive
@@ -53,6 +63,8 @@ employee:
       detail: Employee Detail
     action:
       deactivate: Deactivate
+      clear_passkey: Clear Passkey
+      clear_passkey_confirm: Are you sure you want to clear all passkeys for this user? This action cannot be undone.
       calendar: Calendar
       whatsapp: WhatsApp
     profile:
@@ -93,119 +105,35 @@ employee:
         contact_name: Contact Name
         phone: Phone
       account:
-        title: Account & Team
+        title: Account Info
         username: Username
         last_login: Last Login
         direct_reports: Direct Reports
-    task:
-      active_title: Active Task
+    tasks:
+      title: Active Tasks
     activity:
-      title: Employee Activity
-  onboarding:
-    title: Employee Onboarding
-    steps:
-      basic_info: Basic Info
-      job_info: Job Info
-      account_info: Account Info
-      complete: Complete
-    basic_info:
-      title: Basic Information
-      english_name: English Name
-      id_type: ID Type
-      id_number: ID Number
-    job_info:
-      title: Job Information
-      employee_no: Employee No
-      company: Company
-      department: Department
-      position: Position
-      manager: Direct Manager
-      hire_date: Hire Date
-      status: Status
-    account_info:
-      title: Account Settings
-      username: Username
-      password: Password
-      roles: Roles
-      is_active: Account Enabled
-    action:
-      next: Next Step
-      prev: Previous Step
-      cancel: Cancel
-      submit: Submit
-    placeholder:
-      input: Please input %label%
-      select: Please select %label%
-    complete_step:
-      success: New employee has been successfully onboarded.
-      view_profile: View Employee Profile
-      onboard_another: Onboard Another
-dashboard:
-  title: Dashboard
-  search_placeholder: Quick Search...
-  invite: Invite
-  welcome: Good Morning, %name%
-  export_data: Export Data
-  stats:
-    total_employees: Total Employees
-    fulltime: Fulltime Employee
-    freelance: Freelance Employee
-    attendance: Attendance Overview
-    sick_leave: Sick Leave
-    day_off: Day Off
-    on_time: On Time
-    devices: Today Used Devices
-    overall: Overall
-  charts:
-    performance: Employee Performance Ratings
-    income: Income Statistics
-    advance_filter: Advance Filter
-    devices:
-      macbook: Macbook
-      keyboard: Keyboard
-      headphones: Headphones
-    perf:
-      task_completed: Task completed
-      presence: Presence
-      meeting: Completed Meeting
-    inc:
-      income: Income
-      expense: Expense
-    months:
-      jan: Jan
-      feb: Feb
-      mar: Mar
-      apr: Apr
-      may: May
-      jun: Jun
-      jul: Jul
-      aug: Aug
-      sep: Sep
-      oct: Oct
-      nov: Nov
-      dec: Dec
-  table:
-    all_employees: All Employees
-    search_placeholder: Search Employee
-    all_status: All Status
-    all_role: All Role
-    export: Export
-    header:
-      id: Employee ID
-      name: Employee Name
-      email: Email
-      role: Role
-      projects: Projects
-      status: Status
-      action: Action
-pagination:
-  info: Showing %start% to %end% of %total% entries
-  per_page: 'Rows per page:'
+      title: Activity
+      security:
+        title: Security
+        reset: Reset Password
+        passkey: Register Passkey
+    tab:
+      stats: Stats
+      tasks: Tasks
+      logs: Logs
+    log:
+      event: Event
+      time: Time
+      ip: IP
+      browser: Browser
 layout:
   user:
     settings: Settings
     language: Language
-    logout: Logout
+    logout: Sign out
   language:
     zh: Chinese
     en: English
+pagination:
+  info: Showing {start} to {end} of {total} entries
+  per_page: Per page

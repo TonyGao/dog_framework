@@ -54,10 +54,14 @@ class EfRandomizeEmployeeCommand extends Command
             $randomDept = $departments[array_rand($departments)];
             $employee->setDepartment($randomDept);
             
-            // 设置所属公司（部门的父级如果是公司，则设置为该父级；否则递归查找）
-            // 这里简单处理，假设部门的父级就是公司
-            // 实际上 Department entity 可能有 getCompany() 方法或者通过 parent 查找
-            // 暂时只设置 department，因为 EmployeeController.php 中 list 方法 join 了 department
+            // 设置所属公司
+            if ($randomDept->getCompany()) {
+                $employee->setCompany($randomDept->getCompany());
+            } else {
+                // 如果部门没有直接关联公司，尝试通过上级查找（可选，视业务逻辑而定）
+                // 这里假设 Department 实体的数据完整性，即部门应该关联公司
+                $io->warning(sprintf('部门 %s (ID: %s) 未关联公司', $randomDept->getName(), $randomDept->getId()));
+            }
             
             // 随机分配职位
             $randomPosition = $positions[array_rand($positions)];

@@ -544,17 +544,65 @@ class Department implements GedmoNode
 		return $this->tEST;
 	}
 
-    public function getSortOrder(): ?int
-    {
-        return $this->sortOrder;
-    }
+	public function getSortOrder(): ?int
+	{
+		return $this->sortOrder;
+	}
 
-    public function setSortOrder(?int $sortOrder): self
-    {
-        $this->sortOrder = $sortOrder;
+	public function setSortOrder(?int $sortOrder): self
+	{
+		$this->sortOrder = $sortOrder;
 
-        return $this;
-    }
+		return $this;
+	}
+
+	public function getLft(): ?int
+	{
+		return $this->lft;
+	}
+
+	public function setLft(int $lft): self
+	{
+		$this->lft = $lft;
+
+		return $this;
+	}
+
+	public function getRgt(): ?int
+	{
+		return $this->rgt;
+	}
+
+	public function setRgt(int $rgt): self
+	{
+		$this->rgt = $rgt;
+
+		return $this;
+	}
+
+	public function getLvl(): ?int
+	{
+		return $this->lvl;
+	}
+
+	public function setLvl(int $lvl): self
+	{
+		$this->lvl = $lvl;
+
+		return $this;
+	}
+
+	public function getRoot(): ?self
+	{
+		return $this->root;
+	}
+
+	public function setRoot(?self $root): self
+	{
+		$this->root = $root;
+
+		return $this;
+	}
 
 	/**
 	 * Set sibling node

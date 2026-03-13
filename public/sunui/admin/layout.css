@@ -535,6 +535,10 @@ body {
   height: auto;
 }
 
+.app-header.shrunk .hPerson-container .dropdown-menu {
+  top: 1.625rem !important;
+}
+
 .dropdown-header {
   display: block;
   padding: 0.3125rem 1.5rem;

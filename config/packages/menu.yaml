@@ -47,4 +47,5 @@ parameters:
         "/admin/platform/menu/index",
         "root"
       ]
-      
+    - ["系统设置", "fa-solid fa-gears", "#", "root"]
+    - ["存储配置", "fa-solid fa-server", "/admin/storage", "系统设置"]

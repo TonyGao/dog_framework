@@ -1,0 +1,235 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'setup.passkey.title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .setup-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 480px;
+            padding: 2.5rem;
+            box-sizing: border-box;
+        }
+        .setup-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .setup-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 0 0 0.5rem 0;
+        }
+        .setup-header p {
+            color: #6b7280;
+            margin: 0;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .setup-icon {
+            font-size: 3rem;
+            color: #2563eb;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            gap: 0.5rem;
+        }
+        .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #e5e7eb;
+        }
+        .step-dot.active {
+            background-color: #2563eb;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="setup-card">
+    <div class="step-indicator">
+        <div class="step-dot"></div>
+        <div class="step-dot active"></div>
+    </div>
+
+    <div class="setup-icon">
+        <i class="fa-solid fa-fingerprint"></i>
+    </div>
+
+    <div class="setup-header">
+        <h1>{{ 'setup.passkey.title'|trans }}</h1>
+        <p>{{ 'setup.passkey.subtitle'|trans|raw }}</p>
+    </div>
+
+    <div id="alert-container">
+        {% for message in app.flashes('error') %}
+            <div role="alert" class="ef-alert ef-alert-error" style="margin-bottom: 1.5rem;">
+                <div class="ef-alert-icon">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+                <div class="ef-alert-body">
+                    <div class="ef-alert-content">{{ message }}</div>
+                </div>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('success') %}
+            <div role="alert" class="ef-alert ef-alert-success" style="margin-bottom: 1.5rem;">
+                <div class="ef-alert-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="ef-alert-body">
+                    <div class="ef-alert-content">{{ message }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <button id="register-btn" class="btn primary medium btn-full">
+        <i class="fa-solid fa-fingerprint" style="margin-right: 8px;"></i> {{ 'setup.passkey.register_btn'|trans }}
+    </button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btn = document.getElementById('register-btn');
+        const alertContainer = document.getElementById('alert-container');
+        
+        // Translation variables
+        const trans = {
+            processing: "{{ 'setup.passkey.processing'|trans }}",
+            success: "{{ 'setup.passkey.success'|trans }}",
+            errorOptions: "{{ 'setup.passkey.error.options'|trans }}",
+            errorRegister: "{{ 'setup.passkey.error.register'|trans }}",
+            errorGeneral: "{{ 'setup.passkey.error.general'|trans }}"
+        };
+
+        const showAlert = (message, type = 'error') => {
+            const icon = type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation';
+            const alertClass = type === 'success' ? 'ef-alert-success' : 'ef-alert-error';
+            
+            alertContainer.innerHTML = `
+                <div role="alert" class="ef-alert ${alertClass}" style="margin-bottom: 1.5rem;">
+                    <div class="ef-alert-icon">
+                        <i class="fa-solid ${icon}"></i>
+                    </div>
+                    <div class="ef-alert-body">
+                        <div class="ef-alert-content">${message}</div>
+                    </div>
+                </div>
+            `;
+        };
+
+        const bufferDecode = (value) => {
+            const m = value.length % 4;
+            return Uint8Array.from(atob(
+                value.replace(/-/g, "+")
+                     .replace(/_/g, "/")
+                     .padEnd(value.length + (m === 0 ? 0 : 4 - m), "=")
+            ), c => c.charCodeAt(0));
+        };
+
+        const bufferEncode = (value) => {
+            return btoa(String.fromCharCode.apply(null, new Uint8Array(value)))
+                .replace(/\+/g, "-")
+                .replace(/\//g, "_")
+                .replace(/=/g, "");
+        };
+
+        btn.addEventListener('click', async () => {
+            alertContainer.innerHTML = '';
+            btn.disabled = true;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin" style="margin-right: 8px;"></i> ${trans.processing}`;
+            btn.classList.add('disabled');
+
+            try {
+                // 1. Get creation options
+                const optionsResponse = await fetch('/user/webauthn/register/options', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+
+                if (!optionsResponse.ok) throw new Error(trans.errorOptions);
+                const options = await optionsResponse.json();
+
+                // 2. Decode options
+                options.challenge = bufferDecode(options.challenge);
+                options.user.id = bufferDecode(options.user.id);
+                if (options.excludeCredentials) {
+                    options.excludeCredentials = options.excludeCredentials.map(c => {
+                        c.id = bufferDecode(c.id);
+                        return c;
+                    });
+                }
+
+                // 3. Create credential
+                const credential = await navigator.credentials.create({ publicKey: options });
+
+                // 4. Encode result
+                const credentialData = {
+                    id: credential.id,
+                    rawId: bufferEncode(credential.rawId),
+                    type: credential.type,
+                    response: {
+                        attestationObject: bufferEncode(credential.response.attestationObject),
+                        clientDataJSON: bufferEncode(credential.response.clientDataJSON),
+                    }
+                };
+                
+                // Add transport information if available
+                if (credential.response.getTransports) {
+                    credentialData.response.transports = credential.response.getTransports();
+                }
+
+                // 5. Send result to server
+                const resultResponse = await fetch('/user/webauthn/register/result', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(credentialData)
+                });
+
+                if (!resultResponse.ok) {
+                    const errorData = await resultResponse.json();
+                    throw new Error(errorData.errorMessage || trans.errorRegister);
+                }
+
+                showAlert(trans.success, 'success');
+                setTimeout(() => {
+                    window.location.href = '/employee/list';
+                }, 1500);
+
+            } catch (error) {
+                console.error(error);
+                showAlert(error.message || trans.errorGeneral);
+                btn.disabled = false;
+                btn.classList.remove('disabled');
+                btn.innerHTML = originalContent;
+            }
+        });
+    });
+</script>
+{% endblock %}

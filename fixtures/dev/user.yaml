@@ -5,5 +5,5 @@ App\Entity\OrgUser:
         email: <email()>
         phone: <phoneNumber()>
         roles: ['ROLE_USER']
-        password: "\\$2y\\$13\\$0TAB4pWcWigo3hleLKKNY.zk4F3see7Xk86/tkMIM3zzTGWBdU27a"
+        password: "\\$2y\\$13\\$RVt0vtvONGlAuL6VQWcD7OqDnv4zAYUplJbintHgBmopp5EB4cZHe"
         isVerified: <boolean()>

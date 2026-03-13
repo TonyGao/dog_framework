@@ -1,834 +1,1141 @@
-{% extends 'admin/layout.html.twig' %}
-
-{% block title %}{{ 'employee.detail.title'|trans }}{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        /* Enable scrolling on the parent container */
-        .app-content-container {
-            overflow-y: auto !important;
-        }
-
-        .detail-container {
-            padding: 20px;
-            background-color: #f8fafc; /* Match list view bg */
-            min-height: 100%;
-            height: auto;
-        }
-
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 24px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Card Common Styles */
-        .card {
-            background: #fff;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            position: relative;
-        }
-        
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Left Profile Column */
-        .profile-card {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .profile-header {
-            text-align: center;
-        }
-
-        .profile-avatar-wrapper {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 16px;
-            position: relative;
-        }
-
-        .profile-avatar {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #fff;
-            box-shadow: 0 0 0 1px #e2e8f0;
-        }
-
-        .profile-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .english-name {
-            font-size: 14px;
-            color: #64748b;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #22c55e;
-        }
-        
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            background: #dcfce7;
-            color: #166534;
-            border-radius: 9999px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 8px;
-        }
-
-        .profile-role {
-            font-size: 14px;
-            color: #64748b;
-        }
-
-        .info-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-            font-size: 13px;
-            gap: 12px;
-        }
-
-        .info-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: #f1f5f9;
-            color: #64748b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .info-content {
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .info-label {
-            display: block;
-            color: #94a3b8;
-            font-size: 11px;
-            margin-bottom: 2px;
-        }
-
-        .info-value {
-            color: #334155;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .btn-action {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-
-        .btn-light {
-            background: #fff;
-            border-color: #e2e8f0;
-            color: #0f172a;
-        }
-        .btn-light:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-
-        .btn-success-light {
-            background: #dcfce7;
-            color: #166534;
-            border-color: #dcfce7;
-        }
-        .btn-success-light:hover {
-            background: #bbf7d0;
-        }
-
-        .document-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .doc-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border: 1px solid #f1f5f9;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-        .doc-item:hover {
-            border-color: #e2e8f0;
-            background: #f8fafc;
-        }
-
-        .doc-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-        }
-        .type-pdf { background: #fee2e2; color: #ef4444; }
-        .type-fig { background: #f3e8ff; color: #a855f7; }
-        .type-mp4 { background: #dcfce7; color: #22c55e; }
-
-        .doc-info {
-            flex: 1;
-        }
-        .doc-name {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: #334155;
-            margin-bottom: 2px;
-        }
-        .doc-meta {
-            font-size: 11px;
-            color: #94a3b8;
-        }
-        
-        /* Organization Section in Profile */
-        .org-section {
-            padding-top: 20px;
-            border-top: 1px solid #f1f5f9;
-        }
-        .org-item {
-            margin-bottom: 12px;
-        }
-        .org-label {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-bottom: 4px;
-        }
-        .org-value {
-            font-size: 13px;
-            color: #334155;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .manager-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-        }
-
-        /* Right Dashboard Column */
-        .dashboard-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .stats-row-1 {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 20px;
-        }
-
-        .payout-card {
-            grid-column: span 4; /* Or adjust based on design, design shows full width or split */
-            background: #fff;
-            border-radius: 12px;
-            padding: 24px;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-        
-        .payout-info h3 {
-            font-size: 14px;
-            color: #64748b;
-            margin: 0 0 10px 0;
-            font-weight: 600;
-        }
-        .payout-amount {
-            font-size: 32px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 16px;
-        }
-        .payout-breakdown {
-            display: flex;
-            gap: 20px;
-            font-size: 13px;
-        }
-        .breakdown-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: #475569;
-        }
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-        .bg-purple { background: #8b5cf6; }
-        .bg-orange { background: #f97316; }
-        
-        .payout-bar {
-            height: 8px;
-            background: #f1f5f9;
-            border-radius: 4px;
-            width: 100%;
-            margin-top: 20px;
-            overflow: hidden;
-            display: flex;
-        }
-        .bar-segment { height: 100%; }
-
-        .qr-placeholder {
-            width: 80px;
-            height: 80px;
-            background: #f1f5f9;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            color: #0f172a;
-        }
-
-        .mini-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-        }
-        
-        .mini-stat-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-        }
-        .mini-stat-title {
-            font-size: 13px;
-            color: #64748b;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-        .mini-stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #0f172a;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .mini-stat-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            color: #fff;
-        }
-
-        .split-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        /* Active Tasks */
-        .task-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .task-item {
-            display: flex;
-            gap: 12px;
-            padding: 12px;
-            background: #f8fafc;
-            border-radius: 8px;
-            border-left: 3px solid transparent;
-        }
-        .task-content h4 {
-            margin: 0 0 4px 0;
-            font-size: 13px;
-            color: #334155;
-            font-weight: 600;
-        }
-        .task-meta {
-            font-size: 11px;
-            color: #94a3b8;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        /* Activity Log */
-        .activity-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-        .activity-item {
-            display: grid;
-            grid-template-columns: 80px 1fr 60px;
-            padding: 12px 0;
-            border-bottom: 1px solid #f1f5f9;
-            align-items: center;
-        }
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-        .activity-time {
-            font-size: 12px;
-            color: #64748b;
-        }
-        .activity-action {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #334155;
-            font-weight: 500;
-        }
-        .activity-icon {
-            color: #94a3b8;
-            font-size: 12px;
-        }
-        .activity-status {
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        /* Detail Info Grid */
-        .detail-info-section {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-        }
-        .detail-group-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .detail-field {
-            margin-bottom: 12px;
-        }
-        .detail-field-label {
-            font-size: 11px;
-            color: #94a3b8;
-            margin-bottom: 4px;
-        }
-        .detail-field-value {
-            font-size: 13px;
-            color: #334155;
-            font-weight: 500;
-        }
-        
-        /* Subordinates List */
-        .subordinate-avatars {
-            display: flex;
-            margin-top: 8px;
-        }
-        .sub-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            margin-left: -8px;
-        }
-        .sub-avatar:first-child {
-            margin-left: 0;
-        }
-        .sub-more {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #f1f5f9;
-            color: #64748b;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #fff;
-            margin-left: -8px;
-        }
-
-    </style>
-{% endblock %}
-
-{% block app_content_container %}
-<div class="detail-container">
-    {# Top Header #}
-    <div style="max-width: 1400px; margin: 0 auto 20px; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; align-items: center; gap: 10px; color: #64748b; font-size: 14px;">
-            <a href="{{ path('employee_list') }}" style="border:none; background:transparent; cursor:pointer; color:#64748b; text-decoration: none;"><i class="fa-solid fa-chevron-left"></i></a>
-            <span style="color: #cbd5e1;">|</span>
-            <span>{{ 'employee.detail.breadcrumb.employee'|trans }}</span>
-            <span style="color: #cbd5e1;">/</span>
-            <span style="color: #0f172a; font-weight: 500;">{{ 'employee.detail.breadcrumb.detail'|trans }}</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <button class="btn-action" style="background: #0f172a; color: #fff; border: none; padding: 8px 16px;">
-                <i class="fa-solid fa-ban" style="margin-right: 6px;"></i> {{ 'employee.detail.action.deactivate'|trans }}
-            </button>
-            <button class="btn-action btn-light" style="width: 36px; height: 36px; padding: 0;">
-                <i class="fa-regular fa-comment-dots"></i>
-            </button>
-            <button class="btn-action btn-light" style="width: 36px; height: 36px; padding: 0;">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-        </div>
-    </div>
-
-    <div class="detail-grid">
-        {# Left Column: Profile #}
-        <div class="card profile-card">
-            <div class="profile-header">
-                <div class="profile-avatar-wrapper">
-                    <img src="{{ employee.avatar }}" class="profile-avatar" alt="Avatar">
-                </div>
-                <div class="profile-name">
-                    {{ employee.name }}
-                </div>
-                {% if employee.englishName %}
-                <div class="english-name">{{ employee.englishName }}</div>
-                {% endif %}
-                <div class="profile-role">{{ employee.position }}</div>
-                <div class="status-badge">
-                    <span class="status-dot"></span> {{ ('employee.status_value.' ~ employee.status|lower)|trans }}
-                </div>
+{# Employee Detail Drawer Fragment (AJAX Loaded) #}
+<div class="ef-drawer-container" id="employee-detail-drawer-{{ employee.id }}" style="display:none; z-index: 1001;">
+    <div class="ef-drawer-mask" maskid="employee-detail-drawer-{{ employee.id }}"></div>
+    <div class="ef-drawer" style="width: 1200px; right: -1200px;">
+        <div class="ef-drawer-header">
+            <div class="ef-drawer-title">
+                <i class="fa-solid fa-id-card" style="margin-right: 12px; font-size: 18px;"></i>
+                {{ employee.name }}
+                <span style="font-size: 14px; font-weight: 400; margin-left: 8px; opacity: 0.8;">{{ 'employee.detail.title'|trans({}, 'messages')|default('Employee Details') }}</span>
             </div>
-
-            <div class="info-list">
-                <div class="info-item">
-                    <div class="info-icon"><i class="fa-regular fa-id-card"></i></div>
-                    <div class="info-content">
-                        <span class="info-label">{{ 'employee.detail.profile.id'|trans }}</span>
-                        <div class="info-value">{{ employee.employeeNo }}</div>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-icon"><i class="fa-regular fa-calendar"></i></div>
-                    <div class="info-content">
-                        <span class="info-label">{{ 'employee.detail.profile.date_joined'|trans }}</span>
-                        <div class="info-value">{{ employee.hireDate }}</div>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-icon"><i class="fa-regular fa-envelope"></i></div>
-                    <div class="info-content">
-                        <span class="info-label">{{ 'employee.detail.profile.email'|trans }}</span>
-                        <div class="info-value" title="{{ employee.email }}">{{ employee.email }}</div>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
-                    <div class="info-content">
-                        <span class="info-label">{{ 'employee.detail.profile.phone'|trans }}</span>
-                        <div class="info-value">{{ employee.mobile }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="org-section">
-                <div class="org-item">
-                    <div class="org-label">{{ 'employee.detail.profile.company'|trans }}</div>
-                    <div class="org-value"><i class="fa-regular fa-building" style="color: #94a3b8;"></i> {{ employee.company }}</div>
-                </div>
-                <div class="org-item">
-                    <div class="org-label">{{ 'employee.detail.profile.department'|trans }}</div>
-                    <div class="org-value"><i class="fa-solid fa-sitemap" style="color: #94a3b8;"></i> {{ employee.department }}</div>
-                </div>
-                <div class="org-item">
-                    <div class="org-label">{{ 'employee.detail.profile.manager'|trans }}</div>
-                    <div class="org-value">
-                        <img src="{{ employee.manager.avatar }}" class="manager-avatar" alt="">
-                        {{ employee.manager.name }}
-                    </div>
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn-action btn-light">
-                    <i class="fa-regular fa-calendar-check"></i> {{ 'employee.detail.action.calendar'|trans }}
-                </button>
-                <button class="btn-action btn-success-light">
-                    <i class="fa-brands fa-whatsapp"></i> {{ 'employee.detail.action.whatsapp'|trans }}
-                </button>
-            </div>
-
-            <div style="border-top: 1px solid #f1f5f9; padding-top: 20px;">
-                <div class="card-title" style="font-size: 14px; margin-bottom: 15px;">{{ 'employee.detail.profile.contract_doc'|trans }}</div>
-                <div class="document-list">
-                    {% for doc in employee.documents %}
-                    <div class="doc-item">
-                        <div class="doc-icon type-{{ doc.type }}">{{ doc.type|upper }}</div>
-                        <div class="doc-info">
-                            <span class="doc-name">{{ doc.name }}</span>
-                            <span class="doc-meta">{{ doc.size }} • {{ doc.date }}</span>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
+            <div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn" onclick="$(this).closest('.ef-drawer-container').hideDrawer('employee-detail-drawer-{{ employee.id }}')">
+                <span class="ef-icon-hover">
+                    <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                    </svg>
+                </span>
             </div>
         </div>
-
-        {# Right Column: Dashboard #}
-        <div class="dashboard-grid">
-            <h2 style="font-size: 18px; font-weight: 700; color: #0f172a; margin: 0;">{{ 'employee.detail.stats.title'|trans }}</h2>
+        <div class="ef-drawer-body" style="background-color: #f8fafc; padding: 0; overflow-y: auto; height: calc(100% - 55px);">
             
-            {# Total Payout #}
-            <div class="payout-card">
-                <div style="flex: 1;">
-                    <div class="payout-info">
-                        <h3>{{ 'employee.detail.stats.total_payout'|trans }}</h3>
-                        <div class="payout-amount">${{ employee.payout.total|number_format(0, '.', ',') }}</div>
-                        <div class="payout-breakdown">
-                            <div class="breakdown-item">
-                                <span class="dot bg-purple"></span> {{ 'employee.detail.stats.base_pay'|trans }} ${{ employee.payout.base|number_format(0, '.', ',') }}
-                            </div>
-                            <div class="breakdown-item">
-                                <span class="dot bg-orange"></span> {{ 'employee.detail.stats.overtime'|trans }} ${{ employee.payout.overtime|number_format(0, '.', ',') }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="payout-bar">
-                        <div class="bar-segment bg-purple" style="width: 85%"></div>
-                        <div class="bar-segment bg-orange" style="width: 15%"></div>
-                    </div>
-                </div>
-                <div class="qr-placeholder">
-                    <i class="fa-solid fa-qrcode"></i>
-                </div>
-            </div>
+            <style>
+                /* Enable scrolling on the parent container */
+                .app-content-container {
+                    overflow-y: auto !important;
+                }
 
-            {# Mini Stats #}
-            <div class="mini-stats-grid">
-                <div class="mini-stat-card">
-                    <div class="mini-stat-title">{{ 'employee.detail.stats.total_time'|trans }}</div>
-                    <div class="mini-stat-value">
-                        <div class="mini-stat-icon" style="background: #f97316;"><i class="fa-regular fa-clock"></i></div>
-                        {{ employee.timeWorked }}
-                    </div>
-                </div>
-                <div class="mini-stat-card">
-                    <div class="mini-stat-title">{{ 'employee.detail.stats.reimbursement'|trans }}</div>
-                    <div class="mini-stat-value">
-                        <div class="mini-stat-icon" style="background: #8b5cf6;"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-                        ${{ employee.reimbursement|number_format(2) }}
-                        <span style="font-size: 12px; color: #3b82f6; font-weight: 500; margin-left: auto; cursor: pointer;">{{ 'employee.detail.stats.details'|trans }} (3)</span>
-                    </div>
-                </div>
-                <div class="mini-stat-card">
-                    <div class="mini-stat-title">{{ 'employee.detail.stats.achievement'|trans }}</div>
-                    <div class="mini-stat-value">
-                        <div class="mini-stat-icon" style="background: #10b981;"><i class="fa-solid fa-award"></i></div>
-                        {{ 'employee.detail.stats.veteran'|trans }}
-                    </div>
-                </div>
-            </div>
+                .detail-container {
+                    padding: 20px;
+                    background-color: #f8fafc;
+                    min-height: 100%;
+                    height: auto;
+                }
 
-            {# Location & KPI #}
-            <div class="card">
-                <div class="card-title">
-                    {{ 'employee.detail.info.title'|trans }}
-                    <button style="border:none; background:transparent; color:#94a3b8;"><i class="fa-solid fa-pen-to-square"></i></button>
-                </div>
+                .detail-grid {
+                    display: grid;
+                    grid-template-columns: 320px 1fr;
+                    gap: 24px;
+                    max-width: 1400px;
+                    margin: 0 auto;
+                }
+
+                /* Card Common Styles */
+                .card {
+                    background: #fff;
+                    border-radius: 12px;
+                    border: 1px solid #e2e8f0;
+                    padding: 24px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+                    position: relative;
+                    margin-bottom: 24px;
+                }
                 
-                <div class="detail-info-section">
-                    {# Personal #}
-                    <div>
-                        <div class="detail-group-title">{{ 'employee.detail.info.personal.title'|trans }}</div>
-                        <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.personal.gender'|trans }}</div>
-                            <div class="detail-field-value">{{ ('employee.gender.' ~ employee.gender|lower)|trans }}</div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.personal.dob'|trans }}</div>
-                            <div class="detail-field-value">{{ employee.birthDate }}</div>
-                        </div>
-                         <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.personal.id_card'|trans }}</div>
-                            <div class="detail-field-value">{{ employee.idCard }}</div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.personal.address'|trans }}</div>
-                            <div class="detail-field-value">{{ employee.address }}</div>
-                        </div>
-                    </div>
+                .card-title {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #0f172a;
+                    margin-bottom: 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
 
-                    {# Education #}
-                    <div>
-                        <div class="detail-group-title">{{ 'employee.detail.info.education.title'|trans }}</div>
-                        <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.education.degree'|trans }}</div>
-                            <div class="detail-field-value">{{ ('employee.education.' ~ employee.education|lower)|trans }}</div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.education.school'|trans }}</div>
-                            <div class="detail-field-value">{{ employee.school }}</div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.education.major'|trans }}</div>
-                            <div class="detail-field-value">{{ employee.major }}</div>
-                        </div>
-                         <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.education.graduation'|trans }}</div>
-                            <div class="detail-field-value">{{ employee.graduationDate }}</div>
-                        </div>
-                    </div>
-                    
-                    {# Emergency Contact #}
-                    <div>
-                        <div class="detail-group-title">{{ 'employee.detail.info.emergency.title'|trans }}</div>
-                        <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.emergency.contact_name'|trans }}</div>
-                            <div class="detail-field-value">{{ employee.emergencyContact }}</div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.emergency.phone'|trans }}</div>
-                            <div class="detail-field-value">{{ employee.emergencyPhone }}</div>
-                        </div>
-                    </div>
-                    
-                    {# Account & Relations #}
-                    <div>
-                         <div class="detail-group-title">{{ 'employee.detail.info.account.title'|trans }}</div>
-                        <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.account.username'|trans }}</div>
-                            <div class="detail-field-value">{{ employee.username }}</div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.account.last_login'|trans }}</div>
-                            <div class="detail-field-value">{{ employee.lastLoginAt }}</div>
-                        </div>
-                        <div class="detail-field">
-                            <div class="detail-field-label">{{ 'employee.detail.info.account.direct_reports'|trans }}</div>
-                            <div class="subordinate-avatars">
-                                {% for sub in employee.subordinates %}
-                                <img src="{{ sub.avatar }}" class="sub-avatar" title="{{ sub.name }}">
-                                {% endfor %}
-                                <div class="sub-more">+3</div>
+                /* Left Profile Column */
+                .profile-card {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                }
+
+                .profile-header {
+                    text-align: center;
+                }
+
+                .profile-avatar-wrapper {
+                    width: 120px;
+                    height: 120px;
+                    margin: 0 auto 16px;
+                    position: relative;
+                    cursor: pointer;
+                }
+
+                .profile-avatar-wrapper:hover::after {
+                    content: '\f030'; /* fa-camera */
+                    font-family: "Font Awesome 6 Free";
+                    font-weight: 900;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.4);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: 24px;
+                }
+
+                .profile-avatar {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 4px solid #fff;
+                    box-shadow: 0 0 0 1px #e2e8f0;
+                }
+                
+                .profile-avatar-fallback {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 50%;
+                    background-color: #3b82f6;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 36px;
+                    font-weight: 600;
+                    border: 4px solid #fff;
+                    box-shadow: 0 0 0 1px #e2e8f0;
+                }
+
+                .profile-name {
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #0f172a;
+                    margin-bottom: 4px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                }
+                
+                .english-name {
+                    font-size: 14px;
+                    color: #64748b;
+                    font-weight: 500;
+                    margin-bottom: 8px;
+                }
+
+                .status-dot {
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    background-color: #22c55e;
+                }
+                
+                .status-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    padding: 4px 12px;
+                    background: #dcfce7;
+                    color: #166534;
+                    border-radius: 9999px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    margin-top: 8px;
+                }
+
+                .profile-role {
+                    font-size: 14px;
+                    color: #64748b;
+                }
+
+                .info-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                }
+
+                .info-item {
+                    display: flex;
+                    align-items: center;
+                    font-size: 13px;
+                    gap: 12px;
+                }
+
+                .info-icon {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 8px;
+                    background: #f1f5f9;
+                    color: #64748b;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                }
+
+                .info-content {
+                    flex: 1;
+                    overflow: hidden;
+                }
+
+                .info-label {
+                    display: block;
+                    color: #94a3b8;
+                    font-size: 11px;
+                    margin-bottom: 2px;
+                }
+
+                .info-value {
+                    color: #334155;
+                    font-weight: 500;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .action-buttons {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 12px;
+                }
+
+                .btn-action {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    padding: 10px;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    border: 1px solid transparent;
+                }
+
+                .btn-light {
+                    background: #fff;
+                    border-color: #e2e8f0;
+                    color: #0f172a;
+                }
+                .btn-light:hover {
+                    background: #f8fafc;
+                    border-color: #cbd5e1;
+                }
+
+                .btn-success-light {
+                    background: #dcfce7;
+                    color: #166534;
+                    border-color: #dcfce7;
+                }
+                .btn-success-light:hover {
+                    background: #bbf7d0;
+                }
+
+                .document-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                }
+
+                .doc-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 12px;
+                    border: 1px solid #f1f5f9;
+                    border-radius: 8px;
+                    transition: all 0.2s;
+                }
+                .doc-item:hover {
+                    border-color: #e2e8f0;
+                    background: #f8fafc;
+                }
+
+                .doc-icon {
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 6px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 12px;
+                    font-weight: 700;
+                }
+                .type-pdf { background: #fee2e2; color: #ef4444; }
+                .type-fig { background: #f3e8ff; color: #a855f7; }
+                .type-mp4 { background: #dcfce7; color: #22c55e; }
+
+                .doc-info {
+                    flex: 1;
+                }
+                .doc-name {
+                    display: block;
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: #334155;
+                    margin-bottom: 2px;
+                }
+                .doc-meta {
+                    font-size: 11px;
+                    color: #94a3b8;
+                }
+                
+                /* Organization Section in Profile */
+                .org-section {
+                    padding-top: 20px;
+                    border-top: 1px solid #f1f5f9;
+                }
+                .org-item {
+                    margin-bottom: 12px;
+                }
+                .org-label {
+                    font-size: 11px;
+                    color: #94a3b8;
+                    margin-bottom: 4px;
+                }
+                .org-value {
+                    font-size: 13px;
+                    color: #334155;
+                    font-weight: 500;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                .manager-avatar {
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                }
+
+                /* Right Dashboard Column */
+                .dashboard-grid {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                }
+
+                .mini-stats-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 20px;
+                }
+                
+                .mini-stat-card {
+                    background: #fff;
+                    border-radius: 12px;
+                    padding: 20px;
+                    border: 1px solid #e2e8f0;
+                }
+                .mini-stat-label {
+                    font-size: 13px;
+                    color: #64748b;
+                    font-weight: 600;
+                    margin-bottom: 12px;
+                }
+                .mini-stat-value {
+                    font-size: 24px;
+                    font-weight: 700;
+                    color: #0f172a;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .mini-stat-icon {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 14px;
+                    color: #fff;
+                }
+
+                .split-row {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 20px;
+                }
+
+                /* Active Tasks */
+                .task-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                }
+                .task-item {
+                    display: flex;
+                    gap: 12px;
+                    padding: 12px;
+                    background: #f8fafc;
+                    border-radius: 8px;
+                    border-left: 3px solid transparent;
+                }
+                .task-content h4 {
+                    margin: 0 0 4px 0;
+                    font-size: 13px;
+                    color: #334155;
+                    font-weight: 600;
+                }
+                .task-meta {
+                    font-size: 11px;
+                    color: #94a3b8;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+
+                /* Activity Log */
+                .activity-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0;
+                }
+                .activity-item {
+                    display: grid;
+                    grid-template-columns: 80px 1fr 60px;
+                    padding: 12px 0;
+                    border-bottom: 1px solid #f1f5f9;
+                    align-items: center;
+                }
+                .activity-item:last-child {
+                    border-bottom: none;
+                }
+                .activity-time {
+                    font-size: 12px;
+                    color: #64748b;
+                }
+                .activity-action {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-size: 13px;
+                    color: #334155;
+                    font-weight: 500;
+                }
+                .activity-icon {
+                    color: #94a3b8;
+                    font-size: 12px;
+                }
+                .activity-status {
+                    font-size: 11px;
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    text-align: center;
+                    font-weight: 600;
+                }
+
+                .example-badge {
+                    display: inline-block;
+                    background: #f1f5f9;
+                    color: #64748b;
+                    font-size: 10px;
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    margin-left: 8px;
+                    vertical-align: middle;
+                    font-weight: normal;
+                }
+
+                /* Detail Info Grid */
+                .detail-info-section {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 24px;
+                }
+                .detail-group-title {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #0f172a;
+                    margin-bottom: 16px;
+                    padding-bottom: 8px;
+                    border-bottom: 1px solid #f1f5f9;
+                }
+                .detail-field {
+                    margin-bottom: 12px;
+                }
+                .detail-field-label {
+                    font-size: 11px;
+                    color: #94a3b8;
+                    margin-bottom: 4px;
+                }
+                .detail-field-value {
+                    font-size: 13px;
+                    color: #334155;
+                    font-weight: 500;
+                }
+                
+                /* Subordinates List */
+                .subordinate-avatars {
+                    display: flex;
+                    margin-top: 8px;
+                }
+                .sub-avatar {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    border: 2px solid #fff;
+                    margin-left: -8px;
+                }
+                .sub-avatar:first-child {
+                    margin-left: 0;
+                }
+                .sub-more {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    background: #f1f5f9;
+                    color: #64748b;
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border: 2px solid #fff;
+                    margin-left: -8px;
+                }
+            </style>
+
+            <div class="detail-container">
+                {# Top Action Bar (Matches example page header actions) #}
+                <div style="max-width: 1400px; margin: 0 auto 20px; display: flex; justify-content: flex-end; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <button class="btn-action btn-light" style="width: 36px; height: 36px; padding: 0;">
+                            <i class="fa-regular fa-comment-dots"></i>
+                        </button>
+                        <div style="position: relative;">
+                            <button class="btn-action btn-light" style="width: 36px; height: 36px; padding: 0;" onclick="$(this).next('.employee-action-menu').toggle()">
+                                <i class="fa-solid fa-bars"></i>
+                            </button>
+                            <div class="employee-action-menu" style="display: none; position: absolute; right: 0; top: 100%; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); z-index: 50; min-width: 180px; margin-top: 4px; padding: 4px;">
+                                <button class="action-menu-item" style="width: 100%; text-align: left; padding: 8px 12px; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; color: #0f172a; border-radius: 4px;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='none'" onclick="$(this).closest('.employee-action-menu').hide();">
+                                    <i class="fa-solid fa-ban" style="width: 16px; color: #64748b;"></i>
+                                    {{ 'employee.detail.action.deactivate'|trans({}, 'messages')|default('Deactivate') }}
+                                </button>
+                                <button class="action-menu-item" style="width: 100%; text-align: left; padding: 8px 12px; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ef4444; border-radius: 4px;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='none'" onclick="$(this).closest('.employee-action-menu').hide(); clearPasskey('{{ employee.id }}')">
+                                    <i class="fa-solid fa-fingerprint" style="width: 16px;"></i>
+                                    {{ 'employee.detail.action.clear_passkey'|trans({}, 'messages')|default('Clear Passkey') }}
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {# Active Task & Activity #}
-            <div class="split-row">
-                <div class="card">
-                    <div class="card-title">
-                        {{ 'employee.detail.task.active_title'|trans }}
-                        <button style="border:none; background:transparent; color:#94a3b8;"><i class="fa-solid fa-ellipsis"></i></button>
-                    </div>
-                    <div class="task-list">
-                        {% for task in employee.activeTasks %}
-                        <div class="task-item" style="border-left-color: {{ task.color }}">
-                            <div class="task-content">
-                                <h4>{{ task.title }}</h4>
-                                <div class="task-meta">
-                                    <i class="fa-regular fa-calendar"></i> {{ task.deadline }}
+                <div class="detail-grid">
+                    {# Left Column: Profile #}
+                    <div class="card profile-card">
+                        <div class="profile-header">
+                            <div class="profile-avatar-wrapper" onclick="openAvatarModal('{{ employee.id }}')">
+                                {% if employee.avatar %}
+                                    <img src="{{ employee.avatar }}" class="profile-avatar" id="avatar-preview-{{ employee.id }}" alt="Avatar">
+                                {% else %}
+                                    <div class="profile-avatar-fallback" id="avatar-fallback-{{ employee.id }}">
+                                        {{ employee.name|slice(-2) }}
+                                    </div>
+                                    <img src="" class="profile-avatar" id="avatar-preview-{{ employee.id }}" alt="Avatar" style="display: none;">
+                                {% endif %}
+                            </div>
+                            <div class="profile-name">
+                                {{ employee.name }}
+                            </div>
+                            {% if employee.englishName is defined and employee.englishName %}
+                            <div class="english-name">{{ employee.englishName }}</div>
+                            {% endif %}
+                            <div class="profile-role">{{ employee.position }}</div>
+                            <div class="status-badge">
+                                <span class="status-dot"></span> {{ ('employee.status_value.' ~ employee.status|default('active')|lower)|trans({}, 'messages')|default('Active') }}
+                            </div>
+                        </div>
+
+                        <div class="info-list">
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fa-solid fa-fingerprint"></i></div>
+                                <div class="info-content">
+                                    <span class="info-label">Passkey</span>
+                                    <div class="info-value">
+                                        {% if employee.hasPasskey %}
+                                            <span class="status-badge" style="background: #dcfce7; color: #166534; margin-top: 0;">Enabled</span>
+                                        {% else %}
+                                            <span class="status-badge" style="background: #f1f5f9; color: #64748b; margin-top: 0;">Not Setup</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fa-regular fa-id-card"></i></div>
+                                <div class="info-content">
+                                    <span class="info-label">{{ 'employee.detail.profile.id'|trans({}, 'messages')|default('Employee ID') }}</span>
+                                    <div class="info-value">{{ employee.employeeNo|default('-') }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fa-regular fa-calendar"></i></div>
+                                <div class="info-content">
+                                    <span class="info-label">{{ 'employee.detail.profile.date_joined'|trans({}, 'messages')|default('Date Joined') }}</span>
+                                    <div class="info-value">{{ employee.hireDate|default('-') }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fa-regular fa-envelope"></i></div>
+                                <div class="info-content">
+                                    <span class="info-label">{{ 'employee.detail.profile.email'|trans({}, 'messages')|default('Email') }}</span>
+                                    <div class="info-value" title="{{ employee.email }}">{{ employee.email }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
+                                <div class="info-content">
+                                    <span class="info-label">{{ 'employee.detail.profile.phone'|trans({}, 'messages')|default('Phone') }}</span>
+                                    <div class="info-value">{{ employee.mobile }}</div>
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-title">
-                        {{ 'employee.detail.activity.title'|trans }}
-                        <button style="border:none; background:transparent; color:#94a3b8;"><i class="fa-solid fa-ellipsis"></i></button>
-                    </div>
-                    <div class="activity-list">
-                        <div style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">{{ 'now'|date('M d, Y') }} (10hrs) {{ 'employee.detail.stats.overtime'|trans }} (2hrs)</div>
-                        {% for activity in employee.activityLog %}
-                        <div class="activity-item">
-                            <div class="activity-action">
-                                <i class="fa-regular fa-clock activity-icon"></i>
-                                {{ activity.action }}
+
+                        <div class="org-section">
+                            <div class="org-item">
+                                <div class="org-label">{{ 'employee.detail.profile.company'|trans({}, 'messages')|default('Company') }}</div>
+                                <div class="org-value"><i class="fa-regular fa-building" style="color: #94a3b8;"></i> {{ employee.company|default('Company Name') }}</div>
                             </div>
-                            <div class="activity-time">{{ activity.time }}</div>
-                            {% if activity.status %}
-                            <div class="activity-status" style="background: {{ activity.statusColor }}20; color: {{ activity.statusColor }};">
-                                {{ activity.status }}
+                            <div class="org-item">
+                                <div class="org-label">{{ 'employee.detail.profile.department'|trans({}, 'messages')|default('Department') }}</div>
+                                <div class="org-value"><i class="fa-solid fa-sitemap" style="color: #94a3b8;"></i> {{ employee.department }}</div>
                             </div>
-                            {% endif %}
+                            <div class="org-item">
+                                <div class="org-label">{{ 'employee.detail.profile.manager'|trans({}, 'messages')|default('Manager') }}</div>
+                                <div class="org-value">
+                                    {% if employee.manager.avatar %}
+                                    <img src="{{ employee.manager.avatar }}" class="manager-avatar" alt="">
+                                    {% else %}
+                                    <div class="manager-avatar" style="background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:10px;">{{ employee.manager.name|slice(-2) }}</div>
+                                    {% endif %}
+                                    {{ employee.manager.name }}
+                                </div>
+                            </div>
                         </div>
-                        {% endfor %}
+
+                        <div class="action-buttons">
+                            <button class="btn-action btn-light">
+                                <i class="fa-regular fa-calendar-check"></i> {{ 'employee.detail.action.calendar'|trans({}, 'messages')|default('Calendar') }}
+                            </button>
+                            <button class="btn-action btn-success-light">
+                                <i class="fa-brands fa-whatsapp"></i> {{ 'employee.detail.action.whatsapp'|trans({}, 'messages')|default('Message') }}
+                            </button>
+                        </div>
+
+                        <div style="border-top: 1px solid #f1f5f9; padding-top: 20px;">
+                            <div class="card-title" style="font-size: 14px; margin-bottom: 15px;">
+                                {{ 'employee.detail.profile.contract_doc'|trans({}, 'messages')|default('Documents') }}
+                                <span class="example-badge">示例数据</span>
+                            </div>
+                            <div class="document-list">
+                                {% if employee.documents is defined %}
+                                    {% for doc in employee.documents %}
+                                    <div class="doc-item">
+                                        <div class="doc-icon type-{{ doc.type }}">{{ doc.type|upper }}</div>
+                                        <div class="doc-info">
+                                            <span class="doc-name">{{ doc.name }}</span>
+                                            <span class="doc-meta">{{ doc.size }} • {{ doc.date }}</span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <!-- Fallback Mock Data if not passed -->
+                                    <div class="doc-item">
+                                        <div class="doc-icon type-pdf">PDF</div>
+                                        <div class="doc-info">
+                                            <span class="doc-name">Employment_Contract_2024.pdf</span>
+                                            <span class="doc-meta">2.4 MB • Jan 15, 2024</span>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Right Column: Dashboard #}
+                    <div class="dashboard-grid">
+                        
+                        {# Mini Stats Row (Mock) #}
+                        <div class="mini-stats-grid">
+                            <div class="mini-stat-card">
+                                <div class="mini-stat-label">
+                                    {{ 'employee.detail.stats.total_time'|trans({}, 'messages')|default('Total Worked') }}
+                                    <span class="example-badge">示例数据</span>
+                                </div>
+                                <div class="mini-stat-value">
+                                    <div class="mini-stat-icon" style="background: #f97316;"><i class="fa-regular fa-clock"></i></div>
+                                    {{ employee.timeWorked|default('0h') }}
+                                </div>
+                            </div>
+                            <div class="mini-stat-card">
+                                <div class="mini-stat-label">
+                                    {{ 'employee.detail.stats.reimbursement'|trans({}, 'messages')|default('Reimbursement') }}
+                                    <span class="example-badge">示例数据</span>
+                                </div>
+                                <div class="mini-stat-value">
+                                    <div class="mini-stat-icon" style="background: #8b5cf6;"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                                    ${{ employee.reimbursement|default('0') }}
+                                    <span style="font-size: 12px; color: #3b82f6; font-weight: 500; margin-left: auto; cursor: pointer;">{{ 'employee.detail.stats.details'|trans({}, 'messages')|default('Details') }} (3)</span>
+                                </div>
+                            </div>
+                            <div class="mini-stat-card">
+                                <div class="mini-stat-label">
+                                    {{ 'employee.detail.stats.achievement'|trans({}, 'messages')|default('Achievements') }}
+                                    <span class="example-badge">示例数据</span>
+                                </div>
+                                <div class="mini-stat-value">
+                                    <div class="mini-stat-icon" style="background: #10b981;"><i class="fa-solid fa-award"></i></div>
+                                    {{ 'employee.detail.stats.veteran'|trans({}, 'messages')|default('Veteran') }}
+                                </div> 
+                            </div>
+                        </div>
+
+                        {# Real Personal Details (Replaces Salary Section) #}
+                        <div class="card">
+                            <div class="card-title">
+                                {{ 'employee.detail.info.title'|trans({}, 'messages')|default('Personal Information') }}
+                                <button style="border:none; background:transparent; color:#94a3b8;"><i class="fa-solid fa-pen-to-square"></i></button>
+                            </div>
+                            
+                            <div class="detail-info-section">
+                                {# Personal #}
+                                <div>
+                                    <div class="detail-group-title">{{ 'employee.detail.info.personal.title'|trans({}, 'messages')|default('Basic Info') }}</div>
+                                    <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.personal.gender'|trans({}, 'messages')|default('Gender') }}</div>
+                                        <div class="detail-field-value">{{ ('employee.gender.' ~ employee.gender|default('unknown')|lower)|trans({}, 'messages')|default(employee.gender) }}</div>
+                                    </div>
+                                    <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.personal.dob'|trans({}, 'messages')|default('Date of Birth') }}</div>
+                                        <div class="detail-field-value">{{ employee.birthDate|default('-') }}</div>
+                                    </div>
+                                     <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.personal.id_card'|trans({}, 'messages')|default('ID Card') }}</div>
+                                        <div class="detail-field-value">{{ employee.idCard|default('-') }}</div>
+                                    </div>
+                                    <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.personal.address'|trans({}, 'messages')|default('Address') }}</div>
+                                        <div class="detail-field-value">{{ employee.address|default('-') }}</div>
+                                    </div>
+                                </div>
+
+                                {# Education #}
+                                <div>
+                                    <div class="detail-group-title">{{ 'employee.detail.info.education.title'|trans({}, 'messages')|default('Education') }}</div>
+                                    <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.education.degree'|trans({}, 'messages')|default('Degree') }}</div>
+                                        <div class="detail-field-value">{{ ('employee.education.' ~ employee.education|default('unknown')|lower)|trans({}, 'messages')|default(employee.education) }}</div>
+                                    </div>
+                                    <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.education.school'|trans({}, 'messages')|default('School') }}</div>
+                                        <div class="detail-field-value">{{ employee.school|default('-') }}</div>
+                                    </div>
+                                    <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.education.major'|trans({}, 'messages')|default('Major') }}</div>
+                                        <div class="detail-field-value">{{ employee.major|default('-') }}</div>
+                                    </div>
+                                     <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.education.graduation'|trans({}, 'messages')|default('Graduation Date') }}</div>
+                                        <div class="detail-field-value">{{ employee.graduationDate|default('-') }}</div>
+                                    </div>
+                                </div>
+                                
+                                {# Emergency Contact #}
+                                <div>
+                                    <div class="detail-group-title">{{ 'employee.detail.info.emergency.title'|trans({}, 'messages')|default('Emergency Contact') }}</div>
+                                    <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.emergency.contact_name'|trans({}, 'messages')|default('Contact Name') }}</div>
+                                        <div class="detail-field-value">{{ employee.emergencyContact|default('-') }}</div>
+                                    </div>
+                                    <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.emergency.phone'|trans({}, 'messages')|default('Contact Phone') }}</div>
+                                        <div class="detail-field-value">{{ employee.emergencyPhone|default('-') }}</div>
+                                    </div>
+                                </div>
+                                
+                                {# Account & Relations #}
+                                <div>
+                                     <div class="detail-group-title">{{ 'employee.detail.info.account.title'|trans({}, 'messages')|default('Account Info') }}</div>
+                                    <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.account.username'|trans({}, 'messages')|default('Username') }}</div>
+                                        <div class="detail-field-value">{{ employee.username|default('-') }}</div>
+                                    </div>
+                                    <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.account.last_login'|trans({}, 'messages')|default('Last Login') }}</div>
+                                        <div class="detail-field-value">{{ employee.lastLoginAt|default('-') }}</div>
+                                    </div>
+                                    <div class="detail-field">
+                                        <div class="detail-field-label">{{ 'employee.detail.info.account.direct_reports'|trans({}, 'messages')|default('Direct Reports') }}</div>
+                                        <div class="subordinate-avatars">
+                                            {% if employee.subordinates is defined and employee.subordinates|length > 0 %}
+                                                {% for sub in employee.subordinates|slice(0, 4) %}
+                                                    {% if sub.avatar %}
+                                                    <img src="{{ sub.avatar }}" class="sub-avatar" title="{{ sub.name }}">
+                                                    {% else %}
+                                                    <div class="sub-avatar" style="background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:10px; color:#64748b;" title="{{ sub.name }}">{{ sub.name|slice(-2) }}</div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% if employee.subordinates|length > 4 %}
+                                                <div class="sub-more">+{{ employee.subordinates|length - 4 }}</div>
+                                                {% endif %}
+                                            {% else %}
+                                                <div class="detail-field-value">-</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="split-row">
+                            {# Active Tasks (Mock) #}
+                            <div class="card" style="margin-bottom: 0;">
+                                <div class="card-title">
+                                    <div>
+                                        {{ 'employee.detail.tasks.title'|trans({}, 'messages')|default('Active Tasks') }}
+                                        <span class="example-badge">示例数据</span>
+                                    </div>
+                                    <button style="border:none; background:transparent; color:#94a3b8;"><i class="fa-solid fa-ellipsis"></i></button>
+                                </div>
+                                <div class="task-list">
+                                    {% if employee.activeTasks is defined %}
+                                        {% for task in employee.activeTasks %}
+                                        <div class="task-item" style="border-left-color: {{ task.color }}">
+                                            <div class="task-content">
+                                                <h4>{{ task.title }}</h4>
+                                                <div class="task-meta">
+                                                    <i class="fa-regular fa-calendar"></i> {{ task.deadline }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                        <!-- Mock Fallback -->
+                                        <div class="task-item" style="border-left-color: #f97316;">
+                                            <div class="task-content">
+                                                <h4>Develop marketing strategy</h4>
+                                                <div class="task-meta">
+                                                    <i class="fa-regular fa-calendar"></i> Feb 10, 2024
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {# Activity Log (Mock) #}
+                            <div class="card" style="margin-bottom: 0;">
+                                <div class="card-title">
+                                    <div>
+                                        {{ 'employee.detail.activity.title'|trans({}, 'messages')|default('Activity') }}
+                                        <span class="example-badge">示例数据</span>
+                                    </div>
+                                    <button style="border:none; background:transparent; color:#94a3b8;"><i class="fa-solid fa-ellipsis"></i></button>
+                                </div>
+                                <div class="activity-list">
+                                    <div style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">{{ 'now'|date('M d, Y') }} (10hrs) {{ 'employee.detail.stats.overtime'|trans({}, 'messages')|default('Overtime') }} (2hrs)</div>
+                                    {% if employee.activityLog is defined %}
+                                        {% for activity in employee.activityLog %}
+                                        <div class="activity-item">
+                                            <div class="activity-action">
+                                                <i class="fa-regular fa-clock activity-icon"></i>
+                                                {{ activity.action }}
+                                            </div>
+                                            <div class="activity-time">{{ activity.time }}</div>
+                                            {% if activity.status is defined %}
+                                            <div class="activity-status" style="background: {{ activity.statusColor }}20; color: {{ activity.statusColor }};">
+                                                {{ activity.status }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    {% else %}
+                                         <!-- Mock Fallback -->
+                                        <div class="activity-item">
+                                            <div class="activity-action">
+                                                <i class="fa-regular fa-clock activity-icon"></i>
+                                                Logged in
+                                            </div>
+                                            <div class="activity-time">10:30 AM</div>
+                                            <div class="activity-status" style="background: #3b82f620; color: #3b82f6;">Success</div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Clear Passkey Modal -->
+            <div class="ef-modal-container" id="clearPasskeyModal" style="z-index: 1002; display: none;">
+                <div class="ef-modal-mask" onclick="$('#clearPasskeyModal').hide()"></div>
+                <div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+                    <div class="ef-modal">
+                        <div class="ef-modal-header">
+                            <div class="ef-modal-title ef-modal-title-align-left">
+                                {{ 'employee.detail.action.clear_passkey'|trans({}, 'messages')|default('Clear Passkey') }}
+                            </div>
+                            <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="$('#clearPasskeyModal').hide()">
+                                <span class="ef-icon-hover">
+                                    <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                                    </svg>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="ef-modal-body">
+                            <div>{{ 'employee.detail.action.clear_passkey_confirm'|trans({}, 'messages')|default('Are you sure you want to clear all passkeys for this user? This action cannot be undone.') }}</div>
+                        </div>
+                        <div class="ef-modal-footer">
+                            <button class="btn secondary small" type="button" onclick="$('#clearPasskeyModal').hide()">{{ 'action.cancel'|trans({}, 'messages')|default('Cancel') }}</button>
+                            <button class="btn primary small" type="button" id="confirmClearPasskeyBtn">{{ 'action.confirm'|trans({}, 'messages')|default('Confirm') }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avatar Edit Modal -->
+            <div class="ef-modal-container" id="avatarModal-{{ employee.id }}" style="z-index: 1002; display: none;">
+                <div class="ef-modal-mask" onclick="closeAvatarModal('{{ employee.id }}')"></div>
+                <div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+                    <div class="ef-modal" style="width: 600px; max-width: 90vw;">
+                        <div class="ef-modal-header">
+                            <div class="ef-modal-title ef-modal-title-align-left">
+                                {{ 'employee.avatar.edit.title'|trans({}, 'messages')|default('Edit Avatar') }}
+                            </div>
+                            <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="closeAvatarModal('{{ employee.id }}')">
+                                <span class="ef-icon-hover">
+                                    <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                                    </svg>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="ef-modal-body" style="padding: 20px;">
+                            <div id="drop-area-{{ employee.id }}" style="border: 2px dashed #ccc; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; background: #f9fafb; transition: all 0.2s;">
+                                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 48px; color: #9ca3af; margin-bottom: 16px;"></i>
+                                <p style="margin: 0; color: #6b7280; font-size: 14px;">{{ 'employee.avatar.drop_hint'|trans({}, 'messages')|default('Click or drag image here') }}</p>
+                                <input type="file" id="fileElem-{{ employee.id }}" accept="image/*" style="display:none" onchange="handleFiles('{{ employee.id }}', this.files)">
+                            </div>
+                            
+                            <div id="crop-container-{{ employee.id }}" style="display: none; height: 400px; background: #000; position: relative; border-radius: 8px; overflow: hidden;">
+                                <img id="image-to-crop-{{ employee.id }}" src="" style="max-width: 100%; display: block;">
+                            </div>
+                            
+                            <div id="crop-controls-{{ employee.id }}" style="display: none; margin-top: 16px; text-align: center; gap: 8px; justify-content: center;">
+                                <button type="button" class="btn secondary small" onclick="cropperInstances['{{ employee.id }}'].zoom(0.1)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                                <button type="button" class="btn secondary small" onclick="cropperInstances['{{ employee.id }}'].zoom(-0.1)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                                <button type="button" class="btn secondary small" onclick="cropperInstances['{{ employee.id }}'].rotate(90)"><i class="fa-solid fa-rotate-right"></i></button>
+                                <button type="button" class="btn secondary small" onclick="resetCrop('{{ employee.id }}')"><i class="fa-solid fa-rotate-left"></i></button>
+                                <button type="button" class="btn secondary small" onclick="cancelCrop('{{ employee.id }}')" style="margin-left: 12px;">{{ 'action.reselect'|trans({}, 'messages')|default('Reselect') }}</button>
+                            </div>
+                        </div>
+                        <div class="ef-modal-footer">
+                            <button class="btn secondary small" type="button" onclick="closeAvatarModal('{{ employee.id }}')">{{ 'action.cancel'|trans({}, 'messages')|default('Cancel') }}</button>
+                            <button class="btn primary small" type="button" onclick="saveAvatar('{{ employee.id }}')">{{ 'action.save'|trans({}, 'messages')|default('Save') }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                var cropperInstances = cropperInstances || {};
+
+                function openAvatarModal(id) {
+                    $('#avatarModal-' + id).show();
+                    resetCrop(id);
+                    cancelCrop(id); // Show drop area
+                }
+
+                function closeAvatarModal(id) {
+                    $('#avatarModal-' + id).hide();
+                    if (cropperInstances[id]) {
+                        cropperInstances[id].destroy();
+                        delete cropperInstances[id];
+                    }
+                }
+
+                function cancelCrop(id) {
+                    $('#drop-area-' + id).show();
+                    $('#crop-container-' + id).hide();
+                    $('#crop-controls-' + id).hide();
+                    if (cropperInstances[id]) {
+                        cropperInstances[id].destroy();
+                        delete cropperInstances[id];
+                    }
+                    $('#fileElem-' + id).val('');
+                }
+
+                function resetCrop(id) {
+                    if (cropperInstances[id]) {
+                        cropperInstances[id].reset();
+                    }
+                }
+
+                // Drag and Drop
+                (function() {
+                    var dropArea = document.getElementById('drop-area-{{ employee.id }}');
+                    
+                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                        dropArea.addEventListener(eventName, preventDefaults, false);
+                    });
+
+                    function preventDefaults(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+
+                    ['dragenter', 'dragover'].forEach(eventName => {
+                        dropArea.addEventListener(eventName, highlight, false);
+                    });
+
+                    ['dragleave', 'drop'].forEach(eventName => {
+                        dropArea.addEventListener(eventName, unhighlight, false);
+                    });
+
+                    function highlight(e) {
+                        dropArea.style.borderColor = '#3b82f6';
+                        dropArea.style.background = '#eff6ff';
+                    }
+
+                    function unhighlight(e) {
+                        dropArea.style.borderColor = '#ccc';
+                        dropArea.style.background = '#f9fafb';
+                    }
+
+                    dropArea.addEventListener('drop', handleDrop, false);
+
+                    function handleDrop(e) {
+                        var dt = e.dataTransfer;
+                        var files = dt.files;
+                        handleFiles('{{ employee.id }}', files);
+                    }
+                    
+                    // Click to upload
+                    dropArea.addEventListener('click', function() {
+                        document.getElementById('fileElem-{{ employee.id }}').click();
+                    });
+                })();
+
+                function handleFiles(id, files) {
+                    if (files.length > 0) {
+                        var file = files[0];
+                        if (!file.type.startsWith('image/')) {
+                            alert('Please select an image file');
+                            return;
+                        }
+
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            $('#drop-area-' + id).hide();
+                            $('#crop-container-' + id).show();
+                            $('#crop-controls-' + id).show().css('display', 'flex');
+                            
+                            var image = document.getElementById('image-to-crop-' + id);
+                            image.src = e.target.result;
+                            
+                            if (cropperInstances[id]) {
+                                cropperInstances[id].destroy();
+                            }
+                            
+                            cropperInstances[id] = new Cropper(image, {
+                                aspectRatio: 1,
+                                viewMode: 1,
+                                dragMode: 'move',
+                                autoCropArea: 1,
+                                responsive: true,
+                            });
+                        }
+                        reader.readAsDataURL(file);
+                    }
+                }
+
+                function saveAvatar(id) {
+                    if (!cropperInstances[id]) {
+                        alert('Please select an image first');
+                        return;
+                    }
+
+                    var canvas = cropperInstances[id].getCroppedCanvas({
+                        width: 300,
+                        height: 300
+                    });
+
+                    canvas.toBlob(function(blob) {
+                        var formData = new FormData();
+                        formData.append('avatar', blob, 'avatar.png');
+
+                        // Show loading state (optional)
+                        var saveBtn = $('#avatarModal-' + id + ' .btn.primary');
+                        var originalText = saveBtn.text();
+                        saveBtn.text('Saving...').prop('disabled', true);
+
+                        $.ajax({
+                            url: '/api/employee/' + id + '/avatar',
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                if (response.success) {
+                                    // Update preview
+                                    $('#avatar-preview-' + id).attr('src', response.url).show();
+                                    $('#avatar-fallback-' + id).hide();
+                                    
+                                    closeAvatarModal(id);
+                                } else {
+                                    alert('Upload failed: ' + (response.error || 'Unknown error'));
+                                }
+                            },
+                            error: function(xhr) {
+                                alert('Upload failed: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+                            },
+                            complete: function() {
+                                saveBtn.text(originalText).prop('disabled', false);
+                            }
+                        });
+                    });
+                }
+
+                function clearPasskey(id) {
+                    $('#clearPasskeyModal').show();
+                    $('#confirmClearPasskeyBtn').off('click').on('click', function() {
+                        $('#clearPasskeyModal').hide();
+                        $.ajax({
+                            url: '/employee/' + id + '/clear-passkey',
+                            type: 'POST',
+                            success: function(response) {
+                                if (response.status === 'success') {
+                                    $.alert.success(response.message);
+                                    // Optional: Reload the page to update the Passkey status indicator
+                                    setTimeout(function() { location.reload(); }, 1500);
+                                } else {
+                                    $.alert.error('Error: ' + response.message);
+                                }
+                            },
+                            error: function(xhr) {
+                                $.alert.error('Error: ' + (xhr.responseJSON ? xhr.responseJSON.message : 'Unknown error'));
+                            }
+                        });
+                    });
+                }
+            </script>
         </div>
-    </div>
-</div>
-{% endblock %}

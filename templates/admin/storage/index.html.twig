@@ -1,0 +1,76 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'components/datagrid.html.twig' as grid %}
+
+{% block title %}存储配置管理{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="{{ asset('corporation.css', 'admin') }}">
+{% endblock %}
+
+{% block app_content_container %}
+<div class="org-structure-container">
+    <div class="outside-wrapper" style="padding: 20px;">
+        {{ grid.dataGrid(
+            tableData|default([]),
+                columns|default([]),
+                {
+                    createUrl: path('admin_storage_new'),
+                    editUrlPrefix: path('admin_storage_edit', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                    deleteUrlPrefix: path('admin_storage_delete', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                    toolbarButtons: [
+                        { 
+                            type: 'create', 
+                            text: '新建配置', 
+                            icon: 'fa-solid fa-plus', 
+                            attributes: { 'onclick': "openStorageCreateDrawer()" } 
+                        }
+                    ],
+                    actionButtons: [
+                        { type: 'edit', text: '编辑', icon: 'fa-solid fa-edit' },
+                        { type: 'delete', text: '删除', icon: 'fa-solid fa-trash' }
+                    ],
+                    emptyText: '暂无存储配置',
+                    gridId: 'storage-config-grid',
+                    pagination: false,
+                    serverSide: false,
+                    showCheckbox: false,
+                    showRowNumber: true,
+                    autoFitContent: false
+                }
+            ) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function openStorageCreateDrawer() {
+            // Remove existing drawers to prevent duplicates
+            $('[id^="storage-config-drawer-"]').remove();
+            
+            ajax({
+                method: 'POST',
+                url: '{{ path("admin_storage_drawer") }}',
+                data: {
+                    action: 'create'
+                },
+                contentType: 'application/json',
+                dataType: 'html',
+                success: function(html) {
+                    $('body').append(html);
+                    $().showDrawer('storage-config-drawer-new');
+                    // Initialize drawer events after it's added to DOM
+                    if (typeof window.initStorageCreateDrawer === 'function') {
+                        window.initStorageCreateDrawer();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading storage config drawer:', error);
+                    alert('加载配置表单失败，请重试');
+                }
+            });
+        }
+    </script>
+{% endblock %}

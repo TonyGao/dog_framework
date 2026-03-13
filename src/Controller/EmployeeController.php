@@ -10,6 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+use App\Entity\Platform\UserPreference;
+use App\Entity\Traits\OrganizationTrait;
+
+use App\Entity\Security\WebauthnCredential;
+
 class EmployeeController extends AbstractController
 {
     #[Route('/employee/list', name: 'employee_list')]
@@ -97,11 +102,83 @@ class EmployeeController extends AbstractController
         $limit = $request->query->getInt('limit', 10);
         $offset = ($page - 1) * $limit;
 
+        // 排序处理
+        $sort = $request->query->get('sort');
+        $order = $request->query->get('order');
+
+        // 获取用户自定义列和排序设置
+        $user = $this->getUser();
+        $prefRepo = $em->getRepository(UserPreference::class);
+        $userPref = null;
+        if ($user instanceof Employee) {
+            $userPref = $prefRepo->findOneBy(['user' => $user, 'prefKey' => 'employee_list_columns']);
+        }
+
+        $allColumns = [
+            'name' => ['label' => 'employee.field.name', 'sortable' => true],
+            'employeeNo' => ['label' => 'employee.field.employee_no', 'sortable' => true],
+            'department' => ['label' => 'employee.field.department', 'sortable' => true],
+            'position' => ['label' => 'employee.field.position', 'sortable' => true],
+            'status' => ['label' => 'employee.field.status', 'sortable' => true],
+            'hireDate' => ['label' => 'employee.field.entry_date', 'sortable' => true],
+            'email' => ['label' => 'employee.field.email', 'sortable' => true],
+            'mobile' => ['label' => 'employee.field.mobile', 'sortable' => true],
+            'gender' => ['label' => 'employee.field.gender', 'sortable' => true],
+            'birthDate' => ['label' => 'employee.field.birth_date', 'sortable' => true],
+            'idCard' => ['label' => 'employee.field.id_card', 'sortable' => true],
+            'englishName' => ['label' => 'employee.field.english_name', 'sortable' => true],
+        ];
+
+        $columns = [];
+        if ($userPref && isset($userPref->getPrefValue()['columns'])) {
+            // Merge stored columns with definition to ensure they are valid and have labels
+            foreach ($userPref->getPrefValue()['columns'] as $key => $config) {
+                if (isset($allColumns[$key])) {
+                    $columns[$key] = $allColumns[$key];
+                }
+            }
+        } else {
+            // Default columns
+            $defaultKeys = ['name', 'employeeNo', 'department', 'position', 'status', 'hireDate'];
+            foreach ($defaultKeys as $key) {
+                if (isset($allColumns[$key])) {
+                    $columns[$key] = $allColumns[$key];
+                }
+            }
+        }
+
+        // 如果 URL 参数中没有指定排序，尝试使用用户偏好，否则使用默认值
+        if (!$sort) {
+            if ($userPref && isset($userPref->getPrefValue()['sort'])) {
+                $sort = $userPref->getPrefValue()['sort'];
+                $order = $userPref->getPrefValue()['order'] ?? 'desc';
+            } else {
+                $sort = 'hireDate';
+                $order = 'desc';
+            }
+        }
+        
+        // 验证排序字段是否在允许的字段中
+        $allowedSortFields = array_keys($allColumns);
+        if (!in_array($sort, $allowedSortFields)) {
+            $sort = 'hireDate';
+        }
+        
+        $order = strtolower($order) === 'asc' ? 'asc' : 'desc';
+
         $empRepo = $em->getRepository(Employee::class);
         $qb = $empRepo->createQueryBuilder('e')
             ->leftJoin('e.department', 'd')
-            ->leftJoin('e.position', 'p')
-            ->orderBy('e.employeeNo', 'ASC');
+            ->leftJoin('e.position', 'p');
+
+        // 应用排序
+        if ($sort === 'department') {
+            $qb->orderBy('d.name', $order);
+        } elseif ($sort === 'position') {
+            $qb->orderBy('p.name', $order);
+        } else {
+            $qb->orderBy('e.' . $sort, $order);
+        }
 
         // 搜索功能 (可选，支持按姓名或工号搜索)
         $search = $request->query->get('q');
@@ -109,6 +186,49 @@ class EmployeeController extends AbstractController
             $qb->andWhere('e.name LIKE :search OR e.employeeNo LIKE :search')
                ->setParameter('search', '%' . $search . '%');
         }
+
+        // 树状结构筛选
+        $departmentId = $request->query->get('department_id');
+        $companyId = $request->query->get('company_id');
+        $includeSub = $request->query->getBoolean('include_sub', true); // 默认为 true
+
+        if ($departmentId) {
+            if ($includeSub) {
+                $dept = $deptRepo->find($departmentId);
+                if ($dept) {
+                    $qb->andWhere('d.lft >= :lft')
+                       ->andWhere('d.rgt <= :rgt')
+                       ->andWhere('d.root = :root')
+                       ->setParameter('lft', $dept->getLft())
+                       ->setParameter('rgt', $dept->getRgt())
+                       ->setParameter('root', $dept->getRoot());
+                } else {
+                    // Fallback if department not found (shouldn't happen usually)
+                    $qb->andWhere('e.department = :departmentId')
+                       ->setParameter('departmentId', $departmentId);
+                }
+            } else {
+                $qb->andWhere('e.department = :departmentId')
+                   ->setParameter('departmentId', $departmentId);
+            }
+        } elseif ($companyId) {
+            // $companyId 可能是 Department 表中 company 类型的节点 ID
+            // 先尝试从 Department 表中查找
+            $companyDept = $deptRepo->find($companyId);
+            
+            if ($companyDept && $companyDept->getCompany()) {
+                // 如果找到了 Department 且它关联了 Company 实体，则使用 Company 实体的 ID
+                $qb->andWhere('e.company = :companyId')
+                   ->setParameter('companyId', $companyDept->getCompany()->getId());
+            } else {
+                // 否则，假设它就是 Company ID（回退策略）
+                $qb->andWhere('e.company = :companyId')
+                   ->setParameter('companyId', $companyId);
+            }
+        }
+
+        // 决定是否显示统计数据：只有在首页（无搜索、无筛选、第一页）时显示
+        $showStats = !($search || $departmentId || $companyId || $page > 1);
 
         // 计算总数
         $countQb = clone $qb;
@@ -141,6 +261,11 @@ class EmployeeController extends AbstractController
             'tree' => $tree,
             'entities' => $employees,
             'stats' => $stats,
+            'show_stats' => $showStats,
+            'columns' => $columns,
+            'allColumns' => $allColumns,
+            'currentSort' => $sort,
+            'currentOrder' => $order,
             'pagination' => [
                 'currentPage' => $page,
                 'totalPages' => $totalPages,
@@ -153,7 +278,7 @@ class EmployeeController extends AbstractController
     }
 
     #[Route('/employee/{id}', name: 'employee_show', requirements: ['id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'])]
-    public function show(string $id, EntityManagerInterface $em): Response
+    public function show(string $id, EntityManagerInterface $em, Request $request): Response
     {
         $employee = $em->getRepository(Employee::class)->find($id);
 
@@ -167,7 +292,7 @@ class EmployeeController extends AbstractController
             'id' => $employee->getId(),
             'name' => $employee->getName(),
             'englishName' => $employee->getEnglishName(),
-            'avatar' => 'https://i.pravatar.cc/300?u=' . $employee->getId(), // Placeholder
+            'avatar' => $employee->getAvatar(),
             'position' => $employee->getPosition() ? $employee->getPosition()->getName() : '',
             'employeeNo' => $employee->getEmployeeNo(),
             'status' => $employee->getStatus(), // active, inactive, etc.
@@ -181,7 +306,7 @@ class EmployeeController extends AbstractController
             'manager' => (object)[
                 'id' => $employee->getManager() ? $employee->getManager()->getId() : '', 
                 'name' => $employee->getManager() ? $employee->getManager()->getName() : 'N/A', 
-                'avatar' => 'https://i.pravatar.cc/300?u=' . ($employee->getManager() ? $employee->getManager()->getId() : 'default')
+                'avatar' => $employee->getManager() ? $employee->getManager()->getAvatar() : null
             ],
             'subordinates' => [], // Will populate below
             
@@ -268,9 +393,41 @@ class EmployeeController extends AbstractController
             ];
         }
 
+        // Check for Passkey
+        // WebauthnCredential stores userHandle as base64url encoded string of the UUID
+        $userHandle = rtrim(strtr(base64_encode($employee->getId()), '+/', '-_'), '=');
+        $credentialRepo = $em->getRepository(WebauthnCredential::class);
+        $credentials = $credentialRepo->findBy(['userHandle' => $userHandle]);
+        $viewData->hasPasskey = count($credentials) > 0;
+
         return $this->render('employee/show.html.twig', [
             'employee' => $viewData
         ]);
     }
+
+    #[Route('/employee/{id}/clear-passkey', name: 'employee_clear_passkey', methods: ['POST'])]
+    public function clearPasskey(string $id, EntityManagerInterface $em): Response
+    {
+        $employee = $em->getRepository(Employee::class)->find($id);
+
+        if (!$employee) {
+            return $this->json(['status' => 'error', 'message' => 'Employee not found'], 404);
+        }
+
+        // WebauthnCredential stores userHandle as base64url encoded string of the UUID
+        $userHandle = rtrim(strtr(base64_encode($employee->getId()), '+/', '-_'), '=');
+
+        $credentialRepo = $em->getRepository(WebauthnCredential::class);
+        $credentials = $credentialRepo->findBy(['userHandle' => $userHandle]);
+
+        foreach ($credentials as $credential) {
+            $em->remove($credential);
+        }
+        
+        $em->flush();
+
+        return $this->json(['status' => 'success', 'message' => 'Passkeys cleared successfully']);
+    }
 }
+
 
