@@ -1,0 +1,358 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ 'admin_security.page_title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="{{ asset('corporation.css', 'admin') }}">
+    <style>
+        .security-page {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #1d1d1f;
+        }
+        .security-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .security-tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e5ea;
+            margin-bottom: 32px;
+        }
+        .security-tab {
+            padding: 12px 0;
+            margin-right: 32px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #86868b;
+            cursor: pointer;
+        }
+        .security-tab.active {
+            color: #0066cc;
+            border-bottom: 2px solid #0066cc;
+        }
+        .method-list {
+            border-top: 1px solid #e5e5ea;
+        }
+        .method-item {
+            display: flex;
+            align-items: center;
+            padding: 24px 0;
+            border-bottom: 1px solid #e5e5ea;
+            background: #fff;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .method-item.dragging {
+            opacity: 0.5;
+            background: #f5f5f7;
+        }
+        .method-handle {
+            cursor: grab;
+            margin-right: 16px;
+            color: #ccc;
+            padding: 8px;
+        }
+        .method-handle:hover {
+            color: #86868b;
+        }
+        .method-icon {
+            font-size: 24px;
+            width: 48px;
+            color: #1d1d1f;
+            display: flex;
+            align-items: center;
+        }
+        .method-content {
+            flex: 1;
+        }
+        .method-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .method-subtitle {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .method-subtitle.secure {
+            color: #28a745;
+        }
+        .method-subtitle.less-secure {
+            color: #dc3545;
+        }
+        .method-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .side-card {
+            background: #f5f5f7;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .side-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .side-card-text {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        .side-card-link {
+            color: #0066cc;
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .side-card-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+{% endblock %}
+
+{% block app_content_container %}
+<div class="org-structure-container security-page">
+    <div class="outside-wrapper" style="padding: 40px; max-width: 1200px; margin: 0; background: #fff; min-height: calc(100vh - 60px);">
+        
+        <div class="security-title">{{ 'admin_security.title'|trans }}</div>
+        
+        <div class="security-tabs">
+            <div class="security-tab active">{{ 'admin_security.tabs.2fa_settings'|trans }}</div>
+        </div>
+
+        <div class="ef-row ef-row-align-start ef-row-justify-start">
+            <div class="ef-col-16" style="padding-right: 60px;">
+                
+                <div role="alert" class="ef-alert ef-alert-info" style="margin-bottom: 32px; background-color: #f0f4f8; border: none; border-radius: 12px; padding: 20px;">
+                    <div class="ef-alert-icon" style="color: #0066cc; align-self: flex-start; margin-top: 2px;">
+                        <i class="fa-solid fa-circle-info" style="font-size: 18px;"></i>
+                    </div>
+                    <div class="ef-alert-body">
+                        <div class="ef-alert-title" style="font-weight: 600; font-size: 15px; margin-bottom: 4px; color: #1d1d1f;">{{ 'admin_security.alert.title'|trans }}</div>
+                        <div class="ef-alert-content" style="color: #555; font-size: 14px; line-height: 1.5;">{{ 'admin_security.alert.content'|trans }}</div>
+                    </div>
+                </div>
+
+                <div class="ef-row ef-row-align-center ef-row-justify-between" style="margin-bottom: 16px;">
+                    <div>
+                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">{{ 'admin_security.list.title'|trans }}</div>
+                        <div style="font-size: 14px; color: #86868b;">{{ 'admin_security.list.subtitle'|trans }}</div>
+                    </div>
+                    <div>
+                        {% if methods|length == 0 %}
+                            <a href="{{ path('admin_security_init') }}" class="btn outline medium" style="border-radius: 20px;">{{ 'admin_security.btn.initialize'|trans }}</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="method-list">
+                    {% for method in methods %}
+                    <div class="method-item" draggable="true" data-id="{{ method.id }}">
+                        <div class="method-handle">
+                            <i class="fa-solid fa-grip-vertical"></i>
+                        </div>
+                        <div class="method-icon">
+                            {% if method.methodKey == 'passkey' %}
+                                <i class="fa-solid fa-fingerprint"></i>
+                            {% elseif method.methodKey == 'sms' %}
+                                <i class="fa-solid fa-comment-sms"></i>
+                            {% elseif method.methodKey == 'email' %}
+                                <i class="fa-solid fa-envelope"></i>
+                            {% elseif method.methodKey == 'qa' %}
+                                <i class="fa-solid fa-clipboard-question"></i>
+                            {% else %}
+                                <i class="fa-solid fa-shield-halved"></i>
+                            {% endif %}
+                        </div>
+                        <div class="method-content">
+                            <div class="method-title">{{ method.name }}</div>
+                            <div class="method-subtitle {% if method.priority <= 20 %}secure{% else %}less-secure{% endif %}">
+                                {% if method.priority <= 20 %}{{ 'admin_security.status.more_secure'|trans }}{% else %}{{ 'admin_security.status.less_secure'|trans }}{% endif %}
+                            </div>
+                        </div>
+                        <div class="method-actions">
+                            <form action="{{ path('admin_security_update', {id: method.id}) }}" method="post" style="display:inline;" id="toggleForm{{ method.id }}">
+                                <input type="hidden" name="priority" value="{{ method.priority }}">
+                                {% if not method.isEnabled %}
+                                    <input type="hidden" name="is_enabled" value="1">
+                                {% endif %}
+                                <button type="button" role="switch" aria-checked="{{ method.isEnabled ? 'true' : 'false' }}" class="ef-switch ef-switch-type-circle {% if method.isEnabled %}ef-switch-checked{% endif %}" onclick="document.getElementById('toggleForm{{ method.id }}').submit();">
+                                    <span class="ef-switch-handle">
+                                        <span class="ef-switch-handle-icon"></span>
+                                    </span>
+                                </button>
+                            </form>
+                            <button class="btn secondary medium only-icon circle" style="border:none; background:transparent; box-shadow:none; color: #1d1d1f; font-size: 18px;" onclick="openModal('editMethodModal{{ method.id }}')">
+                                <i class="fa-solid fa-gear"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Edit Modal -->
+                    <div class="ef-modal-container" id="editMethodModal{{ method.id }}" style="z-index: 1001; display: none;">
+                        <div class="ef-modal-mask"></div>
+                        <div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+                            <div class="ef-modal">
+                                <form action="{{ path('admin_security_update', {id: method.id}) }}" method="post">
+                                    <div class="ef-modal-header">
+                                        <div class="ef-modal-title ef-modal-title-align-left">
+                                            {{ 'admin_security.modal.title'|trans({'%name%': method.name}) }}
+                                        </div>
+                                        <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="closeModal('editMethodModal{{ method.id }}')">
+                                            <span class="ef-icon-hover">
+                                                <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                                                    <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="ef-modal-body text-start" style="padding: 20px;">
+                                        <div style="margin-bottom: 20px;">
+                                            <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">{{ 'admin_security.modal.priority_label'|trans }}</label>
+                                            <span class="ef-input-wrapper" style="width: 100%;">
+                                                <input type="number" name="priority" class="ef-input ef-input-size-medium text" value="{{ method.priority }}" required>
+                                            </span>
+                                            <div style="margin-top: 8px; font-size: 12px; color: #86868b;">{{ 'admin_security.modal.priority_help'|trans }}</div>
+                                        </div>
+                                        
+                                        {% if method.methodKey == 'email' %}
+                                        <div style="margin-bottom: 20px;">
+                                            <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">选择邮件模版</label>
+                                            <span class="ef-input-wrapper" style="width: 100%;">
+                                                <select name="config[template]" class="ef-input ef-input-size-medium text" style="width: 100%; border: none; outline: none; background: transparent; padding: 0;">
+                                                    <option value="">-- 请选择模版 --</option>
+                                                    {% for template in emailTemplates %}
+                                                        <option value="{{ template.code }}" {% if method.config.template|default('') == template.code %}selected{% endif %}>{{ template.name }} ({{ template.code }})</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 20px;">
+                                            <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">验证码有效期 (分钟)</label>
+                                            <span class="ef-input-wrapper" style="width: 100%;">
+                                                <input type="number" name="config[expire_minutes]" class="ef-input ef-input-size-medium text" value="{{ method.config.expire_minutes|default('15') }}">
+                                            </span>
+                                        </div>
+                                        <div style="margin-bottom: 20px; font-size: 13px;">
+                                            <a href="{{ path('admin_email_index') }}" style="color: #0066cc; text-decoration: none;">如需修改发件服务器，请前往 [系统设置 - 邮件配置]</a>
+                                        </div>
+                                        {% endif %}
+
+                                        <div>
+                                            <label aria-disabled="false" class="ef-checkbox {% if method.isEnabled %}ef-checkbox-checked{% endif %}">
+                                                <input type="checkbox" name="is_enabled" value="1" class="ef-checkbox-target" {% if method.isEnabled %}checked{% endif %}>
+                                                <span class="ef-icon-hover ef-checkbox-icon-hover">
+                                                    <div class="ef-checkbox-icon"></div>
+                                                </span>
+                                                <span class="ef-checkbox-label" style="font-weight: 500; font-size: 14px;">{{ 'admin_security.modal.enable_method'|trans }}</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="ef-modal-footer">
+                                        <button class="btn secondary medium" type="button" onclick="closeModal('editMethodModal{{ method.id }}')">{{ 'admin_security.btn.cancel'|trans }}</button>
+                                        <button class="btn primary medium" type="submit">{{ 'admin_security.btn.save'|trans }}</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="ef-col-8">
+                <div class="side-card">
+                    <div class="side-card-title">{{ 'admin_security.side_card.checkup.title'|trans }}</div>
+                    <div class="side-card-text">{{ 'admin_security.side_card.checkup.text'|trans }}</div>
+                    <a href="#" class="side-card-link">{{ 'admin_security.side_card.checkup.link'|trans }}</a>
+                </div>
+
+                <div class="side-card">
+                    <div class="side-card-title">{{ 'admin_security.side_card.help.title'|trans }}</div>
+                    <div class="side-card-text">{{ 'admin_security.side_card.help.text'|trans }}</div>
+                    <a href="#" class="side-card-link">{{ 'admin_security.side_card.help.link'|trans }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function openModal(id) {
+            $('#' + id).show();
+            $('body').css('overflow', 'hidden');
+        }
+        function closeModal(id) {
+            $('#' + id).hide();
+            $('body').css('overflow', '');
+        }
+
+        $(document).ready(function() {
+            // Toggle custom checkbox styling
+            $('.ef-checkbox-target').on('change', function() {
+                var $label = $(this).closest('.ef-checkbox');
+                if ($(this).is(':checked')) {
+                    $label.addClass('ef-checkbox-checked');
+                } else {
+                    $label.removeClass('ef-checkbox-checked');
+                }
+            });
+
+            // Drag and Drop
+            const list = document.querySelector('.method-list');
+            let draggedItem = null;
+
+            list.addEventListener('dragstart', function(e) {
+                draggedItem = e.target.closest('.method-item');
+                if (draggedItem) {
+                    e.dataTransfer.effectAllowed = 'move';
+                    draggedItem.classList.add('dragging');
+                }
+            });
+
+            list.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                const target = e.target.closest('.method-item');
+                if (target && target !== draggedItem) {
+                    const rect = target.getBoundingClientRect();
+                    const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+                    list.insertBefore(draggedItem, next && target.nextSibling || target);
+                }
+            });
+
+            list.addEventListener('dragend', function(e) {
+                if (draggedItem) {
+                    draggedItem.classList.remove('dragging');
+                    draggedItem = null;
+                    
+                    // Collect IDs
+                    const ids = Array.from(list.querySelectorAll('.method-item')).map(item => item.dataset.id);
+                    
+                    // AJAX to save
+                    $.ajax({
+                        url: '{{ path('admin_security_reorder') }}',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ ids: ids }),
+                        success: function(response) {
+                            console.log('Order saved');
+                        },
+                        error: function() {
+                            alert('Failed to save order');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -39,13 +39,14 @@ class InitOfficersCommand extends Command
         foreach ($officers as $username => $data) {
             $user = $this->userRepository->findOneBy(['username' => $username]);
             
-            if ($user) {
-                $io->note(sprintf('User "%s" already exists.', $username));
-                continue;
+            if (!$user) {
+                $user = new SystemUser();
+                $user->setUsername($username);
+                $io->note(sprintf('Creating user "%s"...', $username));
+            } else {
+                $io->note(sprintf('Updating user "%s"...', $username));
             }
 
-            $user = new SystemUser();
-            $user->setUsername($username);
             $user->setRoles([$data['role']]);
             $user->setIsActive(true);
             
@@ -55,7 +56,7 @@ class InitOfficersCommand extends Command
             $user->setPassword($hashedPassword);
 
             $this->entityManager->persist($user);
-            $io->success(sprintf('Created user "%s" with role %s. Password: %s', $username, $data['role'], $password));
+            $io->success(sprintf('User "%s" set with role %s. Password: %s', $username, $data['role'], $password));
         }
 
         $this->entityManager->flush();

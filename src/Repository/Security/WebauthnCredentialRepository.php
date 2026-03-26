@@ -16,7 +16,11 @@ use Webauthn\TrustPath\TrustPath;
 
 class WebauthnCredentialRepository extends ServiceEntityRepository implements PublicKeyCredentialSourceRepositoryInterface, CanSaveCredentialSource
 {
-    public function __construct(ManagerRegistry $registry, private \Psr\Log\LoggerInterface $logger)
+    public function __construct(
+        ManagerRegistry $registry, 
+        private \Psr\Log\LoggerInterface $logger,
+        private \Symfony\Component\HttpFoundation\RequestStack $requestStack
+    )
     {
         parent::__construct($registry, WebauthnCredential::class);
     }
@@ -37,6 +41,12 @@ class WebauthnCredentialRepository extends ServiceEntityRepository implements Pu
 
         $this->logger->info('WebAuthn: Credential found', ['id' => $encodedId, 'userHandle' => $credential->getPublicKeyCredentialSource()->userHandle]);
         return $credential->getPublicKeyCredentialSource();
+    }
+
+    public function findEntityByCredentialId(string $publicKeyCredentialId): ?WebauthnCredential
+    {
+        $encodedId = $this->base64UrlEncode($publicKeyCredentialId);
+        return $this->findOneBy(['publicKeyCredentialId' => $encodedId]);
     }
 
     public function findAllForUserEntity(PublicKeyCredentialUserEntity $publicKeyCredentialUserEntity): array
@@ -107,6 +117,13 @@ class WebauthnCredentialRepository extends ServiceEntityRepository implements Pu
             $credential->setBackupStatus($publicKeyCredentialSource->backupStatus);
             $credential->setUvInitialized($publicKeyCredentialSource->uvInitialized);
             
+            // Set device name
+            $request = $this->requestStack->getCurrentRequest();
+            if ($request) {
+                $userAgent = $request->headers->get('User-Agent');
+                $credential->setDeviceName($this->parseUserAgent($userAgent));
+            }
+
             // Link to Employee
             // We need to find the Employee by userHandle (which is the ID)
             $employee = $entityManager->getRepository(Employee::class)->find($publicKeyCredentialSource->userHandle);
@@ -117,5 +134,38 @@ class WebauthnCredentialRepository extends ServiceEntityRepository implements Pu
 
         $entityManager->persist($credential);
         $entityManager->flush();
+    }
+
+    public function parseUserAgent(?string $userAgent): string
+    {
+        if (!$userAgent) {
+            return 'Unknown Device';
+        }
+        
+        $browser = 'Unknown Browser';
+        if (strpos($userAgent, 'Edg') !== false) {
+            $browser = 'Edge';
+        } elseif (strpos($userAgent, 'Chrome') !== false) {
+            $browser = 'Chrome';
+        } elseif (strpos($userAgent, 'Firefox') !== false) {
+            $browser = 'Firefox';
+        } elseif (strpos($userAgent, 'Safari') !== false) {
+            $browser = 'Safari';
+        }
+        
+        $os = 'Unknown OS';
+        if (strpos($userAgent, 'Macintosh') !== false) {
+            $os = 'Mac';
+        } elseif (strpos($userAgent, 'Windows') !== false) {
+            $os = 'Windows';
+        } elseif (strpos($userAgent, 'Linux') !== false) {
+            $os = 'Linux';
+        } elseif (strpos($userAgent, 'Android') !== false) {
+            $os = 'Android';
+        } elseif (strpos($userAgent, 'iPhone') !== false || strpos($userAgent, 'iPad') !== false) {
+            $os = 'iOS';
+        }
+        
+        return "$browser on $os";
     }
 }

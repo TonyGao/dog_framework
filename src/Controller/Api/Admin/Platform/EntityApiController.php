@@ -46,7 +46,7 @@ class EntityApiController extends AbstractController
 
       foreach($fields as $field) {
         // 如果是 string 类型的字段，这里是临时的判断，为了逐渐增加不同类型的Service
-        if ($field['type']['value'] == 'string') {
+        if ($field['type']['value'] == 'string' || $field['type']['value'] == 'text') {
           try {
             $et->addProperty($field);
           } catch (\Exception $e) {

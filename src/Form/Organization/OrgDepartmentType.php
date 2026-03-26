@@ -24,7 +24,13 @@ class OrgDepartmentType extends BaseFormType
   
   public function buildForm(FormBuilderInterface $builder, array $options): void
   {
-      $this->formFieldBuilder->buildFields($builder, Department::class, function ($field, &$fieldOptions) {
+      $rounded = $options['rounded'] ?? true;
+      $height = $options['height'] ?? 36;
+
+      $this->formFieldBuilder->buildFields($builder, Department::class, function ($field, &$fieldOptions) use ($rounded, $height) {
+          $fieldOptions['attr']['rounded'] = $rounded;
+          $fieldOptions['attr']['height'] = $height;
+          
           if ($field->getTargetEntity() === Company::class) {
               $fieldOptions['choices'] = $this->companyRepo->allCompany();
               $fieldOptions['choice_label'] = 'alias';
@@ -42,6 +48,8 @@ class OrgDepartmentType extends BaseFormType
       $resolver->setDefaults([
           'em' => $em,
           'class' => Department::class,
+          'rounded' => true,
+          'height' => 36,
           'attr' => [
             'style' => 'width: 450px;', // 设置表单宽度
           ],

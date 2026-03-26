@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Tree\Node as GedmoNode;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -24,41 +24,41 @@ class Department implements GedmoNode
 {
 	use CommonTrait;
 
-	/** @Groups({"api"}) */
+	#[Groups(['api'])]
 	#[ORM\Id]
 	#[ORM\Column(type: 'uuid', unique: true)]
 	private $id;
 
 	/**
 	 * 部门全称
-	 * @Groups({"api"})
 	 * @Ef(
 	 *     group="department_base_info",
 	 *     isBF=true
 	 * )
 	 */
+	#[Groups(['api'])]
 	#[ORM\Column(type: 'string', length: 180)]
 	private $name;
 
 	/**
 	 * 部门简称
-	 * @Groups({"api"})
 	 * @Ef(
 	 *     group="department_base_info",
 	 *     isBF=true
 	 * )
 	 */
+	#[Groups(['api'])]
 	#[ORM\Column(type: 'string', length: 80, nullable: true)]
 	private $alias;
 
 	/**
 	 * 部门显示名称
-	 * @Groups({"api"})
 	 * @Ef(
 	 *     group="department_base_info_displayname",
 	 *     isBF=true
 	 * )
 	 */
+	#[Groups(['api'])]
 	#[ORM\Column(type: 'string', length: 200, nullable: true)]
 	private $displayName;
 
@@ -72,12 +72,12 @@ class Department implements GedmoNode
 
 	/**
 	 * 所属公司
-	 * @Groups({"api"})
 	 * @Ef(
 	 *   group="department_base_info",
 	 *   isBF=true
 	 * )
 	 */
+	#[Groups(['api'])]
 	#[ORM\ManyToOne(targetEntity: Company::class)]
 	#[ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id')]
 	private $company;
@@ -85,8 +85,8 @@ class Department implements GedmoNode
 	/**
 	 * 在树状中的类型
 	 * 类型包括：集团、公司、部门
-	 * @Groups({"api"})
 	 */
+	#[Groups(['api'])]
 	#[ORM\Column(type: 'string')]
 	private $type = 'department';
 
@@ -102,12 +102,12 @@ class Department implements GedmoNode
 
 	/**
 	 * 编码
-	 * @Groups({"api"})
 	 * @Ef(
 	 *    group="department_base_info",
 	 *    isBF=true
 	 * )
 	 */
+	#[Groups(['api'])]
 	#[ORM\Column(type: 'string', length: 180, nullable: true)]
 	private $code;
 

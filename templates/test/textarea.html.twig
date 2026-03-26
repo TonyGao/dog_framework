@@ -1,5 +1,81 @@
 {% extends "base.html.twig" %}
 
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .demo-header {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 24px;
+    }
+    .demo-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+    .demo-desc {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .demo-section {
+      margin-bottom: 48px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .demo-section-header {
+      background: #f9fafb;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .demo-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+    .demo-section-desc {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 32px;
+      padding: 32px 24px;
+    }
+    .demo-item {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .demo-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #4b5563;
+    }
+    .code-tag {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #ef4444;
+    }
+  </style>
+{% endblock %}
+
 {% block javascripts %}
   {{ parent() }}
   <script>
@@ -87,19 +163,114 @@
 {% endblock %}
 
 {% block body %}
-<div class="ef-textarea-wrapper">
-  <textarea class="ef-textarea" clearable="true" placeholder="Please enter something"></textarea>
-</div>
-<br>
-<div class="ef-textarea-wrapper ef-textarea-disabled">
-  <textarea disabled class="ef-textarea" placeholder="Please enter something"></textarea>
-</div>
-<br>
-<div class="ef-textarea-wrapper ef-textarea-error">
-  <textarea class="ef-textarea" placeholder="Error status"></textarea>
-</div>
-<br>
-<div class="ef-textarea-wrapper">
-  <textarea class="ef-textarea resizeable" min-rows="3" max-rows="10" clearable="true" placeholder="Please enter something"></textarea>
+<div class="demo-container">
+  <div class="demo-header">
+    <h1 class="demo-title">Textarea 多行文本输入框</h1>
+    <p class="demo-desc">用于输入多行文本信息。支持自适应高度、清空按钮，以及 <strong>标准直角样式</strong>（适用于常规表单）和 <strong>专用圆角样式</strong>（更适合系统后台设置页面）。</p>
+  </div>
+
+  <!-- 1. 圆角样式 (适用于 Settings) -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">后台设置专用样式 (圆角)</h2>
+      <p class="demo-section-desc">追加 <span class="code-tag">ef-textarea-rounded</span> 类，提供更柔和的 6px 圆角，适合类似 Notion/Linear 风格的系统设置面板。在表单中可通过 <span class="code-tag">'attr' => ['rounded' => true]</span> 开启。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">基础圆角文本框</span>
+        <div class="ef-textarea-wrapper ef-textarea-rounded">
+          <textarea class="ef-textarea" placeholder="系统后台风格的圆角多行文本框..."></textarea>
+        </div>
+      </div>
+      
+      <div class="demo-item">
+        <span class="demo-label">自适应高度圆角文本框 (min:3, max:5)</span>
+        <div class="ef-textarea-wrapper ef-textarea-rounded">
+          <textarea class="ef-textarea resizeable" min-rows="3" max-rows="5" placeholder="随内容自动增高..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 精确高度控制 -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">自定义精确高度控制</h2>
+      <p class="demo-section-desc">通过 <span class="code-tag">ef-textarea-h*</span> 类（支持28, 32, 36, 40, 48）精准控制多行文本框的基础高度。在表单中可通过 <span class="code-tag">'attr' => ['height' => 36]</span> 进行配置。在某些排版紧凑的页面中非常有用。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">高度 28px (ef-textarea-h28)</span>
+        <div class="ef-textarea-wrapper ef-textarea-rounded ef-textarea-h28">
+          <textarea class="ef-textarea" placeholder="h28"></textarea>
+        </div>
+      </div>
+      
+      <div class="demo-item">
+        <span class="demo-label">高度 32px (默认, ef-textarea-h32)</span>
+        <div class="ef-textarea-wrapper ef-textarea-rounded ef-textarea-h32">
+          <textarea class="ef-textarea" placeholder="h32"></textarea>
+        </div>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">高度 36px (ef-textarea-h36)</span>
+        <div class="ef-textarea-wrapper ef-textarea-rounded ef-textarea-h36">
+          <textarea class="ef-textarea" placeholder="h36"></textarea>
+        </div>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">高度 40px (ef-textarea-h40)</span>
+        <div class="ef-textarea-wrapper ef-textarea-rounded ef-textarea-h40">
+          <textarea class="ef-textarea" placeholder="h40"></textarea>
+        </div>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">高度 48px (ef-textarea-h48)</span>
+        <div class="ef-textarea-wrapper ef-textarea-rounded ef-textarea-h48">
+          <textarea class="ef-textarea" placeholder="h48"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 标准组件 (基础功能) -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">标准功能展示</h2>
+      <p class="demo-section-desc">Textarea 组件支持一键清空、自适应高度以及各种状态反馈（错误、禁用）。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">基础使用 (带清理按钮)</span>
+        <div class="ef-textarea-wrapper">
+          <textarea class="ef-textarea" clearable="true" placeholder="请输入内容..."></textarea>
+        </div>
+      </div>
+      
+      <div class="demo-item">
+        <span class="demo-label">自适应高度 (min-rows=3, max-rows=10)</span>
+        <div class="ef-textarea-wrapper">
+          <textarea class="ef-textarea resizeable" min-rows="3" max-rows="10" clearable="true" placeholder="请输入多行内容..."></textarea>
+        </div>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">禁用状态 (Disabled)</span>
+        <div class="ef-textarea-wrapper ef-textarea-disabled">
+          <textarea disabled class="ef-textarea" placeholder="禁止输入..."></textarea>
+        </div>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">错误状态 (Error)</span>
+        <div class="ef-textarea-wrapper ef-textarea-error">
+          <textarea class="ef-textarea" placeholder="输入内容有误..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

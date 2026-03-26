@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Verify Passkey{% endblock %}
+
+{% block body %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-sm" style="width: 100%; max-width: 400px;">
+        <div class="card-body p-4 text-center">
+            <h3 class="mb-4">{{ 'login.title'|trans }}</h3>
+            <p class="mb-4">Please verify your identity using your Passkey for user: <strong>{{ user.username }}</strong></p>
+            
+            <button id="verify-passkey" class="btn btn-primary btn-lg w-100 mb-3">
+                <i class="fas fa-fingerprint me-2"></i> Verify with Passkey
+            </button>
+            
+            <div class="mt-3">
+                <a href="{{ path('app_reset_password') }}" class="text-decoration-none">Try another way</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const passkeyBtn = document.getElementById('verify-passkey');
+        const username = '{{ user.username }}';
+
+        const bufferDecode = (value) => {
+            return Uint8Array.from(atob(value.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+        }
+
+        const bufferEncode = (value) => {
+            return btoa(String.fromCharCode.apply(null, new Uint8Array(value)))
+                .replace(/\+/g, "-")
+                .replace(/\//g, "_")
+                .replace(/=/g, "");
+        }
+
+        const authenticate = async () => {
+            try {
+                passkeyBtn.disabled = true;
+                passkeyBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Processing...';
+
+                // 1. Get options
+                const response = await fetch('/login/webauthn/options?username=' + encodeURIComponent(username));
+                const options = await response.json();
+
+                // 2. Decode options
+                options.challenge = bufferDecode(options.challenge);
+                if (options.allowCredentials) {
+                    options.allowCredentials.forEach(cred => {
+                        cred.id = bufferDecode(cred.id);
+                    });
+                }
+
+                // 3. Get credential
+                const credential = await navigator.credentials.get({ publicKey: options });
+
+                // 4. Encode result
+                const credentialData = {
+                    id: credential.id,
+                    rawId: bufferEncode(credential.rawId),
+                    type: credential.type,
+                    response: {
+                        authenticatorData: bufferEncode(credential.response.authenticatorData),
+                        clientDataJSON: bufferEncode(credential.response.clientDataJSON),
+                        signature: bufferEncode(credential.response.signature),
+                        userHandle: credential.response.userHandle ? bufferEncode(credential.response.userHandle) : null
+                    }
+                };
+
+                // 5. Send to server
+                const resultResponse = await fetch('/login/webauthn/result', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(credentialData)
+                });
+
+                const result = await resultResponse.json();
+
+                if (result.status === 'ok') {
+                    window.location.href = result.targetUrl;
+                } else {
+                    throw new Error(result.errorMessage || 'Verification failed');
+                }
+
+            } catch (error) {
+                console.error(error);
+                let errorMessage = error.message;
+                if (errorMessage.includes('The credential ID is invalid')) {
+                    errorMessage = '{{ "login.form.error.passkey_invalid"|trans }}';
+                }
+                alert(errorMessage);
+                passkeyBtn.disabled = false;
+                passkeyBtn.innerHTML = '<i class="fas fa-fingerprint me-2"></i> Verify with Passkey';
+            }
+        };
+
+        passkeyBtn.addEventListener('click', authenticate);
+        
+        // Auto trigger if supported? Maybe better to wait for user click to avoid confusion.
+    });
+</script>
+{% endblock %}

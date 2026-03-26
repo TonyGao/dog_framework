@@ -1,0 +1,827 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ 'admin_email.editor.title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="/lib/wangeditor/style.css" rel="stylesheet">
+    <style>
+        /* Override WangEditor padding */
+        #editorContainer .w-e-scroll {
+            padding: 0 !important;
+        }
+        
+        .editor-page {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #1d1d1f;
+        }
+        .outside-wrapper {
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0;
+            background: #fff;
+            min-height: calc(100vh - 60px);
+        }
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 500px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+        .preset-scroll-area {
+            max-height: calc(100vh - 180px);
+            overflow-y: auto;
+            padding-right: 8px;
+            margin-right: -8px;
+        }
+        .preset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .top-form-fields {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .top-form-fields .form-group {
+            margin-bottom: 0 !important;
+        }
+        .editor-form-area {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 150px);
+            position: relative;
+        }
+        .preset-toggle-btn {
+            position: absolute;
+            top: 50%;
+            left: -16px;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            color: #4b5563;
+            transition: all 0.2s;
+        }
+        .preset-toggle-btn:hover {
+            background: #f9fafb;
+            color: #111827;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        .editor-form-area form {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .editor-form-area .form-group {
+            margin-bottom: 24px;
+        }
+        .editor-form-area .form-group:last-child {
+            margin-bottom: 0;
+        }
+        .editor-form-area .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+        .preset-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fff;
+            overflow: hidden;
+        }
+        .preset-thumb {
+            height: 160px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 13px;
+            position: relative;
+            overflow: hidden;
+        }
+        .preset-body {
+            padding: 12px 12px 16px;
+        }
+        .preset-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .preset-desc {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+        .w-e-toolbar {
+            display: flex;
+            align-items: center;
+        }
+        .w-e-toolbar [data-menu-key="insertVariable"] {
+            margin-left: auto;
+            max-width: 140px;
+        }
+        .w-e-menu-panel {
+            min-width: 580px;
+            max-width: 70vw;
+            z-index: 10000 !important;
+        }
+        .preview-canvas {
+            width: 680px;
+            background: transparent;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            margin-left: -340px;
+            transform: scale(0.35);
+            transform-origin: top center;
+            pointer-events: none;
+        }
+        .editor-box {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #f7f7fa;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            margin-bottom: 24px !important;
+        }
+        .editor-toolbar {
+            border-bottom: 1px solid #d1d5db;
+            background: #fff;
+            flex-shrink: 0;
+        }
+        #editorContainer {
+            overflow-y: auto;
+            padding: 0;
+            flex-grow: 1;
+            background: #f7f7fa;
+        }
+        #editorContainer .w-e-scroll {
+            padding: 40px 0;
+        }
+        #editorContainer .w-e-text-container {
+            width: 100%;
+            box-sizing: border-box;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            padding: 10px;
+            min-height: 300px;
+        }
+    </style>
+{% endblock %}
+
+{% import 'ui/template/ui.html.twig' as ui %}
+
+{% block app_content_container %}
+<div class="org-structure-container editor-page">
+    <div id="testAlertContainer" style="max-width: 400px; margin: 0 auto; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;"></div>
+    <div class="outside-wrapper" style="padding: 40px; max-width: 100%; margin: 0; background: #fff; min-height: calc(100vh - 60px);">
+        
+        <div class="email-title">{{ 'admin_email.editor.title'|trans }}</div>
+        
+        <form action="{{ path('admin_email_template_save') }}" method="post" id="editorForm" style="display: flex; flex-direction: column; height: 100%;">
+            <input type="hidden" name="id" id="templateId">
+            <input type="hidden" name="subject" id="editorSubjectHidden">
+
+            <div class="ef-space ef-space-horizontal ef-space-align-center" style="margin-bottom: 24px; justify-content: flex-start;">
+                <div class="page-title" style="margin-bottom: 0; margin-right: 32px; white-space: nowrap;">
+                    {{ 'admin_email.editor.title'|trans }}
+                </div>
+                
+                <div class="top-form-fields" style="margin-bottom: 0; width: 600px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        {{ ui.input('editorTemplateName', 'text', 'admin_email.editor.form.name'|trans, '', 'ef-input-rounded', 'ef-input-size-medium', {'name': 'name', 'required': 'required', 'style': 'width: 100%;'}) }}
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        {% set server_options = [{'label': 'admin_email.editor.form.default_server'|trans, 'value': ''}] %}
+                        {% for config in configs %}
+                            {% set server_options = server_options|merge([{'label': config.name ?: config.host, 'value': config.id}]) %}
+                        {% endfor %}
+                        {{ ui.select(server_options, 'admin_email.editor.form.server'|trans, '292px', 'ef-input-rounded', 'emailConfigId', 'editorEmailConfig', '') }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid" id="mainGrid">
+                <div id="presetPanel" class="preset-panel-container">
+                <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">{{ 'admin_email.editor.preset.title'|trans }}</div>
+                <div style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">{{ 'admin_email.editor.preset.desc'|trans }}</div>
+
+                <div class="preset-scroll-area">
+                    <div class="preset-grid">
+                        <div class="preset-card" id="presetWelcome">
+                            <div class="preset-thumb"><div id="presetWelcomeThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.welcome'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.welcome.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('welcome')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetVerification">
+                            <div class="preset-thumb"><div id="presetVerificationThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.verification_code'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.verification.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('verification_code')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetReset">
+                            <div class="preset-thumb"><div id="presetResetThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.password_reset'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.reset.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('password_reset')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetAnnouncement">
+                            <div class="preset-thumb"><div id="presetAnnouncementThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.announcement'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.announcement.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('announcement')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetMeetingInvite">
+                            <div class="preset-thumb"><div id="presetMeetingInviteThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.meeting_invite'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.meeting_invite.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('meeting_invite')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetNewsletter">
+                            <div class="preset-thumb"><div id="presetNewsletterThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.newsletter'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.newsletter.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('newsletter')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetInvoice">
+                            <div class="preset-thumb"><div id="presetInvoiceThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.invoice'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.invoice.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('invoice')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetSystemAlert">
+                            <div class="preset-thumb"><div id="presetSystemAlertThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.system_alert'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.system_alert.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('system_alert')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetSurvey">
+                            <div class="preset-thumb"><div id="presetSurveyThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.survey'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.survey.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('survey')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetAccountLocked">
+                            <div class="preset-thumb"><div id="presetAccountLockedThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.account_locked'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.account_locked.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('account_locked')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetPromotion">
+                            <div class="preset-thumb"><div id="presetPromotionThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.promotion'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.promotion.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('promotion')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetWeeklyReport">
+                            <div class="preset-thumb"><div id="presetWeeklyReportThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.weekly_report'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.weekly_report.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('weekly_report')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetOrderShipped">
+                            <div class="preset-thumb"><div id="presetOrderShippedThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.order_shipped'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.order_shipped.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('order_shipped')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="preset-card" id="presetEventReminder">
+                            <div class="preset-thumb"><div id="presetEventReminderThumb"></div></div>
+                            <div class="preset-body">
+                                <div class="preset-title">{{ 'admin_email.templates.preset.option.event_reminder'|trans }}</div>
+                                <div class="preset-desc">{{ 'admin_email.editor.preset.event_reminder.desc'|trans }}</div>
+                                <div class="ef-space ef-space-horizontal">
+                                    <button type="button" class="btn outline small" onclick="applyPreset('event_reminder')">{{ 'admin_email.editor.preset.apply'|trans }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-form-area">
+                <button type="button" class="preset-toggle-btn" onclick="togglePresetPanel()" title="收起/展开预置模版">
+                    <svg id="presetToggleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <div class="form-group editor-box">
+                    <div id="editorToolbar" class="editor-toolbar"></div>
+                    <div id="editorContainer"></div>
+                </div>
+                <input type="hidden" name="bodyHtml" id="editorBodyHtml">
+                <input type="hidden" name="description" id="editorDescription">
+                <div class="ef-space ef-space-horizontal ef-space-align-center" style="margin-top: 24px; justify-content: flex-end;">
+                    <button class="btn outline medium" type="button" onclick="previewEmail()">预览</button>
+                    <button class="btn outline medium" type="button" onclick="testTemplateEmail()">发送测试邮件</button>
+                    <button class="btn outline medium" type="button" onclick="window.open('{{ path('admin_email_index') }}', '_self')">{{ 'action.cancel'|trans }}</button>
+                    <button class="btn primary medium" type="button" onclick="promptForSubjectAndSubmit()">{{ 'admin_email.btn.add_template'|trans }}</button>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+
+    {# Subject Modal #}
+    {% set subjectModalBody %}
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label required">{{ 'admin_email.editor.form.subject'|trans }}</label>
+            {{ ui.input('templateSubjectInput', 'text', '如: 您的验证码是 {{ \'{{ code }}\' }}', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'required': 'required', 'style': 'width: 100%;'}) }}
+        </div>
+    {% endset %}
+
+    {% set subjectModalFooter %}
+        <div class="ef-space ef-space-horizontal ef-space-align-center" style="justify-content: flex-end; width: 100%;">
+            <div class="ef-space-item" style="margin-right: 8px;">
+                <button class="btn outline medium" type="button" onclick="closeSubjectModal()">{{ 'action.cancel'|trans }}</button>
+            </div>
+            <div class="ef-space-item">
+                <button class="btn primary medium" type="button" onclick="confirmSubjectAndSubmit()">{{ 'action.confirm'|trans }}</button>
+            </div>
+        </div>
+    {% endset %}
+
+    {{ ui.drawer('subjectModal', 'admin_email.editor.form.subject'|trans, subjectModalBody, subjectModalFooter, {'width': '400px', 'onClose': 'closeSubjectModal()'}) }}
+
+    {# Test Template Email Modal #}
+    {% set testTemplateEmailBody %}
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label required">测试接收邮箱</label>
+            {{ ui.input('templateTestEmailInput', 'email', '请输入接收测试邮件的邮箱地址', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'required': 'required', 'style': 'width: 100%;'}) }}
+        </div>
+    {% endset %}
+
+    {% set testTemplateEmailFooter %}
+        <div class="ef-space ef-space-horizontal ef-space-align-center" style="justify-content: flex-end; width: 100%;">
+            <div class="ef-space-item" style="margin-right: 8px;">
+                <button class="btn outline medium" type="button" onclick="closeTestTemplateEmailModal()">取消</button>
+            </div>
+            <div class="ef-space-item">
+                <button class="btn primary medium" type="button" onclick="executeTestTemplateEmail()" id="confirmTestTemplateEmailBtn">发送</button>
+            </div>
+        </div>
+    {% endset %}
+
+    {{ ui.modal('testTemplateEmailModal', '发送测试邮件', testTemplateEmailBody, testTemplateEmailFooter, {
+        'width': '500px',
+        'onClose': 'closeTestTemplateEmailModal()'
+    }) }}
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="/lib/wangeditor/index.js"></script>
+    <script>
+        let editor;
+        class InsertVariableMenu {
+            constructor() {
+                this.title = '插入变量';
+                this.iconSvg = '<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/><path d="M686.7 348.7c-3.1-3.1-8.2-3.1-11.3 0L512 512.1l-163.4-163.4c-3.1-3.1-8.2-3.1-11.3 0l-42.4 42.4c-3.1 3.1-3.1 8.2 0 11.3L458.3 565.8c3.1 3.1 8.2 3.1 11.3 0L686.7 402.4c3.1-3.1 3.1-8.2 0-11.3l-42.4-42.4z"/></svg>';
+                this.tag = 'select';
+                this.width = 120;
+            }
+            getOptions(editor) {
+                if (typeof templateVariables === 'undefined' || templateVariables.length === 0) {
+                    return [{ value: '', text: '暂无变量' }];
+                }
+                return templateVariables.map(v => ({
+                    value: v.name,
+                    text: v.name + (v.desc ? ` (${v.desc})` : '')
+                }));
+            }
+            isActive(editor) { return false; }
+            isDisabled(editor) { return false; }
+            exec(editor, value) {
+                if (value) insertVariableIntoEditor(value);
+            }
+            getValue(editor) { return ''; }
+        }
+
+        let templateVariables = [];
+        function insertVariableIntoEditor(varName) {
+            const textToInsert = '{' + '{ ' + varName + ' }' + '}';
+            if (editor) {
+                editor.insertText(textToInsert);
+            }
+        }
+        function sampleRender(text) {
+            if (!text) return '';
+            const mockData = {
+                username: '张三 (John Doe)',
+                login_url: 'https://example.com/login',
+                code: '123456',
+                expire_minutes: '15',
+                reset_url: 'https://example.com/reset?token=abc',
+                announcement_title: '系统升级维护通知',
+                announcement_body: '为了提供更优质的服务，我们将于本周末进行系统升级维护，届时部分功能可能短暂不可用。感谢您的理解与支持。',
+                meeting_topic: 'Q3 季度产品规划及研发进度同步会议',
+                meeting_time: '2023-10-25 14:00 - 15:30',
+                meeting_location: '第一会议室 / 线上腾讯会议',
+                meeting_link: 'https://meeting.example.com/join/123456',
+                update_url: 'https://example.com/updates',
+                invoice_number: 'INV-20231024-001',
+                invoice_amount: '¥1,250.00',
+                due_date: '2023-11-01',
+                payment_link: 'https://example.com/pay',
+                download_link: 'https://example.com/download/invoice',
+                alert_message: '生产环境主数据库 CPU 使用率持续 5 分钟超过 90%',
+                alert_time: '2023-10-24 10:30:45',
+                survey_link: 'https://example.com/survey/nps',
+                unlock_link: 'https://example.com/unlock/abc',
+                discount_rate: '8折',
+                promo_code: 'AUTUMN2023',
+                shop_link: 'https://example.com/shop',
+                new_users: '1,245',
+                active_rate: '85.4%',
+                task_completion: '92.1%',
+                report_link: 'https://example.com/report/weekly',
+                order_number: 'ORD987654321',
+                logistics_company: '顺丰速运',
+                tracking_number: 'SF1234567890123',
+                tracking_link: 'https://example.com/track',
+                event_name: '2023 年度开发者大会',
+                event_time: '2023-11-15 09:00',
+                join_link: 'https://example.com/event/join'
+            };
+
+            return text.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, function(match, key) {
+                return mockData[key] !== undefined ? mockData[key] : '[' + key + ']';
+            });
+        }
+        function renderPresetPreview(key, mountId) {
+            if (!presetTemplates[key]) return;
+            const mount = document.getElementById(mountId);
+            if (!mount) return;
+            
+            const html = sampleRender(presetTemplates[key]);
+            mount.innerHTML = '<div class="preview-canvas">' + html + '</div>';
+        }
+
+        function applyPreset(key) {
+            if (!innerTemplates[key]) return;
+            const html = innerTemplates[key];
+            if (editor) {
+                editor.setHtml(html);
+                document.getElementById('editorBodyHtml').value = editor.getHtml();
+            }
+        }
+
+        function previewEmail() {
+            const html = editor ? editor.getHtml() : document.getElementById('editorBodyHtml').value;
+            const rendered = sampleRender(html);
+            const fullHtml = emailWrapperStart + rendered + emailWrapperEnd;
+            
+            // Create a hidden form to submit the HTML to the new tab
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/email/template/preview';
+            form.target = '_blank';
+            
+            const htmlInput = document.createElement('input');
+            htmlInput.type = 'hidden';
+            htmlInput.name = 'html';
+            htmlInput.value = fullHtml;
+            form.appendChild(htmlInput);
+            
+            const subjectInput = document.createElement('input');
+            subjectInput.type = 'hidden';
+            subjectInput.name = 'subject';
+            const rawSubject = document.getElementById('editorSubjectHidden').value || 'Preview Email';
+            subjectInput.value = sampleRender(rawSubject);
+            form.appendChild(subjectInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+
+        function testTemplateEmail() {
+            openModal('testTemplateEmailModal');
+            setTimeout(() => {
+                document.getElementById('templateTestEmailInput').focus();
+            }, 100);
+        }
+
+        function closeTestTemplateEmailModal() {
+            closeModal('testTemplateEmailModal');
+            document.getElementById('templateTestEmailInput').value = '';
+        }
+
+        function executeTestTemplateEmail() {
+            const testEmailInput = document.getElementById('templateTestEmailInput');
+            
+            if (!testEmailInput) {
+                let alert = new Alert($('#testTemplateEmailModal .ef-modal-body'));
+                alert.error('无法找到测试邮箱输入框', { title: "错误", closable: true });
+                return;
+            }
+            
+            const testEmail = testEmailInput.value;
+            
+            if (testEmail.trim() === '') {
+                let alert = new Alert($('#testTemplateEmailModal .ef-modal-body'));
+                alert.error('测试接收邮箱不能为空', { title: "错误", closable: true });
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(testEmail.trim())) {
+                let alert = new Alert($('#testTemplateEmailModal .ef-modal-body'));
+                alert.error('请输入有效的邮箱地址', { title: "错误", closable: true });
+                return;
+            }
+
+            const form = document.getElementById('editorForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            data.testEmail = testEmail.trim();
+            data.bodyHtml = editor ? editor.getHtml() : document.getElementById('editorBodyHtml').value;
+            
+            const btn = document.getElementById('confirmTestTemplateEmailBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 发送中...';
+            btn.disabled = true;
+
+            $.ajax({
+                method: 'POST',
+                url: '/admin/email/template/test-send',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    
+                    if (response.code === 200) {
+                        closeTestTemplateEmailModal();
+                        let alert = new Alert($('#testAlertContainer'));
+                        alert.success(response.message || '测试邮件发送成功', { title: "成功", closable: true });
+                    } else {
+                        let alert = new Alert($('#testTemplateEmailModal .ef-modal-body'));
+                        alert.error(response.message || '发送失败', { title: "错误", closable: true });
+                    }
+                },
+                error: function (xhr, status, errorMsg) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    const errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : errorMsg;
+                    let alert = new Alert($('#testTemplateEmailModal .ef-modal-body'));
+                    alert.error(errorMessage || '请求发生错误', { title: "错误", closable: true });
+                }
+            });
+        }
+
+        function promptForSubjectAndSubmit() {
+            const form = document.getElementById('editorForm');
+            if (!form.reportValidity()) {
+                return;
+            }
+            // open drawer
+            $().showDrawer('subjectModal');
+            setTimeout(() => {
+                const subjectInput = document.getElementById('templateSubjectInput');
+                if (subjectInput) subjectInput.focus();
+            }, 300);
+        }
+
+        function closeSubjectModal() {
+            $().hideDrawer('subjectModal');
+        }
+
+        function confirmSubjectAndSubmit() {
+            const subjectInputWrapper = document.getElementById('templateSubjectInput');
+            if (!subjectInputWrapper) return;
+            
+            const subjectInput = subjectInputWrapper.tagName === 'INPUT' ? subjectInputWrapper : subjectInputWrapper.querySelector('input');
+            
+            if (!subjectInput || !subjectInput.value.trim()) {
+                let alert = new Alert($('#subjectModal .ef-drawer-body'));
+                alert.error('请输入邮件主题', { title: "错误", closable: true });
+                return;
+            }
+            document.getElementById('editorSubjectHidden').value = subjectInput.value.trim();
+            
+            // update bodyHtml before submit
+            if (editor) {
+                document.getElementById('editorBodyHtml').value = editor.getHtml();
+            }
+            
+            document.getElementById('editorForm').submit();
+        }
+
+        function togglePresetPanel() {
+            const grid = document.getElementById('mainGrid');
+            const panel = document.getElementById('presetPanel');
+            const icon = document.getElementById('presetToggleIcon');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                grid.style.gridTemplateColumns = '500px 1fr';
+                if (icon) {
+                    icon.innerHTML = '<polyline points="15 18 9 12 15 6"></polyline>';
+                }
+            } else {
+                panel.style.display = 'none';
+                grid.style.gridTemplateColumns = '1fr';
+                if (icon) {
+                    icon.innerHTML = '<polyline points="9 18 15 12 9 6"></polyline>';
+                }
+            }
+        }
+
+        {% verbatim %}
+        const emailWrapperStart = '<div id="ef-email-wrapper" style="background-color: #f4f5f7; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif, \'Apple Color Emoji\', \'Segoe UI Emoji\', \'Segoe UI Symbol\'; color: #333333;"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;"><tr><td style="height: 6px; background: linear-gradient(90deg, #2563eb 0%, #4f46e5 100%);"></td></tr><tr><td style="padding: 40px;">';
+        const emailWrapperEnd = '</td></tr><tr><td style="padding: 30px 40px; background-color: #f9f9f9; text-align: center; font-size: 12px; color: #999999; border-top: 1px solid #eeeeee;"><p style="margin: 0 0 10px 0;">© 2025 Your Company Name. All rights reserved.</p><p style="margin: 0;">此邮件为系统自动发送，请勿直接回复。</p></td></tr></table></div>';
+
+        const innerTemplates = {
+            verification_code: '<p style="text-align: center;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIzMiIgZmlsbD0iI2UwZTdmZiIvPjxwYXRoIGQ9Ik0xNiAyMkwzMiAzNEw0OCAyMk0xNiA0Mkg0OFYyMkgxNlY0MloiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRmNDZlNSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" width="64" height="64" alt="icon"></p><h2 style="text-align: center;">验证您的邮箱</h2><p style="text-align: center;"><span style="color: rgb(75, 85, 99);">感谢您注册！请使用以下一次性验证码完成邮箱验证。</span></p><p style="text-align: center;"><span style="font-family: monospace; font-size: 32px; color: rgb(31, 41, 55); background-color: rgb(243, 244, 246);"><strong> &nbsp;{{ code }}&nbsp; </strong></span></p><p style="text-align: center;"><span style="font-size: 13px; color: rgb(107, 114, 128);">安全提示：此验证码在 15 分钟内有效，请勿将验证码透露给他人。</span></p>',
+            welcome: '<p style="text-align: center;"><img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" width="100%" alt="Welcome"></p><h2>欢迎加入我们，{{ username }}！</h2><p>我们很高兴能有您的加入。为了让您有一个良好的开始，我们准备了一些入门指引，请点击下方链接进入您的专属工作区。</p><p style="text-align: center;"><a href="{{ login_url }}" target="_blank"><span style="font-size: 18px; color: rgb(37, 99, 235);"><strong>立即开始使用 &gt;</strong></span></a></p><p><span style="font-size: 14px; color: rgb(107, 114, 128);">如果您在登录过程中遇到任何问题，请随时联系我们的 IT 支持团队或 HR 部门。</span></p>',
+            password_reset: '<p style="text-align: center;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIzMiIgZmlsbD0iI2ZlZTJlMiIvPjxyZWN0IHg9IjIwIiB5PSIzMCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjE2IiByeD0iMiIgcnk9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2VmNDQ0NCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMjQgMzBWMjRhOCA4IDAgMCAxIDE2IDB2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlLXN0cm9rZT0iI2VmNDQ0NCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" width="64" height="64" alt="icon"></p><h2 style="text-align: center;">重置您的密码</h2><p style="text-align: center;"><span style="color: rgb(75, 85, 99);">我们收到了重置您账户密码的请求。如果您确实发起了此请求，请点击下方链接重置密码。</span></p><p style="text-align: center;"><a href="{{ reset_url }}" target="_blank"><span style="font-size: 18px; color: rgb(239, 68, 68);"><strong>重置密码 &gt;</strong></span></a></p><p style="text-align: center;"><span style="font-size: 13px; color: rgb(107, 114, 128);">如果您没有请求重置密码，您可以安全地忽略此邮件，您的密码不会被更改。</span></p>',
+            announcement: '<p style="text-align: center;"><img src="https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" width="100%" alt="Announcement"></p><h2><span style="color: rgb(37, 99, 235);">{{ announcement_title }}</span></h2><p><span style="color: rgb(55, 65, 81);">{{ announcement_body }}</span></p><hr/><p><span style="color: rgb(107, 114, 128);">此致，<br>团队敬上</span></p>',
+            meeting_invite: '<h2>邀请：{{ meeting_topic }}</h2><p>您好 {{ username }}，</p><p>您已被邀请参加以下会议。请在下方查看详情：</p><p><strong>时间：</strong>{{ meeting_time }}<br><strong>地点/链接：</strong><a href="{{ meeting_link }}" target="_blank">{{ meeting_link }}</a></p><p>期待您的参与！</p>',
+            newsletter: '<p style="text-align: center;"><img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" width="100%" alt="Newsletter"></p><h2>本月动态回顾</h2><p>您好 {{ username }}，</p><p>这是我们为您准备的本月最新资讯和产品更新。我们推出了几项新功能，希望能帮助您更好地完成工作。</p><ul><li><strong>新功能 A：</strong>提升效率的利器</li><li><strong>新功能 B：</strong>更完善的数据分析</li></ul><p style="text-align: center;"><a href="{{ update_url }}" target="_blank"><span style="font-size: 16px; color: rgb(37, 99, 235);">阅读完整内容 &gt;</span></a></p>',
+            invoice: '<h2>账单已生成：{{ invoice_number }}</h2><p>尊敬的客户，</p><p>您的最新账单已生成，金额为 <strong>{{ invoice_amount }}</strong>。请在 {{ due_date }} 前完成支付。</p><p style="text-align: center;"><a href="{{ payment_link }}" target="_blank"><span style="font-size: 16px; color: rgb(37, 99, 235);"><strong>立即支付 &gt;</strong></span></a></p><p>如需下载发票，请点击<a href="{{ download_link }}" target="_blank">此处</a>。</p>',
+            system_alert: '<h2><span style="color: rgb(239, 68, 68);">系统告警通知</span></h2><p>尊敬的管理员，</p><p>系统检测到以下异常情况，请尽快处理：</p><p style="padding: 10px; background-color: rgb(254, 242, 242); border-left: 4px solid rgb(239, 68, 68); color: rgb(153, 27, 27);"><strong>告警内容：</strong>{{ alert_message }}<br><strong>发生时间：</strong>{{ alert_time }}</p><p>您可以登录控制台查看详细日志。</p>',
+            survey: '<h2>我们需要您的反馈</h2><p>您好 {{ username }}，</p><p>为了不断提升我们的服务质量，我们诚挚地邀请您花几分钟时间填写一份简短的调查问卷。</p><p style="text-align: center;"><a href="{{ survey_link }}" target="_blank"><span style="font-size: 16px; color: rgb(37, 99, 235);"><strong>开始填写问卷 &gt;</strong></span></a></p><p>您的意见对我们非常重要，感谢您的支持！</p>',
+            account_locked: '<h2><span style="color: rgb(245, 158, 11);">账户安全提醒：账户已锁定</span></h2><p>您好 {{ username }}，</p><p>由于多次尝试登录失败或检测到异常活动，为了保护您的账户安全，您的账户已被暂时锁定。</p><p>要解除锁定并恢复访问，请点击下方链接重置您的密码或验证身份：</p><p style="text-align: center;"><a href="{{ unlock_link }}" target="_blank"><span style="font-size: 16px; color: rgb(245, 158, 11);"><strong>解锁账户 &gt;</strong></span></a></p><p>如果这不是您本人的操作，请立即联系我们的支持团队。</p>',
+            promotion: '<p style="text-align: center;"><img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" width="100%" alt="Promotion"></p><h2 style="text-align: center;">限时特惠，不容错过！</h2><p style="text-align: center;">尊敬的用户，为您奉上专属折扣码，全场商品立享 <strong>{{ discount_rate }}</strong> 优惠。</p><p style="text-align: center;"><span style="font-family: monospace; font-size: 24px; color: rgb(31, 41, 55); background-color: rgb(254, 243, 199);"><strong> &nbsp;{{ promo_code }}&nbsp; </strong></span></p><p style="text-align: center;"><a href="{{ shop_link }}" target="_blank"><span style="font-size: 18px; color: rgb(239, 68, 68);"><strong>立即选购 &gt;</strong></span></a></p>',
+            weekly_report: '<h2>本周数据摘要</h2><p>您好 {{ username }}，</p><p>这是您的团队在过去一周的核心数据表现：</p><ul><li><strong>新增用户：</strong>{{ new_users }}</li><li><strong>活跃度：</strong>{{ active_rate }}</li><li><strong>任务完成率：</strong>{{ task_completion }}</li></ul><p style="text-align: center;"><a href="{{ report_link }}" target="_blank"><span style="font-size: 16px; color: rgb(37, 99, 235);">查看详细报表 &gt;</span></a></p>',
+            order_shipped: '<h2>您的订单已发货！</h2><p>您好 {{ username }}，</p><p>好消息！您的订单 <strong>#{{ order_number }}</strong> 已经打包发货，正向您飞奔而来。</p><p><strong>物流公司：</strong>{{ logistics_company }}<br><strong>追踪单号：</strong>{{ tracking_number }}</p><p style="text-align: center;"><a href="{{ tracking_link }}" target="_blank"><span style="font-size: 16px; color: rgb(37, 99, 235);">实时追踪物流 &gt;</span></a></p><p>感谢您的购买！</p>',
+            event_reminder: '<h2>活动即将开始：{{ event_name }}</h2><p>您好 {{ username }}，</p><p>提醒您，您报名的活动即将在 <strong>{{ event_time }}</strong> 开始。</p><p>请提前做好准备。如果是线上活动，请使用下方链接准时加入：</p><p style="text-align: center;"><a href="{{ join_link }}" target="_blank"><span style="font-size: 16px; color: rgb(37, 99, 235);"><strong>加入活动 &gt;</strong></span></a></p><p>期待与您相见！</p>'
+        };
+
+        const presetTemplates = {
+            verification_code: emailWrapperStart + innerTemplates.verification_code + emailWrapperEnd,
+            welcome: emailWrapperStart + innerTemplates.welcome + emailWrapperEnd,
+            password_reset: emailWrapperStart + innerTemplates.password_reset + emailWrapperEnd,
+            announcement: emailWrapperStart + innerTemplates.announcement + emailWrapperEnd,
+            meeting_invite: emailWrapperStart + innerTemplates.meeting_invite + emailWrapperEnd,
+            newsletter: emailWrapperStart + innerTemplates.newsletter + emailWrapperEnd,
+            invoice: emailWrapperStart + innerTemplates.invoice + emailWrapperEnd,
+            system_alert: emailWrapperStart + innerTemplates.system_alert + emailWrapperEnd,
+            survey: emailWrapperStart + innerTemplates.survey + emailWrapperEnd,
+            account_locked: emailWrapperStart + innerTemplates.account_locked + emailWrapperEnd,
+            promotion: emailWrapperStart + innerTemplates.promotion + emailWrapperEnd,
+            weekly_report: emailWrapperStart + innerTemplates.weekly_report + emailWrapperEnd,
+            order_shipped: emailWrapperStart + innerTemplates.order_shipped + emailWrapperEnd,
+            event_reminder: emailWrapperStart + innerTemplates.event_reminder + emailWrapperEnd
+        };
+        {% endverbatim %}
+
+        $(document).ready(function () {
+            const { createEditor, createToolbar, Boot } = window.wangEditor;
+
+            try {
+                Boot.registerMenu({ key: 'insertVariable', factory() { return new InsertVariableMenu(); } });
+            } catch (e) { console.warn('Register menu error:', e); }
+
+            editor = createEditor({
+                selector: '#editorContainer',
+                html: '',
+                config: {
+                    placeholder: '请输入内容...',
+                    onChange(editorInst) {
+                        document.getElementById('editorBodyHtml').value = editorInst.getHtml();
+                    }
+                }
+            });
+            const toolbar = createToolbar({
+                editor,
+                selector: '#editorToolbar',
+                config: {
+                    insertKeys: { index: 0, keys: ['insertVariable'] }
+                }
+            });
+            const iv = document.querySelector('#editorToolbar [data-menu-key="insertVariable"]');
+            if (iv) { iv.style.marginLeft = 'auto'; iv.style.order = '999'; iv.style.justifySelf = 'flex-end'; }
+            renderPresetPreview('welcome', 'presetWelcomeThumb');
+            renderPresetPreview('verification_code', 'presetVerificationThumb');
+            renderPresetPreview('password_reset', 'presetResetThumb');
+            renderPresetPreview('announcement', 'presetAnnouncementThumb');
+            renderPresetPreview('meeting_invite', 'presetMeetingInviteThumb');
+            renderPresetPreview('newsletter', 'presetNewsletterThumb');
+            renderPresetPreview('invoice', 'presetInvoiceThumb');
+            renderPresetPreview('system_alert', 'presetSystemAlertThumb');
+            renderPresetPreview('survey', 'presetSurveyThumb');
+            renderPresetPreview('account_locked', 'presetAccountLockedThumb');
+            renderPresetPreview('promotion', 'presetPromotionThumb');
+            renderPresetPreview('weekly_report', 'presetWeeklyReportThumb');
+            renderPresetPreview('order_shipped', 'presetOrderShippedThumb');
+            renderPresetPreview('event_reminder', 'presetEventReminderThumb');
+            var initial = {{ editingTemplate ? {
+                id: editingTemplate.id,
+                name: editingTemplate.name,
+                subject: editingTemplate.subject,
+                bodyHtml: editingTemplate.bodyHtml,
+                emailConfigId: (editingTemplate.emailConfig ? editingTemplate.emailConfig.id : '')
+            }|json_encode|raw : 'null' }};
+            if (initial) {
+                document.getElementById('templateId').value = initial.id || '';
+                document.getElementById('editorTemplateName').value = initial.name || '';
+                if (document.getElementById('templateSubjectInput')) {
+                    document.getElementById('templateSubjectInput').value = initial.subject || '';
+                }
+                if (document.getElementById('editorSubjectHidden')) {
+                    document.getElementById('editorSubjectHidden').value = initial.subject || '';
+                }
+                if (editor && initial.bodyHtml) {
+                    editor.setHtml(initial.bodyHtml);
+                    document.getElementById('editorBodyHtml').value = editor.getHtml();
+                }
+                if (initial.emailConfigId) {
+                    setEfSelectValue('editorEmailConfig', initial.emailConfigId);
+                }
+            }
+        });
+    </script>
+{% endblock %}

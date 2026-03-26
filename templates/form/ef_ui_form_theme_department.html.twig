@@ -1,11 +1,19 @@
 {%- block department_widget -%}
 
+{%- set wrapper_class = attr.wrapper_class|default('') -%}
+{%- if attr.rounded|default(false) -%}
+    {%- set wrapper_class = wrapper_class ~ ' ef-input-rounded' -%}
+{%- endif -%}
+{%- set attr = attr|merge({'wrapper_class': false, 'rounded': false}) -%}
+
 {% set departmentInputId = random() %}
 {% set departmentContentId = random() %}
 {% set department = form.vars.value %} {# 获取表单当前值 #}
+{% set real_id = id %}
+{% set id = id ~ '_hidden' %}
 
 <div class="ef-deparment-element">
-    <span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search" style="width: 260px; text-align: left;" chosen="{{ department is not empty ? 'true' : 'false' }}" id="{{ departmentInputId }}" contentid="{{ departmentContentId }}">
+    <span class="ef-department-view-single ef-department ef-department-view ef-department-view-size-medium ef-department-view-search {{ wrapper_class }}" style="width: 100%; text-align: left;" chosen="{{ department is not empty ? 'true' : 'false' }}" id="{{ departmentInputId }}" contentid="{{ departmentContentId }}">
         <div class="ef-department-selection-container">
             <div class="ef-department-selection">
                 <span class="ef-department-selection-span">
@@ -26,6 +34,8 @@
                 </span>
             </div>
             <input 
+                id="{{ real_id }}"
+                name="{{ full_name }}_search"
                 class="ef-department-view-input"
                 placeholder="请输入部门名称 ..."
                 mode="single"

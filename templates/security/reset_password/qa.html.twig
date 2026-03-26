@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Verify Security Questions{% endblock %}
+
+{% block body %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-sm" style="width: 100%; max-width: 400px;">
+        <div class="card-body p-4 text-center">
+            <h3 class="mb-4">Security Questions</h3>
+            <p class="mb-4">Please answer the security question for <strong>{{ user.username }}</strong></p>
+            
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+
+            <form action="{{ path('app_reset_password_qa_check', {id: id}) }}" method="post">
+                <div class="mb-3 text-start">
+                    <label class="form-label">Question: What is your favorite color? (Mock)</label>
+                    <input type="text" name="answer1" class="form-control" placeholder="Answer" required autocomplete="off">
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                    Verify Answer
+                </button>
+            </form>
+            
+            <div class="mt-3">
+                <a href="{{ path('app_reset_password') }}" class="text-decoration-none">Try another way</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -61,6 +61,12 @@ class WebauthnCredential
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $createdAt;
 
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $lastUsedAt = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $deviceName = null;
+
     #[ORM\ManyToOne(targetEntity: Employee::class)]
     #[ORM\JoinColumn(nullable: true)]
     private ?Employee $employee = null;
@@ -170,5 +176,37 @@ class WebauthnCredential
     {
         $this->uvInitialized = $uvInitialized;
         return $this;
+    }
+
+    public function getCreatedAt(): \DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function getLastUsedAt(): ?\DateTimeInterface
+    {
+        return $this->lastUsedAt;
+    }
+
+    public function setLastUsedAt(?\DateTimeInterface $lastUsedAt): self
+    {
+        $this->lastUsedAt = $lastUsedAt;
+        return $this;
+    }
+
+    public function getDeviceName(): ?string
+    {
+        return $this->deviceName;
+    }
+
+    public function setDeviceName(?string $deviceName): self
+    {
+        $this->deviceName = $deviceName;
+        return $this;
+    }
+
+    public function getAaguid(): Uuid
+    {
+        return $this->aaguid;
     }
 }

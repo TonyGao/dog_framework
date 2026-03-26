@@ -100,7 +100,7 @@ class MenuController extends BaseController
     ]);
   }
 
-  #[Route('/admin/platforum/menu/new', name: 'platform_menu_new_cache')]
+  #[Route('/admin/platform/menu/new', name: 'platform_menu_new_cache')]
   public function createMenu(Request $request, EntityManagerInterface $em): Response
   {
     $menu = new Menu();

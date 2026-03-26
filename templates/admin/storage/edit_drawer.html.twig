@@ -1,0 +1,197 @@
+<div class="ef-drawer-container" style="z-index: 1001; display: none;" id="{{ drawerId }}">
+    <div class="ef-drawer-mask" maskid="{{ drawerId }}"></div>
+    <div class="ef-drawer" style="right: -650px; width: 650px; box-shadow: -4px 0 20px rgba(0,0,0,0.15);">
+        <div class="ef-drawer-header">
+            <div class="ef-drawer-title">
+                <i class="fa-solid fa-edit" style="margin-right: 12px; font-size: 18px;"></i>
+                编辑存储配置
+            </div>
+            <div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn" onclick="closeDrawer('{{ drawerId }}')">
+                <span class="ef-icon-hover">
+                    <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                    </svg>
+                </span>
+            </div>
+        </div>
+        <div class="ef-drawer-body">
+            <div class="ef-drawer-content">
+                {% import 'ui/template/ui.html.twig' as ui %}
+                {{ form_start(form, {'attr': {'id': 'storage-config-edit-form', 'class': 'ef-form'}}) }}
+                    
+                    <div class="ef-card" style="border: 1px solid #e5e6eb; border-radius: 4px; padding: 20px; margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 20px; font-size: 16px; font-weight: 600;">基本信息</h4>
+                        {{ form_row(form.name) }}
+                        {{ form_row(form.adapterType) }}
+                        {{ form_row(form.isDefault) }}
+                        {{ form_row(form.cdnDomain) }}
+                    </div>
+
+                    <div class="ef-card" id="storage-config-details-card" style="border: 1px solid #e5e6eb; border-radius: 4px; padding: 20px; display: none;">
+                        <div id="local-config-section-drawer" style="display: none;">
+                            <h4 style="margin-bottom: 20px; font-size: 16px; font-weight: 600;">Local 配置</h4>
+                            {{ form_row(form.directory_strategy) }}
+                            {{ form_row(form.directory) }}
+                        </div>
+
+                        <div id="s3-config-section-drawer" style="margin-top: 30px; display: none;">
+                            <h4 style="margin-bottom: 20px; font-size: 16px; font-weight: 600;">S3 配置</h4>
+                            {{ form_row(form.endpoint) }}
+                            {{ form_row(form.region) }}
+                            {{ form_row(form.bucket) }}
+                            {{ form_row(form.access_key) }}
+                            {{ form_row(form.secret_key) }}
+                        </div>
+                    </div>
+
+                    <div class="ef-row" style="margin-top: 24px;">
+                        <div class="ef-col">
+                            <div class="ef-space ef-space-horizontal">
+                                <div class="ef-space-item">
+                                    <button class="btn primary medium" type="submit">保存</button>
+                                </div>
+                                <div class="ef-space-item">
+                                    <button class="btn secondary medium" type="button" onclick="closeDrawer('{{ drawerId }}')">取消</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ ui.formValid() }}
+
+<script>
+    // 抽屉打开时添加body类
+    if (typeof addDrawerOpenClass === 'undefined') {
+        window.addDrawerOpenClass = function() {
+            $('body').addClass('ef-drawer-open');
+        }
+    }
+    if (typeof removeDrawerOpenClass === 'undefined') {
+        window.removeDrawerOpenClass = function() {
+            $('body').removeClass('ef-drawer-open');
+        }
+    }
+    
+    addDrawerOpenClass();
+
+    // 关闭抽屉函数
+    window.closeDrawer = function(id) {
+        removeDrawerOpenClass();
+        $().hideDrawer(id);
+        setTimeout(function() {
+            $('#' + id).remove();
+        }, 300);
+    };
+
+    // 监听适配器类型变化
+    window.initStorageEditDrawer = function() {
+        // 定义显隐更新逻辑
+        function updateVisibility() {
+            // 尝试通过 ID 查找，回退到 name
+            const typeSelect = $('#storage_config_adapterType').length ? $('#storage_config_adapterType') : $('select[name="storage_config[adapterType]"]');
+            const localSection = $('#local-config-section-drawer');
+            const s3Section = $('#s3-config-section-drawer');
+            const detailsCard = $('#storage-config-details-card');
+
+            if (typeSelect.length === 0) {
+                return;
+            }
+
+            const value = typeSelect.val();
+            
+            // 重置状态
+            localSection.hide();
+            s3Section.hide();
+            detailsCard.hide();
+
+            // 根据值显示对应部分
+            if (value === 'local') {
+                detailsCard.show();
+                localSection.show();
+            } else if (value === 's3') {
+                detailsCard.show();
+                s3Section.show();
+            }
+        }
+
+        // 使用事件委托绑定 change 事件，确保动态元素也能响应
+        $('body').off('change.storage_drawer').on('change.storage_drawer', '#storage_config_adapterType, select[name="storage_config[adapterType]"]', function() {
+            updateVisibility();
+        });
+
+        // 立即触发一次以设置初始状态
+        setTimeout(updateVisibility, 100);
+
+        // AJAX Form Submission
+        const form = $('#storage-config-edit-form');
+        form.off('submit').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Basic client-side validation check
+            if (!form.valid()) {
+                return false;
+            }
+
+            const formData = new FormData(this);
+            const submitBtn = form.find('button[type="submit"]');
+            const originalBtnText = submitBtn.text();
+            
+            submitBtn.prop('disabled', true).text('提交中...');
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                     // Check if response is JSON (success) or HTML (redirect/error handled by framework?)
+                     // Controller redirects on success.
+                     // But if it redirects, AJAX might follow it or return the page content.
+                     // Wait, in Controller 'new' method, I returned JsonResponse for success.
+                     // In 'edit' method, I returned RedirectResponse.
+                     // I should fix 'edit' method to return JsonResponse for AJAX request.
+                    
+                    if (response.status === 'success' || (typeof response === 'string' && response.includes('<!DOCTYPE html>'))) {
+                         // If it's a full page (redirect), we should reload.
+                         // But better to return JSON.
+                         closeDrawer('{{ drawerId }}');
+                         window.location.reload();
+                    } else {
+                        // Handle unexpected response
+                         closeDrawer('{{ drawerId }}');
+                         window.location.reload();
+                    }
+                },
+                error: function(xhr) {
+                    submitBtn.prop('disabled', false).text(originalBtnText);
+                    
+                    if (xhr.status === 422) {
+                        // Validation errors - replace drawer content
+                        const newDrawer = $(xhr.responseText);
+                        $('#{{ drawerId }}').replaceWith(newDrawer);
+                        
+                        $().showDrawer('{{ drawerId }}');
+                        addDrawerOpenClass();
+                        // Re-initialize events for the new drawer content
+                        if (typeof window.initStorageEditDrawer === 'function') {
+                            window.initStorageEditDrawer();
+                        }
+                    } else {
+                        console.error('Submission error:', xhr);
+                        alert('系统错误，请稍后重试');
+                    }
+                }
+            });
+        });
+    };
+</script>

@@ -1,0 +1,44 @@
+{% extends 'security/reset_password/layout.html.twig' %}
+
+{% block reset_content %}
+    <h2>重置密码</h2>
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    {% if user and availableMethods|length > 0 %}
+        <p style="color: #6b7280; margin-bottom: 24px; font-size: 14px;">请选择验证方式以重置密码：</p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            {% for method in availableMethods %}
+                {% if method.methodKey == 'email' %}
+                    <a href="{{ path('app_reset_password_email', {'id': user.id}) }}" class="btn-outline">
+                        <i class="fas fa-envelope"></i> 发送验证码到邮箱
+                    </a>
+                {% elseif method.methodKey == 'sms' %}
+                    <a href="{{ path('app_reset_password_sms', {'id': user.id}) }}" class="btn-outline">
+                        <i class="fas fa-mobile-alt"></i> 发送验证码到手机
+                    </a>
+                {% elseif method.methodKey == 'qa' %}
+                    <a href="{{ path('app_reset_password_qa', {'id': user.id}) }}" class="btn-outline">
+                        <i class="fas fa-question-circle"></i> 回答安全问题
+                    </a>
+                {% elseif method.methodKey == 'passkey' %}
+                    <a href="{{ path('app_reset_password_passkey', {'id': user.id}) }}" class="btn-outline">
+                        <i class="fas fa-fingerprint"></i> 使用通行密钥验证
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <form action="{{ path('app_reset_password_check') }}" method="post">
+            <div class="form-group">
+                <label for="identifier" class="form-label">{{ 'login.form.label.username'|trans }}</label>
+                <input type="text" class="form-control" id="identifier" name="identifier" value="{{ username }}" placeholder="{{ 'login.form.label.username'|trans }}" required autofocus>
+            </div>
+            <button type="submit" class="btn-primary btn-block">下一步</button>
+        </form>
+    {% endif %}
+
+    <a href="{{ path('app_login') }}" class="back-link">返回登录</a>
+{% endblock %}

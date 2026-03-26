@@ -38,13 +38,23 @@
     {# 检查是否有传入 readonly  属性，并为 input 元素添加相应的样式类 #}
     {%- set isReadonly = attr.readonly is defined and attr.readonly -%}
     {%- set class_attr = attr.class is defined ? attr.class : '' %}
+    {%- set wrapper_class = attr.wrapper_class|default('') -%}
+    {%- if attr.rounded|default(false) -%}
+        {%- set wrapper_class = wrapper_class ~ ' ef-input-rounded' -%}
+    {%- endif -%}
+    {%- set wrapper_style = '' -%}
+    {%- if attr.height|default(false) -%}
+        {%- set wrapper_class = wrapper_class ~ ' ef-input-h' ~ attr.height -%}
+        {%- set wrapper_style = 'height: ' ~ attr.height ~ 'px;' -%}
+    {%- endif -%}
+    {%- set attr = attr|merge({'wrapper_class': false, 'rounded': false, 'height': false}) -%}
 
     {# 处理 text 类型的输入框，使用自定义的样式 #}
     {%- if type == 'text' -%}
     {# <span class="ef-input-wrapper">
       <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" clearable="true" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
     </span> #}
-        <span class="ef-input-wrapper {% if isReadonly %} ef-input-disabled {% endif %}" >
+        <span class="ef-input-wrapper {{ wrapper_class }} {% if isReadonly %} ef-input-disabled {% endif %}" style="{{ wrapper_style }}">
             <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" 
                    clearable="true" 
                    type="{{ type }}" 
@@ -66,8 +76,23 @@
 {%- block textarea_widget -%}
   {%- set isReadonly = attr.readonly is defined and attr.readonly -%}
   {%- set class_attr = attr.class is defined ? attr.class : '' %}
-  <div class="ef-textarea-wrapper{% if isReadonly %} ef-textarea-disabled {% endif %}">
-    <textarea component="textarea" {{ block('widget_attributes') }} class="ef-textarea resizeable" min-rows="3" max-rows="10" clearable="true" placeholder="Please enter something">{{ value }}</textarea>
+  {%- set wrapper_class = attr.wrapper_class|default('') -%}
+  {%- if attr.rounded|default(false) -%}
+      {%- set wrapper_class = wrapper_class ~ ' ef-textarea-rounded' -%}
+  {%- endif -%}
+  {%- set wrapper_style = '' -%}
+  {%- set min_rows = 3 -%}
+  {%- if attr.rows is defined and attr.rows > 0 -%}
+      {%- set min_rows = attr.rows -%}
+  {%- endif -%}
+  {%- set min_rows = max(min_rows, 3) -%}
+  {%- set is_autosize = false -%}
+  {%- if attr.autosize is defined and attr.autosize -%}
+      {%- set is_autosize = true -%}
+  {%- endif -%}
+  {%- set attr = attr|merge({'wrapper_class': false, 'rounded': false, 'height': false, 'autosize': false}) -%}
+  <div class="ef-textarea-wrapper {{ wrapper_class }} {% if isReadonly %} ef-textarea-disabled {% endif %}" style="{{ wrapper_style }}">
+    <textarea component="textarea" {{ block('widget_attributes') }} class="ef-textarea {% if is_autosize %}resizeable{% endif %} {{ class_attr }}" min-rows="{{ min_rows }}" max-rows="10" clearable="true" placeholder="Please enter something">{{ value }}</textarea>
   </div>
 {%- endblock textarea_widget -%}
 
@@ -145,7 +170,9 @@
 {%- endblock form_errors %}
 
 {%- block switch_widget -%}
-<button type="button" role="switch" aria-checked="{% if checked %}true{% else %}false{% endif %}" class="ef-switch ef-switch-type-circle{% if checked %} ef-switch-checked{% endif %}">
+{% set real_id = id %}
+{% set id = id ~ '_hidden' %}
+<button id="{{ real_id }}" type="button" role="switch" aria-checked="{% if checked %}true{% else %}false{% endif %}" class="ef-switch ef-switch-type-circle{% if checked %} ef-switch-checked{% endif %}">
   <input type="hidden" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
   <span class="ef-switch-handle">
     <span class="ef-switch-handle-icon"></span>
@@ -154,8 +181,19 @@
 {%- endblock switch_widget -%}
 
 {%- block integer_widget -%}
-	<span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium">
+    {%- set wrapper_class = attr.wrapper_class|default('') -%}
+    {%- if attr.rounded|default(false) -%}
+        {%- set wrapper_class = wrapper_class ~ ' ef-input-rounded' -%}
+    {%- endif -%}
+    {%- set wrapper_style = '' -%}
+    {%- if attr.height|default(false) -%}
+        {%- set wrapper_class = wrapper_class ~ ' ef-input-h' ~ attr.height -%}
+        {%- set wrapper_style = 'height: ' ~ attr.height ~ 'px;' -%}
+    {%- endif -%}
+    {%- set attr = attr|merge({'wrapper_class': false, 'rounded': false, 'height': false}) -%}
+	<span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium {{ wrapper_class }}" style="{{ wrapper_style }}">
     <input role="spinbutton"
+      {{ block('widget_attributes') }}
       {% if attr.numValuemax is defined %}
         num-valuemax={{ attr.numValuemax }}
       {% endif %}
@@ -170,6 +208,7 @@
       class="ef-input ef-input-size-medium number"
       type="text"
       placeholder="Please Enter"
+      {% if value is not empty %}value="{{ value }}" {% endif %}
     >
     <span class="ef-input-suffix">
       <div class="ef-input-number-step">
@@ -188,15 +227,28 @@
     {% set selectInputId = random() %}
     {% set selectContentId = random() %}
     {% set isDefault = value is not empty %}
+    {% set real_id = id %}
+    {% set id = id ~ '_hidden' %}
+    {%- set wrapper_class = attr.wrapper_class|default('') -%}
+    {%- if attr.rounded|default(false) -%}
+        {%- set wrapper_class = wrapper_class ~ ' ef-input-rounded' -%}
+    {%- endif -%}
+    {%- set wrapper_style = '' -%}
+    {%- if attr.height|default(false) -%}
+        {%- set wrapper_class = wrapper_class ~ ' ef-input-h' ~ attr.height -%}
+        {%- set wrapper_style = 'height: ' ~ attr.height ~ 'px;' -%}
+    {%- endif -%}
+    {%- set attr = attr|merge({'wrapper_class': false, 'rounded': false, 'height': false}) -%}
     <input type="hidden" component="select" {{ block('widget_attributes') }} {% if isDefault %} value="{{ value }}" {% endif %}/>
     <span
-      class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
+      class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search {{ wrapper_class }}"
+      style="{{ wrapper_style }}"
       chosen="{{ isDefault ? 'true' : 'false' }}"
       for="{{ label }}"
       id="{{ selectInputId }}"
       contentId="{{ selectContentId }}"
       >
-      <input class="ef-select-view-input {% if isDefault %} ef-select-view-input-hidden {% endif %}" placeholder="Please select ...">
+      <input id="{{ real_id }}" name="{{ full_name }}_search" class="ef-select-view-input {% if isDefault %} ef-select-view-input-hidden {% endif %}" placeholder="Please select ...">
       {% set defaultLabel = '' %}
       {%- for key, choice_attr in choices -%}
         {%- if choice_attr.value == value -%} {# 如果选项值等于默认值 #}

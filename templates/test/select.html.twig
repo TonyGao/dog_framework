@@ -4,101 +4,285 @@
 {% set selectInputId2 = random() %}
 {% set selectContentId = random() %}
 {% set selectContentId2 = random() %}
+{% set selectInputId3 = random() %}
+{% set selectContentId3 = random() %}
+{% set selectInputId4 = random() %}
+{% set selectContentId4 = random() %}
 
 {% block javascripts %}
 {{ parent() }}
 {% endblock %}
 
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .demo-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .demo-header {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 24px;
+    }
+    .demo-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+    .demo-desc {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .demo-section {
+      margin-bottom: 48px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .demo-section-header {
+      background: #f9fafb;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .demo-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+    .demo-section-desc {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 32px;
+      padding: 32px 24px;
+    }
+    .demo-item {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .demo-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #4b5563;
+    }
+    .code-tag {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #ef4444;
+    }
+  </style>
+{% endblock %}
+
 {% block body %}
-<span
-  class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
-  style="width: 320px;"
-  chosen="false"
-  id="{{ selectInputId }}"
-  contentId="{{ selectContentId }}"
-  >
-  <input class="ef-select-view-input" placeholder="Please select ...">
-  <span class="ef-select-view-value ef-select-view-value-hidden"></span>
-  <span class="ef-select-view-suffix">
-    <span class="ef-select-view-icon">
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
-        <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
-      </svg>
-    </span>
-  </span>
-</span>
-
-<span
-  class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search ef-select-error"
-  style="width: 320px;"
-  chosen="false"
-  id="{{ selectInputId2 }}"
-  contentId="{{ selectContentId2 }}"
-  >
-  <input class="ef-select-view-input" placeholder="Please select ...">
-  <span class="ef-select-view-value ef-select-view-value-hidden"></span>
-  <span class="ef-select-view-suffix">
-    <span class="ef-select-view-icon">
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
-        <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
-      </svg>
-    </span>
-  </span>
-</span>
-
-<div class="ef-trigger-popup ef-trigger-position-bl"
-     trigger-placement="bl"
-     style="z-index: 1001; pointer-events: auto; width: 320px;"
-     id="{{ selectContentId }}"
-     parentId="{{ selectInputId }}"
-    >
-	<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
-		<div class="ef-trigger-content">
-			<div class="ef-select-dropdown">
-					<div class="ef-scrollbar ef-scrollbar-type-embed" style="">
-            <div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
-              <ul class="ef-select-dropdown-list">
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Beijing</span></li>
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Shanghai</span></li>
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Guangzhou</span></li>
-                <li id="{{ random() }}" class="ef-select-option ef-select-option-disabled"><span class="ef-select-option-content">Disabled</span></li>
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Shenzhen</span></li>
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Chengdu</span></li>
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Wuhan</span></li>
-              </ul>
-            </div>
-					</div>
-				</div>
-      </div>
-		</div>
+<div class="demo-container">
+  <div class="demo-header">
+    <h1 class="demo-title">Select 选择器组件</h1>
+    <p class="demo-desc">下拉选择器。支持 <strong>标准直角样式</strong> 和 <strong>专用圆角样式</strong>。</p>
   </div>
-</div>
 
-<div class="ef-trigger-popup ef-trigger-position-bl"
-     trigger-placement="bl"
-     style="z-index: 1001; pointer-events: auto; width: 320px;"
-     id="{{ selectContentId2 }}"
-     parentId="{{ selectInputId2 }}"
-    >
-	<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
-		<div class="ef-trigger-content">
-			<div class="ef-select-dropdown">
-					<div class="ef-scrollbar ef-scrollbar-type-embed" style="">
-            <div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
-              <ul class="ef-select-dropdown-list">
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Beijing</span></li>
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Shanghai</span></li>
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Guangzhou</span></li>
-                <li id="{{ random() }}" class="ef-select-option ef-select-option-disabled"><span class="ef-select-option-content">Disabled</span></li>
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Shenzhen</span></li>
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Chengdu</span></li>
-                <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Wuhan</span></li>
-              </ul>
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">后台设置专用样式 (圆角)</h2>
+      <p class="demo-section-desc">追加 <span class="code-tag">ef-input-rounded</span> 类，提供更柔和的 6px 圆角。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">基础圆角选择器</span>
+        <span
+          class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search ef-input-rounded"
+          style="width: 100%;"
+          chosen="false"
+          id="{{ selectInputId3 }}"
+          contentId="{{ selectContentId3 }}"
+          >
+          <input class="ef-select-view-input" placeholder="Please select ...">
+          <span class="ef-select-view-value ef-select-view-value-hidden"></span>
+          <span class="ef-select-view-suffix">
+            <span class="ef-select-view-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
+                <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
+              </svg>
+            </span>
+          </span>
+        </span>
+        <div class="ef-trigger-popup ef-trigger-position-bl"
+             trigger-placement="bl"
+             style="z-index: 1001; pointer-events: auto; width: 320px;"
+             id="{{ selectContentId3 }}"
+             parentId="{{ selectInputId3 }}"
+            >
+          <div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+            <div class="ef-trigger-content">
+              <div class="ef-select-dropdown">
+                  <div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+                    <div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
+                      <ul class="ef-select-dropdown-list">
+                        <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Beijing</span></li>
+                        <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Shanghai</span></li>
+                        <li id="{{ random() }}" class="ef-select-option ef-select-option-disabled"><span class="ef-select-option-content">Disabled</span></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-					</div>
-				</div>
+        </div>
       </div>
-		</div>
+
+      <div class="demo-item">
+        <span class="demo-label">错误状态圆角选择器</span>
+        <span
+          class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search ef-select-error ef-input-rounded"
+          style="width: 100%;"
+          chosen="false"
+          id="{{ selectInputId4 }}"
+          contentId="{{ selectContentId4 }}"
+          >
+          <input class="ef-select-view-input" placeholder="Please select ...">
+          <span class="ef-select-view-value ef-select-view-value-hidden"></span>
+          <span class="ef-select-view-suffix">
+            <span class="ef-select-view-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
+                <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
+              </svg>
+            </span>
+          </span>
+        </span>
+        <div class="ef-trigger-popup ef-trigger-position-bl"
+             trigger-placement="bl"
+             style="z-index: 1001; pointer-events: auto; width: 320px;"
+             id="{{ selectContentId4 }}"
+             parentId="{{ selectInputId4 }}"
+            >
+          <div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+            <div class="ef-trigger-content">
+              <div class="ef-select-dropdown">
+                  <div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+                    <div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
+                      <ul class="ef-select-dropdown-list">
+                        <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Beijing</span></li>
+                        <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Shanghai</span></li>
+                        <li id="{{ random() }}" class="ef-select-option ef-select-option-disabled"><span class="ef-select-option-content">Disabled</span></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">标准组件样式 (直角)</h2>
+      <p class="demo-section-desc">系统默认的基础样式。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">基础直角选择器</span>
+        <span
+          class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search"
+          style="width: 100%;"
+          chosen="false"
+          id="{{ selectInputId }}"
+          contentId="{{ selectContentId }}"
+          >
+          <input class="ef-select-view-input" placeholder="Please select ...">
+          <span class="ef-select-view-value ef-select-view-value-hidden"></span>
+          <span class="ef-select-view-suffix">
+            <span class="ef-select-view-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
+                <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
+              </svg>
+            </span>
+          </span>
+        </span>
+        <div class="ef-trigger-popup ef-trigger-position-bl"
+             trigger-placement="bl"
+             style="z-index: 1001; pointer-events: auto; width: 320px;"
+             id="{{ selectContentId }}"
+             parentId="{{ selectInputId }}"
+            >
+          <div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+            <div class="ef-trigger-content">
+              <div class="ef-select-dropdown">
+                  <div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+                    <div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
+                      <ul class="ef-select-dropdown-list">
+                        <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Beijing</span></li>
+                        <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Shanghai</span></li>
+                        <li id="{{ random() }}" class="ef-select-option ef-select-option-disabled"><span class="ef-select-option-content">Disabled</span></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">错误状态直角选择器</span>
+        <span
+          class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search ef-select-error"
+          style="width: 100%;"
+          chosen="false"
+          id="{{ selectInputId2 }}"
+          contentId="{{ selectContentId2 }}"
+          >
+          <input class="ef-select-view-input" placeholder="Please select ...">
+          <span class="ef-select-view-value ef-select-view-value-hidden"></span>
+          <span class="ef-select-view-suffix">
+            <span class="ef-select-view-icon">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
+                <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
+              </svg>
+            </span>
+          </span>
+        </span>
+        <div class="ef-trigger-popup ef-trigger-position-bl"
+             trigger-placement="bl"
+             style="z-index: 1001; pointer-events: auto; width: 320px;"
+             id="{{ selectContentId2 }}"
+             parentId="{{ selectInputId2 }}"
+            >
+          <div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+            <div class="ef-trigger-content">
+              <div class="ef-select-dropdown">
+                  <div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+                    <div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
+                      <ul class="ef-select-dropdown-list">
+                        <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Beijing</span></li>
+                        <li id="{{ random() }}" class="ef-select-option"><span class="ef-select-option-content">Shanghai</span></li>
+                        <li id="{{ random() }}" class="ef-select-option ef-select-option-disabled"><span class="ef-select-option-content">Disabled</span></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

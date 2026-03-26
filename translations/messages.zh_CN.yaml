@@ -162,3 +162,194 @@ setup:
 pagination:
   info: 显示第 {start} 到 {end} 条，共 {total} 条
   per_page: 每页显示
+
+admin_security:
+  page_title: '安全配置管理'
+  title: '安全配置'
+  tabs:
+    email_password: '邮箱与密码'
+    2fa_settings: '二次验证设置'
+  alert:
+    title: '添加强大的备用方法以增加更多保护'
+    content: '拥有一个强大的方法很好，但拥有两个方法可以更好地保护您的帐户。如果您失去了对主要方法的访问权限，您可以使用另一个方法作为备用。'
+  list:
+    title: '您的密码重置方法 (2FA)'
+    subtitle: '为您的帐户添加一层保护'
+  btn:
+    initialize: '初始化默认配置'
+    add_method: '添加新方法'
+    cancel: '取消'
+    save: '保存'
+  status:
+    more_secure: '更安全'
+    less_secure: '较不安全'
+  modal:
+    title: '配置 %name%'
+    priority_label: '优先级'
+    priority_help: '数字越小，优先级越高。在登录或重置密码时将优先展示。'
+    enable_method: '启用此验证方式'
+  side_card:
+    checkup:
+      title: '安全检查'
+      text: '请定期检查您的安全配置，以确保账号安全。'
+      link: '立即检查'
+    help:
+      title: '需要帮助？'
+      text: '如果您在配置过程中遇到问题，请联系我们的客服团队。'
+      link: '联系客服'
+
+admin_email:
+  title: '邮件配置'
+  tabs:
+    config: '发件服务器'
+    templates: '邮件模版'
+  templates:
+    title: '邮件模版'
+    desc: '管理各个业务场景的邮件内容'
+    preset:
+      select_label: '选择模版'
+      select_placeholder: '请选择预置模版'
+      apply: '应用'
+      option:
+        welcome: '欢迎新员工'
+        verification_code: '验证码通知'
+        password_reset: '密码重置'
+        announcement: '公告通知'
+        meeting_invite: '会议邀请'
+        newsletter: '产品月报'
+        invoice: '发票/账单'
+        system_alert: '系统告警'
+        survey: '问卷调查'
+        account_locked: '账户锁定通知'
+        promotion: '营销促销'
+        weekly_report: '每周数据周报'
+        order_shipped: '订单发货通知'
+        event_reminder: '活动开始提醒'
+  btn:
+    save_config: '保存配置'
+    send_test: '发送测试邮件'
+    add_template: '添加模版'
+  side_card:
+    config:
+      title: '配置说明'
+      text: '请填写您的 SMTP 服务器信息以启用邮件发送功能。支持常用变量，如密码重置时可用 <code>{{ code }}</code>。'
+
+  editor:
+    title: '邮件模版编辑器'
+    open_full: '打开完整编辑器'
+    preset:
+      title: '预置模版'
+      desc: '选择一个预置模版以快速开始，或者从空白开始创建。'
+      apply: '应用此模版'
+      thumb: '预览'
+      welcome:
+        desc: '用于欢迎新用户注册或员工入职，包含开始使用的引导链接。'
+      verification:
+        desc: '发送包含数字验证码的邮件，用于邮箱验证或两步验证。'
+      reset:
+        desc: '用户忘记密码时，发送重置密码的链接。'
+      announcement:
+        desc: '发布全员通知、产品更新或重要系统公告。'
+      meeting_invite:
+        desc: '发送会议邀请，包含会议时间、地点及加入链接。'
+      newsletter:
+        desc: '定期发送的产品月报、行业资讯或精选内容。'
+      invoice:
+        desc: '发送账单详情、付款确认或发票下载链接。'
+      system_alert:
+        desc: '系统异常、配额不足等重要警告通知。'
+      survey:
+        desc: '邀请用户参与满意度调查或产品反馈。'
+      account_locked:
+        desc: '账户异常活动导致的锁定通知及解锁指引。'
+      promotion:
+        desc: '节日大促、新功能上线等营销推广邮件。'
+      weekly_report:
+        desc: '自动发送的用户或团队本周数据汇总报表。'
+      order_shipped:
+        desc: '电子商务订单发货、物流跟踪通知。'
+      event_reminder:
+        desc: '即将开始的线上/线下活动提醒。'
+    form:
+      name: '模版名称/标识 *'
+      subject: '邮件主题 *'
+      server: '发送服务器'
+      default_server: '使用默认服务器'
+
+  preview:
+    enterprise: '企业管理'
+    admin: '管理员'
+    menu:
+      dashboard: '仪表盘'
+      control_panel: '控制面板'
+      management: '管理'
+      employees: '员工'
+      clients: '客户'
+      reports: '报告'
+      trials: '试用'
+      tools: '工具'
+      integrations: '集成'
+      resources: '资源'
+    page_title:
+      reports: '报告'
+    page_desc:
+      reports: '此部分显示公民提交的有关...的最新报告'
+    action:
+      display: '显示'
+      filter: '筛选'
+      accept: '接受'
+      decline: '拒绝'
+      send_message: '发送消息'
+    search:
+      placeholder: '按主题、标题搜索...'
+    tab:
+      pending: '待处理'
+      reviewed: '已审阅'
+    status:
+      in_review: '审查中'
+    time:
+      days_3: '3天前'
+      days_2: '2天前'
+      days_5: '5天前'
+      week_1: '1周前'
+    mock:
+      desc1: '我联系您是因为我住所附近发生了一起涉及潜在...'
+      desc2: '我想报告我所在社区持续存在的噪音干扰问题，该问题在...'
+      desc3: '这份报告涉及附近的一个近期建设项目，该项目似乎在违规...'
+      desc4: '我提交了一份关于我办公室附近十字路口公共安全问题的投诉，...'
+    email:
+      from: '发件人：'
+      report_id: '报告 ID：'
+      date: '日期：'
+      status: '状态'
+    input:
+      write_message: '编写消息...'
+
+login:
+  title: '登录'
+  branding:
+    title: '企业管理系统'
+    subtitle: '高效、安全、便捷的企业级管理解决方案。'
+  form:
+    title: '欢迎回来'
+    label:
+      username: '邮箱 / 用户名 / 工号'
+      password: '密码'
+      remember_me: '记住我'
+    link:
+      forgot_password: '忘记密码？'
+      signup: '立即注册'
+    placeholder:
+      password: '请输入密码'
+    text:
+      signup_prompt: '还没有账号？'
+    button:
+      login: '登录'
+      passkey: '使用通行密钥登录'
+      processing: '处理中...'
+    divider:
+      or: '或'
+    error:
+      passkey_invalid: '无效的通行密钥'
+      passkey_generic_error: '通行密钥验证失败'
+      passkey_login_failed: '登录失败：'

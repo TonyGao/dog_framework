@@ -2,64 +2,42 @@
 
 namespace App\Form\Organization;
 
-use App\Lib\Str;
-use App\Lib\Arr;
 use App\Entity\Organization\Company;
-use App\Entity\Platform\Entity;
-use App\Entity\Platform\EntityProperty;
 use App\Form\BaseFormType;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Form\AbstractType;
+use App\Service\Form\FormFieldBuilderService;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\ButtonType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class CompanyType extends BaseFormType
 {
-    public $em;
-    public function __construct(EntityManagerInterface $em)
+    private $fieldBuilder;
+
+    public function __construct(FormFieldBuilderService $fieldBuilder)
     {
-        $this->em = $em;
+        $this->fieldBuilder = $fieldBuilder;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $reflectionClass = new \ReflectionClass(Company::class);
-        $repo = $this->em->getRepository(Entity::class);
-        $en = $repo->findOneBy([
-            'fqn' => $reflectionClass->name,
-        ]);
-        $fields = $this->em->getRepository(EntityProperty::class)
-          ->findBy(['entity' => $en],['id' => 'ASC']);
-        foreach ($fields as $field) {
-            $arr = [];
-            if ($field->getValidation()) {
-                $validation = $field->getValidation();
-                $arr = Arr::transValtoAttr($validation);
+        $defaultRounded = $options['rounded'] ?? true;
+        $defaultHeight = $options['height'] ?? 36;
+
+        $this->fieldBuilder->buildFields($builder, Company::class, function ($field, &$builderOptions) use ($defaultRounded, $defaultHeight) {
+            if (!isset($builderOptions['attr']['rounded'])) {
+                $builderOptions['attr']['rounded'] = $defaultRounded;
             }
-            $type = $field->getType();
-            $classType = Str::convertFormType($type);
-
-            $builderOptions = [
-                'label' => $field->getComment(),
-                'attr' => $arr,
-                'required' => $arr['required'] ?? false,
-            ];
-
-            if ($type === 'entity') {
-                $builderOptions['class'] = $field->getTargetEntity();
+            if (!isset($builderOptions['attr']['height'])) {
+                $builderOptions['attr']['height'] = $defaultHeight;
             }
-
-            $builder->add($field->getPropertyName(), $classType, $builderOptions);
-        }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Company::class,
+            'rounded' => true,
+            'height' => 36,
             'attr' => [
                 'style' => 'width: 450px;', // 设置表单宽度
             ],

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="/lib/wangeditor/style.css" rel="stylesheet">
+    <script src="/lib/wangeditor/index.js"></script>
+</head>
+<body>
+    <div id="editor"></div>
+    <script>
+        const { createEditor } = window.wangEditor;
+        const editor = createEditor({
+            selector: '#editor',
+            html: '<div style="background: red; padding: 20px;"><p>Hello</p></div>'
+        });
+        console.log(editor.getHtml());
+    </script>
+</body>
+</html>

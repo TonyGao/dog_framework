@@ -281,9 +281,17 @@ $(document).ready(function () {
             if (efRow.next(".ef-field-attr-action-bar").length === 0) {
               efRow.after(getTextFieldAttributes());
             }
+            $(element).closest(".ef-logic-row").find(".field-rows-wrapper").hide();
+            $(element).closest(".ef-logic-row").find(".field-autosize-wrapper").hide();
+          } else if (selectedType === 'text') {
+            efRow.next(".ef-field-attr-action-bar").remove();
+            $(element).closest(".ef-logic-row").find(".field-rows-wrapper").show();
+            $(element).closest(".ef-logic-row").find(".field-autosize-wrapper").show();
           } else {
             // 如果不是文本类型，移除补充属性部分
             efRow.next(".ef-field-attr-action-bar").remove();
+            $(element).closest(".ef-logic-row").find(".field-rows-wrapper").hide();
+            $(element).closest(".ef-logic-row").find(".field-autosize-wrapper").hide();
           }
         }
       });
@@ -311,7 +319,11 @@ $(document).ready(function () {
           const id = field.attr('id');
           const name = field.attr('name');
           const component = field.attr('component');
-          const value = field.val();
+          let value = field.val();
+
+          if (field.attr('type') === 'checkbox') {
+            value = field.prop('checked') ? value : 0;
+          }
 
           fields[fieldName] = {
             id,

@@ -133,7 +133,9 @@ class EntityService extends BaseService
     }
 
     $comment = $property['comment']['value'];
-    if ($property['type']['value'] = 'string') {
+    $type = $property['type']['value'];
+
+    if ($type === 'string' || $type === 'text') {
       $finalType = 'string';
 
       $class = $this->class
@@ -141,7 +143,11 @@ class EntityService extends BaseService
         ->setVisibility('private')
         ->addComment($comment);
 
-      $attributeArr = ['type' => 'string', 'length' => (int) $property['length']['value'], 'nullable' => $nullable];
+      if ($type === 'string') {
+        $attributeArr = ['type' => 'string', 'length' => (int) $property['length']['value'], 'nullable' => $nullable];
+      } else {
+        $attributeArr = ['type' => 'text', 'nullable' => $nullable];
+      }
 
       // 默认值
       if ($property['defaultValue']['value'] !== '') {
@@ -205,6 +211,25 @@ class EntityService extends BaseService
       ->setNullable(true)
       ->setEntity($this->entity)
       ->setGroup($group);
+
+    if (isset($property['height']['value']) && $property['height']['value'] !== '') {
+      $prop->setHeight((int) $property['height']['value']);
+    }
+
+    if (isset($property['rounded']['value'])) {
+      $prop->setRounded((bool) $property['rounded']['value']);
+    }
+
+    $formOptions = [];
+    if (isset($property['rows']['value']) && $property['rows']['value'] !== '') {
+      $formOptions['rows'] = (int) $property['rows']['value'];
+    }
+    if (isset($property['autosize']['value'])) {
+      $formOptions['autosize'] = (bool) $property['autosize']['value'];
+    }
+    if (!empty($formOptions)) {
+      $prop->setFormOptions($formOptions);
+    }
 
     if ($property['type']['value'] === 'string') {
       $prop->setLength((int) $property['length']['value']);

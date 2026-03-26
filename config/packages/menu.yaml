@@ -49,3 +49,5 @@ parameters:
       ]
     - ["系统设置", "fa-solid fa-gears", "#", "root"]
     - ["存储配置", "fa-solid fa-server", "/admin/storage", "系统设置"]
+    - ["安全配置", "fa-solid fa-shield", "/admin/security", "系统设置"]
+    - ["邮件配置", "fa-solid fa-envelope", "/admin/email", "系统设置"]

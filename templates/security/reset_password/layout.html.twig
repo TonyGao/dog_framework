@@ -1,0 +1,338 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}重置密码{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .login-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        /* Left Side */
+        .login-left {
+            flex: 1;
+            background-color: #2563eb;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 40px;
+            overflow: hidden;
+        }
+        
+        /* Abstract Geometric Shapes (CSS only) */
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+        .shape-1 {
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            top: -200px;
+            left: -200px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            transform: rotate(45deg);
+            bottom: -100px;
+            right: -100px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .branding-content {
+            position: relative;
+            z-index: 10;
+            max-width: 480px;
+            width: 100%;
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            margin-bottom: 40px;
+        }
+        
+        .branding-content h1 {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        
+        .branding-content p {
+            font-size: 16px;
+            opacity: 0.8;
+            margin-bottom: 40px;
+            line-height: 1.5;
+        }
+        
+        .mockup-window {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            overflow: hidden;
+            width: 100%;
+            aspect-ratio: 16/10;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mockup-header {
+            background: #f1f5f9;
+            padding: 10px 16px;
+            display: flex;
+            gap: 6px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e1;
+        }
+        
+        .mockup-body {
+            flex: 1;
+            display: flex;
+        }
+        
+        .mockup-sidebar {
+            width: 60px;
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .sidebar-item {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: #e2e8f0;
+        }
+        .sidebar-item.active {
+            background: #3b82f6;
+        }
+        
+        .mockup-main {
+            flex: 1;
+            padding: 20px;
+            background: #fff;
+        }
+        
+        .mockup-row {
+            height: 24px;
+            background: #f1f5f9;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .mockup-row:nth-child(1) { width: 40%; height: 32px; margin-bottom: 20px; background: #e2e8f0; }
+        .mockup-row:nth-child(2) { width: 100%; }
+        .mockup-row:nth-child(3) { width: 90%; }
+        .mockup-row:nth-child(4) { width: 95%; }
+        
+        /* Right Side */
+        .login-right {
+            flex: 1;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .login-form-wrapper {
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-form-wrapper h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 32px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #111827;
+            background-color: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            box-sizing: border-box;
+        }
+        
+        .form-control:focus {
+            border-color: #2563eb;
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background-color: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            color: #fff;
+        }
+
+        .btn-outline {
+            background-color: #fff;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background-color 0.2s;
+            text-decoration: none;
+        }
+        
+        .btn-outline:hover {
+            background-color: #f9fafb;
+            color: #111827;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        .alert-info {
+            background-color: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            color: #2563eb;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .login-left {
+                display: none;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="login-container">
+    <div class="login-left">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        
+        <div class="branding-content">
+            <div class="logo-icon">
+                <i class="fa-solid fa-shapes"></i>
+            </div>
+            <h1>{{ 'login.branding.title'|trans }}</h1>
+            <p>{{ 'login.branding.subtitle'|trans }}</p>
+            
+            <div class="visual-mockup">
+                <div class="mockup-window">
+                    <div class="mockup-header">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mockup-sidebar">
+                            <div class="sidebar-item active"></div>
+                            <div class="sidebar-item"></div>
+                            <div class="sidebar-item"></div>
+                        </div>
+                        <div class="mockup-main">
+                            <div class="mockup-row"></div>
+                            <div class="mockup-row"></div>
+                            <div class="mockup-row"></div>
+                            <div class="mockup-row"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="login-right">
+        <div class="login-form-wrapper">
+            {% block reset_content %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}

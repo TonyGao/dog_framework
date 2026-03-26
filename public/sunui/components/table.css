@@ -215,5 +215,9 @@ tr, th {
 }
 
 .ef-table-cell.ef-table-cell-align-center {
-  justify-content: left;
+  justify-content: center;
+}
+
+.ef-table-cell.ef-table-cell-align-right {
+  justify-content: flex-end;
 }

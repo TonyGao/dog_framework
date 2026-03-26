@@ -33,7 +33,6 @@
       $.ajax({
         url: "{{ path('org_department_new') }}", // 你的路由 URL
         data: payload, // GET 请求不会发送 JSON 数据，直接传递对象或字符串
-        async: false,
         dataType: "html",
         success: function(data) {
           $(".right-content").html(data);
@@ -54,7 +53,6 @@
         url: "{{ path('org_department_edit', { id: 'departmentId' }) }}".replace('departmentId', departmentId), // 动态 URL，包含部门 ID
         data: payload,
         dataType: "html",
-        async: false,
         success: function(response) {
           $(".right-content").html(response); // 更新页面内容
         },

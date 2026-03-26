@@ -23,6 +23,9 @@ class CorporationFormType extends BaseFormType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $rounded = $options['rounded'] ?? true;
+        $height = $options['height'] ?? 36;
+
         $reflectionClass = new \ReflectionClass(Corporation::class);
         $repo = $this->em->getRepository(Entity::class);
         $en = $repo->findOneBy([
@@ -31,7 +34,11 @@ class CorporationFormType extends BaseFormType
         $fields = $en->getProperties();
         foreach ($fields as $field) {
             $builder->add($field->getFieldName(), null, [
-                'label' => $field->getComment()
+                'label' => $field->getComment(),
+                'attr' => [
+                    'rounded' => $rounded,
+                    'height' => $height
+                ]
             ]);
         }
     }
@@ -40,6 +47,8 @@ class CorporationFormType extends BaseFormType
     {
         $resolver->setDefaults([
             'data_class' => Corporation::class,
+            'rounded' => true,
+            'height' => 36,
             'attr' => [
                 'style' => 'width: 400px;', // 设置表单宽度
             ],

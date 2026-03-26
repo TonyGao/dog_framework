@@ -1,0 +1,28 @@
+{% extends 'security/reset_password/layout.html.twig' %}
+
+{% block title %}验证邮箱{% endblock %}
+
+{% block reset_content %}
+    <h2>验证邮箱</h2>
+    <p style="color: #6b7280; margin-bottom: 24px; font-size: 14px;">我们已向 <strong>{{ user.email }}</strong> 发送了验证码。</p>
+    
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('info') %}
+        <div class="alert alert-info">{{ message }}</div>
+    {% endfor %}
+
+    <form action="{{ path('app_reset_password_email_check', {id: id}) }}" method="post">
+        <div class="form-group">
+            <label for="code" class="form-label">验证码</label>
+            <input type="text" id="code" name="code" class="form-control" placeholder="请输入6位验证码" maxlength="6" required autocomplete="off" style="text-align: center; font-size: 1.25rem; letter-spacing: 0.25rem; font-weight: bold;">
+        </div>
+        <button type="submit" class="btn-primary btn-block mb-3">验证码</button>
+    </form>
+    
+    <div style="display: flex; justify-content: space-between; margin-top: 24px; align-items: center;">
+        <a href="{{ path('app_reset_password') }}" class="back-link" style="margin-top: 0;">尝试其他方式</a>
+        <a href="{{ path('app_reset_password_email', {id: id, resend: 1}) }}" class="back-link" style="margin-top: 0;">重新发送验证码</a>
+    </div>
+{% endblock %}

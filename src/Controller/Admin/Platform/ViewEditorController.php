@@ -80,6 +80,11 @@ class ViewEditorController extends BaseController
         if ($node['type'] === 'view') {
           $arrayIcon = !empty($node['__children']) ? '<i class="fa-solid fa-caret-right"></i>' : '';
 
+          $postscript = '';
+          if (!empty($node['label']) && $node['label'] !== $node['name']) {
+              $postscript = '<div class="postscript">'. $node['label'] .'</div>';
+          }
+
           return '
             <div class="item-content scroll-item">
               <div class="arrow-icon">' . $arrayIcon . '</div>
@@ -88,7 +93,7 @@ class ViewEditorController extends BaseController
               </div>
               <div class="node-name">
                 <div class="tree-text-content branch" type="view" id="' . $node['id'] . '">' . $node['name'] . '</div>
-                <div class="postscript">'. $node['label'] .'</div>
+                ' . $postscript . '
               </div>
             </div>
             ';

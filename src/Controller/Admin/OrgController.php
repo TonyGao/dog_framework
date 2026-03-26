@@ -121,7 +121,9 @@ class OrgController extends BaseController
     $company = $repo->findOneBy(['id' => $id]);
     $oldName = $company->getName();
 
-    $form = $this->createForm(CompanyType::class, $company);
+    $form = $this->createForm(CompanyType::class, $company, [
+      'rounded' => true,
+    ]);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {

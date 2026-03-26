@@ -24,6 +24,10 @@
   cursor: pointer;
 }
 
+.ef-select-view-single.ef-input-rounded {
+  border-radius: 6px;
+}
+
 .ef-select-view-single:hover {
   border-color: rgb(22, 93, 255);
 }

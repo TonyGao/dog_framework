@@ -69,7 +69,8 @@ $(document).ready(async function () {
     console.log(choseMenus); // 查看选中的菜单信息
   });
 
-  let menu = await Route.generate("platform_menu_new_cache");
+  const route = new Route();
+  let menu = await route.generate("platform_menu_new_cache");
   $("#create").on("click", function() {
     $.ajax({
       url: menu.path,

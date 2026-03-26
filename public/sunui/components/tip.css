@@ -1,0 +1,71 @@
+.sun-tip {
+  position: absolute;
+  z-index: 9999;
+  background-color: #1e293b; /* slate-800 */
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+  transform: translateY(4px);
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+.sun-tip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sun-tip-light {
+  background-color: #fff;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+.sun-tip-large {
+  max-width: 400px;
+  padding: 16px;
+}
+
+.sun-tip-arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: inherit;
+  transform: rotate(45deg);
+}
+
+/* List styles for large tooltips */
+.sun-tip-list-item {
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 12px;
+}
+.sun-tip-list-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.sun-tip-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sun-tip-detail {
+  opacity: 0.7;
+  font-size: 11px;
+}
+.sun-tip-light .sun-tip-list-item {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}

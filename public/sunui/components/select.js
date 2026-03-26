@@ -107,20 +107,39 @@ $(document).ready(function () {
 
     let documentWidth = $("#app").width(); // 获取文档的宽度
     let rightDistance = documentWidth - (elementOffset.left + elementWidth);
-    if (rightDistance + elementWidth < $("#" + contentId).width()) {
-      $("#" + contentId).css({
-        right: 20,
-        top: top,
-      });
-    } else {
-      $("#" + contentId).css({
-        left: left,
-        top: top,
-      });
-    }
+  const isToolbar = $(this).closest("#toolbar-container").length > 0;
+  const panel = $("#" + contentId);
+  const listEl = panel.children().find(".ef-select-dropdown-list")[0];
+  const listWidth = listEl ? listEl.scrollWidth : 0;
+  const minWidth = isToolbar ? 420 : 300;
+  const maxWidth = Math.floor(documentWidth * 0.7);
+  let desiredWidth = Math.max(elementWidth, minWidth, listWidth + 32);
+  desiredWidth = Math.min(desiredWidth, maxWidth);
+  
+  if (rightDistance < desiredWidth - elementWidth) {
+    // If it overflows the right edge of the document
+    const safeLeft = Math.max(20, documentWidth - desiredWidth - 20);
+    // Convert absolute document left to relative left
+    let relativeLeft = left + (safeLeft - elementOffset.left);
+    
+    panel.css({
+      left: relativeLeft,
+      top: top,
+      width: desiredWidth,
+      display: 'block',
+      right: 'auto'
+    });
+  } else {
+    panel.css({
+      left: left,
+      top: top,
+      width: desiredWidth,
+      display: 'block',
+      right: 'auto'
+    });
+  }
 
-    $(".ef-trigger-popup.ef-trigger-position-bl").hide();
-    $("#" + contentId).show();
+  $(".ef-trigger-popup.ef-trigger-position-bl").not("#" + contentId).hide();
   });
 
   let selectIcon = `

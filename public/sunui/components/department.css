@@ -10,7 +10,9 @@
 }
 
 .ef-department-view-single {
+  position: relative;
   display: inline-flex;
+  align-items: center;
   box-sizing: border-box;
   width: 100%;
   padding-right: 12px;
@@ -25,6 +27,12 @@
     border-color 0.1s cubic-bezier(0, 0, 1, 1),
     background-color 0.1s cubic-bezier(0, 0, 1, 1);
   cursor: pointer;
+  height: auto;
+  min-height: 32px;
+}
+
+.ef-department-view-single.ef-input-rounded {
+  border-radius: 6px;
 }
 
 .ef-department-view-single:hover {
@@ -46,6 +54,7 @@
   padding-bottom: 4px;
   font-size: 14px;
   line-height: 1.5715;
+  height: auto;
 }
 
 /* .ef-department-view-single.ef-department-view-search .ef-department-view-input,
@@ -92,9 +101,8 @@
   align-items: center;
   box-sizing: border-box;
   width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-break: break-all;
 }
 
 .ef-department-view-single .ef-department-view-suffix {
@@ -107,6 +115,8 @@
   flex-shrink: 0;
   align-items: center;
   white-space: nowrap;
+  height: auto;
+  align-self: center;
   /* user-department: none; */
 }
 
@@ -120,6 +130,8 @@
   flex-shrink: 0;
   align-items: center;
   white-space: nowrap;
+  height: auto;
+  align-self: center;
   /* user-department: none; */
 }
 .ef-department-view-single.ef-department-view-search {
@@ -273,6 +285,11 @@
 .ef-department-selection-span ul {
   list-style: none;
   padding-left: 0;
+  margin: 0;
+}
+
+.ef-department-selection {
+  width: 100%;
 }
 
 .ef-deparment-element ul {
@@ -283,8 +300,49 @@
   margin: 6px 0;
 }
 
-.ef-department-view-suffix {
+.ef-deparment-element {
+  width: 100%;
+}
+
+.ef-department-selection-li-content {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+}
+
+.ef-department-selection-li-content .ef-link {
+  white-space: normal;
+  word-break: break-all;
+  flex: 0 1 auto;
+  line-height: 1.5;
+}
+
+.ef-department-selection-li-content .close-chose-department {
+  padding-left: 1px !important;
+  align-items: center;
+  height: 100%;
   display: none;
+}
+
+.ef-department-selection-li-content .close-chose-department .ef-department-view-icon {
+  display: flex;
+  align-items: center;
+  position: relative;
+  top: 1px;
+}
+
+.ef-department-view-suffix {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.ef-department-view-suffix.show-department-modal {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: auto;
 }
 
 .ef-department-view-suffix:hover {
@@ -422,6 +480,6 @@
 
 .ef-department-selection-container {
   width: 100%;
-  padding-right: 0;
+  padding-right: 24px;
   padding-left: 0;
 }

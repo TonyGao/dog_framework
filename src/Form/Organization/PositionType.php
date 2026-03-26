@@ -20,19 +20,22 @@ class PositionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $rounded = $options['rounded'] ?? true;
+        $height = $options['height'] ?? 36;
+
         $builder
             ->add('name', TextType::class, [
-                'label' => '岗位名称',
+                'label' => '岗位名称', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => true,
             ])
             ->add('code', TextType::class, [
-                'label' => '岗位编码',
+                'label' => '岗位编码', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => false,
             ])
             ->add('department', EntityType::class, [
                 'class' => Department::class,
                 'choice_label' => 'name',
-                'label' => '所属部门',
+                'label' => '所属部门', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => false,
                 'placeholder' => '-- 请选择所属部门 --',
                 'query_builder' => function (EntityRepository $er) {
@@ -45,7 +48,7 @@ class PositionType extends AbstractType
             ->add('type', EntityType::class, [
                 'class' => OptionValue::class,
                 'choice_label' => 'stringValue',
-                'label' => '岗位类型',
+                'label' => '岗位类型', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => false,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('o')
@@ -57,7 +60,7 @@ class PositionType extends AbstractType
             ->add('level', EntityType::class, [
                 'class' => PositionLevel::class,
                 'choice_label' => 'name',
-                'label' => '岗位级别',
+                'label' => '岗位级别', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => false,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('pl')
@@ -69,32 +72,32 @@ class PositionType extends AbstractType
             ->add('parent', EntityType::class, [
                 'class' => Position::class,
                 'choice_label' => 'name',
-                'label' => '上级岗位',
+                'label' => '上级岗位', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => false,
                 'placeholder' => '-- 请选择上级岗位 --',
             ])
             ->add('responsibility', TextareaType::class, [
-                'label' => '岗位职责',
+                'label' => '岗位职责', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => false,
             ])
             ->add('requirement', TextareaType::class, [
-                'label' => '任职要求',
+                'label' => '任职要求', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => false,
             ])
             ->add('headcount', IntegerType::class, [
-                'label' => '编制人数',
+                'label' => '编制人数', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => false,
             ])
             ->add('state', CheckboxType::class, [
-                'label' => '启用',
+                'label' => '启用', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => false,
             ])
             ->add('sortOrder', IntegerType::class, [
-                'label' => '排序号',
+                'label' => '排序号', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => false,
             ])
             ->add('remark', TextareaType::class, [
-                'label' => '备注',
+                'label' => '备注', 'attr' => ['rounded' => $rounded, 'height' => $height],
                 'required' => false,
             ])
         ;
@@ -104,6 +107,8 @@ class PositionType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Position::class,
+            'rounded' => true,
+            'height' => 36,
         ]);
     }
 }

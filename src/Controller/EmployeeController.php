@@ -399,6 +399,16 @@ class EmployeeController extends AbstractController
         $credentialRepo = $em->getRepository(WebauthnCredential::class);
         $credentials = $credentialRepo->findBy(['userHandle' => $userHandle]);
         $viewData->hasPasskey = count($credentials) > 0;
+        $viewData->passkeys = [];
+        foreach ($credentials as $cred) {
+            $viewData->passkeys[] = (object)[
+                'id' => $cred->getId(),
+                'deviceName' => $cred->getDeviceName() ?? 'Unknown Device',
+                'createdAt' => $cred->getCreatedAt(),
+                'lastUsedAt' => $cred->getLastUsedAt(),
+                'aaguid' => $cred->getAaguid() ? $cred->getAaguid()->toRfc4122() : '00000000-0000-0000-0000-000000000000',
+            ];
+        }
 
         return $this->render('employee/show.html.twig', [
             'employee' => $viewData

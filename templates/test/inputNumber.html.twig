@@ -101,27 +101,160 @@
   </script>
 {% endblock %}
 
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .demo-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .demo-header {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 24px;
+    }
+    .demo-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+    .demo-desc {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .demo-section {
+      margin-bottom: 48px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .demo-section-header {
+      background: #f9fafb;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .demo-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+    .demo-section-desc {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 32px;
+      padding: 32px 24px;
+    }
+    .demo-item {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .demo-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #4b5563;
+    }
+    .code-tag {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #ef4444;
+    }
+  </style>
+{% endblock %}
+
 {% block body %}
-	  <span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium input-demo" style="width: 320px;">
-      <input role="spinbutton"
-        num-valuemax="100"
-        num-valuemin="0"
-        num-value=""
-        step="1.5"
-        precision="3"
-        class="ef-input ef-input-size-medium number"
-        type="text"
-        placeholder="Please Enter"
-      >
-        <span class="ef-input-suffix">
-          <div class="ef-input-number-step">
-            <button class="ef-input-number-step-button add" type="button" tabindex="-1">
-              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-up" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"><path d="M39.6 30.557 24.043 15 8.487 30.557"></path></svg>
-            </button>
-            <button class="ef-input-number-step-button subtract" type="button" tabindex="-1">
-              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-down" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"><path d="M39.6 17.443 24.043 33 8.487 17.443"></path></svg>
-            </button>
-          </div>
+<div class="demo-container">
+  <div class="demo-header">
+    <h1 class="demo-title">InputNumber 数字输入框</h1>
+    <p class="demo-desc">仅允许输入标准的数字值，可定义范围。支持 <strong>标准直角样式</strong> 和 <strong>专用圆角样式</strong>。</p>
+  </div>
+
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">后台设置专用样式 (圆角)</h2>
+      <p class="demo-section-desc">追加 <span class="code-tag">ef-input-rounded</span> 类，提供更柔和的 6px 圆角。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <label class="demo-label" for="rounded-input">基础圆角数字输入</label>
+        <span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium ef-input-rounded">
+          <input role="spinbutton"
+            id="rounded-input"
+            name="rounded-input"
+            num-valuemax="100"
+            num-valuemin="0"
+            num-value=""
+            step="1.5"
+            precision="3"
+            class="ef-input ef-input-size-medium number"
+            type="text"
+            placeholder="Please Enter"
+          >
+          <span class="ef-input-suffix">
+            <div class="ef-input-number-step">
+              <button class="ef-input-number-step-button add" type="button" tabindex="-1">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-up" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"><path d="M39.6 30.557 24.043 15 8.487 30.557"></path></svg>
+              </button>
+              <button class="ef-input-number-step-button subtract" type="button" tabindex="-1">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-down" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"><path d="M39.6 17.443 24.043 33 8.487 17.443"></path></svg>
+              </button>
+            </div>
+          </span>
         </span>
-      </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">标准组件样式 (直角)</h2>
+      <p class="demo-section-desc">系统默认的基础样式。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <label class="demo-label" for="standard-input">基础直角数字输入</label>
+        <span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium">
+          <input role="spinbutton"
+            id="standard-input"
+            name="standard-input"
+            num-valuemax="100"
+            num-valuemin="0"
+            num-value=""
+            step="1.5"
+            precision="3"
+            class="ef-input ef-input-size-medium number"
+            type="text"
+            placeholder="Please Enter"
+          >
+          <span class="ef-input-suffix">
+            <div class="ef-input-number-step">
+              <button class="ef-input-number-step-button add" type="button" tabindex="-1">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-up" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"><path d="M39.6 30.557 24.043 15 8.487 30.557"></path></svg>
+              </button>
+              <button class="ef-input-number-step-button subtract" type="button" tabindex="-1">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-down" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter"><path d="M39.6 17.443 24.043 33 8.487 17.443"></path></svg>
+              </button>
+            </div>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

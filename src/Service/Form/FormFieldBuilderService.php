@@ -44,6 +44,23 @@ class FormFieldBuilderService extends BaseService
                 'required' => $arr['required'] ?? false,
             ];
 
+            if ($field->getHeight() !== null) {
+                $options['attr']['height'] = $field->getHeight();
+            }
+
+            if ($field->getRounded() !== null) {
+                $options['attr']['rounded'] = $field->getRounded();
+            }
+
+            if ($field->getFormOptions()) {
+                if (isset($field->getFormOptions()['rows'])) {
+                    $options['attr']['rows'] = $field->getFormOptions()['rows'];
+                }
+                if (isset($field->getFormOptions()['autosize'])) {
+                    $options['attr']['autosize'] = $field->getFormOptions()['autosize'];
+                }
+            }
+
             if ($field->getTargetEntity() !== null) {
                 $options['class'] = $field->getTargetEntity();
             }

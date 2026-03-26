@@ -2,411 +2,434 @@
 window.DatagridState = window.DatagridState || {};
 
 function getGridState(gridId) {
-    if (!window.DatagridState[gridId]) {
-        window.DatagridState[gridId] = {
-            selectedIds: new Set(),
-            excludedIds: new Set(),
-            isSelectAll: false,
-            allSelectedCurrentPage: false
-        };
-    }
-    return window.DatagridState[gridId];
+  if (!window.DatagridState[gridId]) {
+    window.DatagridState[gridId] = {
+      selectedIds: new Set(),
+      excludedIds: new Set(),
+      isSelectAll: false,
+      allSelectedCurrentPage: false,
+    };
+  }
+  return window.DatagridState[gridId];
 }
 
 function updateGlobalSelectVar(gridId) {
-    const state = getGridState(gridId);
-    // Determine if "current page" is fully selected
-    // This is a bit complex with isSelectAll. 
-    // Simplified: Just use the state logic or let the caller handle it.
-    // For now, we keep the existing variable for backward compatibility, 
-    // but maybe we should expose the full state.
-    window['datagridAllSelected' + gridId] = state.allSelectedCurrentPage;
-    // We might also want to expose the global select all state
-    window['datagridIsSelectAll' + gridId] = state.isSelectAll;
+  const state = getGridState(gridId);
+  // Determine if "current page" is fully selected
+  // This is a bit complex with isSelectAll.
+  // Simplified: Just use the state logic or let the caller handle it.
+  // For now, we keep the existing variable for backward compatibility,
+  // but maybe we should expose the full state.
+  window['datagridAllSelected' + gridId] = state.allSelectedCurrentPage;
+  // We might also want to expose the global select all state
+  window['datagridIsSelectAll' + gridId] = state.isSelectAll;
 }
 
 // Function to initialize or reset datagrid state
 // Call this after AJAX load or when initializing a table
-window.initDatagridState = function(tableSelector) {
-    const $tables = tableSelector ? $(tableSelector) : $('.ef-table');
-    
-    $tables.each(function() {
-        const id = $(this).attr('id');
-        if (id) {
-            // Ensure state exists
-            // If it's a fresh page load, state is new/empty.
-            // If it's an AJAX update (pagination), state is preserved.
-            getGridState(id);
-            const $table = $(this);
-            
-            // Restore selections based on state
-            restoreSelections($table);
-        }
-    });
+window.initDatagridState = function (tableSelector) {
+  const $tables = tableSelector ? $(tableSelector) : $('.ef-table');
+
+  $tables.each(function () {
+    const id = $(this).attr('id');
+    if (id) {
+      // Ensure state exists
+      // If it's a fresh page load, state is new/empty.
+      // If it's an AJAX update (pagination), state is preserved.
+      getGridState(id);
+      const $table = $(this);
+
+      // Restore selections based on state
+      restoreSelections($table);
+    }
+  });
 };
 
 function restoreSelections($table) {
-    const gridId = $table.attr('id');
-    if (!gridId) return;
-    
-    const state = getGridState(gridId);
-    const isServerSide = $table.data('is-server-side');
-    
-    // Determine rows to check.
-    const $rowsToCheck = isServerSide ? $table.find("tbody tr").not('.ef-table-empty-row') : $table.find("tbody tr").not('.ef-table-empty-row').filter(':visible');
-    
-    let allVisibleSelected = true;
-    let hasVisibleRows = false;
+  const gridId = $table.attr('id');
+  if (!gridId) return;
 
-    $rowsToCheck.each(function() {
-        hasVisibleRows = true;
-        const $tr = $(this);
-        let rowId = $tr.data('id');
-        // Fallback for ID
-        if (!rowId) {
-             const $cb = $tr.find('.ef-checkbox input');
-             rowId = $cb.val();
-        }
-        
-        if (rowId) {
-            let isSelected = false;
-            if (state.isSelectAll) {
-                isSelected = !state.excludedIds.has(String(rowId));
-            } else {
-                isSelected = state.selectedIds.has(String(rowId));
-            }
+  const state = getGridState(gridId);
+  const isServerSide = $table.data('is-server-side');
 
-            const $cb = $tr.find('.ef-checkbox input');
-            
-            if ($cb.length) {
-                $cb.prop('checked', isSelected);
+  // Determine rows to check.
+  const $rowsToCheck = isServerSide
+    ? $table.find('tbody tr').not('.ef-table-empty-row')
+    : $table.find('tbody tr').not('.ef-table-empty-row').filter(':visible');
 
-                const $rowLabel = $tr.find(".ef-checkbox");
-                const $hoverIcon = $rowLabel.find(".ef-checkbox-icon-hover");
+  let allVisibleSelected = true;
+  let hasVisibleRows = false;
 
-                if (isSelected) {
-                    $rowLabel.addClass("ef-checkbox-checked");
-                    $hoverIcon.removeClass("ef-icon-hover-disabled");
-                    let checkboxIcon = '<svg aria-hidden="true" focusable="false" viewBox="0 0 1024 1024" width="200" height="200" fill="currentColor" class="ef-checkbox-icon-check"><path d="M877.44815445 206.10060629a64.72691371 64.72691371 0 0 0-95.14856334 4.01306852L380.73381888 685.46812814 235.22771741 533.48933518a64.72691371 64.72691371 0 0 0-92.43003222-1.03563036l-45.82665557 45.82665443a64.72691371 64.72691371 0 0 0-0.90617629 90.61767965l239.61903446 250.10479331a64.72691371 64.72691371 0 0 0 71.19960405 15.14609778 64.33855261 64.33855261 0 0 0 35.08198741-21.23042702l36.24707186-42.71976334 40.5190474-40.77795556-3.36579926-3.49525333 411.40426297-486.74638962a64.72691371 64.72691371 0 0 0-3.88361443-87.64024149l-45.3088404-45.43829334z" p-id="840"></path></svg>';
-                    $hoverIcon.children(".ef-checkbox-icon").html(checkboxIcon);
-                } else {
-                    $rowLabel.removeClass("ef-checkbox-checked");
-                    $hoverIcon.removeClass("ef-icon-hover-disabled");
-                    $hoverIcon.children(".ef-checkbox-icon").empty();
-                }
-
-                if (!isSelected) {
-                    allVisibleSelected = false;
-                }
-            }
-        }
-    });
-    
-    if (!hasVisibleRows) allVisibleSelected = false;
-    
-    // Update Select All checkbox
-    // If Global Select All is on, the header checkbox should be checked.
-    // Or should it only be checked if the current page is fully selected?
-    // Usually, if isSelectAll is true, the header is checked.
-    // If isSelectAll is false, but all items on current page are selected manually, it should also be checked.
-    const $selectAll = $table.find(".check-all input");
-    
-    $selectAll.prop('checked', allVisibleSelected);
-    
-    // Update visual state (label and icon) because checkbox.js click handler isn't triggered here
-    const $selectAllLabel = $table.find(".check-all");
-    const $selectAllHoverIcon = $selectAllLabel.find(".ef-checkbox-icon-hover");
-
-    if (allVisibleSelected) {
-        $selectAllLabel.addClass("ef-checkbox-checked");
-        $selectAllHoverIcon.removeClass("ef-icon-hover-disabled");
-        let checkboxIcon = '<svg aria-hidden="true" focusable="false" viewBox="0 0 1024 1024" width="200" height="200" fill="currentColor" class="ef-checkbox-icon-check"><path d="M877.44815445 206.10060629a64.72691371 64.72691371 0 0 0-95.14856334 4.01306852L380.73381888 685.46812814 235.22771741 533.48933518a64.72691371 64.72691371 0 0 0-92.43003222-1.03563036l-45.82665557 45.82665443a64.72691371 64.72691371 0 0 0-0.90617629 90.61767965l239.61903446 250.10479331a64.72691371 64.72691371 0 0 0 71.19960405 15.14609778 64.33855261 64.33855261 0 0 0 35.08198741-21.23042702l36.24707186-42.71976334 40.5190474-40.77795556-3.36579926-3.49525333 411.40426297-486.74638962a64.72691371 64.72691371 0 0 0-3.88361443-87.64024149l-45.3088404-45.43829334z" p-id="840"></path></svg>';
-        $selectAllHoverIcon.children(".ef-checkbox-icon").html(checkboxIcon);
-    } else {
-        $selectAllLabel.removeClass("ef-checkbox-checked");
-        $selectAllHoverIcon.removeClass("ef-icon-hover-disabled");
-        $selectAllHoverIcon.children(".ef-checkbox-icon").empty();
+  $rowsToCheck.each(function () {
+    hasVisibleRows = true;
+    const $tr = $(this);
+    let rowId = $tr.data('id');
+    // Fallback for ID
+    if (!rowId) {
+      const $cb = $tr.find('.ef-checkbox input');
+      rowId = $cb.val();
     }
-    
-    state.allSelectedCurrentPage = allVisibleSelected;
-    updateGlobalSelectVar(gridId);
+
+    if (rowId) {
+      let isSelected = false;
+      if (state.isSelectAll) {
+        isSelected = !state.excludedIds.has(String(rowId));
+      } else {
+        isSelected = state.selectedIds.has(String(rowId));
+      }
+
+      const $cb = $tr.find('.ef-checkbox input');
+
+      if ($cb.length) {
+        $cb.prop('checked', isSelected);
+
+        const $rowLabel = $tr.find('.ef-checkbox');
+        const $hoverIcon = $rowLabel.find('.ef-checkbox-icon-hover');
+
+        if (isSelected) {
+          $rowLabel.addClass('ef-checkbox-checked');
+          $hoverIcon.removeClass('ef-icon-hover-disabled');
+          let checkboxIcon =
+            '<svg aria-hidden="true" focusable="false" viewBox="0 0 1024 1024" width="200" height="200" fill="currentColor" class="ef-checkbox-icon-check"><path d="M877.44815445 206.10060629a64.72691371 64.72691371 0 0 0-95.14856334 4.01306852L380.73381888 685.46812814 235.22771741 533.48933518a64.72691371 64.72691371 0 0 0-92.43003222-1.03563036l-45.82665557 45.82665443a64.72691371 64.72691371 0 0 0-0.90617629 90.61767965l239.61903446 250.10479331a64.72691371 64.72691371 0 0 0 71.19960405 15.14609778 64.33855261 64.33855261 0 0 0 35.08198741-21.23042702l36.24707186-42.71976334 40.5190474-40.77795556-3.36579926-3.49525333 411.40426297-486.74638962a64.72691371 64.72691371 0 0 0-3.88361443-87.64024149l-45.3088404-45.43829334z" p-id="840"></path></svg>';
+          $hoverIcon.children('.ef-checkbox-icon').html(checkboxIcon);
+        } else {
+          $rowLabel.removeClass('ef-checkbox-checked');
+          $hoverIcon.removeClass('ef-icon-hover-disabled');
+          $hoverIcon.children('.ef-checkbox-icon').empty();
+        }
+
+        if (!isSelected) {
+          allVisibleSelected = false;
+        }
+      }
+    }
+  });
+
+  if (!hasVisibleRows) allVisibleSelected = false;
+
+  // Update Select All checkbox
+  // If Global Select All is on, the header checkbox should be checked.
+  // Or should it only be checked if the current page is fully selected?
+  // Usually, if isSelectAll is true, the header is checked.
+  // If isSelectAll is false, but all items on current page are selected manually, it should also be checked.
+  const $selectAll = $table.find('.check-all input');
+
+  $selectAll.prop('checked', allVisibleSelected);
+
+  // Update visual state (label and icon) because checkbox.js click handler isn't triggered here
+  const $selectAllLabel = $table.find('.check-all');
+  const $selectAllHoverIcon = $selectAllLabel.find('.ef-checkbox-icon-hover');
+
+  if (allVisibleSelected) {
+    $selectAllLabel.addClass('ef-checkbox-checked');
+    $selectAllHoverIcon.removeClass('ef-icon-hover-disabled');
+    let checkboxIcon =
+      '<svg aria-hidden="true" focusable="false" viewBox="0 0 1024 1024" width="200" height="200" fill="currentColor" class="ef-checkbox-icon-check"><path d="M877.44815445 206.10060629a64.72691371 64.72691371 0 0 0-95.14856334 4.01306852L380.73381888 685.46812814 235.22771741 533.48933518a64.72691371 64.72691371 0 0 0-92.43003222-1.03563036l-45.82665557 45.82665443a64.72691371 64.72691371 0 0 0-0.90617629 90.61767965l239.61903446 250.10479331a64.72691371 64.72691371 0 0 0 71.19960405 15.14609778 64.33855261 64.33855261 0 0 0 35.08198741-21.23042702l36.24707186-42.71976334 40.5190474-40.77795556-3.36579926-3.49525333 411.40426297-486.74638962a64.72691371 64.72691371 0 0 0-3.88361443-87.64024149l-45.3088404-45.43829334z" p-id="840"></path></svg>';
+    $selectAllHoverIcon.children('.ef-checkbox-icon').html(checkboxIcon);
+  } else {
+    $selectAllLabel.removeClass('ef-checkbox-checked');
+    $selectAllHoverIcon.removeClass('ef-icon-hover-disabled');
+    $selectAllHoverIcon.children('.ef-checkbox-icon').empty();
+  }
+
+  state.allSelectedCurrentPage = allVisibleSelected;
+  updateGlobalSelectVar(gridId);
 }
 
 $(document).ready(function () {
-    // Initialize state for existing tables
-    window.initDatagridState();
+  // Initialize state for existing tables
+  window.initDatagridState();
 
-    // MutationObserver to automatically initialize new tables
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.addedNodes.length) {
-                $(mutation.addedNodes).each(function() {
-                    // Only process element nodes (nodeType 1)
-                    if (this.nodeType === 1) {
-                        const $node = $(this);
-                        // Check if the added node is itself an ef-table
-                        if ($node.hasClass('ef-table')) {
-                            window.initDatagridState($node);
-                        }
-                        // Check if the added node contains any ef-tables
-                        else if ($node.find('.ef-table').length > 0) {
-                            window.initDatagridState($node.find('.ef-table'));
-                        }
-                    }
-                });
+  // MutationObserver to automatically initialize new tables
+  const observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+      if (mutation.addedNodes.length) {
+        $(mutation.addedNodes).each(function () {
+          // Only process element nodes (nodeType 1)
+          if (this.nodeType === 1) {
+            const $node = $(this);
+            // Check if the added node is itself an ef-table
+            if ($node.hasClass('ef-table')) {
+              window.initDatagridState($node);
             }
-        });
-    });
-
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-
-    // 监听全选复选框点击事件
-    $(document).on("change", ".ef-table .check-all input", function (e) {
-        console.log("Event: Select All Checkbox Change");
-        
-        // Log the raw property directly from the DOM element
-        console.log("DOM Checked State:", this.checked);
-        console.log("jQuery Checked State:", $(this).prop('checked'));
-        
-        const $table = $(this).closest(".ef-table");
-        const gridId = $table.attr("id");
-        if (!gridId) return;
-
-        const isChecked = $(this).prop('checked');
-        console.log("Action:", isChecked ? "Selecting All" : "Deselecting All");
-
-        const state = getGridState(gridId);
-        
-        // Update State
-        state.isSelectAll = isChecked;
-        state.selectedIds.clear();
-        state.excludedIds.clear();
-        state.allSelectedCurrentPage = isChecked;
-        
-        updateGlobalSelectVar(gridId);
-
-        // Update all visible row checkboxes
-        const isServerSide = $table.data('is-server-side');
-        const $rows = isServerSide ? $table.find("tbody tr").not('.ef-table-empty-row') : $table.find("tbody tr").not('.ef-table-empty-row').filter(':visible');
-        
-        console.log("Rows found:", $rows.length);
-
-        $rows.each(function() {
-            const $tr = $(this);
-            const $rowCheckbox = $tr.find(".ef-checkbox input");
-            const $rowLabel = $tr.find(".ef-checkbox");
-            const $hoverIcon = $rowLabel.find(".ef-checkbox-icon-hover");
-            
-            if ($rowCheckbox.length) {
-                $rowCheckbox.prop('checked', isChecked);
-                
-                if (isChecked) {
-                    $rowLabel.addClass("ef-checkbox-checked");
-                    $hoverIcon.removeClass("ef-icon-hover-disabled");
-                    let checkboxIcon = '<svg aria-hidden="true" focusable="false" viewBox="0 0 1024 1024" width="200" height="200" fill="currentColor" class="ef-checkbox-icon-check"><path d="M877.44815445 206.10060629a64.72691371 64.72691371 0 0 0-95.14856334 4.01306852L380.73381888 685.46812814 235.22771741 533.48933518a64.72691371 64.72691371 0 0 0-92.43003222-1.03563036l-45.82665557 45.82665443a64.72691371 64.72691371 0 0 0-0.90617629 90.61767965l239.61903446 250.10479331a64.72691371 64.72691371 0 0 0 71.19960405 15.14609778 64.33855261 64.33855261 0 0 0 35.08198741-21.23042702l36.24707186-42.71976334 40.5190474-40.77795556-3.36579926-3.49525333 411.40426297-486.74638962a64.72691371 64.72691371 0 0 0-3.88361443-87.64024149l-45.3088404-45.43829334z" p-id="840"></path></svg>';
-                    $hoverIcon.children(".ef-checkbox-icon").html(checkboxIcon);
-                } else {
-                    $rowLabel.removeClass("ef-checkbox-checked");
-                    $hoverIcon.removeClass("ef-icon-hover-disabled");
-                    $hoverIcon.children(".ef-checkbox-icon").empty();
-                }
-                
-                let rowId = $tr.data('id');
-                // Debug logging for rowId extraction
-                if (!rowId) {
-                    rowId = $rowCheckbox.val();
-                }
-                
-                // Note: We don't need to add to selectedIds/excludedIds here because 
-                // isSelectAll handles the logic, and we cleared both sets above.
-                // If isChecked is true, everything is selected by default.
-                // If isChecked is false, everything is deselected by default.
+            // Check if the added node contains any ef-tables
+            else if ($node.find('.ef-table').length > 0) {
+              window.initDatagridState($node.find('.ef-table'));
             }
+          }
         });
-
-        console.log("Selected State:", {
-            isSelectAll: state.isSelectAll,
-            selectedIdsCount: state.selectedIds.size,
-            excludedIdsCount: state.excludedIds.size,
-            selectedIds: Array.from(state.selectedIds),
-            excludedIds: Array.from(state.excludedIds)
-        });
+      }
     });
+  });
 
-    // Handle individual row checkbox change
-    $(document).on("change", ".ef-table tbody .ef-checkbox input", function () {
-        const $table = $(this).closest(".ef-table");
-        const gridId = $table.attr("id");
-        if (!gridId) return;
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true,
+  });
 
-        const isChecked = $(this).prop('checked');
-        const $tr = $(this).closest('tr');
+  // 监听全选复选框点击事件
+  $(document).on('change', '.ef-table .check-all input', function (e) {
+    console.log('Event: Select All Checkbox Change');
+
+    // Log the raw property directly from the DOM element
+    console.log('DOM Checked State:', this.checked);
+    console.log('jQuery Checked State:', $(this).prop('checked'));
+
+    const $table = $(this).closest('.ef-table');
+    const gridId = $table.attr('id');
+    if (!gridId) return;
+
+    const isChecked = $(this).prop('checked');
+    console.log('Action:', isChecked ? 'Selecting All' : 'Deselecting All');
+
+    const state = getGridState(gridId);
+
+    // Update State
+    state.isSelectAll = isChecked;
+    state.selectedIds.clear();
+    state.excludedIds.clear();
+    state.allSelectedCurrentPage = isChecked;
+
+    updateGlobalSelectVar(gridId);
+
+    // Update all visible row checkboxes
+    const isServerSide = $table.data('is-server-side');
+    const $rows = isServerSide
+      ? $table.find('tbody tr').not('.ef-table-empty-row')
+      : $table.find('tbody tr').not('.ef-table-empty-row').filter(':visible');
+
+    console.log('Rows found:', $rows.length);
+
+    $rows.each(function () {
+      const $tr = $(this);
+      const $rowCheckbox = $tr.find('.ef-checkbox input');
+      const $rowLabel = $tr.find('.ef-checkbox');
+      const $hoverIcon = $rowLabel.find('.ef-checkbox-icon-hover');
+
+      if ($rowCheckbox.length) {
+        $rowCheckbox.prop('checked', isChecked);
+
+        if (isChecked) {
+          $rowLabel.addClass('ef-checkbox-checked');
+          $hoverIcon.removeClass('ef-icon-hover-disabled');
+          let checkboxIcon =
+            '<svg aria-hidden="true" focusable="false" viewBox="0 0 1024 1024" width="200" height="200" fill="currentColor" class="ef-checkbox-icon-check"><path d="M877.44815445 206.10060629a64.72691371 64.72691371 0 0 0-95.14856334 4.01306852L380.73381888 685.46812814 235.22771741 533.48933518a64.72691371 64.72691371 0 0 0-92.43003222-1.03563036l-45.82665557 45.82665443a64.72691371 64.72691371 0 0 0-0.90617629 90.61767965l239.61903446 250.10479331a64.72691371 64.72691371 0 0 0 71.19960405 15.14609778 64.33855261 64.33855261 0 0 0 35.08198741-21.23042702l36.24707186-42.71976334 40.5190474-40.77795556-3.36579926-3.49525333 411.40426297-486.74638962a64.72691371 64.72691371 0 0 0-3.88361443-87.64024149l-45.3088404-45.43829334z" p-id="840"></path></svg>';
+          $hoverIcon.children('.ef-checkbox-icon').html(checkboxIcon);
+        } else {
+          $rowLabel.removeClass('ef-checkbox-checked');
+          $hoverIcon.removeClass('ef-icon-hover-disabled');
+          $hoverIcon.children('.ef-checkbox-icon').empty();
+        }
+
         let rowId = $tr.data('id');
-        if (!rowId) rowId = $(this).val();
-
-        if (rowId) {
-            const state = getGridState(gridId);
-            const strId = String(rowId);
-            
-            if (state.isSelectAll) {
-                if (isChecked) {
-                    state.excludedIds.delete(strId);
-                } else {
-                    state.excludedIds.add(strId);
-                }
-            } else {
-                if (isChecked) {
-                    state.selectedIds.add(strId);
-                } else {
-                    state.selectedIds.delete(strId);
-                }
-            }
-
-            // Check if all visible rows are selected
-            const isServerSide = $table.data('is-server-side');
-            const $visibleRows = isServerSide ? $table.find("tbody tr").not('.ef-table-empty-row') : $table.find("tbody tr").not('.ef-table-empty-row').filter(':visible');
-            
-            let allVisibleSelected = true;
-            let hasVisibleRows = false;
-            
-            $visibleRows.each(function() {
-                hasVisibleRows = true;
-                const $cb = $(this).find('.ef-checkbox input');
-                if ($cb.length && !$cb.prop('checked')) {
-                    allVisibleSelected = false;
-                    return false; // break
-                }
-            });
-            
-            if (!hasVisibleRows) allVisibleSelected = false;
-
-            // Update Select All checkbox visual state
-            const $selectAll = $table.find(".check-all input");
-            const $selectAllLabel = $table.find(".check-all");
-            const $selectAllHoverIcon = $selectAllLabel.find(".ef-checkbox-icon-hover");
-            
-            if ($selectAll.prop('checked') !== allVisibleSelected) {
-                $selectAll.prop('checked', allVisibleSelected);
-                
-                if (allVisibleSelected) {
-                    $selectAllLabel.addClass("ef-checkbox-checked");
-                    $selectAllHoverIcon.removeClass("ef-icon-hover-disabled");
-                    let checkboxIcon = '<svg aria-hidden="true" focusable="false" viewBox="0 0 1024 1024" width="200" height="200" fill="currentColor" class="ef-checkbox-icon-check"><path d="M877.44815445 206.10060629a64.72691371 64.72691371 0 0 0-95.14856334 4.01306852L380.73381888 685.46812814 235.22771741 533.48933518a64.72691371 64.72691371 0 0 0-92.43003222-1.03563036l-45.82665557 45.82665443a64.72691371 64.72691371 0 0 0-0.90617629 90.61767965l239.61903446 250.10479331a64.72691371 64.72691371 0 0 0 71.19960405 15.14609778 64.33855261 64.33855261 0 0 0 35.08198741-21.23042702l36.24707186-42.71976334 40.5190474-40.77795556-3.36579926-3.49525333 411.40426297-486.74638962a64.72691371 64.72691371 0 0 0-3.88361443-87.64024149l-45.3088404-45.43829334z" p-id="840"></path></svg>';
-                    $selectAllHoverIcon.children(".ef-checkbox-icon").html(checkboxIcon);
-                } else {
-                    $selectAllLabel.removeClass("ef-checkbox-checked");
-                    $selectAllHoverIcon.removeClass("ef-icon-hover-disabled");
-                    $selectAllHoverIcon.children(".ef-checkbox-icon").empty();
-                }
-            }
-            
-            state.allSelectedCurrentPage = allVisibleSelected;
-            updateGlobalSelectVar(gridId);
-            
-             console.log("Row Change - Selected State:", {
-                isSelectAll: state.isSelectAll,
-                selectedIdsCount: state.selectedIds.size,
-                excludedIdsCount: state.excludedIds.size
-            });
+        // Debug logging for rowId extraction
+        if (!rowId) {
+          rowId = $rowCheckbox.val();
         }
+
+        // Note: We don't need to add to selectedIds/excludedIds here because
+        // isSelectAll handles the logic, and we cleared both sets above.
+        // If isChecked is true, everything is selected by default.
+        // If isChecked is false, everything is deselected by default.
+      }
     });
 
-    // 点击字段输入框，清空默认值
-    $(document).on('click', '.ef-filter-editor-field', function(event) {
-        // event.stopPropagation(); // 阻止事件冒泡
-        
-        const $field = $(this);
-        if ($field.text().trim() === '字段') {
-            const height = $field.height();
-            $field.css('min-height', height + 'px');
-            $field.empty();
-        }
+    console.log('Selected State:', {
+      isSelectAll: state.isSelectAll,
+      selectedIdsCount: state.selectedIds.size,
+      excludedIdsCount: state.excludedIds.size,
+      selectedIds: Array.from(state.selectedIds),
+      excludedIds: Array.from(state.excludedIds),
     });
+  });
 
-    // 点击操作符输入框，清空默认值
-    $(document).on('click', '.ef-filter-editor-operator', function(event) {
-        // event.stopPropagation(); // 阻止事件冒泡
-        
-        const $operator = $(this);
-        if ($operator.text().trim() === '操作符') {
-            const height = $operator.height();
-            $operator.css('min-height', height + 'px');
-            $operator.empty();
+  // Handle individual row checkbox change
+  $(document).on('change', '.ef-table tbody .ef-checkbox input', function () {
+    const $table = $(this).closest('.ef-table');
+    const gridId = $table.attr('id');
+    if (!gridId) return;
+
+    const isChecked = $(this).prop('checked');
+    const $tr = $(this).closest('tr');
+    let rowId = $tr.data('id');
+    if (!rowId) rowId = $(this).val();
+
+    if (rowId) {
+      const state = getGridState(gridId);
+      const strId = String(rowId);
+
+      if (state.isSelectAll) {
+        if (isChecked) {
+          state.excludedIds.delete(strId);
+        } else {
+          state.excludedIds.add(strId);
         }
-    });
-    
-    // 点击值输入框，清空默认值
-    $(document).on('click', '.ef-filter-editor-value', function(event) {
-        // event.stopPropagation(); // 阻止事件冒泡
-        
-        const $value = $(this);
-        if ($value.text().trim() === '默认值') {
-            const height = $value.height();
-            $value.css('min-height', height + 'px');
-            $value.empty();
+      } else {
+        if (isChecked) {
+          state.selectedIds.add(strId);
+        } else {
+          state.selectedIds.delete(strId);
         }
-    });
+      }
 
-    // 点击过滤器编辑器区域时，检查并设置空字段和操作符的默认值
-    // 在这里清除没必要的空值、括号聚焦状态
-    $(document).on('click', '.ef-filter-condition-editor', function(e) {
-        // 当点击编辑器其他区域时，清除激活元素
-        if (!$(e.target).is('.ef-filter-editor-field, .ef-filter-editor-operator, .ef-filter-editor-value')) {
-            $activeElement = null;
+      // Check if all visible rows are selected
+      const isServerSide = $table.data('is-server-side');
+      const $visibleRows = isServerSide
+        ? $table.find('tbody tr').not('.ef-table-empty-row')
+        : $table.find('tbody tr').not('.ef-table-empty-row').filter(':visible');
+
+      let allVisibleSelected = true;
+      let hasVisibleRows = false;
+
+      $visibleRows.each(function () {
+        hasVisibleRows = true;
+        const $cb = $(this).find('.ef-checkbox input');
+        if ($cb.length && !$cb.prop('checked')) {
+          allVisibleSelected = false;
+          return false; // break
         }
-        
-        $(this).find('.ef-filter-editor-field').each(function() {
-            // console.log('this: ', $(this));
-            // console.log('$activeElement:', $activeElement);
-            if ($(this).is($activeElement)) return;
-            if ($(this).text().trim() === '') {
-                $(this).text('字段');
-            }
-        });
-        
-        $(this).find('.ef-filter-editor-operator').each(function() {
-            if ($(this).is($activeElement)) return;
-            if ($(this).text().trim() === '') {
-                $(this).text('操作符');
-            }
-        });
+      });
 
-        $(this).find('.ef-filter-editor-value').each(function() {
-            if ($(this).is($activeElement)) return;
-            if ($(this).text().trim() === '') {
-                $(this).text('默认值');
-            }
-        });
+      if (!hasVisibleRows) allVisibleSelected = false;
 
-        // 如果点击的元素不是括号元素，将所有括号的hover状态移除，并且如果点击的元素是括号元素，将所有其他括号的hover状态移除
-        $('.ef-filter-editor-parenthesis').removeClass('hover');
-        if ($(e.target).is('.ef-filter-editor-parenthesis')) {
-            $(e.target).addClass('hover');
+      // Update Select All checkbox visual state
+      const $selectAll = $table.find('.check-all input');
+      const $selectAllLabel = $table.find('.check-all');
+      const $selectAllHoverIcon = $selectAllLabel.find(
+        '.ef-checkbox-icon-hover'
+      );
+
+      if ($selectAll.prop('checked') !== allVisibleSelected) {
+        $selectAll.prop('checked', allVisibleSelected);
+
+        if (allVisibleSelected) {
+          $selectAllLabel.addClass('ef-checkbox-checked');
+          $selectAllHoverIcon.removeClass('ef-icon-hover-disabled');
+          let checkboxIcon =
+            '<svg aria-hidden="true" focusable="false" viewBox="0 0 1024 1024" width="200" height="200" fill="currentColor" class="ef-checkbox-icon-check"><path d="M877.44815445 206.10060629a64.72691371 64.72691371 0 0 0-95.14856334 4.01306852L380.73381888 685.46812814 235.22771741 533.48933518a64.72691371 64.72691371 0 0 0-92.43003222-1.03563036l-45.82665557 45.82665443a64.72691371 64.72691371 0 0 0-0.90617629 90.61767965l239.61903446 250.10479331a64.72691371 64.72691371 0 0 0 71.19960405 15.14609778 64.33855261 64.33855261 0 0 0 35.08198741-21.23042702l36.24707186-42.71976334 40.5190474-40.77795556-3.36579926-3.49525333 411.40426297-486.74638962a64.72691371 64.72691371 0 0 0-3.88361443-87.64024149l-45.3088404-45.43829334z" p-id="840"></path></svg>';
+          $selectAllHoverIcon.children('.ef-checkbox-icon').html(checkboxIcon);
+        } else {
+          $selectAllLabel.removeClass('ef-checkbox-checked');
+          $selectAllHoverIcon.removeClass('ef-icon-hover-disabled');
+          $selectAllHoverIcon.children('.ef-checkbox-icon').empty();
         }
+      }
 
-    });
+      state.allSelectedCurrentPage = allVisibleSelected;
+      updateGlobalSelectVar(gridId);
 
-    // 点击搜索按钮
-    $("body").on("click", ".ef-table .search", function () {
-        const id = $(this).attr("parentid");
-        const $modal = $('#modal' + id);
-        $modal.show();
-        
-        // 检查过滤器编辑器是否为空，如果为空则初始化
-        const $filterEditor = $modal.find('.ef-filter-condition-editor');
-        if ($filterEditor.find('.ef-filter-editor-logic-div').length === 0 && 
-            $filterEditor.find('.ef-filter-empty-state').length === 0) {
-            initEmptyFilterEditor($filterEditor);
+      console.log('Row Change - Selected State:', {
+        isSelectAll: state.isSelectAll,
+        selectedIdsCount: state.selectedIds.size,
+        excludedIdsCount: state.excludedIds.size,
+      });
+    }
+  });
+
+  // 点击字段输入框，清空默认值
+  $(document).on('click', '.ef-filter-editor-field', function (event) {
+    // event.stopPropagation(); // 阻止事件冒泡
+
+    const $field = $(this);
+    if ($field.text().trim() === '字段') {
+      const height = $field.height();
+      $field.css('min-height', height + 'px');
+      $field.empty();
+    }
+  });
+
+  // 点击操作符输入框，清空默认值
+  $(document).on('click', '.ef-filter-editor-operator', function (event) {
+    // event.stopPropagation(); // 阻止事件冒泡
+
+    const $operator = $(this);
+    if ($operator.text().trim() === '操作符') {
+      const height = $operator.height();
+      $operator.css('min-height', height + 'px');
+      $operator.empty();
+    }
+  });
+
+  // 点击值输入框，清空默认值
+  $(document).on('click', '.ef-filter-editor-value', function (event) {
+    // event.stopPropagation(); // 阻止事件冒泡
+
+    const $value = $(this);
+    if ($value.text().trim() === '默认值') {
+      const height = $value.height();
+      $value.css('min-height', height + 'px');
+      $value.empty();
+    }
+  });
+
+  // 点击过滤器编辑器区域时，检查并设置空字段和操作符的默认值
+  // 在这里清除没必要的空值、括号聚焦状态
+  $(document).on('click', '.ef-filter-condition-editor', function (e) {
+    // 当点击编辑器其他区域时，清除激活元素
+    if (
+      !$(e.target).is(
+        '.ef-filter-editor-field, .ef-filter-editor-operator, .ef-filter-editor-value'
+      )
+    ) {
+      $activeElement = null;
+    }
+
+    $(this)
+      .find('.ef-filter-editor-field')
+      .each(function () {
+        // console.log('this: ', $(this));
+        // console.log('$activeElement:', $activeElement);
+        if ($(this).is($activeElement)) return;
+        if ($(this).text().trim() === '') {
+          $(this).text('字段');
         }
-    });
-    
-    // 初始化空的过滤器编辑器
-    function initEmptyFilterEditor($editor) {
-        // 添加空状态提示和添加按钮
-        const $emptyState = $(`
+      });
+
+    $(this)
+      .find('.ef-filter-editor-operator')
+      .each(function () {
+        if ($(this).is($activeElement)) return;
+        if ($(this).text().trim() === '') {
+          $(this).text('操作符');
+        }
+      });
+
+    $(this)
+      .find('.ef-filter-editor-value')
+      .each(function () {
+        if ($(this).is($activeElement)) return;
+        if ($(this).text().trim() === '') {
+          $(this).text('默认值');
+        }
+      });
+
+    // 如果点击的元素不是括号元素，将所有括号的hover状态移除，并且如果点击的元素是括号元素，将所有其他括号的hover状态移除
+    $('.ef-filter-editor-parenthesis').removeClass('hover');
+    if ($(e.target).is('.ef-filter-editor-parenthesis')) {
+      $(e.target).addClass('hover');
+    }
+  });
+
+  // 点击搜索按钮
+  $('body').on('click', '.ef-table .search', function () {
+    const id = $(this).attr('parentid');
+    const $modal = $('#modal' + id);
+    $modal.show();
+
+    // 检查过滤器编辑器是否为空，如果为空则初始化
+    const $filterEditor = $modal.find('.ef-filter-condition-editor');
+    if (
+      $filterEditor.find('.ef-filter-editor-logic-div').length === 0 &&
+      $filterEditor.find('.ef-filter-empty-state').length === 0
+    ) {
+      initEmptyFilterEditor($filterEditor);
+    }
+  });
+
+  // 初始化空的过滤器编辑器
+  function initEmptyFilterEditor($editor) {
+    // 添加空状态提示和添加按钮
+    const $emptyState = $(`
             <div class="ef-filter-empty-state" contenteditable="false">
                 <div class="ef-filter-empty-text">点击下方按钮添加过滤条件</div>
                 <button class="ef-filter-add-first-condition">
@@ -414,615 +437,762 @@ $(document).ready(function () {
                 </button>
             </div>
         `);
-        $editor.append($emptyState);
+    $editor.append($emptyState);
+  }
+
+  // 点击添加第一个条件的按钮
+  $(document).on('click', '.ef-filter-add-first-condition', function () {
+    const $editor = $(this).closest('.ef-filter-condition-editor');
+    $editor.find('.ef-filter-empty-state').remove();
+    $editor.find('.ef-filter-editor-wrapper').append(createConditionBlock());
+  });
+
+  // 当删除最后一个条件块时，显示空状态
+  $(document).on('click', '.delete-button', function (e) {
+    const $editor = $(this).closest('.ef-filter-condition-editor');
+    $(this).closest('.ef-filter-editor-logic-div').remove();
+
+    // 如果删除后没有条件块了，显示空状态
+    if ($editor.find('.ef-filter-editor-logic-div').length === 0) {
+      initEmptyFilterEditor($editor);
     }
-    
-    // 点击添加第一个条件的按钮
-    $(document).on('click', '.ef-filter-add-first-condition', function() {
-        const $editor = $(this).closest('.ef-filter-condition-editor');
-        $editor.find('.ef-filter-empty-state').remove();
-        $editor.find('.ef-filter-editor-wrapper').append(createConditionBlock());
-    });
-    
-    // 当删除最后一个条件块时，显示空状态
-    $(document).on('click', '.delete-button', function (e) {
-        const $editor = $(this).closest('.ef-filter-condition-editor');
-        $(this).closest('.ef-filter-editor-logic-div').remove();
-        
-        // 如果删除后没有条件块了，显示空状态
-        if ($editor.find('.ef-filter-editor-logic-div').length === 0) {
-            initEmptyFilterEditor($editor);
-        }
-    });
+  });
 
-    const availableFields = ["姓名", "部门", "公司", "年龄", "入职时间"];
-    const availableOperators = ["=", "!=", ">", ">=", "<", "<=","LIKE", "AND", "OR", "(", ")"];
+  const availableFields = ['姓名', '部门', '公司', '年龄', '入职时间'];
+  const availableOperators = [
+    '=',
+    '!=',
+    '>',
+    '>=',
+    '<',
+    '<=',
+    'LIKE',
+    'AND',
+    'OR',
+    '(',
+    ')',
+  ];
 
-    $(".ef-filter-condition-editor").autocomplete({
-        source: function (request, response) {
-            const sel = window.getSelection();
-            const node = sel.anchorNode;
-            const inputValue = node ? node.nodeValue || "" : "";
+  $('.ef-filter-condition-editor').autocomplete({
+    source: function (request, response) {
+      const sel = window.getSelection();
+      const node = sel.anchorNode;
+      const inputValue = node ? node.nodeValue || '' : '';
 
-            if (inputValue.trim().length === 0) {
-                response([]); // 如果没有输入内容，则不返回任何建议
-                return;
-            }
+      if (inputValue.trim().length === 0) {
+        response([]); // 如果没有输入内容，则不返回任何建议
+        return;
+      }
 
-            console.log("Current Input:", inputValue.trim()); // 调试输入值
-            const suggestions = availableFields.concat(availableOperators);
-            response($.ui.autocomplete.filter(suggestions, inputValue.trim()));
-        },
-        appendTo: "body", // 避免模态窗遮挡
-        minLength: 1,
-        open: function (event, ui) {
-            const caretCoords = getCaretCoordinates();
-            $(".ui-autocomplete").css({
-                position: "absolute",
-                top: caretCoords.top + 20, // 光标位置 + 偏移
-                left: caretCoords.left,
-                zIndex: 2010,
-                width: "auto",
-            });
-        },
-        focus: function (event, ui) {
-            event.preventDefault();
-        },
-        select: function (event, ui) {
-            event.preventDefault();
+      console.log('Current Input:', inputValue.trim()); // 调试输入值
+      const suggestions = availableFields.concat(availableOperators);
+      response($.ui.autocomplete.filter(suggestions, inputValue.trim()));
+    },
+    appendTo: 'body', // 避免模态窗遮挡
+    minLength: 1,
+    open: function (event, ui) {
+      const caretCoords = getCaretCoordinates();
+      $('.ui-autocomplete').css({
+        position: 'absolute',
+        top: caretCoords.top + 20, // 光标位置 + 偏移
+        left: caretCoords.left,
+        zIndex: 2010,
+        width: 'auto',
+      });
+    },
+    focus: function (event, ui) {
+      event.preventDefault();
+    },
+    select: function (event, ui) {
+      event.preventDefault();
 
-            const sel = window.getSelection();
-            const range = sel.getRangeAt(0);
-            const $target = $(range.startContainer).closest('.ef-filter-editor-field, .ef-filter-editor-operator');
+      const sel = window.getSelection();
+      const range = sel.getRangeAt(0);
+      const $target = $(range.startContainer).closest(
+        '.ef-filter-editor-field, .ef-filter-editor-operator'
+      );
 
-            if ($target.length) {
-                $target.text(ui.item.value);
-                // 在选中的元素后添加空格
-                const space = document.createTextNode(" ");
-                $target[0].parentNode.insertBefore(space, $target[0].nextSibling);
+      if ($target.length) {
+        $target.text(ui.item.value);
+        // 在选中的元素后添加空格
+        const space = document.createTextNode(' ');
+        $target[0].parentNode.insertBefore(space, $target[0].nextSibling);
 
-                // 将光标移动到空格后
-                range.setStartAfter(space);
-                range.setEndAfter(space);
-                sel.removeAllRanges();
-                sel.addRange(range);
-            }
+        // 将光标移动到空格后
+        range.setStartAfter(space);
+        range.setEndAfter(space);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
 
-            // 关闭 autocomplete 弹窗
-            $(this).autocomplete("close");
-        }
-    });
+      // 关闭 autocomplete 弹窗
+      $(this).autocomplete('close');
+    },
+  });
 
-    function getCaretCoordinates () {
-        const sel = window.getSelection();
-        if (sel.rangeCount > 0) {
-            const range = sel.getRangeAt(0).cloneRange();
-            range.collapse(true);
-            const rect = range.getBoundingClientRect();
-            return {
-                top: rect.top + window.scrollY,
-                left: rect.left + window.scrollX,
-            };
-        }
-        return { top: 0, left: 0 }; // 默认值
+  function getCaretCoordinates() {
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0).cloneRange();
+      range.collapse(true);
+      const rect = range.getBoundingClientRect();
+      return {
+        top: rect.top + window.scrollY,
+        left: rect.left + window.scrollX,
+      };
     }
+    return { top: 0, left: 0 }; // 默认值
+  }
 
-    $(".ef-filter-condition-editor").on("focus", function () {
-        $(this).autocomplete("search", ""); // 在焦点时触发
-    });
+  $('.ef-filter-condition-editor').on('focus', function () {
+    $(this).autocomplete('search', ''); // 在焦点时触发
+  });
 
-    $(".ef-filter-condition-editor").on("input", function (event) {
-        const span = $(event.target).closest('span');
-        if (!span.length) return;
+  $('.ef-filter-condition-editor').on('input', function (event) {
+    const span = $(event.target).closest('span');
+    if (!span.length) return;
 
-        const inputValue = span.text().trim();
+    const inputValue = span.text().trim();
 
-        // 根据输入内容设置类型
-        if (availableFields.includes(inputValue)) {
-            span
-                .removeClass("placeholder")
-                .addClass("ef-filter-editor-field yellow")
-                .attr("type", "field");
-        } else if (availableOperators.includes(inputValue)) {
-            span
-                .removeClass("placeholder")
-                .addClass("ef-filter-editor-operator")
-                .attr("type", "operator");
-        } else if (inputValue !== "") {
-            span
-                .removeClass("placeholder")
-                .addClass("ef-filter-editor-value")
-                .attr("type", "value");
+    // 根据输入内容设置类型
+    if (availableFields.includes(inputValue)) {
+      span
+        .removeClass('placeholder')
+        .addClass('ef-filter-editor-field yellow')
+        .attr('type', 'field');
+    } else if (availableOperators.includes(inputValue)) {
+      span
+        .removeClass('placeholder')
+        .addClass('ef-filter-editor-operator')
+        .attr('type', 'operator');
+    } else if (inputValue !== '') {
+      span
+        .removeClass('placeholder')
+        .addClass('ef-filter-editor-value')
+        .attr('type', 'value');
+    }
+  });
+
+  // 使用 Tab 键选择第一个选项
+  $('.ef-filter-condition-editor').on('keydown', function (event) {
+    if (event.key === 'Tab') {
+      const autocompleteInstance = $(this).autocomplete('instance');
+      const menu = autocompleteInstance.menu;
+      if (menu && menu.element.is(':visible')) {
+        const firstItem = menu.element.children(':first');
+        if (firstItem.length) {
+          const ui = {
+            item: menu.element.children(':first').data('ui-autocomplete-item'),
+          };
+          autocompleteInstance._trigger('select', event, ui); // 触发 select 回调
+          event.preventDefault(); // 阻止默认 Tab 行为
         }
-    });
+      }
+    }
+  });
 
-    // 使用 Tab 键选择第一个选项
-    $(".ef-filter-condition-editor").on("keydown", function (event) {
-        if (event.key === "Tab") {
-            const autocompleteInstance = $(this).autocomplete("instance");
-            const menu = autocompleteInstance.menu;
-            if (menu && menu.element.is(":visible")) {
-                const firstItem = menu.element.children(":first");
-                if (firstItem.length) {
-                    const ui = { item: menu.element.children(":first").data("ui-autocomplete-item") };
-                    autocompleteInstance._trigger("select", event, ui); // 触发 select 回调
-                    event.preventDefault(); // 阻止默认 Tab 行为
-                }
-            }
-        }
-    });
+  // 防止在 wrapper 中直接输入
+  $('.ef-filter-editor-wrapper').on('input', function (event) {
+    if (event.target === this) {
+      event.preventDefault();
+      return false;
+    }
+  });
 
-    // 防止在 wrapper 中直接输入
-    $(".ef-filter-editor-wrapper").on("input", function (event) {
-        if (event.target === this) {
-            event.preventDefault();
-            return false;
-        }
-    });
+  // 记录当前激活的编辑元素
+  let $activeElement = null;
+  let $currentElement = null;
+  $(document).on(
+    'click',
+    '.ef-filter-editor-field, .ef-filter-editor-operator, .ef-filter-editor-value',
+    function () {
+      $activeElement = $(this);
+    }
+  );
 
-    // 记录当前激活的编辑元素
-    let $activeElement = null;
-    let $currentElement = null;
-    $(document).on('click', '.ef-filter-editor-field, .ef-filter-editor-operator, .ef-filter-editor-value', function() {
-        $activeElement = $(this);
-    });
+  // 点击实体字段，将内容带入到激活的字段输入框中
+  $(document).on('click', '.ef-filter-entity-field', function () {
+    if ($activeElement && $activeElement.hasClass('ef-filter-editor-field')) {
+      const fieldText = $(this).text().trim();
+      $activeElement.text(fieldText);
+      $activeElement.removeClass('placeholder');
+    }
+  });
 
-    // 点击实体字段，将内容带入到激活的字段输入框中
-    $(document).on('click', '.ef-filter-entity-field', function() {
-        if ($activeElement && $activeElement.hasClass('ef-filter-editor-field')) {
-            const fieldText = $(this).text().trim();
-            $activeElement.text(fieldText);
-            $activeElement.removeClass('placeholder');
-        }
-    });
+  // 点击操作符列表元素，将内容带入到激活的操作符输入框中
+  $(document).on('click', '.ef-filter-entity-operator', function () {
+    if (
+      $activeElement &&
+      $activeElement.hasClass('ef-filter-editor-operator')
+    ) {
+      const operatorText = $(this).text().trim();
+      $activeElement.text(operatorText);
+      $activeElement.removeClass('placeholder');
+    }
+  });
 
-    // 点击操作符列表元素，将内容带入到激活的操作符输入框中
-    $(document).on('click', '.ef-filter-entity-operator', function() {
-        if ($activeElement && $activeElement.hasClass('ef-filter-editor-operator')) {
-            const operatorText = $(this).text().trim();
-            $activeElement.text(operatorText);
-            $activeElement.removeClass('placeholder');
-        }
-    });
+  $(document).on(
+    'click',
+    '.ef-filter-editor-field, .ef-filter-editor-operator, .ef-filter-editor-value, .ef-filter-editor-parenthesis, .ef-filter-editor-logic',
+    function () {
+      $currentElement = $(this);
+      console.log('$currentElement:', $currentElement);
+    }
+  );
 
-    $(document).on('click', '.ef-filter-editor-field, .ef-filter-editor-operator, .ef-filter-editor-value, .ef-filter-editor-parenthesis, .ef-filter-editor-logic', function() {
-        $currentElement = $(this);
-        console.log('$currentElement:', $currentElement);
-    });
-    
-    // 点击左括号操作符，在激活的字段元素左侧插入左括号
-    $(document).on('click', '.ef-filter-entity-operator[data-operator="left_parenthesis"]', function() {
-        if ($activeElement && $activeElement.hasClass('ef-filter-editor-field')) {
-            const $logicDiv = $activeElement.closest('.ef-filter-editor-logic-div');
-            $logicDiv.before(createParenthesisBlock('('));
-        }
-    });
+  // 点击左括号操作符，在激活的字段元素左侧插入左括号
+  $(document).on(
+    'click',
+    '.ef-filter-entity-operator[data-operator="left_parenthesis"]',
+    function () {
+      if ($activeElement && $activeElement.hasClass('ef-filter-editor-field')) {
+        const $logicDiv = $activeElement.closest('.ef-filter-editor-logic-div');
+        $logicDiv.before(createParenthesisBlock('('));
+      }
+    }
+  );
 
-    // 点击括号元素时切换active状态
-    $(document).on('click', '.ef-filter-editor-parenthesis', function(e) {
-        e.stopPropagation();
-        // 移除所有其他括号元素的active类
-        $('.ef-filter-editor-parenthesis').not(this).removeClass('active');
-        // 切换当前括号元素的active类
-        $(this).toggleClass('active');
-    });
-    
-    // 点击过滤器编辑器区域的其他地方时，移除所有括号元素和逻辑块的active类
-    $(document).on('click', '.ef-filter-condition-editor', function(e) {
-        // 如果点击的是逻辑块元素，为其添加active类，并移除其他逻辑块的active类
-        if ($(e.target).closest('.ef-filter-editor-logic-div').length) {
-            $('.ef-filter-editor-logic-div').removeClass('active');
-            $(e.target).closest('.ef-filter-editor-logic-div').addClass('active');
-        }
-        // 如果点击的不是括号元素、添加按钮或删除按钮，移除所有括号元素的active类
-        if (!$(e.target).is('.ef-filter-editor-parenthesis') && 
-            !$(e.target).is('.add-button') && 
-            !$(e.target).is('.delete-button')) {
-            $('.ef-filter-editor-parenthesis').removeClass('active');
-        }
-        // 如果点击的是编辑器区域但不是任何逻辑块，移除所有逻辑块的active类
-        if (!$(e.target).closest('.ef-filter-editor-logic-div').length) {
-            $('.ef-filter-editor-logic-div').removeClass('active');
-        }
-    });
-    
-    
-    // 点击右括号操作符，在激活的值元素右侧插入右括号
-    $(document).on('click', '.ef-filter-entity-operator[data-operator="right_parenthesis"]', function() {
-        if ($activeElement && $activeElement.hasClass('ef-filter-editor-value')) {
-            const $logicDiv = $activeElement.closest('.ef-filter-editor-logic-div');
-            $logicDiv.after(createParenthesisBlock(')'));
-            $logicDiv.addClass('before-parenthesis ');
-        }
-    });
-    
-    // 点击AND操作符，在当前激活的逻辑块后添加AND逻辑连接符
-    $(document).on('click', '.ef-filter-entity-operator[data-operator="and"]', function() {
-        if ($currentElement) {
-            const $logicDiv = $currentElement.closest('.ef-filter-editor-logic-div');
-            if ($logicDiv.length) {
-                // 创建一个新的逻辑块，使用AND作为逻辑连接符
-                const $newLogicDiv = createLogicBlock();
-                $newLogicDiv.find('.ef-filter-editor-logic').text('AND');
-                $logicDiv.after($newLogicDiv);
-            }
-        }
-    });
-    
-    // 点击OR操作符，在当前激活的逻辑块后添加OR逻辑连接符
-    $(document).on('click', '.ef-filter-entity-operator[data-operator="or"]', function() {
-        if ($currentElement) {
-            const $logicDiv = $currentElement.closest('.ef-filter-editor-logic-div');
-            if ($logicDiv.length) {
-                // 创建一个新的逻辑块，使用OR作为逻辑连接符
-                const $newLogicDiv = createLogicBlock();
-                $newLogicDiv.find('.ef-filter-editor-logic').text('OR');
-                $logicDiv.after($newLogicDiv);
-            }
-        }
-    });
+  // 点击括号元素时切换active状态
+  $(document).on('click', '.ef-filter-editor-parenthesis', function (e) {
+    e.stopPropagation();
+    // 移除所有其他括号元素的active类
+    $('.ef-filter-editor-parenthesis').not(this).removeClass('active');
+    // 切换当前括号元素的active类
+    $(this).toggleClass('active');
+  });
 
-    // 监听键盘删除事件
-    $(document).on('keyup', '.ef-filter-condition-editor', function(e) {
-        // 检测删除键（Backspace 或 Delete）
-        if ((e.keyCode === 8 || e.keyCode === 46) && $activeElement) {
-            // 如果元素内容为空
-            if ($activeElement.text().trim() === '') {
-                // 移除自动生成的<br>标签
-                $activeElement.find('br').remove();
-                $activeElement.empty();
-            }
+  // 点击过滤器编辑器区域的其他地方时，移除所有括号元素和逻辑块的active类
+  $(document).on('click', '.ef-filter-condition-editor', function (e) {
+    // 如果点击的是逻辑块元素，为其添加active类，并移除其他逻辑块的active类
+    if ($(e.target).closest('.ef-filter-editor-logic-div').length) {
+      $('.ef-filter-editor-logic-div').removeClass('active');
+      $(e.target).closest('.ef-filter-editor-logic-div').addClass('active');
+    }
+    // 如果点击的不是括号元素、添加按钮或删除按钮，移除所有括号元素的active类
+    if (
+      !$(e.target).is('.ef-filter-editor-parenthesis') &&
+      !$(e.target).is('.add-button') &&
+      !$(e.target).is('.delete-button')
+    ) {
+      $('.ef-filter-editor-parenthesis').removeClass('active');
+    }
+    // 如果点击的是编辑器区域但不是任何逻辑块，移除所有逻辑块的active类
+    if (!$(e.target).closest('.ef-filter-editor-logic-div').length) {
+      $('.ef-filter-editor-logic-div').removeClass('active');
+    }
+  });
+
+  // 点击右括号操作符，在激活的值元素右侧插入右括号
+  $(document).on(
+    'click',
+    '.ef-filter-entity-operator[data-operator="right_parenthesis"]',
+    function () {
+      if ($activeElement && $activeElement.hasClass('ef-filter-editor-value')) {
+        const $logicDiv = $activeElement.closest('.ef-filter-editor-logic-div');
+        $logicDiv.after(createParenthesisBlock(')'));
+        $logicDiv.addClass('before-parenthesis ');
+      }
+    }
+  );
+
+  // 点击AND操作符，在当前激活的逻辑块后添加AND逻辑连接符
+  $(document).on(
+    'click',
+    '.ef-filter-entity-operator[data-operator="and"]',
+    function () {
+      if ($currentElement) {
+        const $logicDiv = $currentElement.closest(
+          '.ef-filter-editor-logic-div'
+        );
+        if ($logicDiv.length) {
+          // 创建一个新的逻辑块，使用AND作为逻辑连接符
+          const $newLogicDiv = createLogicBlock();
+          $newLogicDiv.find('.ef-filter-editor-logic').text('AND');
+          $logicDiv.after($newLogicDiv);
         }
-    });
+      }
+    }
+  );
 
-    // 处理输入事件
-    $(document).on("input", ".ef-filter-editor-wrapper span.placeholder", function (event) {
-        const inputValue = $(this).text().trim();
-
-        // 根据输入内容设置类型
-        if (availableFields.includes(inputValue)) {
-            $(this)
-                .removeClass("placeholder")
-                .addClass("ef-filter-editor-field yellow")
-                .attr("type", "field")
-                .attr("contenteditable", "false"); // 设置完后禁止编辑
-        } else if (availableOperators.includes(inputValue)) {
-            $(this)
-                .removeClass("placeholder")
-                .addClass("ef-filter-editor-operator")
-                .attr("type", "operator")
-                .attr("contenteditable", "false"); // 设置完后禁止编辑
-        } else if (inputValue !== "") {
-            $(this)
-                .removeClass("placeholder")
-                .addClass("ef-filter-editor-value")
-                .attr("type", "value")
-                .attr("contenteditable", "false"); // 设置完后禁止编辑
+  // 点击OR操作符，在当前激活的逻辑块后添加OR逻辑连接符
+  $(document).on(
+    'click',
+    '.ef-filter-entity-operator[data-operator="or"]',
+    function () {
+      if ($currentElement) {
+        const $logicDiv = $currentElement.closest(
+          '.ef-filter-editor-logic-div'
+        );
+        if ($logicDiv.length) {
+          // 创建一个新的逻辑块，使用OR作为逻辑连接符
+          const $newLogicDiv = createLogicBlock();
+          $newLogicDiv.find('.ef-filter-editor-logic').text('OR');
+          $logicDiv.after($newLogicDiv);
         }
-    });
+      }
+    }
+  );
 
-    // 条件块模板
-    function createConditionBlock () {
-        return $(`<div class="ef-filter-editor-logic-div">
+  // 监听键盘删除事件
+  $(document).on('keyup', '.ef-filter-condition-editor', function (e) {
+    // 检测删除键（Backspace 或 Delete）
+    if ((e.keyCode === 8 || e.keyCode === 46) && $activeElement) {
+      // 如果元素内容为空
+      if ($activeElement.text().trim() === '') {
+        // 移除自动生成的<br>标签
+        $activeElement.find('br').remove();
+        $activeElement.empty();
+      }
+    }
+  });
+
+  // 处理输入事件
+  $(document).on(
+    'input',
+    '.ef-filter-editor-wrapper span.placeholder',
+    function (event) {
+      const inputValue = $(this).text().trim();
+
+      // 根据输入内容设置类型
+      if (availableFields.includes(inputValue)) {
+        $(this)
+          .removeClass('placeholder')
+          .addClass('ef-filter-editor-field yellow')
+          .attr('type', 'field')
+          .attr('contenteditable', 'false'); // 设置完后禁止编辑
+      } else if (availableOperators.includes(inputValue)) {
+        $(this)
+          .removeClass('placeholder')
+          .addClass('ef-filter-editor-operator')
+          .attr('type', 'operator')
+          .attr('contenteditable', 'false'); // 设置完后禁止编辑
+      } else if (inputValue !== '') {
+        $(this)
+          .removeClass('placeholder')
+          .addClass('ef-filter-editor-value')
+          .attr('type', 'value')
+          .attr('contenteditable', 'false'); // 设置完后禁止编辑
+      }
+    }
+  );
+
+  // 条件块模板
+  function createConditionBlock() {
+    return $(`<div class="ef-filter-editor-logic-div">
     <span class="ef-filter-editor-field yellow" contenteditable="true">字段</span>
     <span class="ef-filter-editor-operator" contenteditable="true">操作符</span>
     <span class="ef-filter-editor-value" contenteditable="true">默认值</span>
     <span class="add-button">+</span>
     <span class="delete-button">×</span>
   </div>`);
-    }
+  }
 
-    // 逻辑块模板
-    function createLogicBlock () {
-        return $(`<div class="ef-filter-editor-logic-div">
+  // 逻辑块模板
+  function createLogicBlock() {
+    return $(`<div class="ef-filter-editor-logic-div">
     <span class="ef-filter-editor-logic" contenteditable="false">AND</span>
     <span class="add-button">+</span>
     <span class="delete-button">×</span>
     <span class="transition-button" contenteditable="false"><i class="fa-solid fa-shuffle"></i></span>
   </div>`);
+  }
+
+  // 括号块模板
+  function createParenthesisBlock(type) {
+    if (type === '(') {
+      typeStr = 'left_parenthesis';
+    } else if (type === ')') {
+      typeStr = 'right_parenthesis';
     }
-    
-    // 括号块模板
-    function createParenthesisBlock (type) {
-        if (type === '(') {
-            typeStr = 'left_parenthesis';
-        } else if (type === ')') {
-            typeStr = 'right_parenthesis';
-        }
-        return $(`<div class="ef-filter-editor-logic-div parenthesis">
+    return $(`<div class="ef-filter-editor-logic-div parenthesis">
     <span class="ef-filter-editor-parenthesis" contenteditable="false" type="${typeStr}">${type}</span>
     <span class="add-button">+</span>
     <span class="delete-button">×</span>
   </div>`);
+  }
+
+  // 添加按钮功能
+  $(document).on('click', '.add-button', function (e) {
+    e.stopPropagation();
+    const $currentBlock = $(this).closest('.ef-filter-editor-logic-div');
+    const isCondition =
+      $currentBlock.find('.ef-filter-editor-field').length > 0;
+
+    if (isCondition) {
+      $currentBlock.after(createLogicBlock(), createConditionBlock());
+    } else {
+      $currentBlock.after(createConditionBlock());
+    }
+  });
+
+  // 删除按钮功能
+  $(document).on('click', '.delete-button', function (e) {
+    $(this).closest('.ef-filter-editor-logic-div').remove();
+  });
+
+  // 逻辑运算符切换
+  $(document).on('click', '.transition-button', function () {
+    const $logicSpan = $(this)
+      .closest('.ef-filter-editor-logic-div')
+      .find('.ef-filter-editor-logic');
+    $logicSpan.text($logicSpan.text() === 'AND' ? 'OR' : 'AND');
+  });
+
+  // ========== 分页功能实现 ==========
+
+  // 分页配置
+  const paginationConfig = {
+    defaultPageSize: 20,
+    pageSizeOptions: [10, 20, 50, 100],
+  };
+
+  // 初始化分页功能
+  function initPagination($table) {
+    const $paginationBar = $table.find('.ef-pagination-bar');
+    if ($paginationBar.length === 0) return;
+
+    // 检查是否为服务端分页
+    const isServerSide =
+      $table.data('server-side') === true ||
+      $table.data('server-side') === 'true';
+    const dataUrl = $table.data('data-url');
+
+    if (isServerSide && dataUrl) {
+      $table.data('is-server-side', true);
+      $table.data('data-url', dataUrl);
+
+      // 服务端分页：初始加载数据
+      const initialPage = $table.data('current-page') || 1;
+      const initialPageSize =
+        $table.data('page-size') || paginationConfig.defaultPageSize;
+
+      loadServerData($table, initialPage, initialPageSize);
+    } else {
+      // 客户端分页：使用现有逻辑
+      $table.data('is-server-side', false);
+
+      // 获取或设置默认分页参数
+      let currentPage =
+        parseInt($paginationBar.find('.current-page').val()) || 1;
+      let pageSize =
+        parseInt($paginationBar.find('.ef-page-size').val()) ||
+        paginationConfig.defaultPageSize;
+      let totalItems = parseInt($paginationBar.data('total-items')) || 0;
+      let totalPages = Math.ceil(totalItems / pageSize);
+
+      // 更新分页显示
+      updatePaginationDisplay(
+        $paginationBar,
+        currentPage,
+        pageSize,
+        totalItems,
+        totalPages
+      );
     }
 
-    // 添加按钮功能
-    $(document).on('click', '.add-button', function (e) {
-        e.stopPropagation();
-        const $currentBlock = $(this).closest('.ef-filter-editor-logic-div');
-        const isCondition = $currentBlock.find('.ef-filter-editor-field').length > 0;
-
-        if (isCondition) {
-            $currentBlock.after(createLogicBlock(), createConditionBlock());
-        } else {
-            $currentBlock.after(createConditionBlock());
-        }
-    });
-
-    // 删除按钮功能
-    $(document).on('click', '.delete-button', function (e) {
-        $(this).closest('.ef-filter-editor-logic-div').remove();
-    });
-
-    // 逻辑运算符切换
-    $(document).on('click', '.transition-button', function () {
-        const $logicSpan = $(this).closest('.ef-filter-editor-logic-div').find('.ef-filter-editor-logic');
-        $logicSpan.text($logicSpan.text() === 'AND' ? 'OR' : 'AND');
-    });
-
-    // ========== 分页功能实现 ==========
-    
-    // 分页配置
-    const paginationConfig = {
-        defaultPageSize: 20,
-        pageSizeOptions: [10, 20, 50, 100]
-    };
-    
-    // 初始化分页功能
-    function initPagination($table) {
-        const $paginationBar = $table.find('.ef-pagination-bar');
-        if ($paginationBar.length === 0) return;
-        
-        // 检查是否为服务端分页
-        const isServerSide = $table.data('server-side') === true || $table.data('server-side') === 'true';
-        const dataUrl = $table.data('data-url');
-        
-        if (isServerSide && dataUrl) {
-            $table.data('is-server-side', true);
-            $table.data('data-url', dataUrl);
-            
-            // 服务端分页：初始加载数据
-            const initialPage = $table.data('current-page') || 1;
-            const initialPageSize = $table.data('page-size') || paginationConfig.defaultPageSize;
-            
-            loadServerData($table, initialPage, initialPageSize);
-        } else {
-            // 客户端分页：使用现有逻辑
-            $table.data('is-server-side', false);
-            
-            // 获取或设置默认分页参数
-            let currentPage = parseInt($paginationBar.find('.current-page').val()) || 1;
-            let pageSize = parseInt($paginationBar.find('.ef-page-size').val()) || paginationConfig.defaultPageSize;
-            let totalItems = parseInt($paginationBar.data('total-items')) || 0;
-            let totalPages = Math.ceil(totalItems / pageSize);
-            
-            // 更新分页显示
-            updatePaginationDisplay($paginationBar, currentPage, pageSize, totalItems, totalPages);
-        }
-        
-        // 绑定分页事件
-        bindPaginationEvents($table, $paginationBar);
-    }
-    
-    // 更新分页显示
-    function updatePaginationDisplay($paginationBar, currentPage, pageSize, totalItems, totalPages) {
-        // 更新当前页输入框
-        $paginationBar.find('.current-page').val(currentPage).attr('max', totalPages);
-        
-        // 更新总页数
-        $paginationBar.find('.total-pages').text(totalPages);
-        
-        // 更新项目范围显示
-        const startItem = totalItems > 0 ? ((currentPage - 1) * pageSize) + 1 : 0;
-        const endItem = Math.min(currentPage * pageSize, totalItems);
-        $paginationBar.find('.item-range').text(`${startItem}-${endItem} items`);
-        
-        // 更新总项目数
-        $paginationBar.find('.total-items').text(`共 ${totalItems} 条`);
-        
-        // 更新按钮状态
-        $paginationBar.find('.first-page, .prev-page').prop('disabled', currentPage <= 1);
-        $paginationBar.find('.next-page, .last-page').prop('disabled', currentPage >= totalPages);
-    }
-    
     // 绑定分页事件
-    function bindPaginationEvents($table, $paginationBar) {
-        // 首页按钮
-        $paginationBar.find('.first-page').off('click').on('click', function() {
-            if (!$(this).prop('disabled')) {
-                goToPage($table, 1);
-            }
-        });
-        
-        // 上一页按钮
-        $paginationBar.find('.prev-page').off('click').on('click', function() {
-            if (!$(this).prop('disabled')) {
-                const currentPage = parseInt($paginationBar.find('.current-page').val());
-                goToPage($table, currentPage - 1);
-            }
-        });
-        
-        // 下一页按钮
-        $paginationBar.find('.next-page').off('click').on('click', function() {
-            if (!$(this).prop('disabled')) {
-                const currentPage = parseInt($paginationBar.find('.current-page').val());
-                goToPage($table, currentPage + 1);
-            }
-        });
-        
-        // 末页按钮
-        $paginationBar.find('.last-page').off('click').on('click', function() {
-            if (!$(this).prop('disabled')) {
-                const totalPages = parseInt($paginationBar.find('.total-pages').text());
-                goToPage($table, totalPages);
-            }
-        });
-        
-        // 页码输入框回车事件
-        $paginationBar.find('.current-page').off('keypress').on('keypress', function(e) {
-            if (e.which === 13) { // Enter键
-                const targetPage = parseInt($(this).val());
-                const totalPages = parseInt($paginationBar.find('.total-pages').text());
-                
-                if (targetPage >= 1 && targetPage <= totalPages) {
-                    goToPage($table, targetPage);
-                } else {
-                    // 恢复原值
-                    const currentPage = $table.data('current-page') || 1;
-                    $(this).val(currentPage);
-                    alert('请输入有效的页码');
-                }
-            }
-        });
-        
-        // 页面大小选择变化事件
-        $paginationBar.find('.ef-page-size').off('change').on('change', function() {
-            const newPageSize = parseInt($(this).val());
-            const currentPage = parseInt($paginationBar.find('.current-page').val());
-            
-            // 重新计算当前页（保持当前显示的第一条记录位置）
-            const currentFirstItem = ((currentPage - 1) * $table.data('page-size')) + 1;
-            const newCurrentPage = Math.ceil(currentFirstItem / newPageSize);
-            
-            $table.data('page-size', newPageSize);
-            goToPage($table, newCurrentPage);
-        });
-        
-        // 刷新按钮
-        $paginationBar.find('.refresh').off('click').on('click', function() {
-            const currentPage = parseInt($paginationBar.find('.current-page').val());
-            goToPage($table, currentPage, true); // 强制刷新
-        });
-    }
-    
-    // 跳转到指定页面
-    function goToPage($table, targetPage, forceRefresh = false) {
-        const $paginationBar = $table.find('.ef-pagination-bar');
-        const pageSize = parseInt($paginationBar.find('.ef-page-size').val()) || paginationConfig.defaultPageSize;
-        const currentPage = $table.data('current-page') || 1;
-        
-        // 如果页面没有变化且不是强制刷新，则不执行
-        if (targetPage === currentPage && !forceRefresh) {
-            return;
-        }
-        
-        // 保存当前状态
-        $table.data('current-page', targetPage);
-        $table.data('page-size', pageSize);
-        
-        // 如果开启了URL参数更新
-        if ($table.data('update-url-params')) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('page', targetPage);
-            url.searchParams.set('pageSize', pageSize);
-            window.history.pushState({}, '', url);
-        }
-        
-        // 检查是否为服务端分页
-        if ($table.data('is-server-side')) {
-            loadServerData($table, targetPage, pageSize);
-        } else {
-            // 触发自定义事件，让外部处理数据加载
-            $table.trigger('ef-pagination-change', {
-                page: targetPage,
-                pageSize: pageSize,
-                offset: (targetPage - 1) * pageSize
-            });
-            
-            // 如果没有外部处理器，使用默认的客户端分页
-            if (!$table.data('has-pagination-handler')) {
-                performClientSidePagination($table, targetPage, pageSize);
-            }
-        }
-    }
-    
-    // 服务端数据加载
-    function loadServerData($table, page, pageSize) {
-        const dataUrl = $table.data('data-url');
-        const $paginationBar = $table.find('.ef-pagination-bar');
-        const $tbody = $table.find('tbody');
-        const filters = $table.data('filters');
-        
-        // 显示加载状态
-        showLoadingState($table);
-        
-        const requestData = {
-            page: page,
-            pageSize: pageSize
-        };
+    bindPaginationEvents($table, $paginationBar);
+  }
 
-        if (filters) {
-            requestData.filters = filters;
+  // 更新分页显示
+  function updatePaginationDisplay(
+    $paginationBar,
+    currentPage,
+    pageSize,
+    totalItems,
+    totalPages
+  ) {
+    // 更新当前页输入框
+    $paginationBar
+      .find('.current-page')
+      .val(currentPage)
+      .attr('max', totalPages);
+
+    // 更新总页数
+    $paginationBar.find('.total-pages').text(totalPages);
+
+    // 更新项目范围显示
+    const startItem = totalItems > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const endItem = Math.min(currentPage * pageSize, totalItems);
+    $paginationBar.find('.item-range').text(`${startItem}-${endItem} items`);
+
+    // 更新总项目数
+    $paginationBar.find('.total-items').text(`共 ${totalItems} 条`);
+
+    // 更新按钮状态
+    $paginationBar
+      .find('.first-page, .prev-page')
+      .prop('disabled', currentPage <= 1);
+    $paginationBar
+      .find('.next-page, .last-page')
+      .prop('disabled', currentPage >= totalPages);
+  }
+
+  // 绑定分页事件
+  function bindPaginationEvents($table, $paginationBar) {
+    // 首页按钮
+    $paginationBar
+      .find('.first-page')
+      .off('click')
+      .on('click', function () {
+        if (!$(this).prop('disabled')) {
+          goToPage($table, 1);
         }
-        
-        // 发送AJAX请求
-        $.ajax({
-            url: dataUrl,
-            type: 'GET',
-            data: requestData,
-            dataType: 'json',
-            success: function(response) {
-                // 移除加载蒙版
-                hideLoadingState($table);
-                
-                // 清空表格内容
-                $tbody.empty();
-                
-                // 获取表格配置，优先从服务端返回的gridConfig中读取
-                const showRowNumber = response.gridConfig && response.gridConfig.showRowNumber !== undefined 
-                    ? response.gridConfig.showRowNumber 
-                    : ($table.data('show-row-number') === 'true');
-                const showCheckbox = response.gridConfig && response.gridConfig.showCheckbox !== undefined 
-                    ? response.gridConfig.showCheckbox 
-                    : ($table.data('show-checkbox') === 'true');
-                
-                // 如果有表格配置，先更新表头
-                if (response.gridConfig && response.gridConfig.columns) {
-                    updateTableHeader($table, response.gridConfig.columns, showRowNumber, showCheckbox);
-                }
-                
-                if (response.data && response.data.length > 0) {
-                    // 获取表格配置中的列信息
-                    const columns = response.gridConfig && response.gridConfig.columns ? response.gridConfig.columns : null;
-                    
-                    // 渲染数据行
-                    response.data.forEach(function(item, index) {
-                        // 计算正确的全局序号：(当前页-1) * 每页大小 + 当前索引 + 1
-                        const globalRowNumber = (page - 1) * pageSize + index + 1;
-                        // 总是使用buildDynamicRow函数，确保复选框和序号列正确显示
-                        const row = columns ? buildDynamicRow(item, globalRowNumber, columns, showRowNumber, showCheckbox) : buildDynamicRow(item, globalRowNumber, [], showRowNumber, showCheckbox);
-                        $tbody.append(row);
-                    });
-                } else {
-                    // 显示空数据状态
-                    showEmptyState($table);
-                }
-                
-                // 更新分页显示
-                const totalItems = response.totalItems || 0;
-                const totalPages = Math.ceil(totalItems / pageSize);
-                updatePaginationDisplay($paginationBar, page, pageSize, totalItems, totalPages);
-                
-                // 恢复选中状态
-                restoreSelections($table);
-                
-                // 保存当前状态
-                $table.data('current-page', page);
-                $table.data('page-size', pageSize);
-            },
-            error: function(xhr, status, error) {
-                // 移除加载蒙版
-                hideLoadingState($table);
-                
-                console.error('加载数据失败:', error);
-                showErrorState($table, '加载数据失败，请稍后重试');
-            }
-        });
+      });
+
+    // 上一页按钮
+    $paginationBar
+      .find('.prev-page')
+      .off('click')
+      .on('click', function () {
+        if (!$(this).prop('disabled')) {
+          const currentPage = parseInt(
+            $paginationBar.find('.current-page').val()
+          );
+          goToPage($table, currentPage - 1);
+        }
+      });
+
+    // 下一页按钮
+    $paginationBar
+      .find('.next-page')
+      .off('click')
+      .on('click', function () {
+        if (!$(this).prop('disabled')) {
+          const currentPage = parseInt(
+            $paginationBar.find('.current-page').val()
+          );
+          goToPage($table, currentPage + 1);
+        }
+      });
+
+    // 末页按钮
+    $paginationBar
+      .find('.last-page')
+      .off('click')
+      .on('click', function () {
+        if (!$(this).prop('disabled')) {
+          const totalPages = parseInt(
+            $paginationBar.find('.total-pages').text()
+          );
+          goToPage($table, totalPages);
+        }
+      });
+
+    // 页码输入框回车事件
+    $paginationBar
+      .find('.current-page')
+      .off('keypress')
+      .on('keypress', function (e) {
+        if (e.which === 13) {
+          // Enter键
+          const targetPage = parseInt($(this).val());
+          const totalPages = parseInt(
+            $paginationBar.find('.total-pages').text()
+          );
+
+          if (targetPage >= 1 && targetPage <= totalPages) {
+            goToPage($table, targetPage);
+          } else {
+            // 恢复原值
+            const currentPage = $table.data('current-page') || 1;
+            $(this).val(currentPage);
+            alert('请输入有效的页码');
+          }
+        }
+      });
+
+    // 页面大小选择变化事件
+    $paginationBar
+      .find('.ef-page-size')
+      .off('change')
+      .on('change', function () {
+        const newPageSize = parseInt($(this).val());
+        const currentPage = parseInt(
+          $paginationBar.find('.current-page').val()
+        );
+
+        // 重新计算当前页（保持当前显示的第一条记录位置）
+        const currentFirstItem =
+          (currentPage - 1) * $table.data('page-size') + 1;
+        const newCurrentPage = Math.ceil(currentFirstItem / newPageSize);
+
+        $table.data('page-size', newPageSize);
+        goToPage($table, newCurrentPage);
+      });
+
+    // 刷新按钮
+    $paginationBar
+      .find('.refresh')
+      .off('click')
+      .on('click', function () {
+        const currentPage = parseInt(
+          $paginationBar.find('.current-page').val()
+        );
+        goToPage($table, currentPage, true); // 强制刷新
+      });
+  }
+
+  // 跳转到指定页面
+  function goToPage($table, targetPage, forceRefresh = false) {
+    const $paginationBar = $table.find('.ef-pagination-bar');
+    const pageSize =
+      parseInt($paginationBar.find('.ef-page-size').val()) ||
+      paginationConfig.defaultPageSize;
+    const currentPage = $table.data('current-page') || 1;
+
+    // 如果页面没有变化且不是强制刷新，则不执行
+    if (targetPage === currentPage && !forceRefresh) {
+      return;
     }
-    
-    // 构建岗位行HTML
-    function buildPositionRow(position) {
-        return `
+
+    // 保存当前状态
+    $table.data('current-page', targetPage);
+    $table.data('page-size', pageSize);
+
+    // 如果开启了URL参数更新
+    if ($table.data('update-url-params')) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('page', targetPage);
+      url.searchParams.set('pageSize', pageSize);
+      window.history.pushState({}, '', url);
+    }
+
+    // 检查是否为服务端分页
+    if ($table.data('is-server-side')) {
+      loadServerData($table, targetPage, pageSize);
+    } else {
+      // 触发自定义事件，让外部处理数据加载
+      $table.trigger('ef-pagination-change', {
+        page: targetPage,
+        pageSize: pageSize,
+        offset: (targetPage - 1) * pageSize,
+      });
+
+      // 如果没有外部处理器，使用默认的客户端分页
+      if (!$table.data('has-pagination-handler')) {
+        performClientSidePagination($table, targetPage, pageSize);
+      }
+    }
+  }
+
+  // 服务端数据加载
+  function loadServerData($table, page, pageSize) {
+    const dataUrl = $table.data('data-url');
+    const $paginationBar = $table.find('.ef-pagination-bar');
+    const $tbody = $table.find('tbody');
+    const filters = $table.data('filters');
+
+    // 显示加载状态
+    showLoadingState($table);
+
+    const requestData = {
+      page: page,
+      pageSize: pageSize,
+    };
+
+    if (filters) {
+      requestData.filters = filters;
+    }
+
+    // 发送AJAX请求
+    $.ajax({
+      url: dataUrl,
+      type: 'GET',
+      data: requestData,
+      dataType: 'json',
+      success: function (response) {
+        // 移除加载蒙版
+        hideLoadingState($table);
+
+        // 清空表格内容
+        $tbody.empty();
+
+        // 获取表格配置，优先从服务端返回的gridConfig中读取
+        const showRowNumber =
+          response.gridConfig && response.gridConfig.showRowNumber !== undefined
+            ? response.gridConfig.showRowNumber
+            : String($table.data('show-row-number')) === 'true';
+        const showCheckbox =
+          response.gridConfig && response.gridConfig.showCheckbox !== undefined
+            ? response.gridConfig.showCheckbox
+            : String($table.data('show-checkbox')) === 'true';
+
+        // 如果有表格配置，先更新表头
+        if (response.gridConfig && response.gridConfig.columns) {
+          updateTableHeader(
+            $table,
+            response.gridConfig.columns,
+            showRowNumber,
+            showCheckbox
+          );
+        }
+
+        if (response.data && response.data.length > 0) {
+          // 获取表格配置中的列信息
+          const columns =
+            response.gridConfig && response.gridConfig.columns
+              ? response.gridConfig.columns
+              : null;
+
+          // 渲染数据行
+          response.data.forEach(function (item, index) {
+            // 计算正确的全局序号：(当前页-1) * 每页大小 + 当前索引 + 1
+            const globalRowNumber = (page - 1) * pageSize + index + 1;
+            // 总是使用buildDynamicRow函数，确保复选框和序号列正确显示
+            const row = columns
+              ? buildDynamicRow(
+                  item,
+                  globalRowNumber,
+                  columns,
+                  showRowNumber,
+                  showCheckbox
+                )
+              : buildDynamicRow(
+                  item,
+                  globalRowNumber,
+                  [],
+                  showRowNumber,
+                  showCheckbox
+                );
+            $tbody.append(row);
+          });
+        } else {
+          // 显示空数据状态
+          showEmptyState($table);
+        }
+
+        // 更新分页显示
+        const totalItems = response.totalItems || 0;
+        const totalPages = Math.ceil(totalItems / pageSize);
+        updatePaginationDisplay(
+          $paginationBar,
+          page,
+          pageSize,
+          totalItems,
+          totalPages
+        );
+
+        // 恢复选中状态
+        restoreSelections($table);
+
+        // 保存当前状态
+        $table.data('current-page', page);
+        $table.data('page-size', pageSize);
+      },
+      error: function (xhr, status, error) {
+        // 移除加载蒙版
+        hideLoadingState($table);
+
+        console.error('加载数据失败:', error);
+        showErrorState($table, '加载数据失败，请稍后重试');
+      },
+    });
+  }
+
+  // 构建岗位行HTML
+  function buildPositionRow(position) {
+    return `
             <tr>
                 <td>${position.id}</td>
                 <td>${position.name || ''}</td>
@@ -1040,25 +1210,31 @@ $(document).ready(function () {
                 </td>
             </tr>
         `;
-    }
-    
-    // 构建动态行HTML
-    function buildDynamicRow(rowData, rowNumber, columns, showRowNumber = true, showCheckbox = false) {
-        let cellsHtml = '';
-        const rowId = rowData.id || '';
+  }
 
-        // 添加行号列（如果启用）
-        if (showRowNumber) {
-            cellsHtml += `<td class="ef-table-td">
+  // 构建动态行HTML
+  function buildDynamicRow(
+    rowData,
+    rowNumber,
+    columns,
+    showRowNumber = true,
+    showCheckbox = false
+  ) {
+    let cellsHtml = '';
+    const rowId = rowData.id || '';
+
+    // 添加行号列（如果启用）
+    if (showRowNumber) {
+      cellsHtml += `<td class="ef-table-td">
                 <span class="ef-table-cell ef-table-cell-align-center">
                     <span class="ef-table-td-content">${rowNumber}</span>
                 </span>
             </td>`;
-        }
-        
-        // 添加选择框列（如果启用）
-        if (showCheckbox) {
-            cellsHtml += `<td class="ef-table-td">
+    }
+
+    // 添加选择框列（如果启用）
+    if (showCheckbox) {
+      cellsHtml += `<td class="ef-table-td">
               <span class="ef-table-cell ef-table-cell-align-center">
 				<label aria-disabled="false" class="ef-checkbox">
                     <input type="checkbox" id="checkbox${rowData.id}" class="ef-checkbox-target" value="0">
@@ -1068,72 +1244,107 @@ $(document).ready(function () {
 				</label>
               </span>
             </td>`;
-        }
+    }
 
-        // 根据配置动态生成列
-        if (columns && columns.length > 0) {
-            columns.forEach(column => {
-                if (!column.visible || column.field === 'actions') return;
+    // 根据配置动态生成列
+    if (columns && columns.length > 0) {
+      columns.forEach((column) => {
+        if (column.visible === false || column.field === 'actions') return;
 
-                let cellContent = '';
-                const value = rowData[column.field];
+        let cellContent = '';
+        const value = rowData[column.field];
 
-            switch (column.type) {
-                case 'boolean':
-                    // 检查值是否等于trueText，因为后端DataGridService已经将布尔值转换为文本
-                    const trueText = column.trueText || '是';
-                    const falseText = column.falseText || '否';
-                    const isTrue = value === trueText || value === true || value === 1 || value === '1';
-                    const text = isTrue ? trueText : falseText;
-                    const badgeClass = isTrue ? 'ef-badge ef-badge-success' : 'ef-badge ef-badge-secondary';
-                    cellContent = `<span class="${badgeClass}">${text}</span>`;
-                    break;
-                case 'datetime':
-                    cellContent = value ? new Date(value).toLocaleString('zh-CN') : '';
-                    break;
-                case 'relation':
-                    // 处理关联对象，如department.name
-                    if (value && typeof value === 'object' && value.name) {
-                        cellContent = value.name;
-                    } else {
-                        cellContent = value || '';
-                    }
-                    break;
-                default:
-                    cellContent = value || '';
+        switch (column.type) {
+          case 'boolean':
+            // 检查值是否等于trueText，因为后端DataGridService已经将布尔值转换为文本
+            const trueText = column.trueText || '是';
+            const falseText = column.falseText || '否';
+            const isTrue =
+              value === trueText ||
+              value === true ||
+              value === 1 ||
+              value === '1';
+            const text = isTrue ? trueText : falseText;
+            const badgeClass = isTrue
+              ? 'ef-badge ef-badge-success'
+              : 'ef-badge ef-badge-secondary';
+            cellContent = `<span class="${badgeClass}">${text}</span>`;
+            break;
+          case 'datetime':
+            cellContent = value ? new Date(value).toLocaleString('zh-CN') : '';
+            break;
+          case 'relation':
+            // 处理关联对象，如department.name
+            if (value && typeof value === 'object' && value.name) {
+              cellContent = value.name;
+            } else {
+              cellContent = value || '';
             }
-
-                const alignment = column.type === 'boolean' || column.field === 'id' ? 'ef-table-cell-align-center' : 'ef-table-cell-align-left';
-                cellsHtml += `<td class="ef-table-td">
-                    <span class="ef-table-cell ${alignment}">
-                        <span class="ef-table-td-content">${cellContent}</span>
-                    </span>
-                </td>`;
-            });
-        } else {
-            // 如果没有列配置，显示默认的岗位数据列
-            const defaultFields = ['id', 'name', 'description', 'department', 'level', 'state'];
-            defaultFields.forEach(field => {
-                let cellContent = '';
-                if (field === 'department' && rowData[field] && typeof rowData[field] === 'object') {
-                    cellContent = rowData[field].name || '';
-                } else {
-                    cellContent = rowData[field] || '';
-                }
-                
-                const alignment = field === 'id' ? 'ef-table-cell-align-center' : 'ef-table-cell-align-left';
-                cellsHtml += `<td class="ef-table-td">
-                    <span class="ef-table-cell ${alignment}">
-                        <span class="ef-table-td-content">${cellContent}</span>
-                    </span>
-                </td>`;
-            });
+            break;
+          default:
+            cellContent = value || '';
         }
 
-        // 添加操作列
-        const actionsColumn = columns && columns.find(col => col.field === 'actions');
-        if ((actionsColumn && actionsColumn.visible) || (!columns || columns.length === 0)) {
-            cellsHtml += `<td class="ef-table-td">
+        let alignment = column.align
+          ? 'ef-table-cell-align-' + column.align
+          : 'ef-table-cell-align-left';
+
+        if (!column.align) {
+          alignment =
+            column.type === 'boolean' || column.field === 'id'
+              ? 'ef-table-cell-align-center'
+              : 'ef-table-cell-align-left';
+        }
+
+        cellsHtml += `<td class="ef-table-td">
+                    <span class="ef-table-cell ${alignment}">
+                        <span class="ef-table-td-content">${cellContent}</span>
+                    </span>
+                </td>`;
+      });
+    } else {
+      // 如果没有列配置，显示默认的岗位数据列
+      const defaultFields = [
+        'id',
+        'name',
+        'description',
+        'department',
+        'level',
+        'state',
+      ];
+      defaultFields.forEach((field) => {
+        let cellContent = '';
+        if (
+          field === 'department' &&
+          rowData[field] &&
+          typeof rowData[field] === 'object'
+        ) {
+          cellContent = rowData[field].name || '';
+        } else {
+          cellContent = rowData[field] || '';
+        }
+
+        const alignment =
+          field === 'id'
+            ? 'ef-table-cell-align-center'
+            : 'ef-table-cell-align-left';
+        cellsHtml += `<td class="ef-table-td">
+                    <span class="ef-table-cell ${alignment}">
+                        <span class="ef-table-td-content">${cellContent}</span>
+                    </span>
+                </td>`;
+      });
+    }
+
+    // 添加操作列
+    const actionsColumn =
+      columns && columns.find((col) => col.field === 'actions');
+    if (
+      (actionsColumn && actionsColumn.visible) ||
+      !columns ||
+      columns.length === 0
+    ) {
+      cellsHtml += `<td class="ef-table-td">
                 <span class="ef-table-cell ef-table-cell-align-center">
                     <span class="ef-table-td-content">
                         <button type="button" class="btn secondary small view-button" data-id="${rowData.id}">
@@ -1145,32 +1356,38 @@ $(document).ready(function () {
                     </span>
                 </span>
             </td>`;
-        }
-
-        return `<tr class="ef-table-tr" data-id="${rowId}">${cellsHtml}</tr>`;
     }
-    
-    // 更新表头
-    function updateTableHeader($table, columns, showRowNumber = true, showCheckbox = false) {
-        const $thead = $table.find('thead');
-        if ($thead.length === 0) return;
 
-        const $headerRow = $thead.find('tr');
-        if ($headerRow.length === 0) return;
+    return `<tr class="ef-table-tr" data-id="${rowId}">${cellsHtml}</tr>`;
+  }
 
-        let headersHtml = '';
-        
-        // 添加行号列头（如果启用）
-        if (showRowNumber) {
-            headersHtml += `<th class="ef-table-th">
+  // 更新表头
+  function updateTableHeader(
+    $table,
+    columns,
+    showRowNumber = true,
+    showCheckbox = false
+  ) {
+    const $thead = $table.find('thead');
+    if ($thead.length === 0) return;
+
+    const $headerRow = $thead.find('tr');
+    if ($headerRow.length === 0) return;
+
+    let headersHtml = '';
+
+    // 添加行号列头（如果启用）
+    if (showRowNumber) {
+      headersHtml += `<th class="ef-table-th">
                 <span class="ef-table-cell ef-table-cell-align-center">#</span>
             </th>`;
-        }
-        
-        // 添加选择框列头（如果启用）
-        if (showCheckbox) {
-            const tableId = $table.attr('id') || 'grid-' + Math.random().toString(36).substr(2, 9);
-            headersHtml += `<th class="ef-table-th">
+    }
+
+    // 添加选择框列头（如果启用）
+    if (showCheckbox) {
+      const tableId =
+        $table.attr('id') || 'grid-' + Math.random().toString(36).substr(2, 9);
+      headersHtml += `<th class="ef-table-th">
               <span class="ef-table-cell ef-table-cell-align-center">
 				<label aria-disabled="false" class="ef-checkbox check-all">
                     <input type="checkbox" id="selectAll-${tableId}" class="ef-checkbox-target" value="0">
@@ -1180,19 +1397,32 @@ $(document).ready(function () {
 				</label>
               </span>
             </th>`;
+    }
+
+    // 根据配置动态生成列头
+    if (columns && columns.length > 0) {
+      columns.forEach((column) => {
+        if (column.visible === false) return;
+
+        let alignment = column.align
+          ? 'ef-table-cell-align-' + column.align
+          : 'ef-table-cell-align-center';
+
+        // Override for specific types if align is not explicitly set
+        if (!column.align) {
+          alignment =
+            column.type === 'boolean' ||
+            column.field === 'id' ||
+            column.field === 'actions'
+              ? 'ef-table-cell-align-center'
+              : 'ef-table-cell-align-center';
         }
 
-        // 根据配置动态生成列头
-        if (columns && columns.length > 0) {
-            columns.forEach(column => {
-                if (!column.visible) return;
+        const sortable = column.sortable;
 
-                const alignment = column.type === 'boolean' || column.field === 'id' || column.field === 'actions' ? 'ef-table-cell-align-center' : 'ef-table-cell-align-center';
-                const sortable = column.sortable;
-            
-            let headerContent = '';
-            if (sortable) {
-                headerContent = `
+        let headerContent = '';
+        if (sortable) {
+          headerContent = `
                     <span class="ef-table-cell ${alignment} ef-table-cell-with-sorter">
                         <span class="ef-table-th-title">${column.label}</span>
                         <span class="ef-table-th-sort">
@@ -1201,49 +1431,52 @@ $(document).ready(function () {
                             </div>
                         </span>
                     </span>`;
-            } else {
-                headerContent = `
+        } else {
+          headerContent = `
                     <span class="ef-table-cell ${alignment}">
                         <span class="ef-table-th-title">${column.label}</span>
                     </span>`;
-            }
-            
-                headersHtml += `<th class="ef-table-th" data-field="${column.field}">${headerContent}</th>`;
-            });
-        } else {
-            // 如果没有列配置，显示默认的表头
-            const defaultHeaders = [
-                { field: 'id', label: 'ID' },
-                { field: 'name', label: '岗位名称' },
-                { field: 'description', label: '岗位描述' },
-                { field: 'department', label: '所属部门' },
-                { field: 'level', label: '岗位级别' },
-                { field: 'state', label: '状态' },
-                { field: 'actions', label: '操作' }
-            ];
-            
-            defaultHeaders.forEach(header => {
-                const alignment = header.field === 'id' || header.field === 'actions' ? 'ef-table-cell-align-center' : 'ef-table-cell-align-center';
-                const headerContent = `
+        }
+
+        headersHtml += `<th class="ef-table-th" data-field="${column.field}">${headerContent}</th>`;
+      });
+    } else {
+      // 如果没有列配置，显示默认的表头
+      const defaultHeaders = [
+        { field: 'id', label: 'ID' },
+        { field: 'name', label: '岗位名称' },
+        { field: 'description', label: '岗位描述' },
+        { field: 'department', label: '所属部门' },
+        { field: 'level', label: '岗位级别' },
+        { field: 'state', label: '状态' },
+        { field: 'actions', label: '操作' },
+      ];
+
+      defaultHeaders.forEach((header) => {
+        const alignment =
+          header.field === 'id' || header.field === 'actions'
+            ? 'ef-table-cell-align-center'
+            : 'ef-table-cell-align-center';
+        const headerContent = `
                     <span class="ef-table-cell ${alignment}">
                         <span class="ef-table-th-title">${header.label}</span>
                     </span>`;
-                headersHtml += `<th class="ef-table-th" data-field="${header.field}">${headerContent}</th>`;
-            });
-        }
-
-        $headerRow.html(headersHtml);
+        headersHtml += `<th class="ef-table-th" data-field="${header.field}">${headerContent}</th>`;
+      });
     }
-    
-    // 显示加载状态
-    function showLoadingState($table) {
-        // 移除之前的加载蒙版（如果存在）
-        hideLoadingState($table);
-        
-        const $tbody = $table.find('tbody');
-        
-        // 创建加载蒙版
-        const $overlay = $(`
+
+    $headerRow.html(headersHtml);
+  }
+
+  // 显示加载状态
+  function showLoadingState($table) {
+    // 移除之前的加载蒙版（如果存在）
+    hideLoadingState($table);
+
+    const $tbody = $table.find('tbody');
+
+    // 创建加载蒙版
+    const $overlay = $(`
             <div class="ef-table-loading-overlay" style="
                 position: absolute;
                 top: 0;
@@ -1272,26 +1505,26 @@ $(document).ready(function () {
                 </div>
             </div>
         `);
-        
-        // 确保 tbody 有相对定位
-        if ($tbody.css('position') === 'static') {
-            $tbody.css('position', 'relative');
-        }
-        
-        // 添加蒙版到 tbody
-        $tbody.append($overlay);
+
+    // 确保 tbody 有相对定位
+    if ($tbody.css('position') === 'static') {
+      $tbody.css('position', 'relative');
     }
-    
-    // 隐藏加载状态
-    function hideLoadingState($table) {
-        $table.find('tbody .ef-table-loading-overlay').remove();
-    }
-    
-    // 显示空数据状态
-    function showEmptyState($table) {
-        const $tbody = $table.find('tbody');
-        const colCount = $table.find('thead th').length;
-        $tbody.html(`
+
+    // 添加蒙版到 tbody
+    $tbody.append($overlay);
+  }
+
+  // 隐藏加载状态
+  function hideLoadingState($table) {
+    $table.find('tbody .ef-table-loading-overlay').remove();
+  }
+
+  // 显示空数据状态
+  function showEmptyState($table) {
+    const $tbody = $table.find('tbody');
+    const colCount = $table.find('thead th').length;
+    $tbody.html(`
             <tr class="ef-table-tr">
                 <td class="ef-table-td" colspan="${colCount}">
                     <div class="ef-table-empty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px;">
@@ -1301,13 +1534,13 @@ $(document).ready(function () {
                 </td>
             </tr>
         `);
-    }
-    
-    // 显示错误状态
-    function showErrorState($table, message) {
-        const $tbody = $table.find('tbody');
-        const colCount = $table.find('thead th').length;
-        $tbody.html(`
+  }
+
+  // 显示错误状态
+  function showErrorState($table, message) {
+    const $tbody = $table.find('tbody');
+    const colCount = $table.find('thead th').length;
+    $tbody.html(`
             <tr class="ef-table-tr">
                 <td class="ef-table-td" colspan="${colCount}">
                     <div class="ef-table-error" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px;">
@@ -1317,35 +1550,41 @@ $(document).ready(function () {
                 </td>
             </tr>
         `);
-    }
-    
-    // 客户端分页（用于静态数据）
-    function performClientSidePagination($table, currentPage, pageSize) {
-        const $tbody = $table.find('tbody');
-        const $allRows = $tbody.find('tr').not('.ef-table-empty-row');
-        const totalItems = $allRows.length;
-        const totalPages = Math.ceil(totalItems / pageSize);
-        
-        // 隐藏所有行
-        $allRows.hide();
-        
-        // 显示当前页的行
-        const startIndex = (currentPage - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-        $allRows.slice(startIndex, endIndex).show();
-        
-        // 更新分页显示
-        const $paginationBar = $table.find('.ef-pagination-bar');
-        updatePaginationDisplay($paginationBar, currentPage, pageSize, totalItems, totalPages);
-        
-        // 恢复选中状态
-        restoreSelections($table);
+  }
 
-        // 处理空状态
-        if (totalItems === 0) {
-            if ($tbody.find('.ef-table-empty-row').length === 0) {
-                const colCount = $table.find('thead th').length;
-                $tbody.append(`
+  // 客户端分页（用于静态数据）
+  function performClientSidePagination($table, currentPage, pageSize) {
+    const $tbody = $table.find('tbody');
+    const $allRows = $tbody.find('tr').not('.ef-table-empty-row');
+    const totalItems = $allRows.length;
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    // 隐藏所有行
+    $allRows.hide();
+
+    // 显示当前页的行
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    $allRows.slice(startIndex, endIndex).show();
+
+    // 更新分页显示
+    const $paginationBar = $table.find('.ef-pagination-bar');
+    updatePaginationDisplay(
+      $paginationBar,
+      currentPage,
+      pageSize,
+      totalItems,
+      totalPages
+    );
+
+    // 恢复选中状态
+    restoreSelections($table);
+
+    // 处理空状态
+    if (totalItems === 0) {
+      if ($tbody.find('.ef-table-empty-row').length === 0) {
+        const colCount = $table.find('thead th').length;
+        $tbody.append(`
                     <tr class="ef-table-empty-row">
                         <td colspan="${colCount}" style="text-align: center; padding: 40px; color: #999;">
                             <i class="fa-solid fa-inbox" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
@@ -1353,178 +1592,189 @@ $(document).ready(function () {
                         </td>
                     </tr>
                 `);
-            }
-            $tbody.find('.ef-table-empty-row').show();
+      }
+      $tbody.find('.ef-table-empty-row').show();
+    } else {
+      $tbody.find('.ef-table-empty-row').hide();
+    }
+  }
+
+  // 为所有带有分页栏的表格初始化分页功能
+  $(document).ready(function () {
+    $('.ef-table').each(function () {
+      const $table = $(this);
+      if ($table.find('.ef-pagination-bar').length > 0) {
+        // 设置默认数据
+        const $paginationBar = $table.find('.ef-pagination-bar');
+        const currentPage =
+          parseInt($paginationBar.find('.current-page').val()) || 1;
+        const pageSize =
+          parseInt($paginationBar.find('.ef-page-size').val()) ||
+          paginationConfig.defaultPageSize;
+
+        $table.data('current-page', currentPage);
+        $table.data('page-size', pageSize);
+
+        initPagination($table);
+
+        // 检查是否为服务端分页且表格为空（没有预渲染数据）
+        const isServerSide =
+          $table.data('server-side') === true ||
+          $table.data('server-side') === 'true';
+        const $tbody = $table.find('tbody');
+        const hasStaticData =
+          $tbody.find('tr').length > 0 &&
+          !$tbody.find('.ef-table-empty').length;
+        const hasEmptyState = $tbody.find('.ef-table-empty').length > 0;
+
+        // 只有在服务端分页且表格完全为空或只有空状态时才执行初始加载
+        if (isServerSide && (!hasStaticData || hasEmptyState)) {
+          goToPage($table, currentPage);
+        }
+      }
+    });
+  });
+
+  // 批量删除功能
+  function batchDelete(
+    $table,
+    deleteUrl,
+    confirmMessage = '确定要删除选中的项目吗？'
+  ) {
+    const selectedIds = getSelectedIds($table);
+
+    if (selectedIds.length === 0) {
+      alert('请先选择要删除的项目');
+      return;
+    }
+
+    if (!confirm(confirmMessage + `\n\n将删除 ${selectedIds.length} 个项目`)) {
+      return;
+    }
+
+    // 显示加载状态
+    showLoadingState($table);
+
+    // 发送删除请求
+    $.ajax({
+      url: deleteUrl,
+      type: 'POST',
+      data: {
+        ids: selectedIds,
+      },
+      dataType: 'json',
+      success: function (response) {
+        hideLoadingState($table);
+
+        if (response.success) {
+          // 删除成功，刷新表格
+          const currentPage = $table.data('current-page') || 1;
+          goToPage($table, currentPage, true);
+
+          // 取消全选状态及清空选中集合
+          const gridId = $table.attr('id');
+          if (gridId && window.DatagridState && window.DatagridState[gridId]) {
+            window.DatagridState[gridId].selectedIds.clear();
+            window.DatagridState[gridId].allSelectedCurrentPage = false;
+            updateGlobalSelectVar(gridId);
+          }
+
+          const $selectAll = $table.find('.check-all input');
+          if ($selectAll.length > 0) {
+            $selectAll.prop('checked', false);
+          }
+
+          alert(`成功删除 ${selectedIds.length} 个项目`);
         } else {
-            $tbody.find('.ef-table-empty-row').hide();
+          alert('删除失败：' + (response.message || '未知错误'));
         }
-    }
-    
-    // 为所有带有分页栏的表格初始化分页功能
-    $(document).ready(function() {
-        $('.ef-table').each(function() {
-            const $table = $(this);
-            if ($table.find('.ef-pagination-bar').length > 0) {
-                // 设置默认数据
-                const $paginationBar = $table.find('.ef-pagination-bar');
-                const currentPage = parseInt($paginationBar.find('.current-page').val()) || 1;
-                const pageSize = parseInt($paginationBar.find('.ef-page-size').val()) || paginationConfig.defaultPageSize;
-                
-                $table.data('current-page', currentPage);
-                $table.data('page-size', pageSize);
-                
-                initPagination($table);
-                
-                // 检查是否为服务端分页且表格为空（没有预渲染数据）
-                const isServerSide = $table.data('server-side') === true || $table.data('server-side') === 'true';
-                const $tbody = $table.find('tbody');
-                const hasStaticData = $tbody.find('tr').length > 0 && !$tbody.find('.ef-table-empty').length;
-                const hasEmptyState = $tbody.find('.ef-table-empty').length > 0;
-                
-                // 只有在服务端分页且表格完全为空或只有空状态时才执行初始加载
-                if (isServerSide && (!hasStaticData || hasEmptyState)) {
-                    goToPage($table, currentPage);
-                }
-            }
-        });
+      },
+      error: function (xhr, status, error) {
+        hideLoadingState($table);
+        console.error('删除请求失败:', error);
+        alert('删除失败，请稍后重试');
+      },
     });
-    
-    // 批量删除功能
-    function batchDelete($table, deleteUrl, confirmMessage = '确定要删除选中的项目吗？') {
-        const selectedIds = getSelectedIds($table);
-        
-        if (selectedIds.length === 0) {
-            alert('请先选择要删除的项目');
-            return;
-        }
-        
-        if (!confirm(confirmMessage + `\n\n将删除 ${selectedIds.length} 个项目`)) {
-            return;
-        }
-        
-        // 显示加载状态
-        showLoadingState($table);
-        
-        // 发送删除请求
-        $.ajax({
-            url: deleteUrl,
-            type: 'POST',
-            data: {
-                ids: selectedIds
-            },
-            dataType: 'json',
-            success: function(response) {
-                hideLoadingState($table);
-                
-                if (response.success) {
-                    // 删除成功，刷新表格
-                    const currentPage = $table.data('current-page') || 1;
-                    goToPage($table, currentPage, true);
-                    
-                    // 取消全选状态及清空选中集合
-                    const gridId = $table.attr('id');
-                    if (gridId && window.DatagridState && window.DatagridState[gridId]) {
-                        window.DatagridState[gridId].selectedIds.clear();
-                        window.DatagridState[gridId].allSelectedCurrentPage = false;
-                        updateGlobalSelectVar(gridId);
-                    }
-                    
-                    const $selectAll = $table.find('.check-all input');
-                    if ($selectAll.length > 0) {
-                        $selectAll.prop('checked', false);
-                    }
-                    
-                    alert(`成功删除 ${selectedIds.length} 个项目`);
-                } else {
-                    alert('删除失败：' + (response.message || '未知错误'));
-                }
-            },
-            error: function(xhr, status, error) {
-                hideLoadingState($table);
-                console.error('删除请求失败:', error);
-                alert('删除失败，请稍后重试');
-            }
-        });
-    }
-    
-    // 获取选中的ID列表
-    function getSelectedIds($table) {
-        const gridId = $table.attr('id');
-        if (gridId && window.DatagridState && window.DatagridState[gridId]) {
-             return Array.from(window.DatagridState[gridId].selectedIds);
-        }
+  }
 
-        const selectedIds = [];
-        $table.find('tbody .ef-checkbox input:checked').each(function() {
-            const id = $(this).val();
-            if (id && id !== '0') {
-                selectedIds.push(id);
-            }
-        });
-        return selectedIds;
+  // 获取选中的ID列表
+  function getSelectedIds($table) {
+    const gridId = $table.attr('id');
+    if (gridId && window.DatagridState && window.DatagridState[gridId]) {
+      return Array.from(window.DatagridState[gridId].selectedIds);
     }
-    
-    // 监听批量删除按钮点击事件
-    $(document).on('click', '[data-action="batch-delete"]', function() {
-        const $button = $(this);
-        const $table = $button.closest('.ef-table');
-        const deleteUrl = $button.data('delete-url');
-        const confirmMessage = $button.data('confirm-message');
-        
-        if (!deleteUrl) {
-            console.error('批量删除按钮缺少 data-delete-url 属性');
-            alert('配置错误：缺少删除URL');
-            return;
-        }
-        
-        batchDelete($table, deleteUrl, confirmMessage);
+
+    const selectedIds = [];
+    $table.find('tbody .ef-checkbox input:checked').each(function () {
+      const id = $(this).val();
+      if (id && id !== '0') {
+        selectedIds.push(id);
+      }
     });
+    return selectedIds;
+  }
 
-    // 公共API：设置表格数据并刷新分页
-    window.efDataGrid = {
-        setData: function(tableId, data, totalItems) {
-            const $table = $('#' + tableId);
-            const $tbody = $table.find('tbody');
-            const currentPage = $table.data('current-page') || 1;
-            const pageSize = $table.data('page-size') || paginationConfig.defaultPageSize;
-            
-            // 清空现有数据
-            $tbody.empty();
-            
-            // 添加新数据（这里需要根据实际数据结构来渲染）
-            // 示例：假设data是行数据数组
-            if (data && data.length > 0) {
-                data.forEach(function(rowData) {
-                    // 这里需要根据实际需求来构建行HTML
-                    // $tbody.append(buildRowHtml(rowData));
-                });
-            }
-            
-            // 更新总数据量
-            const $paginationBar = $table.find('.ef-pagination-bar');
-            $paginationBar.data('total-items', totalItems || data.length);
-            
-            // 重新初始化分页
-            initPagination($table);
-        },
-        
-        refresh: function(tableId) {
-            const $table = $('#' + tableId);
-            const currentPage = $table.data('current-page') || 1;
-            goToPage($table, currentPage, true);
-        },
-        
-        // 批量删除API
-        batchDelete: function(tableId, deleteUrl, confirmMessage) {
-            const $table = $('#' + tableId);
-            batchDelete($table, deleteUrl, confirmMessage);
-        },
-        
-        // 获取选中项API
-        getSelectedIds: function(tableId) {
-            const $table = $('#' + tableId);
-            return getSelectedIds($table);
-        }
-    };
-    
+  // 监听批量删除按钮点击事件
+  $(document).on('click', '[data-action="batch-delete"]', function () {
+    const $button = $(this);
+    const $table = $button.closest('.ef-table');
+    const deleteUrl = $button.data('delete-url');
+    const confirmMessage = $button.data('confirm-message');
+
+    if (!deleteUrl) {
+      console.error('批量删除按钮缺少 data-delete-url 属性');
+      alert('配置错误：缺少删除URL');
+      return;
+    }
+
+    batchDelete($table, deleteUrl, confirmMessage);
+  });
+
+  // 公共API：设置表格数据并刷新分页
+  window.efDataGrid = {
+    setData: function (tableId, data, totalItems) {
+      const $table = $('#' + tableId);
+      const $tbody = $table.find('tbody');
+      const currentPage = $table.data('current-page') || 1;
+      const pageSize =
+        $table.data('page-size') || paginationConfig.defaultPageSize;
+
+      // 清空现有数据
+      $tbody.empty();
+
+      // 添加新数据（这里需要根据实际数据结构来渲染）
+      // 示例：假设data是行数据数组
+      if (data && data.length > 0) {
+        data.forEach(function (rowData) {
+          // 这里需要根据实际需求来构建行HTML
+          // $tbody.append(buildRowHtml(rowData));
+        });
+      }
+
+      // 更新总数据量
+      const $paginationBar = $table.find('.ef-pagination-bar');
+      $paginationBar.data('total-items', totalItems || data.length);
+
+      // 重新初始化分页
+      initPagination($table);
+    },
+
+    refresh: function (tableId) {
+      const $table = $('#' + tableId);
+      const currentPage = $table.data('current-page') || 1;
+      goToPage($table, currentPage, true);
+    },
+
+    // 批量删除API
+    batchDelete: function (tableId, deleteUrl, confirmMessage) {
+      const $table = $('#' + tableId);
+      batchDelete($table, deleteUrl, confirmMessage);
+    },
+
+    // 获取选中项API
+    getSelectedIds: function (tableId) {
+      const $table = $('#' + tableId);
+      return getSelectedIds($table);
+    },
+  };
 });

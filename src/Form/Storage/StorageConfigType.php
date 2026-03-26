@@ -37,7 +37,7 @@ class StorageConfigType extends AbstractType
             ])
             ->add('directory_strategy', ChoiceType::class, [
                 'mapped' => false,
-                'label' => '文件存放策略',
+                'label' => '文件存储策略',
                 'required' => true,
                 'choices' => [
                     '按年月日 (YYYY/MM/DD)' => 'Y/m/d',
@@ -50,15 +50,15 @@ class StorageConfigType extends AbstractType
             ]);
 
         // Add unmapped fields for config JSON
-        $builder->add('endpoint', TextType::class, ['mapped' => false, 'required' => false, 'label' => 'Endpoint (S3)']);
-        $builder->add('region', TextType::class, ['mapped' => false, 'required' => false, 'label' => 'Region (S3)']);
-        $builder->add('bucket', TextType::class, ['mapped' => false, 'required' => false, 'label' => 'Bucket (S3)']);
-        $builder->add('access_key', TextType::class, ['mapped' => false, 'required' => false, 'label' => 'Access Key (S3)']);
-        $builder->add('secret_key', TextType::class, ['mapped' => false, 'required' => false, 'label' => 'Secret Key (S3)']);
+        $builder->add('endpoint', TextType::class, ['mapped' => false, 'required' => false, 'label' => 'Endpoint']);
+        $builder->add('region', TextType::class, ['mapped' => false, 'required' => false, 'label' => 'Region']);
+        $builder->add('bucket', TextType::class, ['mapped' => false, 'required' => false, 'label' => 'Bucket']);
+        $builder->add('access_key', TextType::class, ['mapped' => false, 'required' => false, 'label' => 'Access Key']);
+        $builder->add('secret_key', TextType::class, ['mapped' => false, 'required' => false, 'label' => 'Secret Key']);
         $builder->add('directory', TextType::class, [
             'mapped' => false,
             'required' => false,
-            'label' => '存储目录 (相对于 public)',
+            'label' => '存储目录（相对于 public）',
             'attr' => ['placeholder' => '默认为 uploads'],
             'help' => '文件将存储在 public/{目录} 下'
         ]);

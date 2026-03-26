@@ -1,0 +1,846 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ 'admin_email.title'|trans }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="/lib/wangeditor/style.css" rel="stylesheet">
+    <style>
+        .w-e-text-container {
+            z-index: 100 !important;
+        }
+        .w-e-toolbar {
+            z-index: 101 !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .w-e-menu-panel {
+            z-index: 10000 !important;
+            min-width: 360px;
+            max-width: 70vw;
+        }
+        .w-e-toolbar [data-menu-key="insertVariable"] {
+            margin-left: auto;
+            max-width: 140px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .email-page {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #1d1d1f;
+        }
+        .email-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .email-tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e5ea;
+            margin-bottom: 32px;
+        }
+        .email-tab {
+            padding: 12px 0;
+            margin-right: 32px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #86868b;
+            cursor: pointer;
+        }
+        .email-tab.active {
+            color: #0066cc;
+            border-bottom: 2px solid #0066cc;
+        }
+        .config-form, .template-list {
+            display: none;
+        }
+        .config-form.active, .template-list.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .method-list {
+            border-top: 1px solid #e5e5ea;
+        }
+        .method-item {
+            display: flex;
+            align-items: center;
+            padding: 24px 0;
+            border-bottom: 1px solid #e5e5ea;
+            background: #fff;
+        }
+        .method-icon {
+            font-size: 24px;
+            width: 48px;
+            color: #1d1d1f;
+            display: flex;
+            align-items: center;
+        }
+        .method-content {
+            flex: 1;
+        }
+        .method-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .method-subtitle {
+            font-size: 12px;
+            color: #86868b;
+        }
+        .method-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Drawer Settings Form Styles (Notion/Linear style) */
+        .settings-drawer-form {
+            padding: 24px;
+            background: #f8fafc;
+            min-height: 100%;
+        }
+        .settings-group {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .settings-group-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+        .settings-drawer-form .form-group {
+            margin-bottom: 16px;
+        }
+        .settings-drawer-form .form-group:last-child {
+            margin-bottom: 0;
+        }
+        .settings-drawer-form .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+        .settings-drawer-form .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .settings-drawer-form .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .settings-drawer-form .checkbox-wrapper input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            accent-color: #0066cc;
+            cursor: pointer;
+            margin: 0;
+        }
+        .settings-drawer-form .checkbox-wrapper label {
+            font-size: 14px;
+            color: #374151;
+            cursor: pointer;
+            user-select: none;
+            margin: 0;
+        }
+    </style>
+{% endblock %}
+
+{% import 'ui/template/ui.html.twig' as ui %}
+
+{% block app_content_container %}
+<div class="org-structure-container email-page">
+    <div class="outside-wrapper" style="padding: 40px; max-width: 1200px; margin: 0; background: #fff; min-height: calc(100vh - 60px);">
+        
+        <div class="email-title">{{ 'admin_email.title'|trans }}</div>
+        
+        <div class="email-tabs">
+            <div class="email-tab active" onclick="switchTab('config', this)">{{ 'admin_email.tabs.config'|trans }}</div>
+            <div class="email-tab" onclick="switchTab('templates', this)">{{ 'admin_email.tabs.templates'|trans }}</div>
+        </div>
+
+        <div class="ef-row ef-row-align-start ef-row-justify-start">
+            <div class="ef-col-16" style="padding-right: 60px;">
+                
+                {% for message in app.flashes('success') %}
+                    <div role="alert" class="ef-alert ef-alert-success" style="margin-bottom: 32px; border-radius: 12px; padding: 20px;">
+                        <div class="ef-alert-icon"><i class="fa-solid fa-circle-check"></i></div>
+                        <div class="ef-alert-body">
+                            <div class="ef-alert-content">{{ message }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% for message in app.flashes('error') %}
+                    <div role="alert" class="ef-alert ef-alert-error" style="margin-bottom: 32px; border-radius: 12px; padding: 20px; background-color: #fef2f2; color: #991b1b;">
+                        <div class="ef-alert-icon" style="color: #dc2626;"><i class="fa-solid fa-circle-exclamation"></i></div>
+                        <div class="ef-alert-body">
+                            <div class="ef-alert-content">{{ message }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <!-- Config Form -->
+                <div id="config-section" class="config-form active">
+                    <div class="ef-row ef-row-align-center ef-row-justify-between" style="margin-bottom: 16px;">
+                        <div>
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">发送服务器配置</div>
+                            <div style="font-size: 14px; color: #86868b;">配置用于发送邮件的服务器信息</div>
+                        </div>
+                        <div>
+                            <button class="btn primary medium" style="border-radius: 20px;" onclick="openConfigDrawerWithData()">添加服务器</button>
+                        </div>
+                    </div>
+
+                    <div class="method-list">
+                        {% for config in configs %}
+                        <div class="method-item">
+                            <div class="method-icon">
+                                <i class="fa-solid fa-server"></i>
+                            </div>
+                            <div class="method-content">
+                                <div class="method-title">
+                                    {{ config.name ?: '未命名服务器' }}
+                                    {% if config.isDefault %}
+                                        <span style="font-size: 12px; background: #e5f0ff; color: #0066cc; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">默认</span>
+                                    {% endif %}
+                                </div>
+                                <div class="method-subtitle">主机: {{ config.host }}:{{ config.port }} ({{ config.protocol|upper }}) | 发件人: {{ config.senderAddress }}</div>
+                            </div>
+                            <div class="method-actions">
+                                <button class="btn secondary medium only-icon circle" style="border:none; background:transparent; box-shadow:none; color: #1d1d1f; font-size: 18px;" onclick="openConfigDrawerWithData('{{ config.id }}', '{{ config.name|e('js') }}', '{{ config.isDefault ? 1 : 0 }}', '{{ config.protocol|e('js') }}', '{{ config.host|e('js') }}', '{{ config.port }}', '{{ config.encryption|e('js') }}', '{{ config.username|e('js') }}', '{{ config.senderName|e('js') }}', '{{ config.senderAddress|e('js') }}')">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <form action="{{ path('admin_email_config_delete', {id: config.id}) }}" method="post" style="display:inline;" onsubmit="return confirm('确定要删除此服务器配置吗？');">
+                                    <button type="submit" class="btn secondary medium only-icon circle" style="border:none; background:transparent; box-shadow:none; color: #dc3545; font-size: 18px;">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div style="padding: 40px 0; text-align: center; color: #86868b;">
+                            暂无发送服务器配置
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Templates List -->
+                <div id="templates-section" class="template-list">
+                    <div class="ef-row ef-row-align-center ef-row-justify-between" style="margin-bottom: 16px;">
+                        <div>
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">{{ 'admin_email.templates.title'|trans }}</div>
+                            <div style="font-size: 14px; color: #86868b;">{{ 'admin_email.templates.desc'|trans }}</div>
+                        </div>
+                        <div>
+                            <button class="btn primary medium" style="border-radius: 20px;" onclick="window.open('{{ path('admin_email_template_editor') }}', '_blank')">{{ 'admin_email.editor.open_full'|trans }}</button>
+                        </div>
+                    </div>
+
+                    <div class="method-list">
+                        {% for template in templates %}
+                        <div class="method-item">
+                            <div class="method-icon">
+                                <i class="fa-regular fa-file-code"></i>
+                            </div>
+                            <div class="method-content">
+                                <div class="method-title">{{ template.name }} ({{ template.code }})</div>
+                                <div class="method-subtitle">主题: {{ template.subject }}</div>
+                            </div>
+                            <div class="method-actions">
+                                <button class="btn secondary medium only-icon circle" style="border:none; background:transparent; box-shadow:none; color: #1d1d1f; font-size: 18px;" onclick="openTemplateDrawerWithData('{{ template.id }}', '{{ template.name|e('js') }}', '{{ template.subject|e('js') }}', '{{ template.description|e('js') }}', '{{ template.bodyHtml|e('js')|replace({"\n": "\\n", "\r": "\\r"}) }}', '{{ template.emailConfig ? template.emailConfig.id : '' }}')">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <form action="{{ path('admin_email_template_delete', {id: template.id}) }}" method="post" style="display:inline;" onsubmit="return confirm('确定要删除此模版吗？');">
+                                    <button type="submit" class="btn secondary medium only-icon circle" style="border:none; background:transparent; box-shadow:none; color: #dc3545; font-size: 18px;">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div style="padding: 40px 0; text-align: center; color: #86868b;">
+                            暂无邮件模版
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+            
+            <div class="ef-col-8">
+                <div class="side-card" style="background: #f5f5f7; border-radius: 16px; padding: 24px; margin-bottom: 16px;">
+                    <div class="side-card-title" style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">{{ 'admin_email.side_card.config.title'|trans }}</div>
+                    <div class="side-card-text" style="font-size: 14px; color: #555; margin-bottom: 16px; line-height: 1.5;">
+                        {{ 'admin_email.side_card.config.text'|trans|raw }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Config Drawer -->
+<div class="ef-drawer-container" id="configDrawer" style="z-index: 1001; display: none;">
+    <div class="ef-drawer-mask" maskid="configDrawer"></div>
+    <div class="ef-drawer" style="right: -600px; width: 600px;">
+        <div class="ef-drawer-header">
+            <div class="ef-drawer-title" id="configDrawerTitle">添加服务器配置</div>
+            <div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn" onclick="$().hideDrawer('configDrawer')">
+                <span class="ef-icon-hover">
+                    <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                    </svg>
+                </span>
+            </div>
+        </div>
+        <div class="ef-drawer-body" style="overflow-y: auto; background: #f8fafc;">
+            <form action="{{ path('admin_email_config_save') }}" method="post" id="configForm" class="settings-drawer-form">
+                <input type="hidden" name="id" id="configId">
+                
+                <div class="settings-group">
+                    <div class="settings-group-title">基础信息</div>
+                    <div class="form-group">
+                        <label class="form-label">配置名称 (Name)</label>
+                        {{ ui.input('configName', 'text', '例如: 营销邮件服务器', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'name', 'style': 'width: 100%;'}) }}
+                    </div>
+                    <div class="form-group" style="margin-top: 16px;">
+                        <input type="hidden" name="isDefault" value="0">
+                        {{ ui.checkbox('configIsDefault', '设为默认服务器 (Default)', '1', false, '', 'isDefault') }}
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-group-title">连接设置</div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">主机地址 (Host) *</label>
+                            {{ ui.input('configHost', 'text', '例如: smtp.exmail.qq.com', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'host', 'required': 'required', 'style': 'width: 100%;'}) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">端口 (Port) *</label>
+                            {{ ui.inputNumber('configPort', null, null, 1, 0, '', 'ef-input-wrapper-full-width ef-input-rounded', 'port', '465', {'required': 'required', 'style': 'width: 100%;'}) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">协议 (Protocol) *</label>
+                            {% set protocol_options = [
+                                {'label': 'SMTP', 'value': 'smtp'},
+                                {'label': 'Sendgrid', 'value': 'sendgrid'},
+                                {'label': 'Mailgun', 'value': 'mailgun'},
+                                {'label': 'Aliyun', 'value': 'aliyun'}
+                            ] %}
+                            {{ ui.select(protocol_options, '请选择协议', '120px', 'ef-input-rounded', 'protocol', 'configProtocol', 'smtp') }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">加密方式 (Encryption)</label>
+                            {% set encryption_options = [
+                                {'label': '无 (None)', 'value': ''},
+                                {'label': 'SSL', 'value': 'ssl'},
+                                {'label': 'TLS', 'value': 'tls'}
+                            ] %}
+                            {{ ui.select(encryption_options, '请选择加密方式', '120px', 'ef-input-rounded', 'encryption', 'configEncryption', 'ssl') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-group-title">身份验证</div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">用户名 (Username)</label>
+                            {{ ui.input('configUsername', 'text', '请输入邮箱用户名', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'username', 'style': 'width: 100%;'}) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">密码/授权码 (Password)</label>
+                            {{ ui.input('configPassword', 'password', '留空表示不修改', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'password', 'style': 'width: 100%;'}) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-group-title">发件人信息</div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label class="form-label">发件人名称 (Sender Name)</label>
+                            {{ ui.input('configSenderName', 'text', '例如: 系统通知', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'senderName', 'style': 'width: 100%;'}) }}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">发件人地址 (Sender Address) *</label>
+                            {{ ui.input('configSenderAddress', 'text', 'noreply@example.com', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'senderAddress', 'required': 'required', 'style': 'width: 100%;'}) }}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="ef-drawer-footer">
+            <button class="btn outline medium" type="button" onclick="testConnection()" id="testConnectionBtn">测试连接</button>
+            <button class="cancelDrawer btn outline medium" type="button" onclick="$().hideDrawer('configDrawer')">取消</button>
+            <button type="submit" form="configForm" class="btn primary medium">保存</button>
+        </div>
+    </div>
+</div>
+
+
+    {# Test Connection Modal #}
+    {% set testConnectionBody %}
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label required">测试接收邮箱</label>
+            {{ ui.input('configTestEmailInput', 'email', '请输入接收测试邮件的邮箱地址', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'required': 'required', 'style': 'width: 100%;'}) }}
+        </div>
+    {% endset %}
+
+    {% set testConnectionFooter %}
+        <div class="ef-space ef-space-horizontal ef-space-align-center" style="justify-content: flex-end; width: 100%;">
+            <div class="ef-space-item" style="margin-right: 8px;">
+                <button class="btn outline medium" type="button" onclick="closeTestConnectionModal()">取消</button>
+            </div>
+            <div class="ef-space-item">
+                <button class="btn primary medium" type="button" onclick="executeTestConnection()" id="confirmTestConnectionBtn">测试</button>
+            </div>
+        </div>
+    {% endset %}
+
+    {{ ui.modal('testConnectionModal', '测试服务器连接', testConnectionBody, testConnectionFooter, {
+        'width': '500px',
+        'onClose': 'closeTestConnectionModal()'
+    }) }}
+
+    {# Test Template Email Modal #}
+    {% set testTemplateEmailBody %}
+        <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label required">测试接收邮箱</label>
+            {{ ui.input('templateTestEmailInput', 'email', '请输入接收测试邮件的邮箱地址', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'required': 'required', 'style': 'width: 100%;'}) }}
+        </div>
+    {% endset %}
+
+    {% set testTemplateEmailFooter %}
+        <div class="ef-space ef-space-horizontal ef-space-align-center" style="justify-content: flex-end; width: 100%;">
+            <div class="ef-space-item" style="margin-right: 8px;">
+                <button class="btn outline medium" type="button" onclick="closeTestTemplateEmailModal()">取消</button>
+            </div>
+            <div class="ef-space-item">
+                <button class="btn primary medium" type="button" onclick="executeTestTemplateEmail()" id="confirmTestTemplateEmailBtn">发送</button>
+            </div>
+        </div>
+    {% endset %}
+
+    {{ ui.modal('testTemplateEmailModal', '发送测试邮件', testTemplateEmailBody, testTemplateEmailFooter, {
+        'width': '500px',
+        'onClose': 'closeTestTemplateEmailModal()'
+    }) }}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="/lib/wangeditor/index.js"></script>
+    <script>
+        let editor;
+
+        class InsertVariableMenu {
+            constructor() {
+                this.title = '插入变量';
+                this.iconSvg = '<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/><path d="M686.7 348.7c-3.1-3.1-8.2-3.1-11.3 0L512 512.1l-163.4-163.4c-3.1-3.1-8.2-3.1-11.3 0l-42.4 42.4c-3.1 3.1-3.1 8.2 0 11.3L458.3 565.8c3.1 3.1 8.2 3.1 11.3 0L686.7 402.4c3.1-3.1 3.1-8.2 0-11.3l-42.4-42.4z"/></svg>';
+                this.tag = 'select';
+                this.width = 140;
+            }
+            getOptions(editor) {
+                if (typeof templateVariables === 'undefined' || templateVariables.length === 0) {
+                    return [{ value: '', text: '暂无变量' }];
+                }
+                return templateVariables.map(v => ({
+                    value: v.name,
+                    text: v.name + (v.desc ? ` (${v.desc})` : '')
+                }));
+            }
+            isActive(editor) { return false; }
+            isDisabled(editor) { return false; }
+            exec(editor, value) {
+                if (value) {
+                    insertVariableIntoEditor(value);
+                }
+            }
+            getValue(editor) { return ''; }
+        }
+
+        $(document).ready(function() {
+            const { createEditor, createToolbar, Boot } = window.wangEditor;
+
+            try {
+                Boot.registerMenu({
+                    key: 'insertVariable',
+                    factory() {
+                        return new InsertVariableMenu();
+                    }
+                });
+            } catch (e) {
+                console.warn('Register menu error:', e);
+            }
+
+            editor = createEditor({
+                selector: '#editor-text-container',
+                html: '',
+                config: {
+                    placeholder: '请输入内容...',
+                    onChange(editor) {
+                        document.getElementById('templateBody').value = editor.getHtml();
+                    }
+                }
+            });
+
+            const toolbar = createToolbar({
+                editor,
+                selector: '#toolbar-container',
+                config: {
+                    insertKeys: {
+                        index: 0,
+                        keys: ['insertVariable']
+                    }
+                }
+            });
+            const iv = document.querySelector('#toolbar-container [data-menu-key="insertVariable"]');
+            if (iv) iv.style.marginLeft = 'auto';
+            
+        });
+
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.email-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            
+            document.querySelectorAll('.config-form, .template-list').forEach(s => s.classList.remove('active'));
+            document.getElementById(tabId + '-section').classList.add('active');
+        }
+
+        function setEfSelectValue(inputId, value) {
+            let input = document.getElementById(inputId);
+            if (!input) return;
+            input.value = value;
+            let spanSelect = document.getElementById(inputId + '_select');
+            if (!spanSelect) return;
+            
+            let contentId = spanSelect.getAttribute('contentid');
+            let popup = document.getElementById(contentId);
+            if (!popup) return;
+            
+            let option = popup.querySelector('.ef-select-option[value="' + value + '"]');
+            if (option) {
+                let text = option.querySelector('.ef-select-option-content').innerText;
+                spanSelect.querySelector('.ef-select-view-value').innerText = text;
+                spanSelect.querySelector('.ef-select-view-value').classList.remove('ef-select-view-value-hidden');
+                spanSelect.querySelector('.ef-select-view-input').classList.add('ef-select-view-input-hidden');
+                spanSelect.setAttribute('chosen', 'true');
+                
+                popup.querySelectorAll('.ef-select-option').forEach(opt => opt.classList.remove('ef-select-option-active'));
+                option.classList.add('ef-select-option-active');
+            } else if (value === '' || !value) {
+                spanSelect.querySelector('.ef-select-view-value').innerText = '';
+                spanSelect.querySelector('.ef-select-view-value').classList.add('ef-select-view-value-hidden');
+                spanSelect.querySelector('.ef-select-view-input').classList.remove('ef-select-view-input-hidden');
+                spanSelect.setAttribute('chosen', 'false');
+                popup.querySelectorAll('.ef-select-option').forEach(opt => opt.classList.remove('ef-select-option-active'));
+            }
+        }
+
+        function openConfigDrawerWithData(id = '', name = '', isDefault = '0', protocol = 'smtp', host = '', port = '465', encryption = 'ssl', username = '', senderName = '', senderAddress = '') {
+            document.getElementById('configId').value = id;
+            document.getElementById('configName').value = name;
+            document.getElementById('configIsDefault').checked = (isDefault === '1' || isDefault === 1);
+            setEfSelectValue('configProtocol', protocol);
+            document.getElementById('configHost').value = host;
+            
+            let portInput = document.getElementById('configPort');
+            portInput.value = port;
+            portInput.setAttribute('num-value', port);
+            
+            setEfSelectValue('configEncryption', encryption);
+            document.getElementById('configUsername').value = username;
+            document.getElementById('configPassword').value = '';
+            document.getElementById('configSenderName').value = senderName;
+            document.getElementById('configSenderAddress').value = senderAddress;
+
+            document.getElementById('configDrawerTitle').innerText = id ? '编辑服务器配置' : '添加服务器配置';
+            $().showDrawer('configDrawer');
+        }
+
+        {% verbatim %}
+        const presetTemplates = {
+            welcome: '<div style="max-width:680px;margin:0 auto;padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;"><div style="font-size:18px;font-weight:600;color:#111827;margin-bottom:8px;">欢迎加入我们</div><div style="font-size:14px;color:#374151;line-height:1.7;margin-bottom:16px;">您好，欢迎加入我们的团队！以下是常用入口与指引，请您尽快完成账号设置。</div><div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin-bottom:12px;"><div style="font-size:14px;color:#111827;">初始账号：{{ username }}</div><div style="font-size:14px;color:#111827;">首次登录地址：{{ login_url }}</div></div><div style="font-size:12px;color:#6b7280;">如果有问题，请联系 HR 或 IT 支持。</div></div>',
+            verification_code: '<div style="max-width:680px;margin:0 auto;padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;"><div style="font-size:18px;font-weight:600;color:#111827;margin-bottom:8px;">验证码</div><div style="font-size:14px;color:#374151;line-height:1.7;margin-bottom:16px;">您好，您正在进行安全验证，以下是您的一次性验证码：</div><div style="font-size:28px;font-weight:700;color:#111827;letter-spacing:4px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin-bottom:12px;text-align:center;">{{ code }}</div><div style="font-size:12px;color:#6b7280;">该验证码有效期 {{ expire_minutes }} 分钟，请勿泄露。</div></div>',
+            password_reset: '<div style="max-width:680px;margin:0 auto;padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;"><div style="font-size:18px;font-weight:600;color:#111827;margin-bottom:8px;">密码重置</div><div style="font-size:14px;color:#374151;line-height:1.7;margin-bottom:16px;">您好，您申请了重置密码，请点击以下链接完成操作：</div><a href="{{ reset_url }}" style="display:inline-block;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;padding:10px 16px;font-size:14px;">重置密码</a><div style="font-size:12px;color:#6b7280;margin-top:12px;">如果不是您本人操作，请忽略本邮件。</div></div>',
+            announcement: '<div style="max-width:680px;margin:0 auto;padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-radius:8px;"><div style="font-size:18px;font-weight:600;color:#111827;margin-bottom:8px;">公告通知</div><div style="font-size:14px;color:#374151;line-height:1.7;margin-bottom:16px;">{{ announcement_title }}</div><div style="font-size:14px;color:#374151;line-height:1.7;">{{ announcement_body }}</div></div>'
+        };
+        {% endverbatim %}
+
+        function applyPresetTemplate() {
+            const key = document.getElementById('presetTemplate').value;
+            if (!key || !presetTemplates[key]) return;
+            const html = presetTemplates[key];
+            if (editor) {
+                editor.setHtml(html);
+                document.getElementById('templateBody').value = editor.getHtml();
+            } else {
+                const container = document.getElementById('editor-text-container');
+                if (container) container.innerHTML = html;
+                document.getElementById('templateBody').value = html;
+            }
+        }
+
+        function openTemplateDrawerWithData(id = '', name = '', subject = '', desc = '', body = '', emailConfigId = '') {
+            let url = '{{ path('admin_email_template_editor') }}';
+            if (id) {
+                url = '{{ path('admin_email_template_editor', {'id': 'ID_PLACEHOLDER'}) }}'.replace('ID_PLACEHOLDER', id);
+            }
+            window.open(url, '_blank');
+        }
+
+        let templateVariables = [];
+
+        function addVariableBadge(varName, varDesc = '') {
+            const existing = templateVariables.find(v => v.name === varName);
+            if (existing) {
+                existing.desc = varDesc;
+            } else {
+                templateVariables.push({name: varName, desc: varDesc});
+            }
+            renderVariables();
+            updateDescriptionField();
+        }
+
+        function addVariable() {
+            const nameInput = document.getElementById('newVariableName');
+            const descInput = document.getElementById('newVariableDesc');
+            const varName = nameInput.value.trim();
+            const varDesc = descInput.value.trim();
+            if (varName) {
+                addVariableBadge(varName, varDesc);
+                nameInput.value = '';
+                descInput.value = '';
+            }
+        }
+
+        function removeVariable(varName) {
+            templateVariables = templateVariables.filter(v => v.name !== varName);
+            renderVariables();
+            updateDescriptionField();
+        }
+
+        function renderVariables() {
+            const list = document.getElementById('variablesList');
+            list.innerHTML = '';
+            templateVariables.forEach(v => {
+                const badge = document.createElement('div');
+                badge.style.cssText = 'background: #e5f0ff; color: #0066cc; padding: 4px 8px; border-radius: 4px; font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer;';
+                
+                const textSpan = document.createElement('span');
+                textSpan.innerText = v.name + (v.desc ? ` (${v.desc})` : '');
+                textSpan.title = '点击插入到编辑器';
+                textSpan.onclick = () => insertVariableIntoEditor(v.name);
+                
+                const delBtn = document.createElement('i');
+                delBtn.className = 'fa-solid fa-xmark';
+                delBtn.style.cursor = 'pointer';
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removeVariable(v.name);
+                };
+                
+                badge.appendChild(textSpan);
+                badge.appendChild(delBtn);
+                list.appendChild(badge);
+            });
+        }
+
+        function updateDescriptionField() {
+            document.getElementById('templateDescription').value = JSON.stringify(templateVariables);
+        }
+
+        function insertVariableIntoEditor(varName) {
+            const textToInsert = '{' + '{ ' + varName + ' }' + '}';
+            if (editor) {
+                editor.insertText(textToInsert);
+            } else {
+                const textarea = document.getElementById('templateBody');
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                textarea.value = textarea.value.substring(0, start) + textToInsert + textarea.value.substring(end);
+                textarea.selectionStart = textarea.selectionEnd = start + textToInsert.length;
+                textarea.focus();
+            }
+        }
+
+        function testConnection() {
+            const form = document.getElementById('configForm');
+            if (!form.reportValidity()) {
+                return;
+            }
+            
+            const senderAddress = document.getElementById('configSenderAddress').value;
+            document.getElementById('configTestEmailInput').value = senderAddress;
+            
+            openModal('testConnectionModal');
+            setTimeout(() => {
+                document.getElementById('configTestEmailInput').focus();
+            }, 100);
+        }
+
+        function closeTestConnectionModal() {
+            closeModal('testConnectionModal');
+        }
+
+        function executeTestConnection() {
+            const testEmailInput = document.getElementById('configTestEmailInput');
+            const testEmail = testEmailInput.value;
+
+            if (testEmail.trim() === '') {
+                let alert = new Alert($('#testConnectionModal .ef-modal-body'));
+                alert.error('测试接收邮箱不能为空', { percent: '90%', title: "错误", closable: true });
+                return;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(testEmail.trim())) {
+                let alert = new Alert($('#testConnectionModal .ef-modal-body'));
+                alert.error('请输入有效的邮箱地址', { percent: '90%', title: "错误", closable: true });
+                return;
+            }
+
+            const form = document.getElementById('configForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            data.testEmail = testEmail.trim();
+            
+            const btn = document.getElementById('confirmTestConnectionBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 测试中...';
+            btn.disabled = true;
+
+            ajax({
+                method: 'POST',
+                url: '{{ path('admin_email_config_test_connection') }}',
+                contentType: 'application/x-www-form-urlencoded',
+                data: data,
+                success: function (response) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    
+                    if (response.code === 200) {
+                        closeTestConnectionModal();
+                        let alert = new Alert($('#configDrawer .ef-drawer-body'));
+                        alert.success(response.message || '连接成功，测试邮件已发送', { percent: '90%', title: "成功", closable: true });
+                    } else {
+                        let alert = new Alert($('#testConnectionModal .ef-modal-body'));
+                        alert.error(response.message || '连接失败', { percent: '90%', title: "错误", closable: true });
+                    }
+                },
+                error: function (xhr, status, errorMsg) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    let alert = new Alert($('#testConnectionModal .ef-modal-body'));
+                    alert.error(errorMsg || '请求发生错误', { percent: '90%', title: "错误", closable: true });
+                }
+            });
+        }
+        function testTemplateEmail() {
+            const form = document.getElementById('templateForm');
+            if (!form.reportValidity()) {
+                return;
+            }
+            
+            // Show custom modal
+            openModal('testTemplateEmailModal');
+            setTimeout(() => {
+                document.getElementById('templateTestEmailInput').focus();
+            }, 100);
+        }
+
+        function closeTestTemplateEmailModal() {
+            closeModal('testTemplateEmailModal');
+            document.getElementById('templateTestEmailInput').value = '';
+        }
+
+        function executeTestTemplateEmail() {
+            const testEmailInput = document.getElementById('templateTestEmailInput');
+            const testEmail = testEmailInput.value;
+            
+            if (testEmail.trim() === '') {
+                let alert = new Alert($('#testTemplateEmailModal .modal-body'));
+                alert.error('测试接收邮箱不能为空', { percent: '90%', title: "错误", closable: true });
+                return;
+            }
+            
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(testEmail.trim())) {
+                let alert = new Alert($('#testTemplateEmailModal .modal-body'));
+                alert.error('请输入有效的邮箱地址', { percent: '90%', title: "错误", closable: true });
+                return;
+            }
+
+            const form = document.getElementById('templateForm');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Get content from WangEditor if it exists
+            if (editor) {
+                data.bodyHtml = editor.getHtml();
+            }
+
+            data.testEmail = testEmail.trim();
+            
+            const btn = document.getElementById('confirmTestTemplateEmailBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 发送中...';
+            btn.disabled = true;
+
+            ajax({
+                method: 'POST',
+                url: '{{ path('admin_email_template_test_send') }}',
+                contentType: 'application/x-www-form-urlencoded',
+                data: data,
+                success: function (response) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    
+                    if (response.code === 200) {
+                        closeTestTemplateEmailModal();
+                        let alert = new Alert($('#templateDrawer .ef-drawer-body'));
+                        alert.success(response.message || '测试邮件发送成功', { percent: '90%', title: "成功", closable: true });
+                    } else {
+                        let alert = new Alert($('#testTemplateEmailModal .modal-body'));
+                        alert.error(response.message || '测试邮件发送失败', { percent: '90%', title: "错误", closable: true });
+                    }
+                },
+                error: function (xhr, status, errorMsg) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    let alert = new Alert($('#testTemplateEmailModal .modal-body'));
+                    alert.error(errorMsg || '请求发生错误', { percent: '90%', title: "错误", closable: true });
+                }
+            });
+        }
+    </script>
+{% endblock %}

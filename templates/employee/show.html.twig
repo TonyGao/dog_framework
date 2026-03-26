@@ -571,7 +571,36 @@
                                     <span class="info-label">Passkey</span>
                                     <div class="info-value">
                                         {% if employee.hasPasskey %}
-                                            <span class="status-badge" style="background: #dcfce7; color: #166534; margin-top: 0;">Enabled</span>
+                                            <span class="status-badge" style="background: #dcfce7; color: #166534; margin-top: 0; cursor: default;"
+                                                  data-tip-target="#passkey-details-{{ employee.id }}"
+                                                  data-tip-size="large"
+                                                  data-tip-theme="dark">
+                                                Enabled <i class="fa-solid fa-circle-info" style="margin-left:4px; opacity:0.6;"></i>
+                                            </span>
+                                            <div id="passkey-details-{{ employee.id }}" style="display:none;">
+                                                {% for passkey in employee.passkeys %}
+                                                    <div class="sun-tip-list-item">
+                                                        <div class="sun-tip-title">
+                                                            {% if 'Mac' in passkey.deviceName or 'iOS' in passkey.deviceName %}
+                                                                <i class="fa-brands fa-apple"></i>
+                                                            {% elseif 'Chrome' in passkey.deviceName %}
+                                                                <i class="fa-brands fa-chrome"></i>
+                                                            {% elseif 'Edge' in passkey.deviceName %}
+                                                                <i class="fa-brands fa-edge"></i>
+                                                            {% elseif 'Firefox' in passkey.deviceName %}
+                                                                <i class="fa-brands fa-firefox"></i>
+                                                            {% elseif 'Safari' in passkey.deviceName %}
+                                                                <i class="fa-brands fa-safari"></i>
+                                                            {% else %}
+                                                                <i class="fa-solid fa-key"></i>
+                                                            {% endif %}
+                                                            {{ passkey.deviceName }}
+                                                        </div>
+                                                        <div class="sun-tip-detail">Created: {{ passkey.createdAt|date('F j, Y, g:i:s A') }}</div>
+                                                        <div class="sun-tip-detail">Last used: {{ passkey.lastUsedAt ? passkey.lastUsedAt|date('F j, Y, g:i:s A') : 'Never' }}</div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
                                         {% else %}
                                             <span class="status-badge" style="background: #f1f5f9; color: #64748b; margin-top: 0;">Not Setup</span>
                                         {% endif %}

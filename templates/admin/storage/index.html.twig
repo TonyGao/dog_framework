@@ -13,64 +13,140 @@
     <div class="outside-wrapper" style="padding: 20px;">
         {{ grid.dataGrid(
             tableData|default([]),
-                columns|default([]),
-                {
-                    createUrl: path('admin_storage_new'),
-                    editUrlPrefix: path('admin_storage_edit', {'id': 'placeholder'})|replace({'placeholder': ''}),
-                    deleteUrlPrefix: path('admin_storage_delete', {'id': 'placeholder'})|replace({'placeholder': ''}),
-                    toolbarButtons: [
-                        { 
-                            type: 'create', 
-                            text: '新建配置', 
-                            icon: 'fa-solid fa-plus', 
-                            attributes: { 'onclick': "openStorageCreateDrawer()" } 
-                        }
-                    ],
-                    actionButtons: [
-                        { type: 'edit', text: '编辑', icon: 'fa-solid fa-edit' },
-                        { type: 'delete', text: '删除', icon: 'fa-solid fa-trash' }
-                    ],
-                    emptyText: '暂无存储配置',
-                    gridId: 'storage-config-grid',
-                    pagination: false,
-                    serverSide: false,
-                    showCheckbox: false,
-                    showRowNumber: true,
-                    autoFitContent: false
-                }
-            ) }}
+            columns|default([]),
+            {
+                createUrl: path('admin_storage_new'),
+                editUrlPrefix: path('admin_storage_edit', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                viewUrlPrefix: path('admin_storage_view', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                deleteUrlPrefix: path('admin_storage_delete', {'id': 'placeholder'})|replace({'placeholder': ''}),
+                toolbarButtons: [
+                    { 
+                        type: 'create', 
+                        text: '新建配置', 
+                        icon: 'fa-solid fa-plus', 
+                        attributes: { 'onclick': "openStorageCreateDrawer()" } 
+                    },
+                    { 
+                        type: 'delete', 
+                        text: '批量删除', 
+                        icon: 'fa-solid fa-trash', 
+                        id: 'batch-delete-button' 
+                    }
+                ],
+                actionButtons: [
+                    { type: 'view', text: '查看', icon: 'fa-solid fa-eye' },
+                    { type: 'edit', text: '编辑', icon: 'fa-solid fa-edit' },
+                    { type: 'delete', text: '删除', icon: 'fa-solid fa-trash' }
+                ],
+                emptyText: '暂无存储配置',
+                gridId: 'storage-config-grid',
+                pagination: true,
+                serverSide: true,
+                dataUrl: path('api_admin_storage_list'),
+                showCheckbox: true,
+                showRowNumber: true,
+                autoFitContent: false,
+                updateUrlParams: true
+            }
+        ) }}
     </div>
 </div>
+
+{# 批量删除确认模态框 #}
+<form id="batch-delete-form" method="post" action="{{ path('admin_storage_batch_delete') }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('batch_delete') }}">
+</form>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script>
-        function openStorageCreateDrawer() {
-            // Remove existing drawers to prevent duplicates
+        // Drawer Loading Helper
+        function loadDrawer(action, id = null) {
+            // Remove existing drawers
             $('[id^="storage-config-drawer-"]').remove();
             
+            const data = { action: action };
+            if (id) data.id = id;
+
             ajax({
                 method: 'POST',
                 url: '{{ path("admin_storage_drawer") }}',
-                data: {
-                    action: 'create'
-                },
+                data: data,
                 contentType: 'application/json',
                 dataType: 'html',
                 success: function(html) {
                     $('body').append(html);
-                    $().showDrawer('storage-config-drawer-new');
-                    // Initialize drawer events after it's added to DOM
-                    if (typeof window.initStorageCreateDrawer === 'function') {
+                    const drawerId = 'storage-config-drawer-' + (id || 'new');
+                    $().showDrawer(drawerId);
+                    
+                    // Initialize specific drawer logic
+                    if (action === 'create' && typeof window.initStorageCreateDrawer === 'function') {
                         window.initStorageCreateDrawer();
+                    } else if (action === 'edit' && typeof window.initStorageEditDrawer === 'function') {
+                        window.initStorageEditDrawer();
+                    } else if (action === 'view' && typeof window.initStorageViewDrawer === 'function') {
+                        window.initStorageViewDrawer();
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('Error loading storage config drawer:', error);
-                    alert('加载配置表单失败，请重试');
+                    console.error('Error loading drawer:', error);
+                    alert('加载失败，请重试');
                 }
             });
         }
+
+        function openStorageCreateDrawer() {
+            loadDrawer('create');
+        }
+
+        // Event delegation for View/Edit buttons (intercepting <a> tags)
+        $(document).on('click', '.view-button', function(e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            loadDrawer('view', id);
+        });
+
+        $(document).on('click', '.edit-button', function(e) {
+            e.preventDefault();
+            const id = $(this).data('id');
+            loadDrawer('edit', id);
+        });
+
+        // Batch Delete
+        $('#batch-delete-button').click(function() {
+            const selectedIds = $().getGridSelectedIds('storage-config-grid');
+            if (selectedIds.length === 0) {
+                alert('请先选择要删除的配置');
+                return;
+            }
+
+            if (!confirm('确认要删除选中的 ' + selectedIds.length + ' 个配置吗？')) {
+                return;
+            }
+            
+            const form = $('#batch-delete-form');
+            const token = form.find('input[name="_token"]').val();
+
+            ajax({
+                method: 'POST',
+                url: form.attr('action'),
+                data: {
+                    ids: selectedIds,
+                    _token: token
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        alert('删除成功');
+                        window.location.reload();
+                    } else {
+                        alert(response.message || '删除失败');
+                    }
+                },
+                error: function() {
+                    alert('系统错误，请重试');
+                }
+            });
+        });
     </script>
 {% endblock %}

@@ -11,6 +11,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class EntityFormService extends BaseService
 {
@@ -86,6 +88,7 @@ class EntityFormService extends BaseService
       ->add('fieldType', ChoiceType::class, [
         'choices' => [
           '文本' => 'string',
+          '长文本' => 'text',
           '网页' => 'link',
           '选项' => 'options',
           '人员' => 'user'
@@ -105,6 +108,36 @@ class EntityFormService extends BaseService
           'name' => 'fieldGroup'.$fieldGroupToken,
           'fieldName' => 'group',
         ],
+      ])
+      ->add('fieldHeight', IntegerType::class, [
+        'required' => false,
+        'attr' => [
+          'class' => 'fieldHeight',
+          'placeholder' => '高度(px)',
+          'fieldName' => 'height',
+        ]
+      ])
+      ->add('fieldRounded', CheckboxType::class, [
+        'required' => false,
+        'attr' => [
+          'class' => 'fieldRounded',
+          'fieldName' => 'rounded',
+        ]
+      ])
+      ->add('fieldRows', IntegerType::class, [
+        'required' => false,
+        'attr' => [
+          'class' => 'fieldRows',
+          'placeholder' => '行数(Textarea)',
+          'fieldName' => 'rows',
+        ]
+      ])
+      ->add('fieldAutosize', CheckboxType::class, [
+        'required' => false,
+        'attr' => [
+          'class' => 'fieldAutosize',
+          'fieldName' => 'autosize',
+        ]
       ]);
 
     $form = $formBuilder->getForm();

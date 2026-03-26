@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  $("input.ef-input.number").on("input", function () {
+  $("body").on("input", "input.ef-input.number", function () {
     if (numOject.isInteger($(this))) {
       $(this).val($(this).val().replace(/[^0-9]/g, '').replace(/(\..*)\./g, '$1'));
     }
@@ -9,16 +9,16 @@ $(document).ready(function () {
     }
   })
 
-  $("input.ef-input.number").on("focusout", function () {
+  $("body").on("focusout", "input.ef-input.number", function () {
     numOject.modify($(this));
   })
 
-  $(".ef-input-number-step-button.add").on("click", function () {
+  $("body").on("click", ".ef-input-number-step-button.add", function () {
     let input = $(this).closest(".ef-input-number").find("input.ef-input.number");
     numOject.modify(input, 'add');
   })
 
-  $(".ef-input-number-step-button.subtract").on("click", function () {
+  $("body").on("click", ".ef-input-number-step-button.subtract", function () {
     let input = $(this).closest(".ef-input-number").find("input.ef-input.number");
     numOject.modify(input, 'subtract');
   })

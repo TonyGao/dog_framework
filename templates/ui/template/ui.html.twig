@@ -39,9 +39,9 @@
    {{ ui.checkbox('checkbox2', 'Option 2', '0', true) }}
    {{ ui.checkbox('checkbox3', 'Option 3', '0', false, 'custom-class') }} 
 #}
-{% macro checkbox(id, label, value, checked=false, className='') %}
+{% macro checkbox(id, label, value, checked=false, className='', name='') %}
     <label class="ef-checkbox {{ className }}">
-        <input type="checkbox" class="ef-checkbox-target" id="{{ id }}" value="{{ value }}" {% if checked %}checked{% endif %}>
+        <input type="checkbox" class="ef-checkbox-target" id="{{ id }}" name="{{ name|default(id) }}" value="{{ value }}" {% if checked %}checked{% endif %}>
         <span class="ef-icon-hover ef-checkbox-icon-hover">
             <div class="ef-checkbox-icon"></div>
         </span>
@@ -170,19 +170,23 @@ $(document).ready(function () {
    {{ ui.inputNumber('input1', 100, 0, 1, 0) }} // id, max, min, step, precision
    // 这几个参数都是可选的，分别代表：id, 最大值, 最小值, 步长, 小数位数
    {{ ui.inputNumber('input2', null, null, 1.5, 3) }} // 不设置最大最小值
+   {{ ui.inputNumber('input3', null, null, 1, 0, '', 'ef-input-rounded ef-input-h36') }} // 设置额外 wrapper 样式
 #}
-{% macro inputNumber(id, max = null, min = null, step = 1, precision = 0, placeholder = "") %}
-    <span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium">
+{% macro inputNumber(id, max = null, min = null, step = 1, precision = 0, placeholder = "", wrapperClass = "", name = "", value = "", attributes = {}) %}
+    <span class="ef-input-wrapper ef-input-number ef-input-number-mode-embed ef-input-number-size-medium {{ wrapperClass }}">
         <input role="spinbutton"
             id="{{ id }}"
+            name="{{ name|default(id) }}"
             {% if max is not null %}num-valuemax="{{ max }}"{% endif %}
             {% if min is not null %}num-valuemin="{{ min }}"{% endif %}
-            num-value=""
+            num-value="{{ value }}"
+            value="{{ value }}"
             step="{{ step }}"
             precision="{{ precision }}"
             class="ef-input ef-input-size-medium number"
             type="text"
             placeholder="{{ placeholder }}"
+            {% for attr, val in attributes %}{{ attr }}="{{ val }}" {% endfor %}
         >
         <span class="ef-input-suffix">
             <div class="ef-input-number-step">
@@ -196,3 +200,160 @@ $(document).ready(function () {
         </span>
     </span>
 {% endmacro %}
+
+{# 单行文本输入框组件 (Input) #}
+{# 使用方法：
+   {{ ui.input('myInput', 'text', 'Please enter', '', 'ef-input-rounded') }}
+#}
+{% macro input(id, type = "text", placeholder = "", value = "", wrapperClass = "", inputClass = "ef-input-size-medium", attributes = {}) %}
+    <span class="ef-input-wrapper {{ wrapperClass }}">
+        <input class="ef-input text {{ inputClass }}" type="{{ type }}" id="{{ id }}" value="{{ value }}" placeholder="{{ placeholder }}" {% for attr, val in attributes %}{{ attr }}="{{ val }}" {% endfor %}>
+    </span>
+{% endmacro %}
+
+{# 多行文本框组件 #}
+{# 使用方法：
+   {{ ui.textarea('desc', 'Description', 3, 10) }} // id, placeholder, minRows, maxRows
+   {{ ui.textarea('remark', 'Remark', 3, 10, 'ef-textarea-rounded ef-textarea-h36') }} // 设置额外 wrapper 样式
+#}
+{% macro textarea(id, placeholder = "", minRows = 3, maxRows = 10, wrapperClass = "") %}
+  <div class="ef-textarea-wrapper {{ wrapperClass }}">
+    <textarea component="textarea" id="{{ id }}" class="ef-textarea resizeable" min-rows="{{ minRows }}" max-rows="{{ maxRows }}" clearable="true" placeholder="{{ placeholder }}"></textarea>
+  </div>
+{% endmacro %}
+
+{# 定义抽屉宏 (Drawer) #}
+{% macro drawer(id, title, body, footer, options = {}) %}
+<div class="ef-drawer-container" id="{{ id }}" style="z-index: {{ options.zIndex | default(1001) }}; display: none;">
+    <div class="ef-drawer-mask" {% if options.onClose is defined %}onclick="{{ options.onClose }}"{% endif %}></div>
+    <div class="ef-drawer" style="right: 0px; width: {{ options.width | default('500px') }};">
+        <div class="ef-drawer-header">
+            <div class="ef-drawer-title">
+                {{ title|raw }}
+            </div>
+            <div class="ef-drawer-close-btn" {% if options.onClose is defined %}onclick="{{ options.onClose }}"{% endif %}>
+                <i class="fa-solid fa-times"></i>
+            </div>
+        </div>
+        <div class="ef-drawer-body">
+            {{ body|raw }}
+        </div>
+        {% if footer is not empty %}
+        <div class="ef-drawer-footer">
+            {{ footer|raw }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{# 切换按钮组件 (Switch) #}
+{% macro switch(id, checked=false, small=false, attributes={}) %}
+<button type="button" id="{{ id }}" role="switch" aria-checked="{{ checked ? 'true' : 'false' }}" class="ef-switch ef-switch-type-circle {% if small %}ef-switch-small{% endif %}" {% for attr, value in attributes %}{{ attr }}="{{ value }}" {% endfor %}>
+  <span class="ef-switch-handle">
+    <span class="ef-switch-handle-icon"></span>
+  </span>
+</button>
+{% endmacro %}
+
+{# 单选框组件 (Radio) #}
+{% macro radio(id, name, value, label, checked=false, attributes={}) %}
+<label class="ef-radio" radioId="{{ id }}">
+    <input type="radio" class="ef-radio-target" name="{{ name }}" value="{{ value }}" {% if checked %}checked{% endif %} {% for attr, val in attributes %}{{ attr }}="{{ val }}" {% endfor %}>
+    <span class="ef-icon-hover ef-radio-icon-hover">
+        <span class="ef-radio-icon"></span>
+    </span>
+    <span class="ef-radio-label">{{ label }}</span>
+</label>
+{% endmacro %}
+
+{# 标签组件 (Label) #}
+{% macro label(text, type='primary', classes='') %}
+<span class="ef-tag ef-tag-{{ type }} {{ classes }}">
+    <span class="ef-tag-text">{{ text }}</span>
+</span>
+{% endmacro %}
+
+{# 链接组件 (Link) #}
+{% macro link(text, href='#', type='primary', classes='', attributes={}) %}
+<a class="ef-link ef-link-{{ type }} {{ classes }}" href="{{ href }}" {% for attr, value in attributes %}{{ attr }}="{{ value }}" {% endfor %}>
+    {{ text }}
+</a>
+{% endmacro %}
+
+{# 分隔线组件 (Divider) #}
+{% macro divider(direction='horizontal', text='', textPosition='center', classes='') %}
+{% if text is not empty %}
+<div class="ef-divider ef-divider-{{ direction }} ef-divider-with-text-{{ textPosition }} {{ classes }}">
+    <span class="ef-divider-inner-text">{{ text }}</span>
+</div>
+{% else %}
+<div class="ef-divider ef-divider-{{ direction }} {{ classes }}"></div>
+{% endif %}
+{% endmacro %}
+
+{# 下拉选择组件 (Select) #}
+{# 使用方法：
+   {{ ui.select(options, 'Please select ...', '320px', 'ef-input-rounded') }}
+#}
+{% macro select(options, placeholder='Please select ...', width='320px', classes='', name='', id='', value='') %}
+{% set selectInputId = id|default(random()) ~ '_select' %}
+{% set selectContentId = random() %}
+{% set real_id = id|default(random()) %}
+{% set chosen_label = '' %}
+{% for option in options %}
+    {% if option.value|default(option.label) == value %}
+        {% set chosen_label = option.label %}
+    {% endif %}
+{% endfor %}
+<input type="hidden" name="{{ name }}" id="{{ real_id }}" value="{{ value }}">
+<span class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-select-view-search {{ classes }}" style="width: {{ width }};" chosen="{{ value ? 'true' : 'false' }}" id="{{ selectInputId }}" contentId="{{ selectContentId }}">
+  <input class="ef-select-view-input {% if value %}ef-select-view-input-hidden{% endif %}" placeholder="{{ placeholder }}">
+  <span class="ef-select-view-value {% if not value %}ef-select-view-value-hidden{% endif %}">{{ chosen_label }}</span>
+  <span class="ef-select-view-suffix">
+    <span class="ef-select-view-icon">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-expand" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" style="transform: rotate(-45deg);">
+        <path d="M7 26v14c0 .552.444 1 .996 1H22m19-19V8c0-.552-.444-1-.996-1H26"></path>
+      </svg>
+    </span>
+  </span>
+</span>
+<div class="ef-trigger-popup ef-trigger-position-bl" trigger-placement="bl" style="z-index: 1001; pointer-events: auto; width: {{ width }}; display: none;" id="{{ selectContentId }}" parentId="{{ selectInputId }}">
+	<div class="ef-trigger-popup-wrapper" style="transform-origin: 0px 0px;">
+		<div class="ef-trigger-content">
+			<div class="ef-select-dropdown">
+					<div class="ef-scrollbar ef-scrollbar-type-embed" style="">
+            <div class="ef-scrollbar-container ef-select-dropdown-list-wrapper">
+              <ul class="ef-select-dropdown-list">
+                {% for option in options %}
+                <li id="{{ random() }}" class="ef-select-option {% if option.disabled|default(false) %}ef-select-option-disabled{% endif %} {% if option.value|default(option.label) == value %}ef-select-option-active{% endif %}" value="{{ option.value|default(option.label) }}"><span class="ef-select-option-content">{{ option.label }}</span></li>
+                {% endfor %}
+              </ul>
+            </div>
+					</div>
+				</div>
+      </div>
+		</div>
+  </div>
+{% endmacro %}
+
+{# 提示组件 (Tip / Tooltip) #}
+{% macro tip(content, placement='top') %}
+<span class="ef-tooltip" data-content="{{ content }}" data-placement="{{ placement }}">
+    <i class="fa-regular fa-circle-question"></i>
+</span>
+{% endmacro %}
+
+{# 文本高亮/标记笔组件 (Text Lighting) #}
+{# 使用方法：
+   {{ ui.textLighting('标记内容', 'yellow') }}
+   {{ ui.textLighting('标记内容', 'green', 2) }}
+#}
+{% macro textLighting(text, color='yellow', style=1) %}
+    {% if style == 2 %}
+        <span class="ef-text-lighting-style2-{{ color }}">{{ text }}</span>
+    {% else %}
+        <span class="ef-text-lighting {{ color }}">{{ text }}</span>
+    {% endif %}
+{% endmacro %}
+

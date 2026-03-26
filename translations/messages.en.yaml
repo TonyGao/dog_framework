@@ -137,3 +137,193 @@ layout:
 pagination:
   info: Showing {start} to {end} of {total} entries
   per_page: Per page
+
+admin_security:
+  page_title: 'Security Configuration'
+  title: 'Security'
+  tabs:
+    email_password: 'Email & Password'
+    2fa_settings: 'Reset Password Rules'
+  alert:
+    title: 'Add a strong backup method to add more protection'
+    content: 'Having one strong method is good, but having two is even better for protecting your account. If you lose access to your main method, you can use the other one as a backup.'
+  list:
+    title: 'Your password reset method (2FA)'
+    subtitle: 'Add a layer of protection to your account'
+  btn:
+    initialize: 'Initialize Defaults'
+    add_method: 'Add new method'
+    cancel: 'Cancel'
+    save: 'Save Changes'
+  status:
+    more_secure: 'MORE SECURE'
+    less_secure: 'LESS SECURE'
+  modal:
+    title: 'Configure %name%'
+    priority_label: 'Priority Order'
+    priority_help: 'Lower numbers are checked first (e.g. 10 runs before 20).'
+    enable_method: 'Enable this method'
+  side_card:
+    checkup:
+      title: 'Security Checkup'
+      text: 'Add more protection to your account through these steps.'
+      link: 'Get started'
+    help:
+      title: 'Need help?'
+      text: "Let us know if anything isn't working as you expect."
+      link: 'Get support'
+
+admin_email:
+  title: 'Email Configuration'
+  tabs:
+    config: 'Mail Server'
+    templates: 'Email Templates'
+  templates:
+    title: 'Email Templates'
+    desc: 'Manage email content for various business scenarios'
+    preset:
+      select_label: 'Choose Template'
+      select_placeholder: 'Please choose a preset'
+      apply: 'Apply'
+      option:
+        welcome: 'Welcome New Employee'
+        verification_code: 'Verification Code'
+        password_reset: 'Password Reset'
+        announcement: 'Announcement'
+        meeting_invite: 'Meeting Invite'
+        newsletter: 'Newsletter'
+        invoice: 'Invoice/Billing'
+        system_alert: 'System Alert'
+        survey: 'Survey'
+        account_locked: 'Account Locked'
+        promotion: 'Promotion'
+        weekly_report: 'Weekly Report'
+        order_shipped: 'Order Shipped'
+        event_reminder: 'Event Reminder'
+  editor:
+    title: 'Email Template Editor'
+    open_full: 'Open Full Editor'
+    preset:
+      title: 'Preset Templates'
+      desc: 'Select a preset template to quick start, or start from scratch.'
+      apply: 'Apply Template'
+      thumb: 'Preview'
+      welcome:
+        desc: 'Welcome new users or employees, includes a getting started link.'
+      verification:
+        desc: 'Send an email with a numeric code for verification or 2FA.'
+      reset:
+        desc: 'Send a password reset link when a user forgets their password.'
+      announcement:
+        desc: 'Publish company-wide notifications, product updates, or alerts.'
+      meeting_invite:
+        desc: 'Send a meeting invitation with time, location, and join link.'
+      newsletter:
+        desc: 'Regularly sent product newsletters, industry news, or curated content.'
+      invoice:
+        desc: 'Send billing details, payment confirmations, or invoice download links.'
+      system_alert:
+        desc: 'Important warnings for system anomalies, quota shortages, etc.'
+      survey:
+        desc: 'Invite users to participate in a satisfaction survey or product feedback.'
+      account_locked:
+        desc: 'Notification of account lockout due to unusual activity and unlock instructions.'
+      promotion:
+        desc: 'Marketing promotional emails for holiday sales, new feature launches, etc.'
+      weekly_report:
+        desc: 'Automatically sent weekly data summary reports for users or teams.'
+      order_shipped:
+        desc: 'E-commerce order shipping and logistics tracking notifications.'
+      event_reminder:
+        desc: 'Reminders for upcoming online or offline events.'
+    form:
+      name: 'Template Name/Code *'
+      subject: 'Email Subject *'
+      server: 'Email Server'
+      default_server: 'Use Default Server'
+  btn:
+    save_config: 'Save Configuration'
+    send_test: 'Send Test Email'
+    add_template: 'Add Template'
+  side_card:
+    config:
+      title: 'Configuration Guide'
+      text: 'Please fill in your SMTP server information to enable email sending. Supports variables, e.g., <code>{{ code }}</code> for password reset.'
+
+  preview:
+    enterprise: 'Enterprise'
+    admin: 'ADMIN'
+    menu:
+      dashboard: 'Dashboard'
+      control_panel: 'Control panel'
+      management: 'Management'
+      employees: 'Employees'
+      clients: 'Clients'
+      reports: 'Reports'
+      trials: 'Trials'
+      tools: 'Tools'
+      integrations: 'Integrations'
+      resources: 'Resources'
+    page_title:
+      reports: 'Reports'
+    page_desc:
+      reports: 'This section displays recent reports submitted by citizens regarding...'
+    action:
+      display: 'Display'
+      filter: 'Filter'
+      accept: 'Accept'
+      decline: 'Decline'
+      send_message: 'Send message'
+    search:
+      placeholder: 'Search by subject, title o...'
+    tab:
+      pending: 'Pending'
+      reviewed: 'Reviewed'
+    status:
+      in_review: 'In review'
+    time:
+      days_3: '3 days ago'
+      days_2: '2 days ago'
+      days_5: '5 days ago'
+      week_1: '1 week ago'
+    mock:
+      desc1: 'I am reaching out regarding an incident that occurred near my residence involving a potential...'
+      desc2: "I'd like to report ongoing noise disturbances in my neighborhood that have been escalating in the p..."
+      desc3: 'This report concerns a recent construction project nearby, which seems to be operating out...'
+      desc4: 'I am submitting a complaint regarding a public safety issue at the intersection near my office, w...'
+    email:
+      from: 'From:'
+      report_id: 'Report ID:'
+      date: 'Date:'
+      status: 'Status'
+    input:
+      write_message: 'Write a message...'
+
+login:
+  title: 'Login'
+  branding:
+    title: 'Enterprise Management System'
+    subtitle: 'Efficient, secure, and convenient enterprise management solution.'
+  form:
+    title: 'Welcome Back'
+    label:
+      username: 'Email / Username / Employee ID'
+      password: 'Password'
+      remember_me: 'Remember me'
+    link:
+      forgot_password: 'Forgot password?'
+      signup: 'Sign up now'
+    placeholder:
+      password: 'Enter your password'
+    text:
+      signup_prompt: "Don't have an account?"
+    button:
+      login: 'Login'
+      passkey: 'Sign in with Passkey'
+      processing: 'Processing...'
+    divider:
+      or: 'OR'
+    error:
+      passkey_invalid: 'Invalid passkey'
+      passkey_generic_error: 'Passkey verification failed'
+      passkey_login_failed: 'Login failed: '

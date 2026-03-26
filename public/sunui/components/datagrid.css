@@ -107,7 +107,7 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-input[type=number] {
+input[type='number'] {
   -moz-appearance: textfield;
 }
 
@@ -124,26 +124,26 @@ input[type=number] {
 }
 
 /* 自适应内容宽度功能实现 - 纯CSS版本 */
-.ef-table[data-auto-fit-content="true"] {
+.ef-table[data-auto-fit-content='true'] {
   width: auto;
   display: inline-block;
 }
 
-.ef-table[data-auto-fit-content="true"] .ef-table-element {
+.ef-table[data-auto-fit-content='true'] .ef-table-element {
   table-layout: fixed;
   width: max-content;
 }
 
-.ef-table[data-auto-fit-content="true"] .ef-table-element col.auto-fit-content {
+.ef-table[data-auto-fit-content='true'] .ef-table-element col.auto-fit-content {
   width: max-content;
 }
 
-.ef-table[data-auto-fit-content="true"] .ef-table-cell {
+.ef-table[data-auto-fit-content='true'] .ef-table-cell {
   width: auto;
 }
 
-.ef-table[data-auto-fit-content="true"] .ef-table-td-content,
-.ef-table[data-auto-fit-content="true"] .ef-table-th-title {
+.ef-table[data-auto-fit-content='true'] .ef-table-td-content,
+.ef-table[data-auto-fit-content='true'] .ef-table-th-title {
   white-space: nowrap;
   overflow: visible;
   text-overflow: clip;
@@ -151,26 +151,28 @@ input[type=number] {
   /* 移除inline-block，让内容正常显示 */
 }
 
-.ef-table[data-auto-fit-content="false"] {
+.ef-table[data-auto-fit-content='false'] {
   width: auto;
   display: inline-block;
 }
 
-.ef-table[data-auto-fit-content="false"] .ef-table-element {
+.ef-table[data-auto-fit-content='false'] .ef-table-element {
   table-layout: fixed;
   width: auto;
 }
 
-.ef-table[data-auto-fit-content="false"] .ef-table-element col.auto-fit-content {
+.ef-table[data-auto-fit-content='false']
+  .ef-table-element
+  col.auto-fit-content {
   width: max-content;
 }
 
-.ef-table[data-auto-fit-content="false"] .ef-table-cell {
+.ef-table[data-auto-fit-content='false'] .ef-table-cell {
   width: auto;
 }
 
-.ef-table[data-auto-fit-content="false"] .ef-table-td-content,
-.ef-table[data-auto-fit-content="false"] .ef-table-th-title {
+.ef-table[data-auto-fit-content='false'] .ef-table-td-content,
+.ef-table[data-auto-fit-content='false'] .ef-table-th-title {
   white-space: normal;
   overflow: visible;
   text-overflow: clip;
@@ -182,15 +184,15 @@ input[type=number] {
 }
 
 /* 确保表格容器不会强制表格扩展 */
-.ef-table[data-auto-fit-content="true"] .ef-table-container,
-.ef-table[data-auto-fit-content="true"] .ef-scrollbar,
-.ef-table[data-auto-fit-content="true"] .ef-scrollbar-container {
+.ef-table[data-auto-fit-content='true'] .ef-table-container,
+.ef-table[data-auto-fit-content='true'] .ef-scrollbar,
+.ef-table[data-auto-fit-content='true'] .ef-scrollbar-container {
   width: auto !important;
   overflow: visible !important;
 }
 
 /* 确保分页栏宽度与表格主体一致 */
-.ef-table[data-auto-fit-content="true"] .ef-pagination-bar {
+.ef-table[data-auto-fit-content='true'] .ef-pagination-bar {
   width: auto;
   /* 移除max-content和min-width限制，使其与表格容器保持一致 */
 }
@@ -207,8 +209,8 @@ input[type=number] {
 }
 
 /* 当表格设置了max-width时，确保toolbar和ef-spin都遵循相同的宽度限制 */
-.ef-table[style*="max-width"] .toolbar,
-.ef-table[style*="max-width"] .ef-spin {
+.ef-table[style*='max-width'] .toolbar,
+.ef-table[style*='max-width'] .ef-spin {
   max-width: inherit;
   overflow-x: auto;
 }
@@ -261,6 +263,7 @@ body.ef-drawer-open {
 /* 表头文字居中 */
 .ef-table-cell.ef-table-cell-align-center {
   justify-content: center;
+  text-align: center;
 }
 
 /* 操作列按钮样式 */
@@ -415,7 +418,7 @@ body.ef-drawer-open {
   padding: 8px;
   border-left: 1px solid var(--ef-separator-color);
   min-height: 400px;
-  align-items: baseline
+  align-items: baseline;
 }
 
 .ef-filter .ef-filter-condition-editor {
@@ -484,7 +487,9 @@ body.ef-drawer-open {
   color: var(--ef-primary-color);
   font-weight: 500;
   display: inline-block;
-  transition: background-color 0.2s ease, border-color 0.2s
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s;
 }
 
 .ef-filter .ef-filter-condition-editor span:hover {
@@ -698,13 +703,15 @@ body.ef-drawer-open {
 }
 
 .ef-filter-editor-logic-div:hover .delete-button,
-.ef-filter-editor-logic-div .ef-filter-editor-parenthesis.active~.delete-button,
+.ef-filter-editor-logic-div
+  .ef-filter-editor-parenthesis.active
+  ~ .delete-button,
 .ef-filter-editor-logic-div.active .delete-button {
   display: block;
 }
 
 .ef-filter-editor-logic-div:hover .add-button,
-.ef-filter-editor-logic-div .ef-filter-editor-parenthesis.active~.add-button,
+.ef-filter-editor-logic-div .ef-filter-editor-parenthesis.active ~ .add-button,
 .ef-filter-editor-logic-div.active .add-button {
   display: block;
 }

@@ -1,0 +1,21 @@
+App\Entity\System\SystemUser:
+  system_user_admin:
+    username: 'sys_admin'
+    password: '\$2y\$13\$fnrrHKC9TFpOC9WrJtfi..SgPaH/3FPkcOgicWYlJiQLcUxiqNnKq' # Officer@123
+    roles: ['ROLE_SYS_ADMIN']
+    isActive: true
+    createdAt: <dateTimeBetween('-1 year', 'now')>
+
+  system_user_sec:
+    username: 'sec_admin'
+    password: '\$2y\$13\$fnrrHKC9TFpOC9WrJtfi..SgPaH/3FPkcOgicWYlJiQLcUxiqNnKq' # Officer@123
+    roles: ['ROLE_SEC_ADMIN']
+    isActive: true
+    createdAt: <dateTimeBetween('-1 year', 'now')>
+
+  system_user_audit:
+    username: 'auditor'
+    password: '\$2y\$13\$fnrrHKC9TFpOC9WrJtfi..SgPaH/3FPkcOgicWYlJiQLcUxiqNnKq' # Officer@123
+    roles: ['ROLE_AUDITOR']
+    isActive: true
+    createdAt: <dateTimeBetween('-1 year', 'now')>

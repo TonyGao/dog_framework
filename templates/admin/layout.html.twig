@@ -54,15 +54,23 @@
 							<div class="hPerson-control">
 								<div class="hPerson-avatar-box {{ headerState == 'shrunk' ? 'shrunk' : '' }}">
 									<div class="hPerson-avatar" style="display: {{ headerState == 'shrunk' ? 'none' : 'block' }}">
-										{% if app.user.avatar is defined and app.user.avatar %}
-											<img src="{{ app.user.avatar }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+										{% if app.user %}
+											{% if app.user.avatar is defined and app.user.avatar %}
+												<img src="{{ app.user.avatar }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+											{% else %}
+												{{ (app.user.name|default(app.user.userIdentifier))|slice(-2) }}
+											{% endif %}
 										{% else %}
-											{{ (app.user.name is defined ? app.user.name : app.user.userIdentifier)|slice(-2) }}
+											Guest
 										{% endif %}
 									</div>
 									<div class="hPerson-content">
 										<div class="hPerson-name">
-											{{ (app.user.englishName is defined and app.user.englishName) ? app.user.englishName : (app.user.name is defined ? app.user.name : app.user.userIdentifier) }}
+											{% if app.user %}
+												{{ app.user.englishName|default(app.user.name|default(app.user.userIdentifier)) }}
+											{% else %}
+												Guest User
+											{% endif %}
 										</div>
 									</div>
 									<div class="hPerson-caret">
@@ -75,22 +83,30 @@
 									<div class="align-items-center">
 										<span>
 											<div class="hPerson-avatar">
-												{% if app.user.avatar is defined and app.user.avatar %}
-													<img src="{{ app.user.avatar }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+												{% if app.user %}
+													{% if app.user.avatar is defined and app.user.avatar %}
+														<img src="{{ app.user.avatar }}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+													{% else %}
+														{{ (app.user.name|default(app.user.userIdentifier))|slice(-2) }}
+													{% endif %}
 												{% else %}
-													{{ (app.user.name is defined ? app.user.name : app.user.userIdentifier)|slice(-2) }}
+													Guest
 												{% endif %}
 											</div>
 										</span>
 										<div class="hPerson-info-text">
 											<div class="hPerson-info-title">
-												{% if app.user.position is defined and app.user.position %}
-													{{ app.user.position.name }}
+												{% if app.user %}
+													{% if app.user.position is defined and app.user.position %}
+														{{ app.user.position.name }}
+													{% endif %}
+													{{ app.user.name|default(app.user.userIdentifier) }}
+												{% else %}
+													Guest User
 												{% endif %}
-												{{ app.user.name is defined ? app.user.name : app.user.userIdentifier }}
 											</div>
 											<div class="text-content">
-												{{ app.user.email is defined ? app.user.email : '' }}
+												{{ app.user and app.user.email is defined ? app.user.email : '' }}
 											</div>
 										</div>
 									</div>

@@ -19,7 +19,7 @@
   flex-direction: column;
   flex-wrap: nowrap;
   -webkit-box-pack: justify;
-  justify-content: center;
+  justify-content: flex-start;
   -webkit-box-align: stretch;
   align-items: stretch;
   margin-bottom: 20px;
@@ -89,7 +89,7 @@
 }
 
 .start-node-wrapper:after {
-  content: "";
+  content: '';
   position: absolute;
   width: 30px;
   height: 2px;
@@ -99,7 +99,7 @@
   z-index: -1;
 }
 
- .ol-wrapper {
+.ol-wrapper {
   list-style: none;
   border-left: 2px solid #b8c0c9;
   padding-left: 10px;
@@ -107,7 +107,7 @@
   border-bottom-left-radius: 10px;
 }
 
- .ol-wrapper > ol > li {
+.ol-wrapper > ol > li {
   margin-bottom: 10px;
   box-sizing: border-box;
   flex: 1;
@@ -126,8 +126,6 @@
 .ef-row-align-start {
   align-items: flex-start;
 }
-
-
 
 /*
 .ol-wrapper > ol > li > h2:before {
@@ -160,7 +158,3 @@
   position: relative;
   width: 20px;
 } */
-
-
-
-

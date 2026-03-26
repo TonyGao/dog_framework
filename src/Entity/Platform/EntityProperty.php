@@ -155,6 +155,30 @@ class EntityProperty
     private $validation;
 
     /**
+     * 是否圆角
+     */
+    #[ORM\Column(type: "boolean", nullable: true)]
+    private $rounded = null;
+
+    /**
+     * 高度
+     */
+    #[ORM\Column(type: "integer", nullable: true)]
+    private $height = null;
+
+    /**
+     * 表单个性化配置 (JSON)
+     * 
+     * 存储格式示例:
+     * {
+     *     "rows": 5,  // 长文本 (textarea) 的行数，类型为 integer
+     *     "autosize": true // 是否自适应高度，类型为 boolean
+     * }
+     */
+    #[ORM\Column(type: "json", nullable: true)]
+    private $formOptions = [];
+
+    /**
      * 属性所属的实体
      */
     #[ORM\ManyToOne(
@@ -634,6 +658,66 @@ class EntityProperty
     public function setGroup($group)
     {
         $this->group = $group;
+
+        return $this;
+    }
+
+    /**
+     * Get 是否圆角
+     */
+    public function getRounded()
+    {
+        return $this->rounded;
+    }
+
+    /**
+     * Set 是否圆角
+     *
+     * @return  self
+     */
+    public function setRounded($rounded)
+    {
+        $this->rounded = $rounded;
+
+        return $this;
+    }
+
+    /**
+     * Get 高度
+     */
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    /**
+     * Set 高度
+     *
+     * @return  self
+     */
+    public function setHeight($height)
+    {
+        $this->height = $height;
+
+        return $this;
+    }
+
+    /**
+     * Get 表单个性化配置 (JSON)
+     */
+    public function getFormOptions()
+    {
+        return $this->formOptions;
+    }
+
+    /**
+     * Set 表单个性化配置 (JSON)
+     *
+     * @return  self
+     */
+    public function setFormOptions($formOptions)
+    {
+        $this->formOptions = $formOptions;
 
         return $this;
     }

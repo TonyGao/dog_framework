@@ -27,7 +27,6 @@ async function clearSingleDepartmentCache() {
   $.ajax({
     url: url.path,
     method: "GET",
-    async: false,
     dataType: "html",
     success: async function (data) {
       await Common.setCache("org.singleDepartment", data);

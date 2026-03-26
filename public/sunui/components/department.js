@@ -213,11 +213,11 @@ $(document).ready(function () {
 
   function refreshSelectionHover() {
     $('body').on('mouseenter', '.ef-department-selection-li', function () {
-      $(this).find('.close-chose-department').show();
+      $(this).find('.close-chose-department').css('display', 'inline-flex');
     });
 
     $('body').on('mouseleave', '.ef-department-selection-li', function () {
-      $(this).find('.close-chose-department').hide();
+      $(this).find('.close-chose-department').css('display', 'none');
     });
   }
 
@@ -376,7 +376,6 @@ $(document).ready(function () {
         $.ajax({
           url: '/admin/org/departemnt/singleSelect',
           method: 'GET',
-          async: false,
           dataType: 'html',
           success: async function (data) {
             await Common.setCache('org.singleDepartment', data);

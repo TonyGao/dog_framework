@@ -22,24 +22,55 @@ $().ready(function () {
     function calcHeight(obj) {
       let fontSize = obj.css('font-size');
       let lineHeight = Math.floor(parseInt(fontSize.replace('px', '')) * 1.5);
-      let outerHeight = parseInt(obj.css('padding-top').replace('px', '')) +
-        parseInt(obj.css('padding-bottom').replace('px', ''));
+      // For textarea, line-height might be 'normal', so we fallback to a calculation or a specific value
+      let cssLineHeight = obj.css('line-height');
+      if (cssLineHeight && cssLineHeight !== 'normal') {
+         lineHeight = parseInt(cssLineHeight.replace('px', ''));
+      }
+      
+      // Calculate padding and border
+      let paddingTop = parseInt(obj.css('padding-top').replace('px', '')) || 0;
+      let paddingBottom = parseInt(obj.css('padding-bottom').replace('px', '')) || 0;
+      let borderTop = parseInt(obj.css('border-top-width').replace('px', '')) || 0;
+      let borderBottom = parseInt(obj.css('border-bottom-width').replace('px', '')) || 0;
+      let outerHeight = paddingTop + paddingBottom + borderTop + borderBottom;
 
-      let content = obj.val();
+      // Use scrollHeight for content height calculation
+      // Important: We must set height to 'auto' on the ACTUAL element temporarily to get the correct scrollHeight
+      let currentHeight = obj.css('height');
+      obj.css('height', 'auto');
+      let scrollHeight = obj[0].scrollHeight;
+      obj.css('height', currentHeight);
+
       let minRows = parseInt(obj.attr('min-rows')) ? parseInt(obj.attr('min-rows')) : 2;
       let maxRows = parseInt(obj.attr('max-rows')) ? parseInt(obj.attr('max-rows')) : null;
-      let numberOfLineBreaks = (content.match(/\n/g) || []).length;
-      // 当没有 minRows, 并且没有 maxRows 时，不用做任何处理。
-      // 当实际行数少于 minRows 时
-      if (minRows != 2 && (numberOfLineBreaks + 1) < minRows) {
-        numberOfLineBreaks = minRows - 1;
-      }
-      // 当有实际行数多于 maxRows 时
-      if (maxRows != null && (numberOfLineBreaks + 1) > maxRows) {
-        numberOfLineBreaks = maxRows - 1;
+      
+      // Calculate min height based on minRows
+      // Total height = (lineHeight * rows) + padding + border
+      let minTotalHeight = (lineHeight * minRows) + outerHeight;
+
+      let newHeight = scrollHeight;
+      
+      if (obj.css('box-sizing') === 'border-box') {
+          newHeight = newHeight + borderTop + borderBottom;
       }
 
-      let newHeight = lineHeight + numberOfLineBreaks * lineHeight + outerHeight + numberOfLineBreaks;
+      if (newHeight < minTotalHeight) {
+        newHeight = minTotalHeight;
+      }
+      
+      if (maxRows !== null) {
+          let maxTotalHeight = (lineHeight * maxRows) + outerHeight;
+          if (newHeight > maxTotalHeight) {
+              newHeight = maxTotalHeight;
+              obj.css('overflow-y', 'auto'); // Enable scroll if max height reached
+          } else {
+              obj.css('overflow-y', 'hidden'); // Hide scroll otherwise
+          }
+      } else {
+          obj.css('overflow-y', 'hidden');
+      }
+
       return newHeight;
     }
 

@@ -81,74 +81,262 @@
   </script>
 {% endblock %}
 
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .demo-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .demo-header {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 24px;
+    }
+    .demo-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+    .demo-desc {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .demo-section {
+      margin-bottom: 48px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .demo-section-header {
+      background: #f9fafb;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .demo-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+    .demo-section-desc {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 32px;
+      padding: 32px 24px;
+    }
+    .demo-item {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .demo-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #4b5563;
+    }
+    .code-tag {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #ef4444;
+    }
+  </style>
+{% endblock %}
+
 {% block body %}
-	  <span class="ef-input-wrapper" style="width: 320px;">
-      <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="Please enter something">
-    </span>
-    <br>
-    <span class="ef-input-wrapper ef-input-disabled" style="width: 320px;">
-      <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="Please enter something" disabled>
-    </span>
-    <br>
-    <span class="ef-input-wrapper ef-input-error" style="width: 320px;">
-      <input aria-invalid="true" class="ef-input ef-input-size-medium text" clearable="true" type="text" placeholder="Error status">
-    </span>
-    <br>
-    <span class="ef-input-wrapper" style="width: 320px;">
-      <input class="ef-input ef-input-size-mini text" type="text" clearable="true" placeholder="Please enter something">
-    </span>
-    <br>
-    <span class="ef-input-wrapper" style="width: 320px;">
-      <input class="ef-input ef-input-size-small text" type="text" clearable="true" placeholder="Please enter something">
-    </span>
-    <br>
-    <span class="ef-input-wrapper" style="width: 320px;">
-      <input class="ef-input ef-input-size-large text" type="text" clearable="true" placeholder="Please enter something">
-    </span>
-    <br>
-    <span class="ef-input-wrapper" style="width: 320px;">
-      <span class="ef-input-prefix">
-        <i class="fa-regular fa-user"></i>
-      </span>
-      <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="Please enter something">
-    </span>
-    <br>
-    <span class="ef-input-wrapper" style="width: 320px;">
-      <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="Please enter something">
-      <span class="ef-input-suffix">
-        <i class="fa-brands fa-java"></i>
-      </span>
-    </span>
-    <br>
-    <span class="ef-input-outer ef-input-outer-size-medium" style="width: 320px;">
-      <span class="ef-input-prepend"> +86 </span>
-      <span class="ef-input-wrapper">
-        <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="Please enter something">
-      </span>
-    </span>
-    <br>
-    <span class="ef-input-outer ef-input-outer-size-medium" style="width: 320px;">
-      <span class="ef-input-wrapper">
-        <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="Please enter something">
-      </span>
-      <span class="ef-input-append"> RMB </span>
-    </span>
-    <br>
-    <span class="ef-input-wrapper" style="width: 320px;">
-      <input class="ef-input ef-input-size-medium text" type="text" clearable="true" maxlength="10" show-word-limit placeholder="Please enter something">
-      <span class="ef-input-suffix">
-        <span class="ef-input-word-limit">0/10</span>
-      </span>
-    </span>
-    <br>
-    <span class="ef-input-wrapper" style="width: 320px;">
-      <input class="ef-input ef-input-size-medium text" type="text" clearable="true" max-length="{length:10,errorOnly:true}" show-word-limit placeholder="Please enter something">
-      <span class="ef-input-suffix">
-        <span class="ef-input-word-limit">0/10</span>
-      </span>
-    </span>
-    <br>
-	<input type="text" maxlength="180">
-    <br>
-	<input type="text" required maxlength="180">
+<div class="demo-container">
+  <div class="demo-header">
+    <h1 class="demo-title">Input 单行文本输入框</h1>
+    <p class="demo-desc">通过鼠标或键盘输入字符。我们提供了 <strong>标准直角样式</strong>（适用于常规表单）和 <strong>专用圆角样式</strong>（更适合系统后台设置页面）。</p>
+  </div>
+
+  <!-- 1. 圆角样式 (适用于 Settings) -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">后台设置专用样式 (圆角)</h2>
+      <p class="demo-section-desc">追加 <span class="code-tag">ef-input-rounded</span> 类，提供更柔和的 6px 圆角，适合类似 Notion/Linear 风格的系统设置面板。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">基础圆角输入框</span>
+        <span class="ef-input-wrapper ef-input-rounded">
+          <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="请输入内容...">
+        </span>
+      </div>
+      
+      <div class="demo-item">
+        <span class="demo-label">禁用状态 (Disabled)</span>
+        <span class="ef-input-wrapper ef-input-rounded ef-input-disabled">
+          <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="禁止输入..." disabled>
+        </span>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">带前缀图标 (Prefix)</span>
+        <span class="ef-input-wrapper ef-input-rounded">
+          <span class="ef-input-prefix">
+            <i class="fa-regular fa-user"></i>
+          </span>
+          <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="用户名...">
+        </span>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">带前后缀组合 (Prepend/Append)</span>
+        <span class="ef-input-outer ef-input-outer-size-medium ef-input-rounded">
+          <span class="ef-input-prepend"> https:// </span>
+          <span class="ef-input-wrapper">
+            <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="example.com">
+          </span>
+          <span class="ef-input-append"> .cn </span>
+        </span>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">错误状态 (Error)</span>
+        <span class="ef-input-wrapper ef-input-rounded ef-input-error">
+          <input aria-invalid="true" class="ef-input ef-input-size-medium text" clearable="true" type="text" placeholder="输入校验失败...">
+        </span>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">字数限制 (Word Limit)</span>
+        <span class="ef-input-wrapper ef-input-rounded">
+          <input class="ef-input ef-input-size-medium text" type="text" clearable="true" maxlength="20" show-word-limit placeholder="最多20个字符...">
+          <span class="ef-input-suffix">
+            <span class="ef-input-word-limit">0/20</span>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 自定义高度样式 -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">自定义精确高度控制</h2>
+      <p class="demo-section-desc">通过追加 <span class="code-tag">ef-input-h{size}</span> 类（如 <span class="code-tag">h28, h32, h36, h40, h48</span>）可以脱离标准尺寸（Mini/Small/Medium/Large），进行精准高度控制。适用于复杂的表单对齐与定制排版场景（以下演示结合了圆角使用）。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">28px (h28) - 紧凑型</span>
+        <span class="ef-input-wrapper ef-input-rounded ef-input-h28">
+          <input class="ef-input text" type="text" placeholder="Height: 28px">
+        </span>
+      </div>
+      
+      <div class="demo-item">
+        <span class="demo-label">32px (h32) - 常规高度</span>
+        <span class="ef-input-wrapper ef-input-rounded ef-input-h32">
+          <span class="ef-input-prefix"><i class="fa-regular fa-user"></i></span>
+          <input class="ef-input text" type="text" placeholder="Height: 32px">
+        </span>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">36px (h36) - 推荐后台设置</span>
+        <span class="ef-input-wrapper ef-input-rounded ef-input-h36">
+          <input class="ef-input text" type="text" placeholder="Height: 36px">
+          <span class="ef-input-suffix"><i class="fa-solid fa-gear"></i></span>
+        </span>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">40px (h40) - 带前置标签</span>
+        <span class="ef-input-outer ef-input-rounded ef-input-h40">
+          <span class="ef-input-prepend"> URL </span>
+          <span class="ef-input-wrapper">
+            <input class="ef-input text" type="text" placeholder="Height: 40px">
+          </span>
+        </span>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">48px (h48) - 强调型 / 触控友好</span>
+        <span class="ef-input-wrapper ef-input-rounded ef-input-h48">
+          <input class="ef-input text" type="text" placeholder="Height: 48px">
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 标准直角样式 -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">标准组件样式 (直角)</h2>
+      <p class="demo-section-desc">系统默认的基础样式（2px微圆角），适用于传统的表单录入场景。</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">基础输入框</span>
+        <span class="ef-input-wrapper">
+          <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="Please enter something">
+        </span>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">不同尺寸 (Mini / Small / Medium / Large)</span>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <span class="ef-input-wrapper"><input class="ef-input ef-input-size-mini text" type="text" placeholder="Mini size"></span>
+          <span class="ef-input-wrapper"><input class="ef-input ef-input-size-small text" type="text" placeholder="Small size"></span>
+          <span class="ef-input-wrapper"><input class="ef-input ef-input-size-medium text" type="text" placeholder="Medium size"></span>
+          <span class="ef-input-wrapper"><input class="ef-input ef-input-size-large text" type="text" placeholder="Large size"></span>
+        </div>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">带前缀标签 (Prepend)</span>
+        <span class="ef-input-outer ef-input-outer-size-medium">
+          <span class="ef-input-prepend"> +86 </span>
+          <span class="ef-input-wrapper">
+            <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="Phone number">
+          </span>
+        </span>
+      </div>
+
+      <div class="demo-item">
+        <span class="demo-label">带后缀标签 (Append)</span>
+        <span class="ef-input-outer ef-input-outer-size-medium">
+          <span class="ef-input-wrapper">
+            <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="Amount">
+          </span>
+          <span class="ef-input-append"> RMB </span>
+        </span>
+      </div>
+      
+      <div class="demo-item">
+        <span class="demo-label">带后缀图标 (Suffix)</span>
+        <span class="ef-input-wrapper">
+          <input class="ef-input ef-input-size-medium text" type="text" clearable="true" placeholder="Search...">
+          <span class="ef-input-suffix">
+            <i class="fa-brands fa-java"></i>
+          </span>
+        </span>
+      </div>
+      
+      <div class="demo-item">
+        <span class="demo-label">带原生 maxlength 和 required 验证</span>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <input type="text" maxlength="180" placeholder="原生 input 演示">
+          <input type="text" required maxlength="180" placeholder="带 required">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

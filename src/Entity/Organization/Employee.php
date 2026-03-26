@@ -28,6 +28,9 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'uuid', unique: true)]
     private ?Uuid $id = null;
 
+    #[ORM\OneToMany(mappedBy: 'employee', targetEntity: \App\Entity\Security\WebauthnCredential::class)]
+    private Collection $passkeys;
+
     /**
      * 工号
      * @Ef(
@@ -301,6 +304,24 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     private $major;
 
     /**
+     * 安全问题答案
+     * Store as JSON: {"question1": "answer1", "question2": "answer2"}
+     */
+    #[ORM\Column(type: 'json', nullable: true)]
+    private $securityAnswers = [];
+
+    public function getSecurityAnswers(): ?array
+    {
+        return $this->securityAnswers;
+    }
+
+    public function setSecurityAnswers(?array $securityAnswers): self
+    {
+        $this->securityAnswers = $securityAnswers;
+        return $this;
+    }
+
+    /**
      * 毕业时间
      * @Ef(
      *     group="employee_education_info",
@@ -325,6 +346,7 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
         // 自动生成 UUID
         $this->id = Uuid::v4();
         $this->subordinates = new ArrayCollection();
+        $this->passkeys = new ArrayCollection();
     }
 
     /**
@@ -750,6 +772,36 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     public function getSubordinates(): Collection
     {
         return $this->subordinates;
+    }
+
+    /**
+     * @return Collection<int, \App\Entity\Security\WebauthnCredential>
+     */
+    public function getPasskeys(): Collection
+    {
+        return $this->passkeys;
+    }
+
+    public function addPasskey(\App\Entity\Security\WebauthnCredential $passkey): self
+    {
+        if (!$this->passkeys->contains($passkey)) {
+            $this->passkeys[] = $passkey;
+            $passkey->setEmployee($this);
+        }
+
+        return $this;
+    }
+
+    public function removePasskey(\App\Entity\Security\WebauthnCredential $passkey): self
+    {
+        if ($this->passkeys->removeElement($passkey)) {
+            // set the owning side to null (unless already changed)
+            if ($passkey->getEmployee() === $this) {
+                $passkey->setEmployee(null);
+            }
+        }
+
+        return $this;
     }
 
     /**

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Login{% endblock %}
+{% block title %}{{ 'login.title'|trans }}{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -356,8 +356,8 @@
             <div class="logo-icon">
                 <i class="fa-solid fa-shapes"></i>
             </div>
-            <h1>Designed for Individuals</h1>
-            <p>See the analytics and grow your data remotely, from anywhere!</p>
+            <h1>{{ 'login.branding.title'|trans }}</h1>
+            <p>{{ 'login.branding.subtitle'|trans }}</p>
             
             <div class="visual-mockup">
                 <div class="mockup-window">
@@ -386,7 +386,7 @@
     
     <div class="login-right">
         <div class="login-form-wrapper">
-            <h2>Login</h2>
+            <h2>{{ 'login.form.title'|trans }}</h2>
             
             {% if error %}
                 <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -394,44 +394,39 @@
 
             <form method="post">
                 <div class="form-group">
-                    <label for="inputEmail" class="form-label">Email, Username or Employee No</label>
-                    <input type="text" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" placeholder="Email, Username or Employee No" autocomplete="username webauthn" required autofocus>
+                    <label for="inputEmail" class="form-label">{{ 'login.form.label.username'|trans }}</label>
+                    <input type="text" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" placeholder="{{ 'login.form.label.username'|trans }}" autocomplete="username webauthn" required autofocus>
                 </div>
                 
                 <div class="form-group">
                     <div class="label-row">
-                        <label for="inputPassword" class="form-label" style="margin-bottom: 0;">Password</label>
-                        <a href="#" class="forgot-password">Reset Password</a>
+                        <label for="inputPassword" class="form-label" style="margin-bottom: 0;">{{ 'login.form.label.password'|trans }}</label>
+                        <a href="{{ path('app_reset_password') }}" class="forgot-password" id="forgot-password-link">{{ 'login.form.link.forgot_password'|trans }}</a>
                     </div>
-                    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="**********" autocomplete="current-password" required>
+                    <input type="password" name="password" id="inputPassword" class="form-control" placeholder="{{ 'login.form.placeholder.password'|trans }}" autocomplete="current-password" required>
                 </div>
 
                 <div class="form-group checkbox-group">
                     <input type="checkbox" name="_remember_me" id="_remember_me">
-                    <label for="_remember_me">Remember Password</label>
+                    <label for="_remember_me">{{ 'login.form.label.remember_me'|trans }}</label>
                 </div>
 
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
                 <button class="btn btn-primary btn-block" type="submit">
-                    Login
+                    {{ 'login.form.button.login'|trans }}
                 </button>
                 
                 <div class="signup-link">
-                    Don't have an account? <a href="#">Sign up</a>
+                    {{ 'login.form.text.signup_prompt'|trans }} <a href="#">{{ 'login.form.link.signup'|trans }}</a>
                 </div>
                 
                 <div class="divider">
-                    <span>or</span>
+                    <span>{{ 'login.form.divider.or'|trans }}</span>
                 </div>
                 
                 <button type="button" id="passkey-login" class="btn btn-outline btn-block" style="margin-bottom: 10px;">
-                    <i class="fas fa-fingerprint"></i> Sign in with Passkey
-                </button>
-
-                <button type="button" class="btn btn-outline btn-block">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="google-icon">
-                    Authorize with Google
+                    <i class="fas fa-fingerprint"></i> {{ 'login.form.button.passkey'|trans }}
                 </button>
             </form>
         </div>
@@ -442,6 +437,19 @@
     document.addEventListener('DOMContentLoaded', () => {
         const passkeyBtn = document.getElementById('passkey-login');
         const usernameInput = document.getElementById('inputEmail');
+        const forgotPasswordLink = document.getElementById('forgot-password-link');
+
+        if (forgotPasswordLink) {
+            forgotPasswordLink.addEventListener('click', (e) => {
+                const username = usernameInput.value.trim();
+                if (username) {
+                    e.preventDefault();
+                    const url = new URL(forgotPasswordLink.href, window.location.origin);
+                    url.searchParams.set('username', username);
+                    window.location.href = url.toString();
+                }
+            });
+        }
 
         const bufferDecode = (value) => {
             const m = value.length % 4;
@@ -469,7 +477,7 @@
                     conditionalController = null;
                 }
                 passkeyBtn.disabled = true;
-                passkeyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                passkeyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {{ "login.form.button.processing"|trans }}';
             } else {
                 conditionalController = new AbortController();
             }
@@ -550,11 +558,27 @@
             } catch (error) {
                 if (error.name === 'AbortError') return;
                 console.error(error);
-                if (!isConditional) {
-                    $.alert.error('Passkey login failed: ' + error.message, { closable: true });
-                    passkeyBtn.disabled = false;
-                    passkeyBtn.innerHTML = '<i class="fas fa-fingerprint"></i> Sign in with Passkey';
+                
+                // Show error if user clicked the button OR if user selected a credential in conditional UI
+                // We infer user selection if we got past navigator.credentials.get() or if it's manual button click (!isConditional)
+                // Since we can't easily track execution flow in catch block without a flag, we'll assume any error here means user interaction failed
+                // except AbortError which is handled above.
+                
+                let errorMessage = error.message;
+                
+                // Map specific error messages to neutral user-friendly messages
+                if (errorMessage.includes('The credential ID is invalid') || 
+                    errorMessage.includes('The public key credential source is not present') ||
+                    errorMessage.includes('User handle not found')) {
+                    errorMessage = '{{ "login.form.error.passkey_invalid"|trans }}';
+                } else if (!errorMessage || errorMessage === 'Login failed') {
+                     errorMessage = '{{ "login.form.error.passkey_generic_error"|trans }}';
                 }
+                
+                $.alert.error('{{ "login.form.error.passkey_login_failed"|trans }}' + errorMessage, { closable: true });
+                
+                passkeyBtn.disabled = false;
+                passkeyBtn.innerHTML = '<i class="fas fa-fingerprint"></i> {{ "login.form.button.passkey"|trans }}';
             }
         };
 

@@ -15,7 +15,8 @@ input {
   border: 1px solid #a7a7a7;
   border-radius: 2px;
   cursor: text;
-  transition: color 0.1s cubic-bezier(0, 0, 1, 1),
+  transition:
+    color 0.1s cubic-bezier(0, 0, 1, 1),
     border-color 0.1s cubic-bezier(0, 0, 1, 1),
     background-color 0.1s cubic-bezier(0, 0, 1, 1);
 }
@@ -89,35 +90,36 @@ input {
   box-sizing: border-box;
   border-radius: var(--border-radius-circle);
   transition: background-color 0.1s cubic-bezier(0, 0, 1, 1);
-  content: "";
+  content: '';
 }
 
-.ef-input-wrapper .ef-input-clear-btn>svg {
+.ef-input-wrapper .ef-input-clear-btn > svg {
   position: relative;
-  transition: color .1s cubic-bezier(0,0,1,1);
+  transition: color 0.1s cubic-bezier(0, 0, 1, 1);
 }
 
 .ef-input-wrapper.ef-input-disabled {
-  color: rgb(201,205,212);
-  background-color: rgb(242,243,245);
+  color: rgb(201, 205, 212);
+  background-color: rgb(242, 243, 245);
   border-color: transparent;
   cursor: not-allowed;
 }
 
 .ef-input-wrapper.ef-input-error {
-  background-color: rgb(255,236,232);
+  background-color: rgb(255, 236, 232);
   border-color: transparent;
 }
 
 .ef-input-wrapper.ef-input-error:hover {
-  background-color: rgb(253,205,197);
+  background-color: rgb(253, 205, 197);
   border-color: transparent;
 }
 
-.ef-input-wrapper.ef-input-error:focus-within, .ef-input-wrapper.ef-input-error.ef-input-wrapper-focus {
+.ef-input-wrapper.ef-input-error:focus-within,
+.ef-input-wrapper.ef-input-error.ef-input-wrapper-focus {
   background-color: #fff;
-  border-color: rgb(245,63,63);
-  box-shadow: 0 0 0 0 rgb(253,205,197);
+  border-color: rgb(245, 63, 63);
+  box-shadow: 0 0 0 0 rgb(253, 205, 197);
   outline: transparent;
 }
 
@@ -144,10 +146,11 @@ input {
 
 .ef-input-wrapper .ef-input-prefix {
   padding-right: 12px;
-  color: rgb(78,89,105);
+  color: rgb(78, 89, 105);
 }
 
-.ef-input-wrapper .ef-input-prefix, .ef-input-wrapper .ef-input-suffix {
+.ef-input-wrapper .ef-input-prefix,
+.ef-input-wrapper .ef-input-suffix {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -155,16 +158,18 @@ input {
   user-select: none;
 }
 
-.ef-input-wrapper .ef-input-prefix>i, .ef-input-wrapper .ef-input-suffix>i {
+.ef-input-wrapper .ef-input-prefix > i,
+.ef-input-wrapper .ef-input-suffix > i {
   font-size: 14px;
 }
 
 .ef-input-wrapper .ef-input-suffix {
   padding-left: 12px;
-  color: rgb(78,89,105);
+  color: rgb(78, 89, 105);
 }
 
-.ef-input-wrapper .ef-input-prefix, .ef-input-wrapper .ef-input-suffix {
+.ef-input-wrapper .ef-input-prefix,
+.ef-input-wrapper .ef-input-suffix {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -172,7 +177,8 @@ input {
   user-select: none;
 }
 
-.ef-input-wrapper .ef-input-prefix>i, .ef-input-wrapper .ef-input-suffix>i {
+.ef-input-wrapper .ef-input-prefix > i,
+.ef-input-wrapper .ef-input-suffix > i {
   font-size: 14px;
 }
 
@@ -181,29 +187,30 @@ input {
   width: 100%;
 }
 
-.ef-input-outer>:first-child {
+.ef-input-outer > :first-child {
   border-top-left-radius: 2px;
   border-bottom-left-radius: 2px;
 }
 
-.ef-input-outer>:last-child {
+.ef-input-outer > :last-child {
   border-top-right-radius: 2px;
   border-bottom-right-radius: 2px;
 }
 
 .ef-input-prepend {
-  border-right: 1px solid rgb(229,230,235);
+  border-right: 1px solid rgb(229, 230, 235);
 }
 
-.ef-input-prepend, .ef-input-append {
+.ef-input-prepend,
+.ef-input-append {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   box-sizing: border-box;
   padding: 0 12px;
-  color: rgb(29,33,41);
+  color: rgb(29, 33, 41);
   white-space: nowrap;
-  background-color: rgb(242,243,245);
+  background-color: rgb(242, 243, 245);
   border: 1px solid transparent;
 }
 
@@ -229,4 +236,76 @@ input {
   background: transparent;
   border-bottom: 1px solid #a7a7a7;
   font-size: 14px;
+}
+
+/* Rounded Variant */
+.ef-input-wrapper.ef-input-rounded {
+  border-radius: 6px;
+}
+
+.ef-input-outer.ef-input-rounded > :first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.ef-input-outer.ef-input-rounded > :last-child {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+/* Custom Height Variants */
+.ef-input-wrapper.ef-input-h28 {
+  height: 28px;
+  align-items: center;
+}
+.ef-input-wrapper.ef-input-h32 {
+  height: 32px;
+  align-items: center;
+}
+.ef-input-wrapper.ef-input-h36 {
+  height: 36px;
+  align-items: center;
+}
+.ef-input-wrapper.ef-input-h40 {
+  height: 40px;
+  align-items: center;
+}
+.ef-input-wrapper.ef-input-h48 {
+  height: 48px;
+  align-items: center;
+}
+
+.ef-input-wrapper.ef-input-h28 .ef-input,
+.ef-input-wrapper.ef-input-h32 .ef-input,
+.ef-input-wrapper.ef-input-h36 .ef-input,
+.ef-input-wrapper.ef-input-h40 .ef-input,
+.ef-input-wrapper.ef-input-h48 .ef-input {
+  padding-top: 0;
+  padding-bottom: 0;
+  height: 100%;
+}
+
+.ef-input-outer.ef-input-h28 {
+  height: 28px;
+}
+.ef-input-outer.ef-input-h32 {
+  height: 32px;
+}
+.ef-input-outer.ef-input-h36 {
+  height: 36px;
+}
+.ef-input-outer.ef-input-h40 {
+  height: 40px;
+}
+.ef-input-outer.ef-input-h48 {
+  height: 48px;
+}
+
+.ef-input-outer.ef-input-h28 .ef-input-wrapper,
+.ef-input-outer.ef-input-h32 .ef-input-wrapper,
+.ef-input-outer.ef-input-h36 .ef-input-wrapper,
+.ef-input-outer.ef-input-h40 .ef-input-wrapper,
+.ef-input-outer.ef-input-h48 .ef-input-wrapper {
+  height: 100%;
+  align-items: center;
 }
