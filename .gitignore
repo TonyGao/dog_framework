@@ -37,3 +37,27 @@ node_modules/**/*
 
 temp.md
 .env
+
+###> IDE & OS Files ###
+.idea/
+.vscode/
+.DS_Store
+###< IDE & OS Files ###
+
+###> Uploads & Backups ###
+public/uploads/
+backups/
+###< Uploads & Backups ###
+
+###> Temp & Log Files ###
+*.bak
+*.swp
+*.tmp
+*.log
+###< Temp & Log Files ###
+
+###> Test Scratch Files ###
+test_*.php
+test_*.html
+tests/test*.html
+###< Test Scratch Files ###
