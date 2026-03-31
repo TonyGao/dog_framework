@@ -754,7 +754,7 @@
                                         {% if key == 'name' %}
                                             <td>
                                                 <div class="user-info">
-                                                    <div id="list-avatar-img-{{ item.id }}" class="custom-avatar" data-ef-sync="employee:{{ item.id }}">{% if item.avatar %}<img src="{{ item.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% else %}{{ item.name|slice(-2, 2) }}{% endif %}</div>
+                                                    <div id="list-avatar-img-{{ item.id }}" class="custom-avatar" data-ef-sync="employee:{{ item.id }}" data-name="{{ item.name }}">{% if item.avatar %}<img src="{{ item.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% else %}{{ item.name|slice(-2, 2) }}{% endif %}</div>
                                                     <span class="user-name sync-val-name" onclick="openEmployeeDrawer('{{ item.id }}')" style="cursor: pointer;">{{ item.name }}</span>
                                                 </div>
                                             </td>
@@ -812,7 +812,7 @@
                         <div class="employee-card sync-row-emp" data-ef-sync="employee:{{ item.id }}">
                             <div class="card-header">
                                 <div class="card-avatar-wrapper">
-                                    <div id="card-avatar-img-{{ item.id }}" class="card-custom-avatar" data-ef-sync="employee:{{ item.id }}">{% if item.avatar %}<img src="{{ item.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% else %}{{ item.name|slice(-2, 2) }}{% endif %}</div>
+                                    <div id="card-avatar-img-{{ item.id }}" class="card-custom-avatar" data-ef-sync="employee:{{ item.id }}" data-name="{{ item.name }}">{% if item.avatar %}<img src="{{ item.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% else %}{{ item.name|slice(-2, 2) }}{% endif %}</div>
                                     {% if item.status == 'active' %}
                                         <span class="status-indicator indicator-active"></span>
                                     {% elseif item.status == 'inactive' %}
@@ -963,10 +963,13 @@
     // Open Employee Drawer
     window.openEmployeeDrawer = function(id) {
         const drawerId = 'employee-detail-drawer-' + id;
-        // Remove existing drawer if it exists to ensure fresh content
+        // Remove existing drawer and its associated modals if they exist to ensure fresh content
         if ($('#' + drawerId).length > 0) {
             $('#' + drawerId).remove();
         }
+        // Also remove any associated modals that were moved to body
+        $('#avatarModal-' + id).remove();
+        $('#clearPasskeyModal-' + id).remove();
         
         // Create and show loading overlay
         const loadingId = 'drawer-loading-' + id;
@@ -1333,10 +1336,24 @@
         $(document).on('ef:sync', '[data-ef-sync^="employee:"]', function(e, data) {
             const $el = $(this);
             
-            // 1. 如果是头像 img 自身触发
-            if ($el.is('img') && data.avatarUrl) {
-                $el.attr('src', data.avatarUrl);
-                return;
+            // 1. 处理头像容器更新 (div 或 img)
+            if (typeof data.avatarUrl !== 'undefined') {
+                if ($el.is('img')) {
+                    $el.attr('src', data.avatarUrl || '');
+                } else if ($el.hasClass('profile-avatar') || $el.hasClass('card-custom-avatar') || $el.hasClass('card-avatar-img') || $el.hasClass('custom-avatar')) {
+                    // 如果是自定义头像容器 div
+                    if (data.avatarUrl) {
+                        $el.html(`<img src="${data.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`);
+                        $el.css('background-color', 'transparent');
+                    } else {
+                        // 降级回名字缩写
+                        const name = data.name || $el.attr('data-name') || '';
+                        if (name) {
+                            $el.text(name.slice(-2));
+                        }
+                        $el.css('background-color', '#3b82f6');
+                    }
+                }
             }
             
             // 2. 如果是整行数据更新 (tr 或 .employee-card)

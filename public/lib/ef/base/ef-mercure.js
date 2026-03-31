@@ -29,6 +29,7 @@
 
             this.connect();
             this._bindAutoSync();
+            this._observeDOM(); // 开启 DOM 监听，自动处理动态加载的内容
         },
 
         /**
@@ -53,13 +54,16 @@
             this.eventSource = new EventSource(url, { withCredentials: true });
 
             this.eventSource.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                this._handleMessage(data);
+                try {
+                    const data = JSON.parse(event.data);
+                    this._handleMessage(data);
+                } catch (e) {
+                    console.error('Failed to parse Mercure message:', e, event.data);
+                }
             };
 
             this.eventSource.onerror = (err) => {
-                console.error('Mercure connection error:', err);
-                // 浏览器会自动重连，这里可以做一些 UI 提示
+                // 浏览器会自动重连
             };
         },
 
@@ -71,7 +75,7 @@
             const topics = Array.isArray(newTopics) ? newTopics : [newTopics];
             let changed = false;
             topics.forEach(t => {
-                if (!this.topics.has(t)) {
+                if (t && !this.topics.has(t)) {
                     this.topics.add(t);
                     changed = true;
                 }
@@ -80,6 +84,32 @@
             if (changed) {
                 this.connect(); // 重新连接以订阅新主题
             }
+        },
+
+        /**
+         * 开启 DOM 监听，检测动态添加的 data-ef-sync 元素
+         */
+        _observeDOM: function() {
+            const self = this;
+            const observer = new MutationObserver((mutations) => {
+                let hasNewSync = false;
+                mutations.forEach((mutation) => {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === 1) { // Element
+                            const $node = $(node);
+                            if ($node.attr('data-ef-sync') || $node.find('[data-ef-sync]').length > 0) {
+                                hasNewSync = true;
+                            }
+                        }
+                    });
+                });
+
+                if (hasNewSync) {
+                    self._bindAutoSync();
+                }
+            });
+
+            observer.observe(document.body, { childList: true, subtree: true });
         },
 
         /**

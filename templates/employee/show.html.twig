@@ -552,9 +552,12 @@
                     {# Left Column: Profile #}
                     <div class="card profile-card">
                         <div class="profile-header">
-                            <div class="profile-avatar-wrapper" onclick="openAvatarModal('{{ employee.id }}')">
+                            <div class="profile-avatar-wrapper" onclick="openAvatarModal('{{ employee.id }}')" data-ef-sync="employee:{{ employee.id }}">
                                 {% if employee.avatar %}
                                     <img src="{{ employee.avatar }}" class="profile-avatar" id="avatar-preview-{{ employee.id }}" alt="Avatar">
+                                    <div class="profile-avatar-fallback" id="avatar-fallback-{{ employee.id }}" style="display: none;">
+                                        {{ employee.name|slice(-2) }}
+                                    </div>
                                 {% else %}
                                     <div class="profile-avatar-fallback" id="avatar-fallback-{{ employee.id }}">
                                         {{ employee.name|slice(-2) }}
@@ -927,15 +930,15 @@
             </div>
 
             <!-- Clear Passkey Modal -->
-            <div class="ef-modal-container" id="clearPasskeyModal" style="z-index: 1002; display: none;">
-                <div class="ef-modal-mask" onclick="$('#clearPasskeyModal').hide()"></div>
+            <div class="ef-modal-container" id="clearPasskeyModal-{{ employee.id }}" style="z-index: 1002; display: none;">
+                <div class="ef-modal-mask" onclick="$('#clearPasskeyModal-{{ employee.id }}').hide()"></div>
                 <div class="ef-modal-wrapper ef-modal-wrapper-align-center">
                     <div class="ef-modal">
                         <div class="ef-modal-header">
                             <div class="ef-modal-title ef-modal-title-align-left">
                                 {{ 'employee.detail.action.clear_passkey'|trans({}, 'messages')|default('Clear Passkey') }}
                             </div>
-                            <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="$('#clearPasskeyModal').hide()">
+                            <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="$('#clearPasskeyModal-{{ employee.id }}').hide()">
                                 <span class="ef-icon-hover">
                                     <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
                                         <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
@@ -947,72 +950,18 @@
                             <div>{{ 'employee.detail.action.clear_passkey_confirm'|trans({}, 'messages')|default('Are you sure you want to clear all passkeys for this user? This action cannot be undone.') }}</div>
                         </div>
                         <div class="ef-modal-footer">
-                            <button class="btn secondary small" type="button" onclick="$('#clearPasskeyModal').hide()">{{ 'action.cancel'|trans({}, 'messages')|default('Cancel') }}</button>
-                            <button class="btn primary small" type="button" id="confirmClearPasskeyBtn">{{ 'action.confirm'|trans({}, 'messages')|default('Confirm') }}</button>
+                            <button class="btn secondary small" type="button" onclick="$('#clearPasskeyModal-{{ employee.id }}').hide()">{{ 'action.cancel'|trans({}, 'messages')|default('Cancel') }}</button>
+                            <button class="btn primary small" type="button" id="confirmClearPasskeyBtn-{{ employee.id }}">{{ 'action.confirm'|trans({}, 'messages')|default('Confirm') }}</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Avatar Edit Modal -->
-            <div class="ef-modal-container" id="avatarModal-{{ employee.id }}" style="z-index: 9999; display: none;">
-                <div class="ef-modal-mask" onclick="closeAvatarModal('{{ employee.id }}')"></div>
-                <div class="ef-modal-wrapper ef-modal-wrapper-align-center">
-                    <div class="ef-modal" style="width: 600px; max-width: 90vw;">
-                        <div class="ef-modal-header">
-                            <div class="ef-modal-title ef-modal-title-align-left">
-                                {{ 'employee.avatar.edit.title'|trans({}, 'messages')|default('Edit Avatar') }}
-                            </div>
-                            <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="closeAvatarModal('{{ employee.id }}')">
-                                <span class="ef-icon-hover">
-                                    <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
-                                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
-                                    </svg>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="ef-modal-body" style="padding: 20px;">
-                            <div id="drop-area-{{ employee.id }}" style="border: 2px dashed #ccc; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; background: #f9fafb; transition: all 0.2s;">
-                                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 48px; color: #9ca3af; margin-bottom: 16px;"></i>
-                                <p style="margin: 0; color: #6b7280; font-size: 14px;">{{ 'employee.avatar.drop_hint'|trans({}, 'messages')|default('Click or drag image here') }}</p>
-                                <input type="file" id="fileElem-{{ employee.id }}" accept="image/*" style="display:none" onchange="handleFiles('{{ employee.id }}', this.files)">
-                            </div>
-                            
-                            <div id="crop-container-{{ employee.id }}" style="display: none; height: 400px; background: #000; position: relative; border-radius: 8px; overflow: hidden;">
-                                <img id="image-to-crop-{{ employee.id }}" src="" style="max-width: 100%; display: block;">
-                            </div>
-                            
-                            <div id="crop-controls-{{ employee.id }}" style="display: none; margin-top: 16px; text-align: center; gap: 8px; justify-content: center;">
-                                <button type="button" class="btn secondary small" onclick="cropperInstances['{{ employee.id }}'].zoom(0.1)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-                                <button type="button" class="btn secondary small" onclick="cropperInstances['{{ employee.id }}'].zoom(-0.1)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
-                                <button type="button" class="btn secondary small" onclick="cropperInstances['{{ employee.id }}'].rotate(90)"><i class="fa-solid fa-rotate-right"></i></button>
-                                <button type="button" class="btn secondary small" onclick="resetCrop('{{ employee.id }}')"><i class="fa-solid fa-rotate-left"></i></button>
-                                <button type="button" class="btn secondary small" onclick="cancelCrop('{{ employee.id }}')" style="margin-left: 12px;">{{ 'action.reselect'|trans({}, 'messages')|default('Reselect') }}</button>
-                            </div>
-                        </div>
-                        <div class="ef-modal-footer">
-                            <button class="btn secondary small" type="button" onclick="closeAvatarModal('{{ employee.id }}')">{{ 'action.cancel'|trans({}, 'messages')|default('Cancel') }}</button>
-                            <button class="btn primary small" type="button" onclick="saveAvatar('{{ employee.id }}')">{{ 'action.save'|trans({}, 'messages')|default('Save') }}</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {{ include('employee/_avatar_modal.html.twig') }}
 
             <script>
-                var cropperInstances = cropperInstances || {};
-
-                // 立即将头像弹窗移到 body 直接子级
-                // 原因：show.html.twig 作为 Drawer 被 AJAX 注入，avatarModal 在 Drawer 的
-                // stacking context（z-index:1001）内，无法突破到编辑 Drawer 的遮罩之上
-                // 解决：Drawer 加载瞬间就把 modal 提升到 body 层级
-                (function() {
-                    var $modal = $('#avatarModal-{{ employee.id }}');
-                    if ($modal.length && $modal.parent()[0] !== document.body) {
-                        $modal.appendTo(document.body);
-                    }
-                })();
-
-                function openEmployeeEditDrawer(id) {
+                window.openEmployeeEditDrawer = function(id) {
                     const drawerId = 'employee-drawer-' + id;
                     
                     if ($('#' + drawerId).length > 0) {
@@ -1030,175 +979,12 @@
                             ui.alert.error('Failed to load edit form');
                         }
                     });
-                }
+                };
 
-                function openAvatarModal(id) {
-                    var modal = document.getElementById('avatarModal-' + id);
-                    if (!modal) return;
-                    // 使用原生 DOM API：将 modal 物理移动到 <body> 直接子级
-                    // appendChild 是原生移动操作，100% 可靠，不依赖 jQuery 状态
-                    // 目的：逃离 ef-drawer-container（position:fixed + z-index:1001）的层叠上下文
-                    document.body.appendChild(modal);
-                    modal.style.setProperty('z-index', '99999', 'important');
-                    modal.style.display = 'block';
-                    resetCrop(id);
-                    cancelCrop(id); // Show drop area
-                }
-
-                function closeAvatarModal(id) {
-                    $('#avatarModal-' + id).hide();
-                    if (cropperInstances[id]) {
-                        cropperInstances[id].destroy();
-                        delete cropperInstances[id];
-                    }
-                }
-
-                function cancelCrop(id) {
-                    $('#drop-area-' + id).show();
-                    $('#crop-container-' + id).hide();
-                    $('#crop-controls-' + id).hide();
-                    if (cropperInstances[id]) {
-                        cropperInstances[id].destroy();
-                        delete cropperInstances[id];
-                    }
-                    $('#fileElem-' + id).val('');
-                }
-
-                function resetCrop(id) {
-                    if (cropperInstances[id]) {
-                        cropperInstances[id].reset();
-                    }
-                }
-
-                // Drag and Drop
-                (function() {
-                    var dropArea = document.getElementById('drop-area-{{ employee.id }}');
-                    
-                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                        dropArea.addEventListener(eventName, preventDefaults, false);
-                    });
-
-                    function preventDefaults(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-
-                    ['dragenter', 'dragover'].forEach(eventName => {
-                        dropArea.addEventListener(eventName, highlight, false);
-                    });
-
-                    ['dragleave', 'drop'].forEach(eventName => {
-                        dropArea.addEventListener(eventName, unhighlight, false);
-                    });
-
-                    function highlight(e) {
-                        dropArea.style.borderColor = '#3b82f6';
-                        dropArea.style.background = '#eff6ff';
-                    }
-
-                    function unhighlight(e) {
-                        dropArea.style.borderColor = '#ccc';
-                        dropArea.style.background = '#f9fafb';
-                    }
-
-                    dropArea.addEventListener('drop', handleDrop, false);
-
-                    function handleDrop(e) {
-                        var dt = e.dataTransfer;
-                        var files = dt.files;
-                        handleFiles('{{ employee.id }}', files);
-                    }
-                    
-                    // Click to upload
-                    dropArea.addEventListener('click', function() {
-                        document.getElementById('fileElem-{{ employee.id }}').click();
-                    });
-                })();
-
-                function handleFiles(id, files) {
-                    if (files.length > 0) {
-                        var file = files[0];
-                        if (!file.type.startsWith('image/')) {
-                            alert('Please select an image file');
-                            return;
-                        }
-
-                        var reader = new FileReader();
-                        reader.onload = function(e) {
-                            $('#drop-area-' + id).hide();
-                            $('#crop-container-' + id).show();
-                            $('#crop-controls-' + id).show().css('display', 'flex');
-                            
-                            var image = document.getElementById('image-to-crop-' + id);
-                            image.src = e.target.result;
-                            
-                            if (cropperInstances[id]) {
-                                cropperInstances[id].destroy();
-                            }
-                            
-                            cropperInstances[id] = new Cropper(image, {
-                                aspectRatio: 1,
-                                viewMode: 1,
-                                dragMode: 'move',
-                                autoCropArea: 1,
-                                responsive: true,
-                            });
-                        }
-                        reader.readAsDataURL(file);
-                    }
-                }
-
-                function saveAvatar(id) {
-                    if (!cropperInstances[id]) {
-                        alert('Please select an image first');
-                        return;
-                    }
-
-                    var canvas = cropperInstances[id].getCroppedCanvas({
-                        width: 300,
-                        height: 300
-                    });
-
-                    canvas.toBlob(function(blob) {
-                        var formData = new FormData();
-                        formData.append('avatar', blob, 'avatar.png');
-
-                        // Show loading state (optional)
-                        var saveBtn = $('#avatarModal-' + id + ' .btn.primary');
-                        var originalText = saveBtn.text();
-                        saveBtn.text('Saving...').prop('disabled', true);
-
-                        $.ajax({
-                            url: '/api/employee/' + id + '/avatar',
-                            type: 'POST',
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            success: function(response) {
-                                if (response.success) {
-                                    // Update preview
-                                    $('#avatar-preview-' + id).attr('src', response.url).show();
-                                    $('#avatar-fallback-' + id).hide();
-                                    
-                                    closeAvatarModal(id);
-                                } else {
-                                    alert('Upload failed: ' + (response.error || 'Unknown error'));
-                                }
-                            },
-                            error: function(xhr) {
-                                alert('Upload failed: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
-                            },
-                            complete: function() {
-                                saveBtn.text(originalText).prop('disabled', false);
-                            }
-                        });
-                    });
-                }
-
-                function clearPasskey(id) {
-                    $('#clearPasskeyModal').show();
-                    $('#confirmClearPasskeyBtn').off('click').on('click', function() {
-                        $('#clearPasskeyModal').hide();
+                window.clearPasskey = function(id) {
+                    $('#clearPasskeyModal-' + id).show();
+                    $('#confirmClearPasskeyBtn-' + id).off('click').on('click', function() {
+                        $('#clearPasskeyModal-' + id).hide();
                         $.ajax({
                             url: '/employee/' + id + '/clear-passkey',
                             type: 'POST',
@@ -1216,6 +1002,25 @@
                             }
                         });
                     });
-                }
+                };
+
+                // Handle Mercure sync for avatar
+                $(document).on('ef:sync', '[data-ef-sync="employee:{{ employee.id }}"]', function(e, data) {
+                    if (data && typeof data.avatarUrl !== 'undefined') {
+                        const $preview = $('#avatar-preview-{{ employee.id }}');
+                        const $fallback = $('#avatar-fallback-{{ employee.id }}');
+                        
+                        if (data.avatarUrl) {
+                            $preview.attr('src', data.avatarUrl).show();
+                            $fallback.hide();
+                        } else {
+                            $preview.hide();
+                            $fallback.show();
+                            if (data.name) {
+                                $fallback.text(data.name.slice(-2));
+                            }
+                        }
+                    }
+                });
             </script>
         </div>

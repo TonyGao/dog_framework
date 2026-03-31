@@ -104,14 +104,44 @@
             background: #f8fafc;
             color: #0f172a;
         }
+
+        .edit-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+        }
+
+        .edit-avatar-fallback {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-weight: 500;
+            margin-right: 12px;
+        }
+
     </style>
 {% endblock %}
 
 {% block app_content_container %}
 <div class="edit-container">
     <div class="edit-header">
-        <div class="edit-title">
-            <i class="fa-solid fa-user-pen"></i>
+        <div class="edit-title" data-ef-sync="employee:{{ employee.id }}">
+            {% if employee.avatar %}
+                <img src="{{ employee.avatar }}" class="edit-avatar" id="edit-avatar-img-{{ employee.id }}" alt="Avatar">
+                <div class="edit-avatar-fallback" id="edit-avatar-fallback-{{ employee.id }}" style="display: none;"></div>
+            {% else %}
+                <img src="{{ employee.avatar }}" class="edit-avatar" id="edit-avatar-img-{{ employee.id }}" alt="Avatar" style="display: none;">
+                <div class="edit-avatar-fallback" id="edit-avatar-fallback-{{ employee.id }}">
+                    {{ employee.name|slice(-2) }}
+                </div>
+            {% endif %}
             {{ 'employee.detail.action.edit'|trans }} - {{ employee.name }}
         </div>
     </div>
@@ -188,9 +218,40 @@
         </div>
     {{ form_end(form) }}
 </div>
+
+{{ include('employee/_avatar_modal.html.twig') }}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     {{ ui.formValid() }}
+    <script>
+        // Avatar sync using ef-mercure.js framework
+        // The ef-mercure.js library is already loaded in base.html.twig
+        // Data-ef-sync attribute will trigger automatic updates
+        $(document).ready(function() {
+            // Listen for sync events on the avatar container
+            $('.edit-title').on('ef:sync', function(e, data) {
+                if (data && data.entity === 'Employee' && data.id === '{{ employee.id }}') {
+                    const $avatarImg = $('#edit-avatar-img-{{ employee.id }}');
+                    const $avatarFallback = $('#edit-avatar-fallback-{{ employee.id }}');
+
+                    if (typeof data.avatarUrl !== 'undefined') {
+                        if (data.avatarUrl) {
+                            // Show new avatar
+                            $avatarImg.attr('src', data.avatarUrl).show();
+                            $avatarFallback.hide();
+                        } else {
+                            // Remove avatar, show fallback
+                            $avatarImg.hide();
+                            $avatarFallback.show();
+                            if (data.name) {
+                                $avatarFallback.text(data.name.slice(-2));
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}

@@ -1,0 +1,236 @@
+{# Avatar Edit Modal Fragment #}
+<div class="ef-modal-container" id="avatarModal-{{ employee.id }}" style="z-index: 9999; display: none;">
+    <div class="ef-modal-mask" onclick="window.closeAvatarModal('{{ employee.id }}')"></div>
+    <div class="ef-modal-wrapper ef-modal-wrapper-align-center">
+        <div class="ef-modal" style="width: 600px; max-width: 90vw;">
+            <div class="ef-modal-header">
+                <div class="ef-modal-title ef-modal-title-align-left">
+                    {{ 'employee.avatar.edit.title'|trans({}, 'messages')|default('Edit Avatar') }}
+                </div>
+                <div tabindex="-1" role="button" aria-label="Close" class="ef-modal-close-btn" onclick="window.closeAvatarModal('{{ employee.id }}')">
+                    <span class="ef-icon-hover">
+                        <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                            <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <div class="ef-modal-body" style="padding: 20px;">
+                <div id="drop-area-{{ employee.id }}" 
+                     onclick="document.getElementById('fileElem-{{ employee.id }}').click()"
+                     style="border: 2px dashed #ccc; border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; background: #f9fafb; transition: all 0.2s;">
+                    <i class="fa-solid fa-cloud-arrow-up" style="font-size: 48px; color: #9ca3af; margin-bottom: 16px;"></i>
+                    <p style="margin: 0; color: #6b7280; font-size: 14px;">{{ 'employee.avatar.drop_hint'|trans({}, 'messages')|default('Click or drag image here') }}</p>
+                </div>
+                <input type="file" id="fileElem-{{ employee.id }}" accept="image/*" style="display:none" 
+                       onclick="event.stopPropagation()"
+                       onchange="window.handleFiles('{{ employee.id }}', this.files)">
+                
+                <div id="crop-container-{{ employee.id }}" style="display: none; height: 400px; background: #000; position: relative; border-radius: 8px; overflow: hidden;">
+                    <img id="image-to-crop-{{ employee.id }}" src="" style="max-width: 100%; display: block;">
+                </div>
+                
+                <div id="crop-controls-{{ employee.id }}" style="display: none; margin-top: 16px; text-align: center; gap: 8px; justify-content: center;">
+                    <button type="button" class="btn secondary small" onclick="window.cropperInstances['{{ employee.id }}'].zoom(0.1)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                    <button type="button" class="btn secondary small" onclick="window.cropperInstances['{{ employee.id }}'].zoom(-0.1)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                    <button type="button" class="btn secondary small" onclick="window.cropperInstances['{{ employee.id }}'].rotate(90)"><i class="fa-solid fa-rotate-right"></i></button>
+                    <button type="button" class="btn secondary small" onclick="window.resetCrop('{{ employee.id }}')"><i class="fa-solid fa-rotate-left"></i></button>
+                    <button type="button" class="btn secondary small" onclick="window.cancelCrop('{{ employee.id }}')" style="margin-left: 12px;">{{ 'action.reselect'|trans({}, 'messages')|default('Reselect') }}</button>
+                </div>
+            </div>
+            <div class="ef-modal-footer">
+                <button class="btn secondary small" type="button" onclick="window.closeAvatarModal('{{ employee.id }}')">{{ 'action.cancel'|trans({}, 'messages')|default('Cancel') }}</button>
+                <button class="btn primary small" type="button" onclick="window.saveAvatar('{{ employee.id }}')">{{ 'action.save'|trans({}, 'messages')|default('Save') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.cropperInstances = window.cropperInstances || {};
+
+    // 单例模式：确保 body 下只有一个特定员工的头像模态框
+    ;(function() {
+        var modalId = 'avatarModal-{{ employee.id }}';
+        var $existingModal = $('body').children('#' + modalId);
+        var $newModal = $('#' + modalId);
+
+        // 如果 body 下已经有了旧的，则删除新的，避免重复
+        if ($existingModal.length > 0 && $newModal.parent()[0] !== document.body) {
+            $newModal.remove();
+            return; // 已经存在就不再执行初始化
+        }
+
+        // 如果没有，则将当前的移到 body
+        $newModal.appendTo(document.body);
+
+        // 仅在第一次移入 body 时初始化拖拽上传事件
+        var dropArea = document.getElementById('drop-area-{{ employee.id }}');
+        if (dropArea) {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, function() {
+                    dropArea.style.borderColor = '#3b82f6';
+                    dropArea.style.background = '#eff6ff';
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, function() {
+                    dropArea.style.borderColor = '#ccc';
+                    dropArea.style.background = '#f9fafb';
+                }, false);
+            });
+
+            dropArea.addEventListener('drop', function(e) {
+                var files = e.dataTransfer.files;
+                window.handleFiles('{{ employee.id }}', files);
+            }, false);
+        }
+    })();
+
+    // 始终定义全局函数，确保它们始终指向最新的逻辑
+    window.openAvatarModal = function(id) {
+        var modal = document.getElementById('avatarModal-' + id);
+        if (!modal) return;
+        
+        // 确保模态框在 body 的最上层
+        if (modal.parentNode !== document.body) {
+            document.body.appendChild(modal);
+        }
+        modal.style.setProperty('z-index', '99999', 'important');
+        modal.style.display = 'block';
+        
+        window.resetCrop(id);
+        window.cancelCrop(id);
+    };
+
+    window.closeAvatarModal = function(id) {
+        var modal = document.getElementById('avatarModal-' + id);
+        if (modal) modal.style.display = 'none';
+        if (window.cropperInstances[id]) {
+            window.cropperInstances[id].destroy();
+            delete window.cropperInstances[id];
+        }
+    };
+
+    window.cancelCrop = function(id) {
+        var dropArea = document.getElementById('drop-area-' + id);
+        var cropContainer = document.getElementById('crop-container-' + id);
+        var cropControls = document.getElementById('crop-controls-' + id);
+        var fileElem = document.getElementById('fileElem-' + id);
+
+        if (dropArea) dropArea.style.display = 'block';
+        if (cropContainer) cropContainer.style.display = 'none';
+        if (cropControls) cropControls.style.display = 'none';
+        
+        if (window.cropperInstances[id]) {
+            window.cropperInstances[id].destroy();
+            delete window.cropperInstances[id];
+        }
+        if (fileElem) fileElem.value = '';
+    };
+
+    window.resetCrop = function(id) {
+        if (window.cropperInstances[id]) {
+            window.cropperInstances[id].reset();
+        }
+    };
+
+    window.handleFiles = function(id, files) {
+        if (files && files.length > 0) {
+            var file = files[0];
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file');
+                return;
+            }
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var dropArea = document.getElementById('drop-area-' + id);
+                var cropContainer = document.getElementById('crop-container-' + id);
+                var cropControls = document.getElementById('crop-controls-' + id);
+                var image = document.getElementById('image-to-crop-' + id);
+
+                if (dropArea) dropArea.style.display = 'none';
+                if (cropContainer) cropContainer.style.display = 'block';
+                if (cropControls) {
+                    cropControls.style.display = 'flex';
+                }
+                
+                if (image) {
+                    image.src = e.target.result;
+                    
+                    if (window.cropperInstances[id]) {
+                        window.cropperInstances[id].destroy();
+                    }
+                    
+                    window.cropperInstances[id] = new Cropper(image, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        dragMode: 'move',
+                        autoCropArea: 1,
+                        responsive: true,
+                    });
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    window.saveAvatar = function(id) {
+        if (!window.cropperInstances[id]) {
+            alert('Please select an image first');
+            return;
+        }
+
+        var canvas = window.cropperInstances[id].getCroppedCanvas({
+            width: 300,
+            height: 300
+        });
+
+        canvas.toBlob(function(blob) {
+            var formData = new FormData();
+            formData.append('avatar', blob, 'avatar.png');
+
+            var modal = document.getElementById('avatarModal-' + id);
+            var saveBtn = modal ? modal.querySelector('.btn.primary') : null;
+            var originalText = saveBtn ? saveBtn.innerText : 'Save';
+            
+            if (saveBtn) {
+                saveBtn.innerText = 'Saving...';
+                saveBtn.disabled = true;
+            }
+
+            $.ajax({
+                url: '/api/employee/' + id + '/avatar',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        window.closeAvatarModal(id);
+                    } else {
+                        alert('Upload failed: ' + (response.error || 'Unknown error'));
+                    }
+                },
+                error: function(xhr) {
+                    alert('Upload failed: ' + (xhr.responseJSON ? xhr.responseJSON.error : 'Unknown error'));
+                },
+                complete: function() {
+                    if (saveBtn) {
+                        saveBtn.innerText = originalText;
+                        saveBtn.disabled = false;
+                    }
+                }
+            });
+        });
+    };
+</script>

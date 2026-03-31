@@ -2,6 +2,9 @@ action:
   cancel: 取消
   confirm: 确认
   save: 保存
+  saving: 保存中...
+  edit_success: 更新成功
+  reselect: 重新选择
 employee:
   list:
     title: 员工花名册

@@ -7,8 +7,8 @@ use App\Service\Storage\FileUploadService;
 use App\Service\Storage\FileUrlGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Mercure\HubInterface;
@@ -32,21 +32,21 @@ class AvatarController extends AbstractController
     }
 
     #[Route('/{id}/avatar', name: 'api_employee_avatar_upload', methods: ['POST'])]
-    public function upload(string $id, Request $request, HubInterface $hub): JsonResponse
+    public function upload(string $id, Request $request, HubInterface $hub): Response
     {
         $currentUser = $this->getUser();
         if (!$this->isGranted('ROLE_ADMIN') && (!$currentUser instanceof Employee || (string) $currentUser->getId() !== $id)) {
-            return new JsonResponse(['error' => 'Access denied'], 403);
+            return $this->json(['status' => 'error', 'message' => 'Access denied'], 403);
         }
 
         $employee = $this->em->getRepository(Employee::class)->find($id);
         if (!$employee) {
-            return new JsonResponse(['error' => 'Employee not found'], 404);
+            return $this->json(['status' => 'error', 'message' => 'Employee not found'], 404);
         }
 
         $file = $request->files->get('avatar');
         if (!$file) {
-            return new JsonResponse(['error' => 'No file uploaded'], 400);
+            return $this->json(['status' => 'error', 'message' => 'No file uploaded'], 400);
         }
 
         try {
@@ -73,70 +73,77 @@ class AvatarController extends AbstractController
                     'type' => 'sync',
                     'entity' => 'Employee',
                     'id' => $employee->getId(),
+                    'name' => $employee->getName(),
                     'avatarUrl' => $url
                 ])
             );
             $hub->publish($update);
 
-            return new JsonResponse([
+            return $this->json([
+                'status' => 'success',
                 'success' => true,
                 'url' => $url,
             ]);
 
         } catch (\RuntimeException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 400);
+            return $this->json(['status' => 'error', 'message' => $e->getMessage()], 400);
         } catch (\Exception $e) {
-            return new JsonResponse([
-                'error' => '上传失败: ' . $e->getMessage() . ' in ' . basename($e->getFile()) . ':' . $e->getLine()
+            return $this->json([
+                'status' => 'error',
+                'message' => '上传失败: ' . $e->getMessage() . ' in ' . basename($e->getFile()) . ':' . $e->getLine()
             ], 500);
         }
     }
 
     #[Route('/{id}/avatar', name: 'api_employee_avatar_remove', methods: ['DELETE'])]
-    public function remove(string $id, HubInterface $hub): JsonResponse
+    public function remove(string $id, HubInterface $hub): Response
     {
         $currentUser = $this->getUser();
         if (!$this->isGranted('ROLE_ADMIN') && (!$currentUser instanceof Employee || (string) $currentUser->getId() !== $id)) {
-            return new JsonResponse(['error' => 'Access denied'], 403);
+            return $this->json(['status' => 'error', 'message' => 'Access denied'], 403);
         }
 
         $employee = $this->em->getRepository(Employee::class)->find($id);
         if (!$employee) {
-            return new JsonResponse(['error' => 'Employee not found'], 404);
+            return $this->json(['status' => 'error', 'message' => 'Employee not found'], 404);
         }
 
         $employee->setAvatar(null);
         $this->em->flush();
 
         // Broadcast the avatar removal via Mercure SSE
-        $update = new Update(
-            '/entity/employee/' . $employee->getId(),
-            json_encode([
-                'type' => 'sync',
-                'entity' => 'Employee',
-                'id' => $employee->getId(),
-                'avatarUrl' => null
-            ])
-        );
+            $update = new Update(
+                '/entity/employee/' . $employee->getId(),
+                json_encode([
+                    'type' => 'sync',
+                    'entity' => 'Employee',
+                    'id' => $employee->getId(),
+                    'name' => $employee->getName(),
+                    'avatarUrl' => null
+                ])
+            );
         $hub->publish($update);
 
-        return new JsonResponse(['success' => true]);
+        return $this->json([
+            'status' => 'success',
+            'success' => true
+        ]);
     }
 
     #[Route('/{id}/send-verification', name: 'api_employee_send_verification', methods: ['POST'])]
-    public function sendVerificationEmail(string $id, MailService $mailService): JsonResponse
+    public function sendVerificationEmail(string $id, MailService $mailService): Response
     {
         if (!$this->isGranted('ROLE_ADMIN')) {
-            return new JsonResponse(['error' => 'Access denied. Administrator privileges required.'], 403);
+            return $this->json(['status' => 'error', 'message' => 'Access denied. Administrator privileges required.'], 403);
         }
 
         $employee = $this->em->getRepository(Employee::class)->find($id);
         if (!$employee) {
-            return new JsonResponse(['error' => 'Employee not found'], 404);
+            return $this->json(['status' => 'error', 'message' => 'Employee not found'], 404);
         }
 
         if (!$employee->getEmail()) {
-            return new JsonResponse(['error' => 'This employee does not have an email address configured.'], 400);
+            return $this->json(['status' => 'error', 'message' => 'This employee does not have an email address configured.'], 400);
         }
 
         try {
@@ -154,12 +161,12 @@ class AvatarController extends AbstractController
                 ]
             );
 
-            return new JsonResponse(['success' => true, 'message' => 'Verification email queued successfully.']);
+            return $this->json(['status' => 'success', 'success' => true, 'message' => 'Verification email queued successfully.']);
         } catch (\DomainException $e) {
             // Translates binding exceptions
-            return new JsonResponse(['error' => '邮件系统未完全配置: ' . $e->getMessage()], 400);
+            return $this->json(['status' => 'error', 'message' => '邮件系统未完全配置: ' . $e->getMessage()], 400);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => '邮件发送失败 (' . get_class($e) . '): ' . $e->getMessage()], 500);
+            return $this->json(['status' => 'error', 'message' => '邮件发送失败 (' . get_class($e) . '): ' . $e->getMessage()], 500);
         }
     }
 }

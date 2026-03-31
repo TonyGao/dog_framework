@@ -203,7 +203,7 @@
                 </div>
 
                 {% import 'ui/template/ui.html.twig' as ui %}
-                {{ form_start(form, {'attr': {'id': 'employee-edit-form', 'class': 'edit-form'}}) }}
+                {{ form_start(form, {'attr': {'id': 'employee-edit-form-' ~ employee.id, 'class': 'edit-form'}}) }}
                     <div class="modern-form-grid">
                         <div class="modern-form-group">
                             {{ form_label(form.employeeNo, null, {'label_attr': {'class': 'modern-label'}}) }}
@@ -277,15 +277,27 @@
     </div>
 </div>
 
+{{ include('employee/_avatar_modal.html.twig') }}
+
 <script>
-    function closeDrawer(id) {
+    window.closeDrawer = function(id) {
         $().hideDrawer(id);
-    }
+    };
 
     // SSR Real-time Avatar Sync
     $('#edit-avatar-img-{{ employee.id }}').on('ef:sync', function(e, data) {
-        if (data && data.avatarUrl) {
-            $(this).attr('src', data.avatarUrl);
+        if (data && typeof data.avatarUrl !== 'undefined') {
+            const $el = $(this);
+            if (data.avatarUrl) {
+                // 有头像：替换内容为 img 标签
+                $el.html(`<img src="${data.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`);
+                $el.css('background-color', 'transparent'); // 移除背景色
+            } else {
+                // 无头像：显示名字缩写
+                const name = data.name || '{{ employee.name }}';
+                $el.text(name.slice(-2));
+                $el.css('background-color', '#3b82f6'); // 恢复蓝色背景
+            }
         }
     });
 
@@ -311,7 +323,7 @@
         });
     }
 
-    document.getElementById('employee-edit-form').addEventListener('submit', function(e) {
+    document.getElementById('employee-edit-form-{{ employee.id }}').addEventListener('submit', function(e) {
         e.preventDefault();
         
         const form = e.target;
@@ -360,12 +372,34 @@
         })
         .then(data => {
             if (data.status === 'success') {
-                closeDrawer('{{ drawerId }}');
-                // Reload the parent drawer to show updated info instead of the entire page
-                if (typeof window.openEmployeeDrawer === 'function') {
-                    window.openEmployeeDrawer('{{ employee.id }}');
+                // 1. Close ONLY the edit drawer
+                window.closeDrawer('{{ drawerId }}');
+                
+                // 2. Refresh the parent detail drawer if it exists
+                const parentDrawerId = 'employee-detail-drawer-{{ employee.id }}';
+                const $parentDrawer = $('#' + parentDrawerId);
+                
+                if ($parentDrawer.length > 0) {
+                    $.ajax({
+                        url: '/employee/{{ employee.id }}',
+                        method: 'GET',
+                        success: function(html) {
+                            const $newHtml = $(html);
+                            const $newBody = $newHtml.find('.ef-drawer-body');
+                            $parentDrawer.find('.ef-drawer-body').html($newBody.html());
+                            
+                            if (typeof window.Alert !== 'undefined') {
+                                let alertMsg = new Alert($parentDrawer.find('.ef-drawer-body'));
+                                alertMsg.success('{{ "action.edit_success"|trans }}', { percent: '300px', title: "成功", closable: false });
+                            }
+                        }
+                    });
                 } else {
-                    window.location.reload();
+                    if (typeof ui !== 'undefined' && ui.alert) {
+                        ui.alert.success('{{ "action.edit_success"|trans }}');
+                    } else {
+                        window.location.reload();
+                    }
                 }
             } else {
                 alert(data.message || 'Error saving employee');
@@ -383,7 +417,7 @@
         });
     });
 
-    function removeAvatar(employeeId, btn) {
+    window.removeAvatar = function(employeeId, btn) {
         if (!confirm('确定要移除头像吗？')) return;
         
         const originalText = btn.innerHTML;
@@ -410,9 +444,9 @@
             btn.disabled = false;
             alert('请求发生错误');
         });
-    }
+    };
 
-    function sendVerification(employeeId, btn) {
+    window.sendVerification = function(employeeId, btn) {
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> {{ "action.saving"|trans|default("发送中...") }}';
         btn.disabled = true;
@@ -431,7 +465,7 @@
             btn.disabled = false;
             if (typeof window.Alert !== 'undefined') {
                 let alertMsg = new Alert($('#{{ drawerId }} .ef-drawer-body'));
-                alertMsg.success(data.message || '发送成功', { percent: '90%', title: "成功", closable: true });
+                alertMsg.success(data.message || '发送成功', { percent: '300px', title: "成功", closable: false });
             } else {
                 alert(data.message || '发送成功');
             }
@@ -442,10 +476,10 @@
             btn.disabled = false;
             if (typeof window.Alert !== 'undefined') {
                 let alertMsg = new Alert($('#{{ drawerId }} .ef-drawer-body'));
-                alertMsg.error(err.message || '请求发生错误', { percent: '90%', title: "错误", closable: true });
+                alertMsg.error(err.message || '请求发生错误', { percent: '300px', title: "错误", closable: false });
             } else {
                 alert(err.message || '请求发生错误');
             }
         });
-    }
+    };
 </script>
