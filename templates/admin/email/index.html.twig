@@ -53,10 +53,10 @@
             color: #0066cc;
             border-bottom: 2px solid #0066cc;
         }
-        .config-form, .template-list {
+        .config-form, .template-list, .binding-list {
             display: none;
         }
-        .config-form.active, .template-list.active {
+        .config-form.active, .template-list.active, .binding-list.active {
             display: block;
         }
         
@@ -181,6 +181,7 @@
         <div class="email-tabs">
             <div class="email-tab active" onclick="switchTab('config', this)">{{ 'admin_email.tabs.config'|trans }}</div>
             <div class="email-tab" onclick="switchTab('templates', this)">{{ 'admin_email.tabs.templates'|trans }}</div>
+            <div class="email-tab" onclick="switchTab('bindings', this)">{{ 'admin_email.tabs.bindings'|trans }}</div>
         </div>
 
         <div class="ef-row ef-row-align-start ef-row-justify-start">
@@ -207,11 +208,11 @@
                 <div id="config-section" class="config-form active">
                     <div class="ef-row ef-row-align-center ef-row-justify-between" style="margin-bottom: 16px;">
                         <div>
-                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">发送服务器配置</div>
-                            <div style="font-size: 14px; color: #86868b;">配置用于发送邮件的服务器信息</div>
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">{{ 'admin_email.config.title'|trans }}</div>
+                            <div style="font-size: 14px; color: #86868b;">{{ 'admin_email.config.desc'|trans }}</div>
                         </div>
                         <div>
-                            <button class="btn primary medium" style="border-radius: 20px;" onclick="openConfigDrawerWithData()">添加服务器</button>
+                            <button class="btn primary medium" style="border-radius: 20px;" onclick="openConfigDrawerWithData()">{{ 'admin_email.config.add_server'|trans }}</button>
                         </div>
                     </div>
 
@@ -223,9 +224,9 @@
                             </div>
                             <div class="method-content">
                                 <div class="method-title">
-                                    {{ config.name ?: '未命名服务器' }}
+                                    {{ config.name ?: ('admin_email.config.unnamed'|trans) }}
                                     {% if config.isDefault %}
-                                        <span style="font-size: 12px; background: #e5f0ff; color: #0066cc; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">默认</span>
+                                        <span style="font-size: 12px; background: #e5f0ff; color: #0066cc; padding: 2px 6px; border-radius: 4px; margin-left: 8px;">{{ 'admin_email.config.default'|trans }}</span>
                                     {% endif %}
                                 </div>
                                 <div class="method-subtitle">主机: {{ config.host }}:{{ config.port }} ({{ config.protocol|upper }}) | 发件人: {{ config.senderAddress }}</div>
@@ -234,7 +235,7 @@
                                 <button class="btn secondary medium only-icon circle" style="border:none; background:transparent; box-shadow:none; color: #1d1d1f; font-size: 18px;" onclick="openConfigDrawerWithData('{{ config.id }}', '{{ config.name|e('js') }}', '{{ config.isDefault ? 1 : 0 }}', '{{ config.protocol|e('js') }}', '{{ config.host|e('js') }}', '{{ config.port }}', '{{ config.encryption|e('js') }}', '{{ config.username|e('js') }}', '{{ config.senderName|e('js') }}', '{{ config.senderAddress|e('js') }}')">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
-                                <form action="{{ path('admin_email_config_delete', {id: config.id}) }}" method="post" style="display:inline;" onsubmit="return confirm('确定要删除此服务器配置吗？');">
+                                <form action="{{ path('admin_email_config_delete', {id: config.id}) }}" method="post" style="display:inline;" onsubmit="return confirm('{{ 'admin_email.config.delete_confirm'|trans }}');">
                                     <button type="submit" class="btn secondary medium only-icon circle" style="border:none; background:transparent; box-shadow:none; color: #dc3545; font-size: 18px;">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
@@ -243,7 +244,7 @@
                         </div>
                         {% else %}
                         <div style="padding: 40px 0; text-align: center; color: #86868b;">
-                            暂无发送服务器配置
+                            {{ 'admin_email.config.empty'|trans }}
                         </div>
                         {% endfor %}
                     </div>
@@ -275,7 +276,7 @@
                                 <button class="btn secondary medium only-icon circle" style="border:none; background:transparent; box-shadow:none; color: #1d1d1f; font-size: 18px;" onclick="openTemplateDrawerWithData('{{ template.id }}', '{{ template.name|e('js') }}', '{{ template.subject|e('js') }}', '{{ template.description|e('js') }}', '{{ template.bodyHtml|e('js')|replace({"\n": "\\n", "\r": "\\r"}) }}', '{{ template.emailConfig ? template.emailConfig.id : '' }}')">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
-                                <form action="{{ path('admin_email_template_delete', {id: template.id}) }}" method="post" style="display:inline;" onsubmit="return confirm('确定要删除此模版吗？');">
+                                <form action="{{ path('admin_email_template_delete', {id: template.id}) }}" method="post" style="display:inline;" onsubmit="return confirm('{{ 'admin_email.templates.delete_confirm'|trans }}');">
                                     <button type="submit" class="btn secondary medium only-icon circle" style="border:none; background:transparent; box-shadow:none; color: #dc3545; font-size: 18px;">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
@@ -284,7 +285,65 @@
                         </div>
                         {% else %}
                         <div style="padding: 40px 0; text-align: center; color: #86868b;">
-                            暂无邮件模版
+                            {{ 'admin_email.templates.empty'|trans }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Bindings List -->
+                <div id="bindings-section" class="binding-list">
+                    <div class="ef-row ef-row-align-center ef-row-justify-between" style="margin-bottom: 16px;">
+                        <div>
+                            <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">{{ 'admin_email.bindings.title'|trans }}</div>
+                            <div style="font-size: 14px; color: #86868b;">{{ 'admin_email.bindings.desc'|trans }}</div>
+                        </div>
+                    </div>
+
+                    <div class="method-list">
+                        {% for binding in bindings %}
+                        <div class="method-item" style="padding-bottom: 24px; padding-top: 24px; display: block;">
+                            <form action="{{ path('admin_email_binding_save') }}" method="post" style="display: flex; align-items: center; width: 100%;">
+                                <input type="hidden" name="id" value="{{ binding.id }}">
+                                
+                                <div class="method-icon">
+                                    <i class="fa-solid fa-link"></i>
+                                </div>
+                                <div class="method-content" style="flex: 1; padding-right: 20px;">
+                                    <div class="method-title">{{ ('function_binding.' ~ binding.functionCode)|trans }}</div>
+                                    <div class="method-subtitle">{{ 'function_binding.function_code'|trans }}: <code>{{ binding.functionCode }}</code></div>
+                                </div>
+                                
+                                <div class="binding-selectors" style="display: flex; gap: 16px; align-items: center;">
+                                    <div style="min-width: 200px;">
+                                        <div style="font-size:12px; color:#86868b; margin-bottom: 4px;">{{ 'function_binding.server'|trans }}</div>
+                                        <select name="emailConfigId" class="ef-input-wrapper-full-width ef-input-rounded" style="padding: 8px 12px; outline: none; border: 1px solid #d1d5db; border-radius: 6px; background-color: white;">
+                                            <option value="">-- {{ 'function_binding.system_default'|trans }} --</option>
+                                            {% for config in configs %}
+                                                <option value="{{ config.id }}" {% if binding.emailConfig and binding.emailConfig.id == config.id %}selected{% endif %}>{{ config.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    
+                                    <div style="min-width: 200px;">
+                                        <div style="font-size:12px; color:#86868b; margin-bottom: 4px;">{{ 'function_binding.template'|trans }}</div>
+                                        <select name="emailTemplateId" class="ef-input-wrapper-full-width ef-input-rounded" style="padding: 8px 12px; outline: none; border: 1px solid #d1d5db; border-radius: 6px; background-color: white;" required>
+                                            <option value="">-- {{ 'function_binding.select_template'|trans }} --</option>
+                                            {% for template in templates %}
+                                                <option value="{{ template.id }}" {% if binding.emailTemplate and binding.emailTemplate.id == template.id %}selected{% endif %}>{{ template.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    
+                                    <div style="padding-top: 20px;">
+                                        <button type="submit" class="btn primary small" style="border-radius: 6px;">{{ 'function_binding.save_binding'|trans }}</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        {% else %}
+                        <div style="padding: 40px 0; text-align: center; color: #86868b;">
+                            {{ 'admin_email.bindings.empty'|trans }}
                         </div>
                         {% endfor %}
                     </div>
@@ -309,7 +368,7 @@
     <div class="ef-drawer-mask" maskid="configDrawer"></div>
     <div class="ef-drawer" style="right: -600px; width: 600px;">
         <div class="ef-drawer-header">
-            <div class="ef-drawer-title" id="configDrawerTitle">添加服务器配置</div>
+            <div class="ef-drawer-title" id="configDrawerTitle">{{ 'admin_email.drawer.add_title'|trans }}</div>
             <div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn" onclick="$().hideDrawer('configDrawer')">
                 <span class="ef-icon-hover">
                     <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
@@ -323,83 +382,176 @@
                 <input type="hidden" name="id" id="configId">
                 
                 <div class="settings-group">
-                    <div class="settings-group-title">基础信息</div>
+                    <div class="settings-group-title">{{ 'admin_email.drawer.basic_info'|trans }}</div>
                     <div class="form-group">
-                        <label class="form-label">配置名称 (Name)</label>
-                        {{ ui.input('configName', 'text', '例如: 营销邮件服务器', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'name', 'style': 'width: 100%;'}) }}
+                        <label class="form-label">{{ 'admin_email.drawer.name'|trans }}</label>
+                        {{ ui.input('configName', 'text', 'admin_email.drawer.name_placeholder'|trans, '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'name', 'style': 'width: 100%;'}) }}
                     </div>
                     <div class="form-group" style="margin-top: 16px;">
                         <input type="hidden" name="isDefault" value="0">
-                        {{ ui.checkbox('configIsDefault', '设为默认服务器 (Default)', '1', false, '', 'isDefault') }}
+                        {{ ui.checkbox('configIsDefault', 'admin_email.drawer.is_default'|trans, '1', false, '', 'isDefault') }}
                     </div>
                 </div>
 
                 <div class="settings-group">
-                    <div class="settings-group-title">连接设置</div>
+                    <div class="settings-group-title">{{ 'admin_email.drawer.conn_settings'|trans }}</div>
                     <div class="grid-2">
                         <div class="form-group">
-                            <label class="form-label">主机地址 (Host) *</label>
-                            {{ ui.input('configHost', 'text', '例如: smtp.exmail.qq.com', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'host', 'required': 'required', 'style': 'width: 100%;'}) }}
+                            <label class="form-label">{{ 'admin_email.drawer.host'|trans }} *</label>
+                            {{ ui.input('configHost', 'text', 'admin_email.drawer.host_placeholder'|trans, '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'host', 'required': 'required', 'style': 'width: 100%;'}) }}
                         </div>
                         <div class="form-group">
-                            <label class="form-label">端口 (Port) *</label>
+                            <label class="form-label">{{ 'admin_email.drawer.port'|trans }} *</label>
                             {{ ui.inputNumber('configPort', null, null, 1, 0, '', 'ef-input-wrapper-full-width ef-input-rounded', 'port', '465', {'required': 'required', 'style': 'width: 100%;'}) }}
                         </div>
                         <div class="form-group">
-                            <label class="form-label">协议 (Protocol) *</label>
+                            <label class="form-label">{{ 'admin_email.drawer.protocol'|trans }} *</label>
                             {% set protocol_options = [
                                 {'label': 'SMTP', 'value': 'smtp'},
                                 {'label': 'Sendgrid', 'value': 'sendgrid'},
                                 {'label': 'Mailgun', 'value': 'mailgun'},
                                 {'label': 'Aliyun', 'value': 'aliyun'}
                             ] %}
-                            {{ ui.select(protocol_options, '请选择协议', '120px', 'ef-input-rounded', 'protocol', 'configProtocol', 'smtp') }}
+                            {{ ui.select(protocol_options, 'admin_email.drawer.protocol_select'|trans, '120px', 'ef-input-rounded', 'protocol', 'configProtocol', 'smtp') }}
                         </div>
                         <div class="form-group">
-                            <label class="form-label">加密方式 (Encryption)</label>
+                            <label class="form-label">{{ 'admin_email.drawer.encryption'|trans }}</label>
                             {% set encryption_options = [
-                                {'label': '无 (None)', 'value': ''},
+                                {'label': 'None', 'value': ''},
                                 {'label': 'SSL', 'value': 'ssl'},
                                 {'label': 'TLS', 'value': 'tls'}
                             ] %}
-                            {{ ui.select(encryption_options, '请选择加密方式', '120px', 'ef-input-rounded', 'encryption', 'configEncryption', 'ssl') }}
+                            {{ ui.select(encryption_options, 'admin_email.drawer.encryption_select'|trans, '120px', 'ef-input-rounded', 'encryption', 'configEncryption', 'ssl') }}
                         </div>
                     </div>
                 </div>
 
                 <div class="settings-group">
-                    <div class="settings-group-title">身份验证</div>
+                    <div class="settings-group-title">{{ 'admin_email.drawer.auth'|trans }}</div>
                     <div class="grid-2">
                         <div class="form-group">
-                            <label class="form-label">用户名 (Username)</label>
-                            {{ ui.input('configUsername', 'text', '请输入邮箱用户名', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'username', 'style': 'width: 100%;'}) }}
+                            <label class="form-label">{{ 'admin_email.drawer.username'|trans }}</label>
+                            {{ ui.input('configUsername', 'text', 'admin_email.drawer.username_placeholder'|trans, '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'username', 'style': 'width: 100%;'}) }}
                         </div>
                         <div class="form-group">
-                            <label class="form-label">密码/授权码 (Password)</label>
-                            {{ ui.input('configPassword', 'password', '留空表示不修改', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'password', 'style': 'width: 100%;'}) }}
+                            <label class="form-label">{{ 'admin_email.drawer.password'|trans }}</label>
+                            {{ ui.input('configPassword', 'password', 'admin_email.drawer.password_hint'|trans, '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'password', 'style': 'width: 100%;'}) }}
                         </div>
                     </div>
                 </div>
 
                 <div class="settings-group">
-                    <div class="settings-group-title">发件人信息</div>
+                    <div class="settings-group-title">{{ 'admin_email.drawer.sender_info'|trans }}</div>
                     <div class="grid-2">
                         <div class="form-group">
-                            <label class="form-label">发件人名称 (Sender Name)</label>
-                            {{ ui.input('configSenderName', 'text', '例如: 系统通知', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'senderName', 'style': 'width: 100%;'}) }}
+                            <label class="form-label">{{ 'admin_email.drawer.sender_name'|trans }}</label>
+                            {{ ui.input('configSenderName', 'text', 'admin_email.drawer.sender_name_placeholder'|trans, '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'senderName', 'style': 'width: 100%;'}) }}
                         </div>
                         <div class="form-group">
-                            <label class="form-label">发件人地址 (Sender Address) *</label>
-                            {{ ui.input('configSenderAddress', 'text', 'noreply@example.com', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'senderAddress', 'required': 'required', 'style': 'width: 100%;'}) }}
+                            <label class="form-label">{{ 'admin_email.drawer.sender_address'|trans }} *</label>
+                            {{ ui.input('configSenderAddress', 'text', 'admin_email.drawer.sender_address_placeholder'|trans, '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'senderAddress', 'required': 'required', 'style': 'width: 100%;'}) }}
                         </div>
                     </div>
                 </div>
             </form>
         </div>
         <div class="ef-drawer-footer">
-            <button class="btn outline medium" type="button" onclick="testConnection()" id="testConnectionBtn">测试连接</button>
-            <button class="cancelDrawer btn outline medium" type="button" onclick="$().hideDrawer('configDrawer')">取消</button>
-            <button type="submit" form="configForm" class="btn primary medium">保存</button>
+            <button class="btn outline medium" type="button" onclick="testConnection()" id="testConnectionBtn">{{ 'admin_email.drawer.test_conn'|trans }}</button>
+            <button class="cancelDrawer btn outline medium" type="button" onclick="$().hideDrawer('configDrawer')">{{ 'action.cancel'|trans }}</button>
+            <button type="submit" form="configForm" class="btn primary medium">{{ 'action.save'|trans }}</button>
+        </div>
+    </div>
+</div>
+
+<!-- Template Drawer -->
+<div class="ef-drawer-container" id="templateDrawer" style="z-index: 1001; display: none;">
+    <div class="ef-drawer-mask" maskid="templateDrawer"></div>
+    <div class="ef-drawer" style="right: -80% !important; width: 80% !important;">
+        <div class="ef-drawer-header">
+            <div class="ef-drawer-title" id="templateDrawerTitle">{{ 'admin_email.drawer.add_template'|trans }}</div>
+            <div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn" onclick="$().hideDrawer('templateDrawer')">
+                <span class="ef-icon-hover">
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                    </svg>
+                </span>
+            </div>
+        </div>
+        <div class="ef-drawer-body" style="overflow-y: auto; background: #f8fafc; padding: 0;">
+            <form action="{{ path('admin_email_template_save') }}" method="post" id="templateForm" class="settings-drawer-form" style="padding: 24px;">
+                <input type="hidden" name="id" id="templateId">
+                <input type="hidden" name="bodyHtml" id="templateBody">
+                <input type="hidden" name="description" id="templateDescription">
+                
+                <div class="ef-row" style="gap: 24px; margin-bottom: 24px;">
+                    <div class="ef-col-16">
+                        <div class="settings-group" style="padding: 0; margin: 0; background: transparent; border: none;">
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label class="form-label">{{ 'admin_email.form.name'|trans }}</label>
+                                    {{ ui.input('templateName', 'text', 'admin_email.form.name_placeholder'|trans, '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'name', 'required': 'required', 'style': 'width: 100%;'}) }}
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">{{ 'admin_email.form.subject'|trans }}</label>
+                                    {{ ui.input('templateSubject', 'text', 'admin_email.form.subject_placeholder'|trans, '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'name': 'subject', 'required': 'required', 'style': 'width: 100%;'}) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ef-col-8">
+                        <div class="form-group">
+                            <label class="form-label">{{ 'admin_email.form.server'|trans }}</label>
+                            {% set server_options = [{'label': 'admin_email.form.default_server'|trans, 'value': ''}] %}
+                            {% for config in configs %}
+                                {% set server_options = server_options|merge([{'label': config.name, 'value': config.id}]) %}
+                            {% endfor %}
+                            {{ ui.select(server_options, 'admin_email.form.server_select'|trans, '100%', 'ef-input-rounded', 'emailConfigId', 'templateServer', '') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="editor-section" style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                    <div class="editor-toolbar-wrapper" style="border-bottom: 1px solid #e5e7eb;">
+                        <div id="toolbar-container"></div>
+                    </div>
+                    <div class="editor-content-wrapper" style="height: 500px;">
+                        <div id="editor-text-container" style="height: 100%;"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <div style="font-size: 14px; font-weight: 600; color: #1d1d1f;">{{ 'admin_email.editor.preset.title'|trans }}</div>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="presetTemplate" class="ef-input-rounded" style="padding: 4px 8px; font-size: 13px; border: 1px solid #e5e7eb;">
+                                <option value="">{{ 'admin_email.templates.preset.select_label'|trans }}</option>
+                                <option value="welcome">{{ 'admin_email.templates.preset.option.welcome'|trans }}</option>
+                                <option value="verification_code">{{ 'admin_email.templates.preset.option.verification_code'|trans }}</option>
+                                <option value="password_reset">{{ 'admin_email.templates.preset.option.password_reset'|trans }}</option>
+                                <option value="announcement">{{ 'admin_email.templates.preset.option.announcement'|trans }}</option>
+                            </select>
+                            <button type="button" class="btn secondary small" onclick="applyPresetTemplate()">{{ 'admin_email.templates.preset.apply'|trans }}</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <div style="font-size: 14px; font-weight: 600; color: #1d1d1f; margin-bottom: 8px;">变量配置</div>
+                    <div id="variablesList" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+                        <!-- Variables will be rendered here -->
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="text" id="newVariableName" placeholder="变量名 (如: username)" class="ef-input-rounded" style="flex: 1; padding: 8px 12px; border: 1px solid #e5e7eb;">
+                        <input type="text" id="newVariableDesc" placeholder="描述 (如: 用户姓名)" class="ef-input-rounded" style="flex: 1; padding: 8px 12px; border: 1px solid #e5e7eb;">
+                        <button type="button" class="btn outline small" onclick="addVariable()">添加变量</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="ef-drawer-footer">
+            <button class="btn outline medium" type="button" onclick="testTemplateEmail()">{{ 'admin_email.btn.send_test'|trans }}</button>
+            <button class="cancelDrawer btn outline medium" type="button" onclick="$().hideDrawer('templateDrawer')">{{ 'action.cancel'|trans }}</button>
+            <button type="submit" form="templateForm" class="btn primary medium">{{ 'action.save'|trans }}</button>
         </div>
     </div>
 </div>
@@ -408,23 +560,23 @@
     {# Test Connection Modal #}
     {% set testConnectionBody %}
         <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label required">测试接收邮箱</label>
-            {{ ui.input('configTestEmailInput', 'email', '请输入接收测试邮件的邮箱地址', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'required': 'required', 'style': 'width: 100%;'}) }}
+            <label class="form-label required">{{ 'admin_email.drawer.test_email_label'|trans }}</label>
+            {{ ui.input('configTestEmailInput', 'email', 'admin_email.drawer.test_email_placeholder'|trans, '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'required': 'required', 'style': 'width: 100%;'}) }}
         </div>
     {% endset %}
 
     {% set testConnectionFooter %}
         <div class="ef-space ef-space-horizontal ef-space-align-center" style="justify-content: flex-end; width: 100%;">
             <div class="ef-space-item" style="margin-right: 8px;">
-                <button class="btn outline medium" type="button" onclick="closeTestConnectionModal()">取消</button>
+                <button class="btn outline medium" type="button" onclick="closeTestConnectionModal()">{{ 'action.cancel'|trans }}</button>
             </div>
             <div class="ef-space-item">
-                <button class="btn primary medium" type="button" onclick="executeTestConnection()" id="confirmTestConnectionBtn">测试</button>
+                <button class="btn primary medium" type="button" onclick="executeTestConnection()" id="confirmTestConnectionBtn">{{ 'admin_email.drawer.test_conn'|trans }}</button>
             </div>
         </div>
     {% endset %}
 
-    {{ ui.modal('testConnectionModal', '测试服务器连接', testConnectionBody, testConnectionFooter, {
+    {{ ui.modal('testConnectionModal', 'admin_email.drawer.test_modal_title'|trans, testConnectionBody, testConnectionFooter, {
         'width': '500px',
         'onClose': 'closeTestConnectionModal()'
     }) }}
@@ -432,23 +584,23 @@
     {# Test Template Email Modal #}
     {% set testTemplateEmailBody %}
         <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label required">测试接收邮箱</label>
-            {{ ui.input('templateTestEmailInput', 'email', '请输入接收测试邮件的邮箱地址', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'required': 'required', 'style': 'width: 100%;'}) }}
+            <label class="form-label required">{{ 'admin_email.drawer.test_email_label'|trans }}</label>
+            {{ ui.input('templateTestEmailInput', 'email', 'admin_email.drawer.test_email_placeholder'|trans, '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'required': 'required', 'style': 'width: 100%;'}) }}
         </div>
     {% endset %}
 
     {% set testTemplateEmailFooter %}
         <div class="ef-space ef-space-horizontal ef-space-align-center" style="justify-content: flex-end; width: 100%;">
             <div class="ef-space-item" style="margin-right: 8px;">
-                <button class="btn outline medium" type="button" onclick="closeTestTemplateEmailModal()">取消</button>
+                <button class="btn outline medium" type="button" onclick="closeTestTemplateEmailModal()">{{ 'action.cancel'|trans }}</button>
             </div>
             <div class="ef-space-item">
-                <button class="btn primary medium" type="button" onclick="executeTestTemplateEmail()" id="confirmTestTemplateEmailBtn">发送</button>
+                <button class="btn primary medium" type="button" onclick="executeTestTemplateEmail()" id="confirmTestTemplateEmailBtn">{{ 'admin_email.btn.send_test'|trans }}</button>
             </div>
         </div>
     {% endset %}
 
-    {{ ui.modal('testTemplateEmailModal', '发送测试邮件', testTemplateEmailBody, testTemplateEmailFooter, {
+    {{ ui.modal('testTemplateEmailModal', 'admin_email.btn.send_test'|trans, testTemplateEmailBody, testTemplateEmailFooter, {
         'width': '500px',
         'onClose': 'closeTestTemplateEmailModal()'
     }) }}
@@ -525,13 +677,22 @@
             const iv = document.querySelector('#toolbar-container [data-menu-key="insertVariable"]');
             if (iv) iv.style.marginLeft = 'auto';
             
+            // Handle tab from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            if (tab) {
+                const tabEl = document.querySelector(`.email-tab[onclick*="'${tab}'"]`);
+                if (tabEl) {
+                    switchTab(tab, tabEl);
+                }
+            }
         });
 
         function switchTab(tabId, el) {
             document.querySelectorAll('.email-tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
             
-            document.querySelectorAll('.config-form, .template-list').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.config-form, .template-list, .binding-list').forEach(s => s.classList.remove('active'));
             document.getElementById(tabId + '-section').classList.add('active');
         }
 
@@ -582,7 +743,7 @@
             document.getElementById('configSenderName').value = senderName;
             document.getElementById('configSenderAddress').value = senderAddress;
 
-            document.getElementById('configDrawerTitle').innerText = id ? '编辑服务器配置' : '添加服务器配置';
+            document.getElementById('configDrawerTitle').innerText = id ? '{{ 'admin_email.drawer.edit_title'|trans }}' : '{{ 'admin_email.drawer.add_title'|trans }}';
             $().showDrawer('configDrawer');
         }
 
@@ -612,7 +773,7 @@
         function openTemplateDrawerWithData(id = '', name = '', subject = '', desc = '', body = '', emailConfigId = '') {
             let url = '{{ path('admin_email_template_editor') }}';
             if (id) {
-                url = '{{ path('admin_email_template_editor', {'id': 'ID_PLACEHOLDER'}) }}'.replace('ID_PLACEHOLDER', id);
+                url = '{{ path('admin_email_template_editor_with_id', {'id': 'ID_PLACEHOLDER'}) }}'.replace('ID_PLACEHOLDER', id);
             }
             window.open(url, '_blank');
         }
@@ -717,14 +878,14 @@
 
             if (testEmail.trim() === '') {
                 let alert = new Alert($('#testConnectionModal .ef-modal-body'));
-                alert.error('测试接收邮箱不能为空', { percent: '90%', title: "错误", closable: true });
+                alert.error('{{ 'admin_email.flash.test_email_required'|trans }}', { percent: '90%', title: "{{ 'admin_email.flash.error'|trans }}", closable: true });
                 return;
             }
             
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(testEmail.trim())) {
                 let alert = new Alert($('#testConnectionModal .ef-modal-body'));
-                alert.error('请输入有效的邮箱地址', { percent: '90%', title: "错误", closable: true });
+                alert.error('{{ 'admin_email.flash.invalid_email'|trans }}', { percent: '90%', title: "{{ 'admin_email.flash.error'|trans }}", closable: true });
                 return;
             }
 
@@ -735,7 +896,7 @@
             
             const btn = document.getElementById('confirmTestConnectionBtn');
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 测试中...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> {{ 'admin_email.flash.testing'|trans }}';
             btn.disabled = true;
 
             ajax({
@@ -750,17 +911,17 @@
                     if (response.code === 200) {
                         closeTestConnectionModal();
                         let alert = new Alert($('#configDrawer .ef-drawer-body'));
-                        alert.success(response.message || '连接成功，测试邮件已发送', { percent: '90%', title: "成功", closable: true });
+                        alert.success(response.message || '{{ 'admin_email.flash.test_success'|trans }}', { percent: '90%', title: "{{ 'admin_email.flash.success'|trans }}", closable: true });
                     } else {
                         let alert = new Alert($('#testConnectionModal .ef-modal-body'));
-                        alert.error(response.message || '连接失败', { percent: '90%', title: "错误", closable: true });
+                        alert.error(response.message || '{{ 'admin_email.flash.test_failed'|trans }}', { percent: '90%', title: "{{ 'admin_email.flash.error'|trans }}", closable: true });
                     }
                 },
                 error: function (xhr, status, errorMsg) {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                     let alert = new Alert($('#testConnectionModal .ef-modal-body'));
-                    alert.error(errorMsg || '请求发生错误', { percent: '90%', title: "错误", closable: true });
+                    alert.error(errorMsg || '{{ 'admin_email.flash.ajax_error'|trans }}', { percent: '90%', title: "{{ 'admin_email.flash.error'|trans }}", closable: true });
                 }
             });
         }
@@ -788,7 +949,7 @@
             
             if (testEmail.trim() === '') {
                 let alert = new Alert($('#testTemplateEmailModal .modal-body'));
-                alert.error('测试接收邮箱不能为空', { percent: '90%', title: "错误", closable: true });
+                alert.error('{{ 'admin_email.flash.test_email_required'|trans }}', { percent: '90%', title: "{{ 'admin_email.flash.error'|trans }}", closable: true });
                 return;
             }
             
@@ -796,7 +957,7 @@
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(testEmail.trim())) {
                 let alert = new Alert($('#testTemplateEmailModal .modal-body'));
-                alert.error('请输入有效的邮箱地址', { percent: '90%', title: "错误", closable: true });
+                alert.error('{{ 'admin_email.flash.invalid_email'|trans }}', { percent: '90%', title: "{{ 'admin_email.flash.error'|trans }}", closable: true });
                 return;
             }
 
@@ -813,7 +974,7 @@
             
             const btn = document.getElementById('confirmTestTemplateEmailBtn');
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 发送中...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> {{ 'admin_email.flash.sending'|trans }}';
             btn.disabled = true;
 
             ajax({
@@ -828,17 +989,17 @@
                     if (response.code === 200) {
                         closeTestTemplateEmailModal();
                         let alert = new Alert($('#templateDrawer .ef-drawer-body'));
-                        alert.success(response.message || '测试邮件发送成功', { percent: '90%', title: "成功", closable: true });
+                        alert.success(response.message || '{{ 'admin_email.flash.send_success'|trans }}', { percent: '90%', title: "{{ 'admin_email.flash.success'|trans }}", closable: true });
                     } else {
                         let alert = new Alert($('#testTemplateEmailModal .modal-body'));
-                        alert.error(response.message || '测试邮件发送失败', { percent: '90%', title: "错误", closable: true });
+                        alert.error(response.message || '{{ 'admin_email.flash.send_failed'|trans }}', { percent: '90%', title: "{{ 'admin_email.flash.error'|trans }}", closable: true });
                     }
                 },
                 error: function (xhr, status, errorMsg) {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                     let alert = new Alert($('#testTemplateEmailModal .modal-body'));
-                    alert.error(errorMsg || '请求发生错误', { percent: '90%', title: "错误", closable: true });
+                    alert.error(errorMsg || '{{ 'admin_email.flash.ajax_error'|trans }}', { percent: '90%', title: "{{ 'admin_email.flash.error'|trans }}", closable: true });
                 }
             });
         }

@@ -1,6 +1,6 @@
 {% include 'ui/template/icons.html.twig' %}
 <!DOCTYPE html>
-<html>
+<html lang="{{ app.request.locale|default('zh_CN') }}">
 	<head>
 		<meta charset="UTF-8">
     <meta name="session" session="{{ get_session_id() }}">
@@ -15,13 +15,14 @@
     {# 将 Flash 消息渲染到 <meta> 标签中 #}
     {% for type, messages in app.flashes %}
         {% for message in messages %}
-            <meta name="flash-{{ type }}" content="{{ message }}">
+            <meta name="flash-{{ type }}" content="{{ message|trans({}, 'messages') }}">
         {% endfor %}
     {% endfor %}
     
     {# View Editor 配置 #}
     <meta name="view-editor-undo-steps" content="{{ app.request.server.get('VIEW_EDITOR_UNDO_STEPS', 50) }}">
     <meta name="view-editor-version" content="1.0">
+    <meta name="mercure-hub-url" content="{{ mercure_public_url() }}">
 		<title>
 			{% block title %}Welcome!{% endblock %}
 		</title>
@@ -32,7 +33,8 @@
 			<link rel="stylesheet" href="{{ asset('/lib/font-awesome-642/css/all.min.css', 'static') }}">
 			<link rel="stylesheet" href="{{ asset('/lib/cropper/cropper.min.css') }}">
 			<link rel="stylesheet" href="{{ asset('/lib/jquery-ui/jquery-ui.min.css', 'static') }}">
-			<link rel="stylesheet" type="text/css" href="{{ asset('button.css', 'ui') }}">
+                        <link rel="stylesheet" href="{{ asset('/lib/daterangepicker/daterangepicker.css', 'static') }}">
+                        <link rel="stylesheet" type="text/css" href="{{ asset('button.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('text-lighting.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('input-number.css', 'ui') }}">
 			<link rel="stylesheet" type="text/css" href="{{ asset('input.css', 'ui') }}">
@@ -73,6 +75,7 @@
 			<script src="{{ asset('lib/ef/base/common.js') }}"></script>
 			<script src="{{ asset('lib/ef/base/str.js') }}"></script>
 			<script src="{{ asset('lib/ef/base/cache.js', 'static') }}"></script>
+			<script src="{{ asset('lib/ef/base/ef-mercure.js') }}"></script>
 			<script src="{{ asset('lib/pinyin/browser.js') }}"></script>
 			<script src="{{ asset('lib/leader-line/leader-line.min.js') }}"></script>
 			<script src="{{ asset('alert.js', 'ui') }}"></script>
@@ -93,7 +96,20 @@
 			<script src="{{ asset('datagrid.js', 'ui') }}"></script>
 			<script src="{{ asset('modal.js', 'ui') }}"></script>
 			<script src="{{ asset('tip.js', 'ui') }}"></script>
+                        <script src="{{ asset('lib/daterangepicker/moment.min.js', 'static') }}"></script>
+                        <script src="{{ asset('lib/daterangepicker/daterangepicker.js', 'static') }}"></script>
+                        <script src="{{ asset('date.js', 'ui') }}"></script>
 			<script src="{{ asset('sunui/admin/platform/undo_redo_manager.js') }}"></script>
+			<script>
+				$(document).ready(function() {
+					// 初始化 Mercure 实时通信
+					if (window.EF && window.EF.Mercure) {
+						window.EF.Mercure.init();
+						// 开启在线心跳
+						window.EF.Mercure.startHeartbeat();
+					}
+				});
+			</script>
 			<script src="{{ asset('lib/echarts/echarts.min.js') }}"></script>
 			<script src="{{ asset('lib/cropper/cropper.min.js') }}"></script>
 			{# <script src="https://kit.fontawesome.com/ef1baf8144.js" crossorigin="anonymous"></script> #}

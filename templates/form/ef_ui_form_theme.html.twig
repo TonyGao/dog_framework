@@ -1,4 +1,4 @@
-{# 参照 symfony/src/Symfony/Bridge/Twig/Resources/views/Form/ 下文件 #}
+{# 参照 symfony/twig-bridge/Resources/views/Form/ 下文件 #}
 {% use 'form_div_layout.html.twig' %}
 
 {% block form_start -%}
@@ -49,12 +49,25 @@
     {%- endif -%}
     {%- set attr = attr|merge({'wrapper_class': false, 'rounded': false, 'height': false}) -%}
 
-    {# 处理 text 类型的输入框，使用自定义的样式 #}
-    {%- if type == 'text' -%}
-    {# <span class="ef-input-wrapper">
-      <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" clearable="true" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
-    </span> #}
+    {# 处理各类文本输入框，使用自定义的样式 #}
+    {%- if type in ['text', 'week', 'email', 'password', 'url', 'tel', 'color'] -%}
+        {%- if type == 'color' -%}
+            {%- set wrapper_style = wrapper_style ~ ' padding: 4px;' -%}
+            {%- set class_attr = class_attr ~ ' ef-input-color' -%}
+        {%- endif -%}
         <span class="ef-input-wrapper {{ wrapper_class }} {% if isReadonly %} ef-input-disabled {% endif %}" style="{{ wrapper_style }}">
+            <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" 
+                   {% if type != 'color' %}clearable="true"{% endif %}
+                   type="{{ type }}" 
+                   {{ block('widget_attributes') }} 
+                   {% if value is not empty %}value="{{ value }}" {% endif %}
+                   {% if isReadonly %} readonly="readonly" {% endif %}
+                   {% if disabled %} disabled="disabled" {% endif %}
+                   {% if type == 'color' %} style="padding: 0; cursor: pointer; border: none; background: transparent;" {% endif %}/>
+        </span>
+    {%- elseif type == 'search' -%}
+        <span class="ef-input-wrapper {{ wrapper_class }} {% if isReadonly %} ef-input-disabled {% endif %}" style="{{ wrapper_style }}">
+            <span class="ef-input-prefix"><i class="fa-solid fa-magnifying-glass"></i></span>
             <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" 
                    clearable="true" 
                    type="{{ type }}" 
@@ -63,13 +76,14 @@
                    {% if isReadonly %} readonly="readonly" {% endif %}
                    {% if disabled %} disabled="disabled" {% endif %}/>
         </span>
+    {%- elseif type == 'range' -%}
+        <input type="{{ type }}" class="ef-input {{ class_attr }} {% if isReadonly %} ef-input-disabled {% endif %}" style="width: 100%;" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %} {% if isReadonly %} readonly="readonly" {% endif %} {% if disabled %} disabled="disabled" {% endif %}/>
     {%- else -%}
         {# 处理其他类型的输入框 #}
         <input type="{{ type }}" {{ block('widget_attributes') }} 
                {% if value is not empty %}value="{{ value }}" {% endif %}
                {% if isReadonly %} readonly="readonly" {% endif %}
-               {% if isReadonly %} disabled="disabled" {% endif %}/>
-      {# <input type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/> #}
+               {% if disabled %} disabled="disabled" {% endif %}/>
     {%- endif -%}
 {%- endblock form_widget_simple -%}
 
@@ -127,11 +141,23 @@
 {# Labels #}
 
 {% block form_label -%}
-  {%- if label_attr is not defined or label_attr is not iterable -%}
-      {%- set label_attr = {} -%}
+  {%- if label is same as(false) -%}
+      {# No label, output nothing #}
+  {%- elseif label is empty -%}
+      {# Empty label, output nothing #}
+  {%- else -%}
+      {%- if label_attr is not defined or label_attr is not iterable -%}
+          {%- set label_attr = {} -%}
+      {%- endif -%}
+      {%- set label_attr = label_attr|merge({ class: (label_attr.class|default('') ~ ' ' ~ (label_class|default('ef-form-item-label')))|trim }) -%}
+      <label for="{{ id }}"{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}>
+          {%- if translation_domain is same as(false) -%}
+              {{- label|raw -}}
+          {%- else -%}
+              {{- label|trans({}, translation_domain|default('messages')) -}}
+          {%- endif -%}
+      </label>
   {%- endif -%}
-  {%- set label_attr = label_attr|merge({ class: label_attr.class|default(label_class|default('ef-form-item-label')) }) -%}
-  {{- parent() -}}
 {%- endblock form_label %}
 
 {# Rows #}
@@ -151,6 +177,55 @@
     {{- form_errors(form) -}}
   </div>
 {%- endblock form_row %}
+
+{% block choice_widget_expanded -%}
+  {%- set is_radio = form.vars.expanded and not form.vars.multiple -%}
+  <div {{ block('widget_container_attributes') }} class="ef-{{ is_radio ? 'radio' : 'checkbox' }}-group ef-{{ is_radio ? 'radio' : 'checkbox' }}-group-direction-horizontal">
+    {%- for child in form %}
+      <label class="ef-{{ is_radio ? 'radio' : 'checkbox' }}">
+        <input type="{{ is_radio ? 'radio' : 'checkbox' }}" id="{{ child.vars.id }}" name="{{ child.vars.full_name }}" class="ef-{{ is_radio ? 'radio' : 'checkbox' }}-target" value="{{ child.vars.value }}" {% if child.vars.checked %}checked="checked"{% endif %} {% if child.vars.disabled %}disabled="disabled"{% endif %} />
+        <span class="ef-icon-hover ef-{{ is_radio ? 'radio' : 'checkbox' }}-icon-hover">
+          {% if is_radio %}
+            <span class="ef-radio-icon"></span>
+          {% else %}
+            <div class="ef-checkbox-icon"></div>
+          {% endif %}
+        </span>
+        <span class="ef-{{ is_radio ? 'radio' : 'checkbox' }}-label">
+          {{- child.vars.label|trans({}, choice_translation_domain) -}}
+        </span>
+      </label>
+    {% endfor -%}
+  </div>
+{%- endblock choice_widget_expanded %}
+
+{% block checkbox_widget -%}
+  <label class="ef-checkbox">
+    <input type="checkbox" class="ef-checkbox-target" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    <span class="ef-icon-hover ef-checkbox-icon-hover">
+        <div class="ef-checkbox-icon"></div>
+    </span>
+  </label>
+{%- endblock checkbox_widget %}
+
+{% block radio_widget -%}
+  <label class="ef-radio">
+    <input type="radio" class="ef-radio-target" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    <span class="ef-icon-hover ef-radio-icon-hover">
+        <span class="ef-radio-icon"></span>
+    </span>
+  </label>
+{%- endblock radio_widget %}
+
+{% block file_widget -%}
+  <div class="ef-upload-wrapper" style="display: flex; align-items: center; gap: 12px;">
+    <button type="button" class="btn secondary medium {% if disabled %}disabled{% endif %}" onclick="this.nextElementSibling.click()">
+        <i class="fa-solid fa-upload"></i> 选择文件
+    </button>
+    <input type="file" {{ block('widget_attributes') }} style="display: none;" onchange="this.nextElementSibling.textContent = this.files[0] ? this.files[0].name : '未选择任何文件'" />
+    <span class="ef-upload-filename" style="color: #666; font-size: 14px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">未选择任何文件</span>
+  </div>
+{%- endblock file_widget %}
 
 {% block button_row -%}
     {{- form_widget(form) -}}
@@ -223,6 +298,77 @@
   </span>
 {%- endblock integer_widget -%}
 
+{%- block money_widget -%}
+    {%- set type = type|default('text') -%}
+    {%- set isReadonly = attr.readonly is defined and attr.readonly -%}
+    {%- set class_attr = attr.class is defined ? attr.class : '' %}
+    {%- set wrapper_class = attr.wrapper_class|default('') -%}
+    {%- if attr.rounded|default(false) -%}
+        {%- set wrapper_class = wrapper_class ~ ' ef-input-rounded' -%}
+    {%- endif -%}
+    {%- set wrapper_style = '' -%}
+    {%- if attr.height|default(false) -%}
+        {%- set wrapper_class = wrapper_class ~ ' ef-input-h' ~ attr.height -%}
+        {%- set wrapper_style = 'height: ' ~ attr.height ~ 'px;' -%}
+    {%- endif -%}
+    {%- set attr = attr|merge({'wrapper_class': false, 'rounded': false, 'height': false}) -%}
+    
+    {%- set currency_symbol -%}
+        {{ money_pattern|replace({'{{ widget }}': ''})|trim }}
+    {%- endset -%}
+    
+    <span class="ef-input-wrapper {{ wrapper_class }} {% if isReadonly %} ef-input-disabled {% endif %}" style="{{ wrapper_style }}">
+        {% if money_pattern starts with '{{ widget }}' %}
+            <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" 
+                   clearable="true" 
+                   type="{{ type }}" 
+                   {{ block('widget_attributes') }} 
+                   {% if value is not empty %}value="{{ value }}" {% endif %}
+                   {% if isReadonly %} readonly="readonly" {% endif %}
+                   {% if disabled %} disabled="disabled" {% endif %}/>
+            <span class="ef-input-suffix" style="padding: 0 12px; color: var(--color-text-3);">{{ currency_symbol }}</span>
+        {% else %}
+            <span class="ef-input-prefix" style="padding: 0 12px; color: var(--color-text-3);">{{ currency_symbol }}</span>
+            <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" 
+                   clearable="true" 
+                   type="{{ type }}" 
+                   {{ block('widget_attributes') }} 
+                   {% if value is not empty %}value="{{ value }}" {% endif %}
+                   {% if isReadonly %} readonly="readonly" {% endif %}
+                   {% if disabled %} disabled="disabled" {% endif %}/>
+        {% endif %}
+    </span>
+{%- endblock money_widget -%}
+
+{%- block percent_widget -%}
+    {%- set type = type|default('text') -%}
+    {%- set isReadonly = attr.readonly is defined and attr.readonly -%}
+    {%- set class_attr = attr.class is defined ? attr.class : '' %}
+    {%- set wrapper_class = attr.wrapper_class|default('') -%}
+    {%- if attr.rounded|default(false) -%}
+        {%- set wrapper_class = wrapper_class ~ ' ef-input-rounded' -%}
+    {%- endif -%}
+    {%- set wrapper_style = '' -%}
+    {%- if attr.height|default(false) -%}
+        {%- set wrapper_class = wrapper_class ~ ' ef-input-h' ~ attr.height -%}
+        {%- set wrapper_style = 'height: ' ~ attr.height ~ 'px;' -%}
+    {%- endif -%}
+    {%- set attr = attr|merge({'wrapper_class': false, 'rounded': false, 'height': false}) -%}
+    
+    <span class="ef-input-wrapper {{ wrapper_class }} {% if isReadonly %} ef-input-disabled {% endif %}" style="{{ wrapper_style }}">
+        <input component="input" class="ef-input ef-input-size-medium {{ class_attr }}" 
+               clearable="true" 
+               type="{{ type }}" 
+               {{ block('widget_attributes') }} 
+               {% if value is not empty %}value="{{ value }}" {% endif %}
+               {% if isReadonly %} readonly="readonly" {% endif %}
+               {% if disabled %} disabled="disabled" {% endif %}/>
+        {% if symbol|default('%') %}
+            <span class="ef-input-suffix" style="padding: 0 12px; color: var(--color-text-3);">{{ symbol|default('%') }}</span>
+        {% endif %}
+    </span>
+{%- endblock percent_widget -%}
+
 {%- block choice_widget_collapsed -%}
     {% set selectInputId = random() %}
     {% set selectContentId = random() %}
@@ -248,14 +394,22 @@
       id="{{ selectInputId }}"
       contentId="{{ selectContentId }}"
       >
-      <input id="{{ real_id }}" name="{{ full_name }}_search" class="ef-select-view-input {% if isDefault %} ef-select-view-input-hidden {% endif %}" placeholder="Please select ...">
+      <input id="{{ real_id }}" class="ef-select-view-input {% if isDefault %} ef-select-view-input-hidden {% endif %}" placeholder="Please select ...">
       {% set defaultLabel = '' %}
+      {% set defaultTranslationParams = {} %}
+      {%- for key, choice_attr in preferred_choices -%}
+        {%- if choice_attr.value == value -%}
+          {%- set defaultLabel = choice_attr.label -%}
+          {%- set defaultTranslationParams = choice_attr.labelTranslationParameters|default({}) -%}
+        {%- endif -%}
+      {%- endfor -%}
       {%- for key, choice_attr in choices -%}
         {%- if choice_attr.value == value -%} {# 如果选项值等于默认值 #}
           {%- set defaultLabel = choice_attr.label -%}
+          {%- set defaultTranslationParams = choice_attr.labelTranslationParameters|default({}) -%}
         {%- endif -%}
       {%- endfor -%}
-      <span class="ef-select-view-value {% if not isDefault %} ef-select-view-value-hidden {% endif %}">{{ defaultLabel }}</span>
+      <span class="ef-select-view-value {% if not isDefault %} ef-select-view-value-hidden {% endif %}">{{ defaultLabel != '' ? (choice_translation_domain is same as(false) ? defaultLabel : defaultLabel|trans(defaultTranslationParams, choice_translation_domain)) : '' }}</span>
       <span class="ef-select-view-suffix">
         <span class="ef-select-view-icon">
           {% if isDefault %}
@@ -316,3 +470,226 @@
         {%- endif -%}
     {% endfor %}
 {%- endblock choice_widget_options -%}
+
+{%- block date_widget -%}
+    {%- if widget == 'single_text' -%}
+        {%- set type = 'text' -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' date-picker')|trim}) -%}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{- date_pattern|replace({
+                '{{ year }}':  form_widget(form.year),
+                '{{ month }}': form_widget(form.month),
+                '{{ day }}':   form_widget(form.day),
+            })|raw -}}
+        </div>
+    {%- endif -%}
+{%- endblock date_widget -%}
+
+{%- block datetime_widget -%}
+    {%- if widget == 'single_text' -%}
+        {%- set type = 'text' -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' datetime-picker')|trim}) -%}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{- form_errors(form.date) -}}
+            {{- form_errors(form.time) -}}
+            {{- form_widget(form.date) -}}
+            {{- form_widget(form.time) -}}
+        </div>
+    {%- endif -%}
+{%- endblock datetime_widget -%}
+
+{%- block time_widget -%}
+    {%- if widget == 'single_text' -%}
+        {%- set type = 'text' -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' time-picker')|trim}) -%}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        {%- set vars = widget == 'text' ? {attr: {size: 1}} : {} -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{ form_widget(form.hour, vars) }}{% if with_minutes %}:{{ form_widget(form.minute, vars) }}{% endif %}{% if with_seconds %}:{{ form_widget(form.second, vars) }}{% endif %}
+        </div>
+    {%- endif -%}
+{%- endblock time_widget -%}
+
+{%- block week_widget -%}
+    {%- if widget == 'single_text' -%}
+        {%- set type = 'week' -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' week-picker')|trim}) -%}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        {%- set vars = widget == 'text' ? {attr: {size: 1}} : {} -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{ form_widget(form.year, vars) }}-{{ form_widget(form.week, vars) }}
+        </div>
+    {%- endif -%}
+{%- endblock week_widget -%}
+
+{%- block timezone_widget -%}
+    {%- if required and placeholder is none and not placeholder_in_choices and not multiple and (attr.size is not defined or attr.size <= 1) -%}
+        {% set required = false %}
+    {%- endif -%}
+    {%- set wrapper_class = attr.wrapper_class|default('') -%}
+    {%- if attr.rounded|default(false) -%}
+        {%- set wrapper_class = wrapper_class ~ ' ef-input-rounded' -%}
+    {%- endif -%}
+    <span class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium {{ wrapper_class }}" style="height: 36px; line-height: 36px;">
+        <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %} class="ef-input" style="border:none; width: 100%; height: 100%; outline: none; background: transparent; padding: 0 12px;">
+            {%- if placeholder is not none -%}
+                <option value=""{% if placeholder_attr|default({}) %}{% with {attr: placeholder_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}{% if required and value is empty %} selected="selected"{% endif %}>{{ placeholder != '' ? (translation_domain is same as(false) ? placeholder : placeholder|trans({}, translation_domain)) }}</option>
+            {%- endif -%}
+            {%- if preferred_choices|length > 0 -%}
+                {% set options = preferred_choices %}
+                {% set render_preferred_choices = true %}
+                {{- block('timezone_widget_options') -}}
+                {%- if choices|length > 0 and separator is not none -%}
+                    {%- if separator_html is not defined or separator_html is same as(false) -%}
+                        <option disabled="disabled">{{ separator }}</option>
+                    {% else %}
+                        {{ separator|raw }}
+                    {% endif %}
+                {%- endif -%}
+            {%- endif -%}
+            {%- set options = choices -%}
+            {%- set render_preferred_choices = false -%}
+            {{- block('timezone_widget_options') -}}
+        </select>
+    </span>
+{%- endblock timezone_widget -%}
+
+{%- block timezone_widget_options -%}
+    {% for group_label, choice in options %}
+        {%- if choice is iterable -%}
+            <optgroup label="{{ choice_translation_domain is same as(false) ? group_label : group_label|trans({}, choice_translation_domain) }}">
+                {% set options = choice %}
+                {{- block('timezone_widget_options') -}}
+            </optgroup>
+        {%- else -%}
+            <option value="{{ choice.value }}"{% if choice.attr %}{% with {attr: choice.attr} %}{{ block('attributes') }}{% endwith %}{% endif %}{% if (not render_preferred_choices|default(false) or not (duplicate_preferred_choices ?? true)) and choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice_translation_domain is same as(false) ? choice.label : choice.label|trans(choice.labelTranslationParameters, choice_translation_domain) }}</option>
+        {%- endif -%}
+    {% endfor %}
+{%- endblock timezone_widget_options -%}
+
+{%- block collection_widget -%}
+    {% if prototype is defined and not prototype.rendered %}
+        {%- set prototype_html = '<div class="ef-space ef-space-horizontal ef-space-align-center ef-collection-item" style="margin-bottom: 12px; width: 100%; display: flex;"><div style="flex: 1;">' ~ form_widget(prototype) ~ '</div><span class="ef-collection-remove" style="cursor: pointer; color: #999; padding: 4px 8px; transition: color 0.2s; margin-left: 4px;" title="删除" onmouseover="this.style.color=\'#ff4d4f\'" onmouseout="this.style.color=\'#999\'"><i class="fa-solid fa-trash-can"></i></span></div>' -%}
+        {%- set attr = attr|merge({'data-prototype': prototype_html}) -%}
+    {% endif %}
+    <div class="ef-collection-container" {{ block('widget_container_attributes') }} style="width: 100%;">
+        <div class="ef-collection-items">
+            {% for child in form %}
+                <div class="ef-space ef-space-horizontal ef-space-align-center ef-collection-item" style="margin-bottom: 12px; width: 100%; display: flex;">
+                    <div style="flex: 1;">
+                        {{- form_widget(child) -}}
+                    </div>
+                    {% if form.vars.allow_delete|default(true) %}
+                    <span class="ef-collection-remove" style="cursor: pointer; color: #999; padding: 4px 8px; transition: color 0.2s; margin-left: 4px;" title="删除" onmouseover="this.style.color='#ff4d4f'" onmouseout="this.style.color='#999'">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        {% if form.vars.allow_add|default(true) %}
+            <div style="margin-top: 8px;">
+                <button type="button" class="btn outline medium ef-collection-add-btn" style="width: 100%; border-style: dashed; border-color: #d9d9d9; color: #666; background: #fafafa; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-plus"></i> {{ 'action.add'|trans({}, 'messages')|default('添加一项') }}
+                </button>
+            </div>
+        {% endif %}
+    </div>
+    <script>
+    if (typeof window.efCollectionInitialized === 'undefined') {
+        window.efCollectionInitialized = true;
+        document.addEventListener('click', function(e) {
+            const removeBtn = e.target.closest('.ef-collection-remove');
+            if (removeBtn) {
+                const item = removeBtn.closest('.ef-collection-item');
+                if (item) {
+                    item.remove();
+                }
+                return;
+            }
+            const addBtn = e.target.closest('.ef-collection-add-btn');
+            if (addBtn) {
+                const container = addBtn.closest('.ef-collection-container');
+                const itemsContainer = container.querySelector('.ef-collection-items');
+                const prototype = container.getAttribute('data-prototype');
+                if (prototype) {
+                    const index = itemsContainer.children.length;
+                    const newHtml = prototype.replace(/__name__/g, index);
+                    itemsContainer.insertAdjacentHTML('beforeend', newHtml);
+                }
+            }
+        });
+    }
+    </script>
+{%- endblock collection_widget -%}
+
+{%- block repeated_row -%}
+    {%- set first_id = form.first.vars.id -%}
+    {%- set second_id = form.second.vars.id -%}
+    <div class="ef-repeated-wrapper" data-first-id="{{ first_id }}" data-second-id="{{ second_id }}">
+        {{- form_row(form.first) -}}
+        {{- form_row(form.second) -}}
+    </div>
+    <script>
+    if (typeof window.efRepeatedInitialized === 'undefined') {
+        window.efRepeatedInitialized = true;
+        document.addEventListener('input', function(e) {
+            if (e.target.tagName === 'INPUT') {
+                document.querySelectorAll('.ef-repeated-wrapper').forEach(wrapper => {
+                    const firstId = wrapper.getAttribute('data-first-id');
+                    const secondId = wrapper.getAttribute('data-second-id');
+                    if (e.target.id === firstId || e.target.id === secondId) {
+                        const firstInput = document.getElementById(firstId);
+                        const secondInput = document.getElementById(secondId);
+                        
+                        if (firstInput && secondInput) {
+                            let errorMsg = secondInput.closest('.ef-form-item-wrapper-col')?.querySelector('.ef-repeated-error');
+                            if (!errorMsg) {
+                                const col = secondInput.closest('.ef-form-item-wrapper-col');
+                                if (col) {
+                                    errorMsg = document.createElement('div');
+                                    errorMsg.className = 'ef-repeated-error';
+                                    errorMsg.style.cssText = 'color: #ff4d4f; font-size: 12px; margin-top: 4px; display: none;';
+                                    errorMsg.textContent = '两次输入的内容不一致';
+                                    col.appendChild(errorMsg);
+                                }
+                            }
+                            
+                            const wrapperEl = secondInput.closest('.ef-input-wrapper');
+                            if (secondInput.value && firstInput.value !== secondInput.value) {
+                                if (errorMsg) errorMsg.style.display = 'block';
+                                if (wrapperEl) wrapperEl.style.borderColor = '#ff4d4f';
+                            } else {
+                                if (errorMsg) errorMsg.style.display = 'none';
+                                if (wrapperEl) wrapperEl.style.borderColor = '';
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
+    </script>
+{%- endblock repeated_row -%}
+
+{% block reset_widget -%}
+  {%- if attr is not defined or attr is not iterable -%}
+      {%- set attr = {} -%}
+  {%- endif -%}
+  <div class="ef-space-item">
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' btn outline medium')|trim}) %}
+    <button type="{{ type|default('reset') }}" {{ block('button_attributes') }}>
+        {%- if translation_domain is same as(false) -%}
+            {{- label -}}
+        {%- else -%}
+            {{- label|trans(label_translation_parameters, translation_domain) -}}
+        {%- endif -%}
+    </button>
+  </div>
+{%- endblock reset_widget %}

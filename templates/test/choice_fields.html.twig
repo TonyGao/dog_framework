@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+{% form_theme form 'form/ef_ui_form_theme.html.twig' %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .demo-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .demo-header {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 24px;
+    }
+    .demo-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+    .demo-desc {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .ef-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+<div class="demo-container">
+  <div class="demo-header">
+    <h1 class="demo-title">Symfony Choice Fields</h1>
+    <p class="demo-desc">
+      测试 Symfony 内置的各种选择器表单类型。<br>
+      因为这些类型都继承自 <code>ChoiceType</code>，所以 <code>ef_ui_form_theme.html.twig</code> 的 <code>choice_widget_collapsed</code> 已经为它们统一提供了样式支持，无需编写重复的组件。
+    </p>
+  </div>
+
+  <div class="ef-card">
+    {{ form_start(form) }}
+      <div class="demo-grid">
+        {{ form_row(form.choice) }}
+        {{ form_row(form.enum) }}
+        {{ form_row(form.entity) }}
+        {{ form_row(form.country) }}
+        {{ form_row(form.language) }}
+        {{ form_row(form.locale) }}
+        {{ form_row(form.timezone) }}
+        {{ form_row(form.currency) }}
+      </div>
+    {{ form_end(form) }}
+  </div>
+</div>
+{% endblock %}

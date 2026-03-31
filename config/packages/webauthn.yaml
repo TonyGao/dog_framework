@@ -21,7 +21,6 @@ webauthn:
 
   # Global configuration for allowed origins (required for local development to bypass HTTPS check)
   allowed_origins: ['http://localhost:8000']
-  secured_rp_ids: ['%env(RELYING_PARTY_ID)%']
 
   controllers:
     enabled: true

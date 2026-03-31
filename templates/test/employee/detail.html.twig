@@ -162,7 +162,7 @@
 
         .action-buttons {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 12px;
         }
 
@@ -178,6 +178,16 @@
             cursor: pointer;
             transition: all 0.2s;
             border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: #0f172a;
+            color: #fff;
+            border-color: #0f172a;
+        }
+        .btn-primary:hover {
+            background: #334155;
+            border-color: #334155;
         }
 
         .btn-light {
@@ -617,6 +627,9 @@
             </div>
 
             <div class="action-buttons">
+                <button class="btn-action btn-primary" onclick="openEmployeeEditDrawer('{{ employee.id }}')">
+                    <i class="fa-solid fa-pen-to-square"></i> {{ 'employee.detail.action.edit'|trans({}, 'messages')|default('Edit') }}
+                </button>
                 <button class="btn-action btn-light">
                     <i class="fa-regular fa-calendar-check"></i> {{ 'employee.detail.action.calendar'|trans }}
                 </button>
@@ -700,7 +713,7 @@
             <div class="card">
                 <div class="card-title">
                     {{ 'employee.detail.info.title'|trans }}
-                    <button style="border:none; background:transparent; color:#94a3b8;"><i class="fa-solid fa-pen-to-square"></i></button>
+                    <button style="border:none; background:transparent; color:#94a3b8; cursor:pointer;" onclick="openEmployeeEditDrawer('{{ employee.id }}')"><i class="fa-solid fa-pen-to-square"></i></button>
                 </div>
                 
                 <div class="detail-info-section">
@@ -829,6 +842,28 @@
             </div>
 
         </div>
+        </div>
     </div>
-</div>
+
+    <script>
+        function openEmployeeEditDrawer(id) {
+            const drawerId = 'employee-drawer-' + id;
+            
+            if ($('#' + drawerId).length > 0) {
+                $('#' + drawerId).remove();
+            }
+
+            $.ajax({
+                url: '/employee/' + id + '/edit',
+                type: 'GET',
+                success: function(response) {
+                    $('body').append(response);
+                    $().showDrawer(drawerId);
+                },
+                error: function(xhr) {
+                    ui.alert.error('Failed to load edit form');
+                }
+            });
+        }
+    </script>
 {% endblock %}

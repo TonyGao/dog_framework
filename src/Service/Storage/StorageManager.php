@@ -31,7 +31,7 @@ class StorageManager
 
     public function getAdapter(?string $disk = null): StorageAdapterInterface
     {
-        if (!$disk) {
+        if (!$disk || $disk === 'default') {
             $config = $this->configRepo->findDefault();
             if (!$config) {
                 // Fallback to local if no default config
@@ -80,7 +80,8 @@ class StorageManager
 
     private function createLocalAdapter(): StorageAdapterInterface
     {
-        $rootPath = $this->params->get('kernel.project_dir') . '/public/uploads';
-        return new LocalStorageAdapter($rootPath, '/uploads');
+        $directory = 'uploads';
+        $rootPath = $this->params->get('kernel.project_dir') . '/public/' . $directory;
+        return new LocalStorageAdapter($rootPath, '/' . $directory);
     }
 }

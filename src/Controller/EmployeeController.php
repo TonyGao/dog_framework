@@ -9,14 +9,83 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Update;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 use App\Entity\Platform\UserPreference;
 use App\Entity\Traits\OrganizationTrait;
 
 use App\Entity\Security\WebauthnCredential;
+use App\Form\Organization\EmployeeType;
 
+#[IsGranted('ROLE_USER')]
 class EmployeeController extends AbstractController
 {
+    #[Route('/employee/{id}/edit', name: 'employee_edit', requirements: ['id' => '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'])]
+    public function edit(string $id, EntityManagerInterface $em, Request $request, HubInterface $hub, TranslatorInterface $translator): Response
+    {
+        $employee = $em->getRepository(Employee::class)->find($id);
+
+        if (!$employee) {
+            throw $this->createNotFoundException('Employee not found');
+        }
+
+        $form = $this->createForm(EmployeeType::class, $employee);
+        $form->handleRequest($request);
+
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+            $this->addFlash('success', 'action.edit_success');
+            
+            $statusTransKey = [
+                'active' => 'employee.status.active',
+                'inactive' => 'employee.status.inactive',
+                'vacation' => 'employee.status.vacation'
+            ][$employee->getStatus()] ?? 'employee.status.active';
+
+            // Broadcast the updated info via Mercure SSE
+            $update = new Update(
+                '/entity/employee/' . $employee->getId(),
+                json_encode([
+                    'type' => 'sync',
+                    'entity' => 'Employee',
+                    'id' => $employee->getId(),
+                    'name' => $employee->getName(),
+                    'employeeNo' => $employee->getEmployeeNo(),
+                    'department' => $employee->getDepartment() ? $employee->getDepartment()->getName() : '',
+                    'position' => $employee->getPosition() ? $employee->getPosition()->getName() : '',
+                    'status' => $employee->getStatus(),
+                    'statusTrans' => $translator->trans($statusTransKey, [], 'messages'),
+                    'hireDate' => $employee->getHireDate() ? $employee->getHireDate()->format('Y-m-d') : ''
+                ])
+            );
+            $hub->publish($update);
+            
+            if ($request->isXmlHttpRequest()) {
+                return $this->json(['status' => 'success']);
+            }
+            
+            // Can redirect back to the edit page or list
+            return $this->redirectToRoute('employee_edit', ['id' => $id]);
+        }
+
+        if ($request->isXmlHttpRequest()) {
+            $response = new Response(null, $form->isSubmitted() ? 422 : 200);
+            return $this->render('employee/edit_drawer.html.twig', [
+                'employee' => $employee,
+                'form' => $form->createView(),
+                'drawerId' => 'employee-drawer-' . $id,
+            ], $response);
+        }
+
+        return $this->render('employee/edit.html.twig', [
+            'employee' => $employee,
+            'form' => $form->createView(),
+        ]);
+    }
     #[Route('/employee/list', name: 'employee_list')]
     public function list(Request $request, EntityManagerInterface $em): Response
     {
@@ -422,6 +491,11 @@ class EmployeeController extends AbstractController
 
         if (!$employee) {
             return $this->json(['status' => 'error', 'message' => 'Employee not found'], 404);
+        }
+
+        // Only allow admins or the user themselves to clear passkeys
+        if (!$this->isGranted('ROLE_ADMIN') && $this->getUser() !== $employee) {
+            return $this->json(['status' => 'error', 'message' => 'Access Denied.'], 403);
         }
 
         // WebauthnCredential stores userHandle as base64url encoded string of the UUID

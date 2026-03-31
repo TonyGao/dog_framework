@@ -13,6 +13,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\Organization\Employee;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use App\Service\MailService;
 
 #[Route('/reset-password')]
 class ResetPasswordController extends AbstractController
@@ -107,25 +109,104 @@ class ResetPasswordController extends AbstractController
     }
 
     #[Route('/verify/email/{id}', name: 'app_reset_password_email')]
-    public function verifyEmail($id, Request $request, EmployeeRepository $employeeRepository): Response
+    public function verifyEmail($id, Request $request, EmployeeRepository $employeeRepository, TranslatorInterface $translator, MailService $mailService): Response
     {
         $user = $employeeRepository->find($id);
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
 
-        // Generate and send code (Mock) if not present or resend requested
-        if ($request->query->get('resend') || !$request->getSession()->has('reset_password_code_' . $id)) {
-            $code = (string) random_int(100000, 999999);
-            $request->getSession()->set('reset_password_code_' . $id, $code);
-            // In a real app, send email here
-            $this->addFlash('info', 'Verification code sent to ' . $user->getEmail() . ' (Mock: ' . $code . ')');
+        $token = bin2hex(random_bytes(32));
+        $expiry = time() + 3600; // 1 hour expiry
+        $request->getSession()->set('reset_password_token_' . $id, [
+            'token' => $token,
+            'expiry' => $expiry,
+            'user_id' => $user->getId()
+        ]);
+        
+        $resetUrl = $this->generateUrl('app_reset_password_token', ['token' => $token], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+        
+        try {
+            $mailService->sendForFunction($user->getEmail(), 'security.reset_password', [
+                'reset_url' => $resetUrl,
+                'expire_minutes' => 60
+            ]);
+            $this->addFlash('success', $translator->trans('security.reset_password.link_sent', ['%email%' => $user->getEmail()], 'messages'));
+        } catch (\DomainException $e) {
+            $this->addFlash('info', $translator->trans('security.reset_password.link_sent_mock', [
+                '%email%' => $user->getEmail(),
+                '%token%' => substr($token, 0, 8) . '...'
+            ], 'messages'));
         }
 
-        return $this->render('security/reset_password/email.html.twig', [
-            'id' => $id,
+        return $this->redirectToRoute('app_reset_password_check_email', ['id' => $id]);
+    }
+
+    #[Route('/check-email/{id}', name: 'app_reset_password_check_email')]
+    public function checkEmail($id, EmployeeRepository $employeeRepository): Response
+    {
+        $user = $employeeRepository->find($id);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        return $this->render('security/reset_password/check_email.html.twig', [
             'user' => $user
         ]);
+    }
+
+    #[Route('/token/{token}', name: 'app_reset_password_token')]
+    public function verifyToken($token, Request $request, EmployeeRepository $employeeRepository): Response
+    {
+        $session = $request->getSession();
+        
+        // Find the token in session
+        $storedData = null;
+        $sessionKey = null;
+        
+        // Check all possible session keys for a valid token
+        $keysToCheck = array_keys($session->all());
+        foreach ($keysToCheck as $key) {
+            if (strpos($key, 'reset_password_token_') === 0) {
+                $data = $session->get($key);
+                if ($data && isset($data['token']) && $data['token'] === $token) {
+                    $storedData = $data;
+                    $sessionKey = $key;
+                    break;
+                }
+            }
+        }
+        
+        if (!$storedData) {
+            $this->addFlash('error', 'Invalid or expired reset link. Please request a new password reset.');
+            return $this->redirectToRoute('app_reset_password');
+        }
+        
+        // Check if token is expired
+        if (time() > $storedData['expiry']) {
+            if ($sessionKey) {
+                $session->remove($sessionKey);
+            }
+            $this->addFlash('error', 'Reset link has expired. Please request a new password reset.');
+            return $this->redirectToRoute('app_reset_password');
+        }
+        
+        // Token valid - mark user as verified and redirect to new password page
+        $user = $employeeRepository->find($storedData['user_id']);
+        if (!$user) {
+            $this->addFlash('error', 'User not found. Please request a new password reset.');
+            return $this->redirectToRoute('app_reset_password');
+        }
+        
+        // Clean up the token from session
+        if ($sessionKey) {
+            $session->remove($sessionKey);
+        }
+        
+        // Set the verified user ID in session
+        $session->set('reset_password_verified_user_id', $user->getId());
+        
+        return $this->redirectToRoute('app_reset_password_new');
     }
 
     #[Route('/verify/email/check/{id}', name: 'app_reset_password_email_check', methods: ['POST'])]
@@ -151,7 +232,7 @@ class ResetPasswordController extends AbstractController
     }
 
     #[Route('/verify/sms/{id}', name: 'app_reset_password_sms')]
-    public function verifySms($id, Request $request, EmployeeRepository $employeeRepository): Response
+    public function verifySms($id, Request $request, EmployeeRepository $employeeRepository, TranslatorInterface $translator): Response
     {
         $user = $employeeRepository->find($id);
         if (!$user) {
@@ -163,7 +244,10 @@ class ResetPasswordController extends AbstractController
             $code = (string) random_int(100000, 999999);
             $request->getSession()->set('reset_password_sms_code_' . $id, $code);
             // In a real app, send SMS here
-            $this->addFlash('info', 'SMS Verification code sent to ' . $user->getMobile() . ' (Mock: ' . $code . ')');
+            $this->addFlash('info', $translator->trans('security.reset_password.sms_sent', [
+                '%mobile%' => $user->getMobile(),
+                '%code%' => $code
+            ], 'messages'));
         }
 
         return $this->render('security/reset_password/sms.html.twig', [

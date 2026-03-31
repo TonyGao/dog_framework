@@ -12,7 +12,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class EntityApiController extends AbstractController
 {
   /**
@@ -71,7 +73,6 @@ class EntityApiController extends AbstractController
   public function submitFields(Request $request)
   {
     $payload = $request->getPayload();
-    dump($payload);
     return ApiResponse::success();
   }
 }

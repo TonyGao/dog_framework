@@ -748,30 +748,27 @@
                             </thead>
                             <tbody>
                                 {% for item in entities %}
-                                <tr>
+                                <tr class="sync-row-emp" data-ef-sync="employee:{{ item.id }}">
                                     <td><input type="checkbox" class="custom-checkbox row-checkbox" value="{{ item.employeeNo }}"></td>
                                     {% for key, config in columns %}
                                         {% if key == 'name' %}
                                             <td>
                                                 <div class="user-info">
-                                                    {% set avatarColorIndex = item.name|length % 8 %}
-                                                    <div class="custom-avatar avatar-color-{{ avatarColorIndex }}">
-                                                        {{ item.name|slice(-2) }}
-                                                    </div>
-                                                    <span class="user-name" onclick="openEmployeeDrawer('{{ item.id }}')" style="cursor: pointer;">{{ item.name }}</span>
+                                                    <div id="list-avatar-img-{{ item.id }}" class="custom-avatar" data-ef-sync="employee:{{ item.id }}">{% if item.avatar %}<img src="{{ item.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% else %}{{ item.name|slice(-2, 2) }}{% endif %}</div>
+                                                    <span class="user-name sync-val-name" onclick="openEmployeeDrawer('{{ item.id }}')" style="cursor: pointer;">{{ item.name }}</span>
                                                 </div>
                                             </td>
                                         {% elseif key == 'employeeNo' %}
-                                            <td>{{ item.employeeNo }}</td>
+                                            <td class="sync-val-employeeNo">{{ item.employeeNo }}</td>
                                         {% elseif key == 'department' %}
-                                            <td>
+                                            <td class="sync-val-department">
                                                 <span class="dept-dot" style="background-color: #f59e0b;"></span>
-                                                {{ item.department ? item.department.name : '' }}
+                                                <span class="dept-text">{{ item.department ? item.department.name : '' }}</span>
                                             </td>
                                         {% elseif key == 'position' %}
-                                            <td>{{ item.position ? item.position.name : '' }}</td>
+                                            <td class="sync-val-position">{{ item.position ? item.position.name : '' }}</td>
                                         {% elseif key == 'status' %}
-                                            <td>
+                                            <td class="sync-val-status">
                                                 {% if item.status == 'active' %}
                                                     <span class="status-pill status-active"><i class="fa-solid fa-check" style="margin-right:4px;"></i> {{ 'employee.status.active'|trans }}</span>
                                                 {% elseif item.status == 'inactive' %}
@@ -781,7 +778,7 @@
                                                 {% endif %}
                                             </td>
                                         {% elseif key == 'hireDate' %}
-                                            <td>{{ item.hireDate ? item.hireDate|date('Y-m-d') : '' }}</td>
+                                            <td class="sync-val-hireDate">{{ item.hireDate ? item.hireDate|date('Y-m-d') : '' }}</td>
                                         {% elseif key == 'email' %}
                                             <td>{{ item.email }}</td>
                                         {% elseif key == 'mobile' %}
@@ -812,13 +809,10 @@
                 <div id="cardView" style="display: none;">
                     <div class="card-grid">
                         {% for item in entities %}
-                        <div class="employee-card">
+                        <div class="employee-card sync-row-emp" data-ef-sync="employee:{{ item.id }}">
                             <div class="card-header">
                                 <div class="card-avatar-wrapper">
-                                    {% set avatarColorIndex = item.name|length % 8 %}
-                                    <div class="card-custom-avatar avatar-color-{{ avatarColorIndex }}">
-                                        {{ item.name|slice(-2) }}
-                                    </div>
+                                    <div id="card-avatar-img-{{ item.id }}" class="card-custom-avatar" data-ef-sync="employee:{{ item.id }}">{% if item.avatar %}<img src="{{ item.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% else %}{{ item.name|slice(-2, 2) }}{% endif %}</div>
                                     {% if item.status == 'active' %}
                                         <span class="status-indicator indicator-active"></span>
                                     {% elseif item.status == 'inactive' %}
@@ -831,18 +825,18 @@
                             </div>
 
                             <div class="card-main-info">
-                                <span class="card-name" onclick="openEmployeeDrawer('{{ item.id }}')" style="cursor: pointer;">{{ item.name }}</span>
-                                <span class="card-role">{{ item.position ? item.position.name : '' }}</span>
+                                <span class="card-name sync-val-name" onclick="openEmployeeDrawer('{{ item.id }}')" style="cursor: pointer;">{{ item.name }}</span>
+                                <span class="card-role sync-val-position">{{ item.position ? item.position.name : '' }}</span>
                             </div>
 
                             <div class="card-details-grid">
                                 <div class="detail-item">
                                     <span class="detail-label">{{ 'employee.field.department'|trans }}</span>
-                                    <span class="detail-value">{{ item.department ? item.department.name : '' }}</span>
+                                    <span class="detail-value sync-val-department">{{ item.department ? item.department.name : '' }}</span>
                                 </div>
                                 <div class="detail-item">
                                     <span class="detail-label">{{ 'employee.field.entry_date'|trans }}</span>
-                                    <span class="detail-value">{{ item.hireDate ? item.hireDate|date('Y-m-d') : '' }}</span>
+                                    <span class="detail-value sync-val-hireDate">{{ item.hireDate ? item.hireDate|date('Y-m-d') : '' }}</span>
                                 </div>
                             </div>
 
@@ -993,6 +987,13 @@
             success: function(html) {
                 $('#' + loadingId).remove();
                 $('body').append(html);
+                // 将 drawer 内的所有 modal 移到 body 直接子级
+                // 原因：ef-drawer-container 有 position:fixed + z-index:1001，会创建独立的
+                // 层叠上下文，导致 drawer 内的 modal（即便 z-index:9999）无法显示在第二层
+                // drawer 的遮罩之上。移到 body 后，modal 直接参与 body 层叠上下文比较。
+                $('#' + drawerId + ' .ef-modal-container').each(function() {
+                    $(this).appendTo(document.body);
+                });
                 $().showDrawer(drawerId);
             },
             error: function(xhr) {
@@ -1327,6 +1328,58 @@
         });
         
         $('<style>.active-node { color: #3b82f6; font-weight: bold; }</style>').appendTo('head');
+
+        // 监听来自 Mercure 的数据同步事件 (基于 ef-mercure.js)
+        $(document).on('ef:sync', '[data-ef-sync^="employee:"]', function(e, data) {
+            const $el = $(this);
+            
+            // 1. 如果是头像 img 自身触发
+            if ($el.is('img') && data.avatarUrl) {
+                $el.attr('src', data.avatarUrl);
+                return;
+            }
+            
+            // 2. 如果是整行数据更新 (tr 或 .employee-card)
+            if (($el.is('tr') || $el.hasClass('employee-card')) && data.name) {
+                $el.find('.sync-val-name').text(data.name);
+                $el.find('.sync-val-employeeNo').text(data.employeeNo);
+                
+                // 部门和职位
+                const $deptText = $el.find('.dept-text');
+                if ($deptText.length) {
+                    $deptText.text(' ' + data.department);
+                } else {
+                    $el.find('.sync-val-department').text(data.department);
+                }
+                
+                $el.find('.sync-val-position').text(data.position);
+                $el.find('.sync-val-hireDate').text(data.hireDate);
+                
+                // 状态 - HTML 重构
+                if (data.status && data.statusTrans) {
+                    const $statusTd = $el.find('.sync-val-status');
+                    if ($statusTd.length) {
+                        let icon = 'fa-check';
+                        let pillClass = 'status-active';
+                        if (data.status === 'inactive') {
+                            icon = 'fa-xmark';
+                            pillClass = 'status-inactive';
+                        } else if (data.status === 'vacation') {
+                            icon = 'fa-umbrella-beach';
+                            pillClass = 'status-vacation';
+                        }
+                        $statusTd.html(`<span class="status-pill ${pillClass}"><i class="fa-solid ${icon}" style="margin-right:4px;"></i> ${data.statusTrans}</span>`);
+                    }
+                    
+                    // 卡片视图的状态点
+                    const $cardStatus = $el.find('.status-indicator');
+                    if ($cardStatus.length) {
+                        $cardStatus.removeClass('indicator-active indicator-inactive indicator-vacation');
+                        $cardStatus.addClass('indicator-' + data.status);
+                    }
+                }
+            }
+        });
     });
 </script>
 {% endblock %}

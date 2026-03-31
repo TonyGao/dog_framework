@@ -1,0 +1,196 @@
+{% import "ui/template/ui.html.twig" as ui %}
+{% extends 'admin/layout.html.twig' %}
+{% form_theme form 'form/ef_ui_form_theme.html.twig' %}
+
+{% block title %}{{ 'employee.detail.action.edit'|trans }} - {{ employee.name }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .edit-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .edit-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .edit-title i {
+            color: #64748b;
+        }
+
+        .edit-form {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            margin-bottom: 4px;
+        }
+
+        .form-actions {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        .btn-save {
+            background: #0f172a;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .btn-save:hover {
+            background: #334155;
+        }
+        
+        .btn-cancel {
+            background: #fff;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background: #f8fafc;
+            color: #0f172a;
+        }
+    </style>
+{% endblock %}
+
+{% block app_content_container %}
+<div class="edit-container">
+    <div class="edit-header">
+        <div class="edit-title">
+            <i class="fa-solid fa-user-pen"></i>
+            {{ 'employee.detail.action.edit'|trans }} - {{ employee.name }}
+        </div>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div style="background: #dcfce7; color: #166534; padding: 12px 16px; border-radius: 6px; margin-bottom: 24px; font-size: 14px;">
+            <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i> {{ message|trans }}
+        </div>
+    {% endfor %}
+
+    {{ form_start(form, {'attr': {'class': 'edit-form'}}) }}
+        <div class="form-grid">
+            <div class="form-group">
+                {{ form_label(form.employeeNo, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.employeeNo) }}
+                {{ form_errors(form.employeeNo) }}
+            </div>
+            
+            <div class="form-group">
+                {{ form_label(form.status, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.status) }}
+                {{ form_errors(form.status) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.hireDate, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.hireDate) }}
+                {{ form_errors(form.hireDate) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.email) }}
+                {{ form_errors(form.email) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.mobile, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.mobile) }}
+                {{ form_errors(form.mobile) }}
+            </div>
+            
+            <div style="grid-column: span 2; height: 1px; background: #f1f5f9; margin: 8px 0;"></div>
+
+            <div class="form-group" style="grid-column: span 2; margin-top: 8px;">
+                <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: #1e293b; display: flex; align-items: center;">
+                    <i class="fa-solid fa-sitemap" style="color: #64748b; margin-right: 8px; font-size: 16px;"></i>
+                    {{ 'employee.detail.info.org.title'|trans({}, 'messages')|default('Organization Info') }}
+                </h4>
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.company, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.company) }}
+                {{ form_errors(form.company) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.department, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.department) }}
+                {{ form_errors(form.department) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.manager, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.manager) }}
+                {{ form_errors(form.manager) }}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="window.close()">{{ 'action.cancel'|trans|default('Cancel') }}</button>
+            <button type="submit" class="btn-save"><i class="fa-solid fa-check" style="margin-right: 6px;"></i> {{ 'action.save'|trans|default('Save') }}</button>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ ui.formValid() }}
+{% endblock %}

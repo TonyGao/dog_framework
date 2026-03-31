@@ -1,0 +1,27 @@
+{% extends 'security/reset_password/layout.html.twig' %}
+
+{% block reset_content %}
+    <h2>{{ 'security.reset_password.check_email'|trans }}</h2>
+    <p style="color: #6b7280; margin-bottom: 24px; font-size: 14px; text-align: center;">
+        {{ 'security.reset_password.link_sent_message'|trans }}
+    </p>
+    
+    <div style="background: #f3f4f6; border-radius: 8px; padding: 20px; margin-bottom: 24px; text-align: center;">
+        <i class="fas fa-envelope-open-text" style="font-size: 48px; color: #2563eb; margin-bottom: 16px;"></i>
+        <p style="color: #374151; font-size: 14px; margin: 0;">
+            {{ 'security.reset_password.check_inbox'|trans }}
+        </p>
+    </div>
+    
+    <p style="color: #6b7280; font-size: 13px; text-align: center;">
+        {{ 'security.reset_password.link_expire_note'|trans }}
+    </p>
+    
+    <div style="margin-top: 24px; text-align: center;">
+        <a href="{{ path('app_reset_password_email', {'id': user.id, 'resend': 1}) }}" class="btn-outline">
+            <i class="fas fa-paper-plane"></i> {{ 'security.reset_password.resend_link'|trans }}
+        </a>
+    </div>
+    
+    <a href="{{ path('app_login') }}" class="back-link">{{ 'security.reset_password.back_to_login'|trans }}</a>
+{% endblock %}

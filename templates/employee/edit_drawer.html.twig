@@ -1,0 +1,451 @@
+{% form_theme form 'form/ef_ui_form_theme.html.twig' %}
+<div class="ef-drawer-container" style="z-index: 1001; display: none;" id="{{ drawerId }}">
+    <div class="ef-drawer-mask" maskid="{{ drawerId }}" onclick="closeDrawer('{{ drawerId }}')"></div>
+    <div class="ef-drawer" style="right: -650px; width: 650px; box-shadow: -4px 0 20px rgba(0,0,0,0.15);">
+        <div class="ef-drawer-header">
+            <div class="ef-drawer-title">
+                <i class="fa-solid fa-user-pen" style="margin-right: 12px; font-size: 18px;"></i>
+                {{ 'employee.detail.action.edit'|trans({}, 'messages')|default('Edit Employee') }} - {{ employee.name }}
+            </div>
+            <div tabindex="-1" role="button" aria-label="Close" class="ef-drawer-close-btn" onclick="closeDrawer('{{ drawerId }}')">
+                <span class="ef-icon-hover">
+                    <svg viewbox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" class="ef-icon ef-icon-close" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter">
+                        <path d="M9.857 9.858 24 24m0 0 14.142 14.142M24 24 38.142 9.858M24 24 9.857 38.142"></path>
+                    </svg>
+                </span>
+            </div>
+        </div>
+        <div class="ef-drawer-body">
+            <div class="ef-drawer-content" style="padding: 24px 32px; background: #ffffff;">
+                <style>
+                    .profile-drawer-title {
+                        font-size: 18px;
+                        font-weight: 600;
+                        color: #1e293b;
+                        margin-bottom: 24px;
+                    }
+
+                    .profile-section {
+                        display: flex;
+                        gap: 20px;
+                        align-items: center;
+                        margin-bottom: 32px;
+                    }
+
+                    .profile-avatar {
+                        width: 72px;
+                        height: 72px;
+                        border-radius: 50%;
+                        object-fit: cover;
+                    }
+
+                    .profile-info {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                    }
+                    
+                    .profile-info-title {
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: #1e293b;
+                    }
+
+                    .profile-actions {
+                        display: flex;
+                        gap: 12px;
+                    }
+
+                    .btn-upload {
+                        border: 1px solid #6366f1;
+                        color: #6366f1;
+                        background: transparent;
+                        padding: 6px 16px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    }
+                    
+                    .btn-upload:hover {
+                        background: #e0e7ff;
+                    }
+
+                    .btn-remove {
+                        border: none;
+                        color: #ef4444;
+                        background: #fee2e2;
+                        padding: 6px 16px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    }
+                    
+                    .btn-remove:hover {
+                        background: #fecaca;
+                    }
+
+                    .profile-hint {
+                        font-size: 12px;
+                        color: #64748b;
+                        margin-top: 2px;
+                    }
+
+                    .modern-form-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 20px;
+                        margin-bottom: 20px;
+                    }
+
+                    .modern-form-group {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                    }
+
+                    .modern-form-group.full-width {
+                        grid-column: span 2;
+                    }
+
+                    .modern-label {
+                        font-size: 14px;
+                        font-weight: 500;
+                        color: #334155;
+                    }
+
+                    .btn-verify {
+                        background: #e0e7ff;
+                        color: #6366f1;
+                        border: none;
+                        padding: 8px 12px;
+                        border-radius: 6px;
+                        font-size: 13px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        white-space: nowrap;
+                    }
+
+                    .modern-divider {
+                        height: 1px;
+                        background: #f1f5f9;
+                        margin: 28px 0;
+                    }
+
+                    .toggle-row {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 24px;
+                    }
+
+                    .toggle-info {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 4px;
+                    }
+
+                    .toggle-title {
+                        font-size: 14px;
+                        font-weight: 500;
+                        color: #1e293b;
+                    }
+
+                    .toggle-desc {
+                        font-size: 13px;
+                        color: #64748b;
+                    }
+
+                    .btn-full-save {
+                        width: 100%;
+                        background: #3b82f6;
+                        color: #fff;
+                        border: none;
+                        padding: 12px;
+                        border-radius: 8px;
+                        font-size: 15px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: background 0.2s;
+                        margin-top: 8px;
+                        text-align: center;
+                    }
+
+                    .btn-full-save:hover {
+                        background: #2563eb;
+                    }
+                </style>
+
+                <div class="profile-drawer-title">{{ 'employee.edit_drawer.account_details'|trans }}</div>
+
+                <div class="profile-section">
+                    <div id="edit-avatar-img-{{ employee.id }}" data-ef-sync="employee:{{ employee.id }}" class="profile-avatar" style="cursor: pointer;display:flex;align-items:center;justify-content:center;background-color:#3b82f6;color:#ffffff;font-weight:600;font-size:24px;" onclick="openAvatarModal('{{ employee.id }}')">{% if employee.avatar %}<img src="{{ employee.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% else %}{{ employee.name|slice(-2, 2) }}{% endif %}</div>
+                    <div class="profile-info">
+                        <div class="profile-info-title">{{ 'employee.edit_drawer.profile_picture'|trans }}</div>
+                        <div class="profile-actions">
+                            <button type="button" class="btn-upload" onclick="openAvatarModal('{{ employee.id }}')"><i class="fa-solid fa-arrow-up-from-bracket"></i> {{ 'employee.edit_drawer.upload_image'|trans }}</button>
+                            <button type="button" class="btn-remove" onclick="removeAvatar('{{ employee.id }}', this)"><i class="fa-regular fa-trash-can"></i> {{ 'employee.edit_drawer.remove'|trans }}</button>
+                        </div>
+                        <div class="profile-hint">{{ 'employee.edit_drawer.profile_picture_format'|trans }}</div>
+                    </div>
+                </div>
+
+                {% import 'ui/template/ui.html.twig' as ui %}
+                {{ form_start(form, {'attr': {'id': 'employee-edit-form', 'class': 'edit-form'}}) }}
+                    <div class="modern-form-grid">
+                        <div class="modern-form-group">
+                            {{ form_label(form.employeeNo, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.employeeNo) }}
+                            {{ form_errors(form.employeeNo) }}
+                        </div>
+                        
+                        <div class="modern-form-group">
+                            {{ form_label(form.hireDate, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.hireDate) }}
+                            {{ form_errors(form.hireDate) }}
+                        </div>
+
+                        <div class="modern-form-group full-width">
+                            {{ form_label(form.email, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <div style="flex: 1;">{{ form_widget(form.email) }}</div>
+                                <button type="button" class="btn-verify" onclick="sendVerification('{{ employee.id }}', this)">
+                                    <i class="fa-regular fa-envelope"></i> {{ 'employee.edit_drawer.send_verification_mail'|trans }}
+                                </button>
+                            </div>
+                            {{ form_errors(form.email) }}
+                        </div>
+
+                        <div class="modern-form-group full-width">
+                            {{ form_label(form.mobile, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.mobile) }}
+                            {{ form_errors(form.mobile) }}
+                        </div>
+                    </div>
+
+                    <div class="modern-divider"></div>
+
+                    <div class="modern-form-grid">
+                        <div class="modern-form-group full-width">
+                            {{ form_label(form.company, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.company) }}
+                            {{ form_errors(form.company) }}
+                        </div>
+
+                        <div class="modern-form-group">
+                            {{ form_label(form.department, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.department) }}
+                            {{ form_errors(form.department) }}
+                        </div>
+
+                        <div class="modern-form-group">
+                            {{ form_label(form.manager, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.manager) }}
+                            {{ form_errors(form.manager) }}
+                        </div>
+                    </div>
+
+                    <div class="modern-divider"></div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-info">
+                            <div class="toggle-title">{{ 'employee.edit_drawer.user_account_status'|trans }}</div>
+                            <div class="toggle-desc">{{ 'employee.edit_drawer.user_account_status_desc'|trans }}</div>
+                        </div>
+                        <div style="width: 160px;">
+                            {{ form_widget(form.status) }}
+                            {{ form_errors(form.status) }}
+                        </div>
+                    </div>
+
+                    <button class="btn-full-save" type="submit">{{ 'employee.edit_drawer.save_changes'|trans }}</button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function closeDrawer(id) {
+        $().hideDrawer(id);
+    }
+
+    // SSR Real-time Avatar Sync
+    $('#edit-avatar-img-{{ employee.id }}').on('ef:sync', function(e, data) {
+        if (data && data.avatarUrl) {
+            $(this).attr('src', data.avatarUrl);
+        }
+    });
+
+    if (window.EF && window.EF.Mercure) {
+        window.EF.Mercure.subscribe('/entity/employee/{{ employee.id }}');
+    }
+
+    // Initialize date pickers in the drawer if needed
+    if (typeof $.fn.daterangepicker !== 'undefined' && typeof window.EFDate !== 'undefined') {
+        $('#{{ drawerId }} .date-picker').each(function() {
+            if (!$(this).data('daterangepicker')) {
+                $(this).daterangepicker({
+                    ...window.EFDate.getDefaultOptions('YYYY-MM-DD'),
+                    singleDatePicker: true,
+                    showDropdowns: true,
+                    autoUpdateInput: false
+                }).on('apply.daterangepicker', function(ev, picker) {
+                    $(this).val(picker.startDate.format('YYYY-MM-DD'));
+                }).on('cancel.daterangepicker', function(ev, picker) {
+                    $(this).val('');
+                });
+            }
+        });
+    }
+
+    document.getElementById('employee-edit-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        // Skip validation if ui.formValid is not available, but try to use it if it is
+        if (typeof ui !== 'undefined' && ui.formValid && ui.formValid(form) === false) {
+            return;
+        }
+
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> {{ "action.saving"|trans|default("Saving...") }}';
+        submitBtn.disabled = true;
+
+        fetch('{{ path("employee_edit", {id: employee.id}) }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.status === 422) {
+                // Validation error, replace drawer content
+                return response.text().then(html => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    const newDrawer = tempDiv.querySelector('.ef-drawer-container');
+                    if (newDrawer) {
+                        const oldDrawer = document.getElementById('{{ drawerId }}');
+                        if (oldDrawer) {
+                            oldDrawer.outerHTML = newDrawer.outerHTML;
+                            // Re-initialize any JS components in the new form
+                            if (typeof ui !== 'undefined' && ui.init) {
+                                ui.init();
+                            }
+                        }
+                    }
+                    throw new Error('Validation failed');
+                });
+            }
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                closeDrawer('{{ drawerId }}');
+                // Reload the parent drawer to show updated info instead of the entire page
+                if (typeof window.openEmployeeDrawer === 'function') {
+                    window.openEmployeeDrawer('{{ employee.id }}');
+                } else {
+                    window.location.reload();
+                }
+            } else {
+                alert(data.message || 'Error saving employee');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (error.message !== 'Validation failed') {
+                alert('An error occurred while saving.');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    });
+
+    function removeAvatar(employeeId, btn) {
+        if (!confirm('确定要移除头像吗？')) return;
+        
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        btn.disabled = true;
+
+        fetch('/api/employee/' + employeeId + '/avatar', {
+            method: 'DELETE',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            if (data.success) {
+                // The Mercure SSE sync will update the UI automatically.
+            } else {
+                alert(data.error || '移除失败');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            alert('请求发生错误');
+        });
+    }
+
+    function sendVerification(employeeId, btn) {
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> {{ "action.saving"|trans|default("发送中...") }}';
+        btn.disabled = true;
+
+        fetch('/api/employee/' + employeeId + '/send-verification', {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(async response => {
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || '发送失败');
+            return data;
+        })
+        .then(data => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            if (typeof window.Alert !== 'undefined') {
+                let alertMsg = new Alert($('#{{ drawerId }} .ef-drawer-body'));
+                alertMsg.success(data.message || '发送成功', { percent: '90%', title: "成功", closable: true });
+            } else {
+                alert(data.message || '发送成功');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            if (typeof window.Alert !== 'undefined') {
+                let alertMsg = new Alert($('#{{ drawerId }} .ef-drawer-body'));
+                alertMsg.error(err.message || '请求发生错误', { percent: '90%', title: "错误", closable: true });
+            } else {
+                alert(err.message || '请求发生错误');
+            }
+        });
+    }
+</script>

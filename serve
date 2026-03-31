@@ -1,0 +1,104 @@
+#!/bin/bash
+
+# Enterprise Framework FrankenPHP Launcher
+# Usage: ./serve [dev|prod|stop|restart]
+
+PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$PROJECT_ROOT"
+
+MODE="${1:-dev}"
+
+show_help() {
+    echo "Enterprise Framework FrankenPHP Launcher"
+    echo ""
+    echo "Usage: ./serve [MODE]"
+    echo ""
+    echo "Modes:"
+    echo "  dev     Development mode with hot reload (default)"
+    echo "  prod    Production mode with optimal performance"
+    echo "  stop    Stop the running FrankenPHP server"
+    echo "  restart Restart the server in the previous mode"
+    echo ""
+    echo "Examples:"
+    echo "  ./serve          Start in dev mode"
+    echo "  ./serve dev      Start in dev mode"
+    echo "  ./serve prod     Start in prod mode"
+    echo "  ./serve stop     Stop the server"
+    echo "  ./serve restart  Restart in dev mode"
+}
+
+PID_FILE="$PROJECT_ROOT/var/frankenphp.pid"
+STATE_FILE="$PROJECT_ROOT/var/frankenphp.state"
+
+stop_server() {
+    if [ -f "$PID_FILE" ]; then
+        PID=$(cat "$PID_FILE")
+        if kill -0 "$PID" 2>/dev/null; then
+            echo "Stopping FrankenPHP (PID: $PID)..."
+            kill "$PID" 2>/dev/null || true
+            rm -f "$PID_FILE"
+            echo "Server stopped."
+        else
+            echo "Server not running (stale PID file)."
+            rm -f "$PID_FILE"
+        fi
+    else
+        echo "Stopping FrankenPHP via CLI..."
+        ./frankenphp stop 2>/dev/null || echo "No running server found."
+    fi
+    rm -f "$STATE_FILE"
+}
+
+start_dev() {
+    echo "Starting FrankenPHP in DEV mode (hot reload enabled)..."
+    echo "dev" > "$STATE_FILE"
+    ./frankenphp run --config Caddyfile --watch &
+    echo $! > "$PID_FILE"
+    echo "Server started in background (PID: $(cat "$PID_FILE"))."
+    echo "Press Ctrl+C to stop."
+    wait
+}
+
+start_prod() {
+    echo "Starting FrankenPHP in PROD mode..."
+    echo "prod" > "$STATE_FILE"
+    ./frankenphp run --config Caddyfile &
+    echo $! > "$PID_FILE"
+    echo "Server started in background (PID: $(cat "$PID_FILE"))."
+    echo "Press Ctrl+C to stop."
+    wait
+}
+
+case "$MODE" in
+    dev)
+        stop_server
+        start_dev
+        ;;
+    prod)
+        stop_server
+        start_prod
+        ;;
+    stop)
+        stop_server
+        ;;
+    restart)
+        PREV_MODE=$(cat "$STATE_FILE" 2>/dev/null || echo "dev")
+        echo "Restarting in $PREV_MODE mode..."
+        stop_server
+        sleep 1
+        if [ "$PREV_MODE" = "prod" ]; then
+            start_prod
+        else
+            start_dev
+        fi
+        ;;
+    help|--help|-h)
+        show_help
+        ;;
+    *)
+        echo "Unknown mode: $MODE"
+        echo ""
+        show_help
+        exit 1
+        ;;
+esac

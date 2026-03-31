@@ -22,6 +22,21 @@
 * 应用程序构建器
   * 表单设计器
   * [菜单管理](/documents/features/menu/Menu.md)
+* 实时通信与推送
+  * 基于 FrankenPHP 和 Symfony Mercure 实现的 SSE 实时推送
+  * 支持全局通知与即时通讯 (IM) 基础设施
+
+### 运行指南 (本地开发)
+
+本项目已全面迁移至 **FrankenPHP** 以提供极速的 Worker 模式和内置的 Mercure 推送支持，不再使用传统的 `symfony server:start`。
+
+```bash
+# 在项目根目录启动服务 (自动启动 Web 服务和 Mercure Hub)
+./frankenphp run --config Caddyfile
+```
+
+* **Web 访问地址**: `http://localhost:8000`
+* **Mercure 推送地址**: `http://localhost:8000/.well-known/mercure`
 
 ### Todo List
 
@@ -84,9 +99,9 @@
 * [ ] 测试系统
   * [ ] 界面功能测试
   * [ ] 冒烟测试
-* [ ] Websocket通信基础库
-  * [ ] 即时通知
-  * [ ] 简易即时通讯
+* [ ] 实时推送与通讯基础库 (Mercure)
+  * [ ] 即时全局通知
+  * [ ] 简易即时通讯 (用户聊天)
 * [ ] 虚拟助手
   * [ ] 复活雨果，以Blender建模，three.js呈现
   * [ ] 实现基本的文字提问功能索引、文件上传、调用基本功能api完成功能
@@ -98,3 +113,4 @@
 * <https://github.com/symfony/panther>
 * [LeaderLine](https://anseki.github.io/leader-line/)
 * [Daterangepicker](https://www.daterangepicker.com/)
+* [FrankenPHP](https://frankenphp.dev/) - 极速的现代 PHP 应用服务器 (内置 Mercure)

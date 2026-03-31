@@ -1,0 +1,40 @@
+{
+	frankenphp {
+	}
+	order php_server before file_server
+	order php before file_server
+	order mercure after encode
+}
+
+http://localhost:8000 {
+	root * public
+
+	# 1. 开启 zstd, br, gzip 压缩，大幅减小传输体积，提升加载速度
+	encode zstd br gzip
+
+	route /.well-known/mercure {
+		mercure {
+			transport bolt {
+				path /Users/tony/projects/enterprise_framework/var/mercure.db
+			}
+			publisher_jwt !ChangeThisMercureHubJWTSecretKey!
+			subscriber_jwt !ChangeThisMercureHubJWTSecretKey!
+			cors_origins *
+			publish_origins *
+			anonymous
+		}
+	}
+
+	# 2. 静态资源长缓存策略 (提升客户端二次加载速度)
+	@static {
+		file
+		path *.ico *.css *.js *.gif *.webp *.jpg *.jpeg *.png *.svg *.woff *.woff2 *.ttf *.eot
+	}
+	header @static Cache-Control "max-age=31536000, public, immutable"
+
+	php_server {
+		resolve_root_symlink
+	}
+
+	file_server
+}

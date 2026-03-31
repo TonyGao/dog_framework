@@ -10,10 +10,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Uid\Uuid;
 
 #[Route('/api/storage')]
+#[IsGranted('ROLE_USER')]
 class FileUploadController extends AbstractController
 {
+    private const MAX_CHUNKS = 1000;
     private FileUploadService $uploadService;
     private FileRepository $fileRepo;
     private StorageManager $storageManager;
@@ -56,8 +60,10 @@ class FileUploadController extends AbstractController
                 'width' => $fileEntity->getWidth(),
                 'height' => $fileEntity->getHeight(),
             ]);
+        } catch (\RuntimeException $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['error' => '文件上传失败，请稍后重试。'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -72,6 +78,10 @@ class FileUploadController extends AbstractController
         $chunkFile = $request->files->get('file');
 
         if (!$chunkFile || !$sessionId) {
+            return new JsonResponse(['error' => 'Invalid chunk upload request'], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$this->isValidUploadSession($sessionId, $chunkIndex, $totalChunks)) {
             return new JsonResponse(['error' => 'Invalid chunk upload request'], Response::HTTP_BAD_REQUEST);
         }
 
@@ -95,7 +105,7 @@ class FileUploadController extends AbstractController
         // Save chunk
         $tempDir = sys_get_temp_dir() . '/storage_chunks/' . $sessionId;
         if (!is_dir($tempDir)) {
-            mkdir($tempDir, 0777, true);
+            mkdir($tempDir, 0700, true);
         }
         $chunkFile->move($tempDir, (string)$chunkIndex);
 
@@ -112,6 +122,10 @@ class FileUploadController extends AbstractController
     public function completeUpload(Request $request, \App\Repository\Storage\UploadSessionRepository $sessionRepo, \Doctrine\ORM\EntityManagerInterface $em): JsonResponse
     {
         $sessionId = $request->request->get('session_id');
+        if (!is_string($sessionId) || !Uuid::isValid($sessionId)) {
+            return new JsonResponse(['error' => 'Session not found'], Response::HTTP_NOT_FOUND);
+        }
+
         $session = $sessionRepo->find($sessionId);
 
         if (!$session) {
@@ -126,6 +140,9 @@ class FileUploadController extends AbstractController
         $tempDir = sys_get_temp_dir() . '/storage_chunks/' . $sessionId;
         $finalPath = $tempDir . '/merged_file';
         $outFile = fopen($finalPath, 'wb');
+        if ($outFile === false) {
+            return new JsonResponse(['error' => 'Failed to process upload'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
         for ($i = 0; $i < $session->getTotalChunks(); $i++) {
             $chunkPath = $tempDir . '/' . $i;
@@ -158,7 +175,12 @@ class FileUploadController extends AbstractController
             $fileEntity = $this->uploadService->upload($uploadedFile, $options);
             
             // Cleanup
-            rmdir($tempDir);
+            if (file_exists($finalPath)) {
+                unlink($finalPath);
+            }
+            if (is_dir($tempDir)) {
+                rmdir($tempDir);
+            }
             $em->remove($session);
             $em->flush();
 
@@ -171,8 +193,18 @@ class FileUploadController extends AbstractController
                 'width' => $fileEntity->getWidth(),
                 'height' => $fileEntity->getHeight(),
             ]);
+        } catch (\RuntimeException $e) {
+            if (file_exists($finalPath)) {
+                unlink($finalPath);
+            }
+
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            if (file_exists($finalPath)) {
+                unlink($finalPath);
+            }
+
+            return new JsonResponse(['error' => '文件上传失败，请稍后重试。'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -207,5 +239,18 @@ class FileUploadController extends AbstractController
         // $this->uploadService->delete($file);
         
         return new JsonResponse(['success' => true]);
+    }
+
+    private function isValidUploadSession(mixed $sessionId, int $chunkIndex, int $totalChunks): bool
+    {
+        if (!is_string($sessionId) || !Uuid::isValid($sessionId)) {
+            return false;
+        }
+
+        if ($chunkIndex < 0 || $totalChunks <= 0 || $totalChunks > self::MAX_CHUNKS) {
+            return false;
+        }
+
+        return $chunkIndex < $totalChunks;
     }
 }

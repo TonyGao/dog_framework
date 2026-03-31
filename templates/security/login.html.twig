@@ -161,6 +161,7 @@
             align-items: center;
             justify-content: center;
             padding: 40px;
+            position: relative;
         }
         
         .login-form-wrapper {
@@ -385,6 +386,13 @@
     </div>
     
     <div class="login-right">
+        <div class="language-selector" style="position: absolute; top: 24px; right: 24px; z-index: 10;">
+            <select id="language-select" class="form-control" style="width: auto; padding: 6px 30px 6px 12px; font-size: 13px; appearance: none; background: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'12\' height=\'12\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23374151\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'6 9 12 15 18 9\'></polyline></svg>') no-repeat right 10px center; background-color: #f9fafb; border-color: #e5e7eb; border-radius: 6px; cursor: pointer; color: #374151;">
+                <option value="zh_CN" {% if app.request.locale == 'zh_CN' %}selected{% endif %}>中文 (简体)</option>
+                <option value="en" {% if app.request.locale == 'en' %}selected{% endif %}>English</option>
+            </select>
+        </div>
+
         <div class="login-form-wrapper">
             <h2>{{ 'login.form.title'|trans }}</h2>
             
@@ -435,6 +443,15 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        const languageSelect = document.getElementById('language-select');
+        if (languageSelect) {
+            languageSelect.addEventListener('change', (e) => {
+                const url = new URL(window.location.href);
+                url.searchParams.set('_locale', e.target.value);
+                window.location.href = url.toString();
+            });
+        }
+
         const passkeyBtn = document.getElementById('passkey-login');
         const usernameInput = document.getElementById('inputEmail');
         const forgotPasswordLink = document.getElementById('forgot-password-link');

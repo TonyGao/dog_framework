@@ -1,27 +1,22 @@
 <?php
 namespace App\Twig;
 
+use App\Service\Platform\PresenceService;
 use Twig\TwigTest;
 use Twig\Environment;
 use Twig\TwigFunction;
 use Twig\Extension\AbstractExtension;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 
 class TwigExtension extends AbstractExtension
 {
-    private $session;
+    private RequestStack $rs;
+    private PresenceService $presenceService;
 
-    public function __construct(RequestStack $rs)
+    public function __construct(RequestStack $rs, PresenceService $presenceService)
     {
-        if (php_sapi_name() === 'cli') {
-            // 在 CLI 环境下不执行会话相关代码
-            return;
-        }
-        
-        $this->session = $rs->getSession();
-        $this->session->set('active', 'active');
+        $this->rs = $rs;
+        $this->presenceService = $presenceService;
     }
 
     public function getTests(): array {
@@ -38,7 +33,22 @@ class TwigExtension extends AbstractExtension
             new TwigFunction('instanceof', [$this, 'isInstanceof']),
             new TwigFunction('get_session_id', [$this, 'getSessionId']),
             new TwigFunction('generateRandomString', [$this, 'generateRandomString']),
+            new TwigFunction('is_online', [$this, 'isOnline']),
+            new TwigFunction('mercure_public_url', [$this, 'getMercurePublicUrl']),
         ];
+    }
+
+    public function getMercurePublicUrl(): string
+    {
+        return $this->rs->getCurrentRequest()->server->get('MERCURE_PUBLIC_URL', '');
+    }
+
+    /**
+     * 判断用户是否在线
+     */
+    public function isOnline(string $userId): bool
+    {
+        return $this->presenceService->isOnline($userId);
     }
 
     public function getObjectFields($object): array
@@ -93,8 +103,16 @@ class TwigExtension extends AbstractExtension
 
     public function getSessionId(): string
     {
-        /** @var SessionInterface $session */
-        return $this->session->getId();
+        $request = $this->rs->getCurrentRequest();
+        if ($request && $request->hasSession()) {
+            $session = $request->getSession();
+            if (!$session->isStarted()) {
+                $session->start();
+            }
+            $session->set('active', 'active');
+            return $session->getId();
+        }
+        return '';
     }
 
     public function generateRandomString(int $length = 9): string

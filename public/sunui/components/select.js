@@ -188,7 +188,7 @@ $(document).ready(function () {
       );
       let id = selectContent.attr("parentId");
       let selectInput = $("#" + id);
-      selectInput.prev("input").attr("value", value);
+      selectInput.prev("input").val(value).attr("value", value);
       selectInput.removeClass("ef-select-error");
       selectInput
         .children(".ef-select-view-input")

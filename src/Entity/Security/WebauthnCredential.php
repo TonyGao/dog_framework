@@ -67,7 +67,7 @@ class WebauthnCredential
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $deviceName = null;
 
-    #[ORM\ManyToOne(targetEntity: Employee::class)]
+    #[ORM\ManyToOne(targetEntity: Employee::class, inversedBy: 'passkeys')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Employee $employee = null;
 

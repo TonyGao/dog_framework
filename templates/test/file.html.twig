@@ -1,0 +1,54 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="test-container" style="padding: 24px;">
+    <h2>File 文件上传 (FileType)</h2>
+    
+    <div class="ef-card" style="padding: 24px; margin-top: 24px; max-width: 600px;">
+        <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+            <div class="ef-col ef-col-8 ef-form-item-label-col">
+                <label class="ef-form-item-label">默认按钮上传</label>
+            </div>
+            <div class="ef-col ef-col-16 ef-form-item-wrapper-col">
+                <div class="ef-upload-wrapper" style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" class="btn secondary medium" onclick="this.nextElementSibling.click()">
+                        <i class="fa-solid fa-upload"></i> 选择文件
+                    </button>
+                    <input type="file" class="ef-input" style="display: none;" onchange="this.nextElementSibling.textContent = this.files[0] ? this.files[0].name : '未选择任何文件'" />
+                    <span class="ef-upload-filename" style="color: #666; font-size: 14px; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">未选择任何文件</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+            <div class="ef-col ef-col-8 ef-form-item-label-col">
+                <label class="ef-form-item-label">拖拽上传区</label>
+            </div>
+            <div class="ef-col ef-col-16 ef-form-item-wrapper-col">
+                <label class="ef-upload-drag-zone" style="display: block; width: 100%; padding: 24px; text-align: center; border: 1px dashed #d9d9d9; border-radius: 6px; background-color: #fafafa; cursor: pointer; transition: border-color 0.3s;" onmouseover="this.style.borderColor='#1677ff'" onmouseout="this.style.borderColor='#d9d9d9'">
+                    <i class="fa-solid fa-cloud-arrow-up fa-2x" style="color: #1677ff; margin-bottom: 12px;"></i>
+                    <div style="font-weight: 500; color: #333; margin-bottom: 4px;">点击或将文件拖拽到这里上传</div>
+                    <div style="font-size: 12px; color: #999;">支持扩展名：.rar .zip .doc .docx .pdf .jpg...</div>
+                    <input type="file" style="display: none;" onchange="this.nextElementSibling.style.display='block'; this.nextElementSibling.textContent = '已选择: ' + (this.files[0] ? this.files[0].name : '')" />
+                    <div class="ef-upload-filename-drag" style="margin-top: 12px; font-size: 14px; color: #1677ff; display: none;"></div>
+                </label>
+            </div>
+        </div>
+
+        <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+            <div class="ef-col ef-col-8 ef-form-item-label-col">
+                <label class="ef-form-item-label">禁用状态</label>
+            </div>
+            <div class="ef-col ef-col-16 ef-form-item-wrapper-col">
+                <div class="ef-upload-wrapper" style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" class="btn secondary medium disabled" onclick="this.nextElementSibling.click()" disabled>
+                        <i class="fa-solid fa-upload"></i> 选择文件
+                    </button>
+                    <input type="file" class="ef-input" disabled style="display: none;" />
+                    <span class="ef-upload-filename" style="color: #999; font-size: 14px;">未选择任何文件</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

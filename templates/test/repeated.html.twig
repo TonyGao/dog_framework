@@ -1,0 +1,54 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="test-container" style="padding: 24px;">
+    <h2>Repeated 重复字段 (RepeatedType)</h2>
+    
+    <div class="ef-card" style="padding: 24px; margin-top: 24px; max-width: 600px;">
+        <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+            <div class="ef-col ef-col-8 ef-form-item-label-col">
+                <label class="ef-form-item-label ef-form-item-required">密码</label>
+            </div>
+            <div class="ef-col ef-col-16 ef-form-item-wrapper-col">
+                <span class="ef-input-wrapper" style="width: 100%;">
+                    <input type="password" id="pwd1" class="ef-input ef-input-size-medium text" placeholder="请输入密码" style="width: 100%;" />
+                </span>
+            </div>
+        </div>
+
+        <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+            <div class="ef-col ef-col-8 ef-form-item-label-col">
+                <label class="ef-form-item-label ef-form-item-required">确认密码</label>
+            </div>
+            <div class="ef-col ef-col-16 ef-form-item-wrapper-col">
+                <span class="ef-input-wrapper" id="pwd2-wrapper" style="width: 100%;">
+                    <input type="password" id="pwd2" class="ef-input ef-input-size-medium text" placeholder="请再次输入密码" style="width: 100%;" />
+                </span>
+                <div id="pwd-error" style="color: #ff4d4f; font-size: 12px; margin-top: 4px; display: none;">两次输入的密码不一致</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pwd1 = document.getElementById('pwd1');
+    const pwd2 = document.getElementById('pwd2');
+    const pwd2Wrapper = document.getElementById('pwd2-wrapper');
+    const errorMsg = document.getElementById('pwd-error');
+
+    function checkMatch() {
+        if (pwd2.value && pwd1.value !== pwd2.value) {
+            errorMsg.style.display = 'block';
+            pwd2Wrapper.style.borderColor = '#ff4d4f';
+        } else {
+            errorMsg.style.display = 'none';
+            pwd2Wrapper.style.borderColor = '';
+        }
+    }
+
+    pwd1.addEventListener('input', checkMatch);
+    pwd2.addEventListener('input', checkMatch);
+});
+</script>
+{% endblock %}

@@ -21,9 +21,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Controller\Api\ApiResponse;
 use App\Service\Platform\DataGridService;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 /**
  * 组织架构管理
  */
+#[IsGranted('ROLE_ADMIN')]
 class OrgController extends BaseController
 {
 

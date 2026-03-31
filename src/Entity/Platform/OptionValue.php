@@ -55,6 +55,10 @@ class OptionValue
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $datetime;
 
+    #[ORM\ManyToOne(targetEntity: Options::class, inversedBy: 'OptionValue')]
+    #[ORM\JoinColumn(nullable: true)]
+    private $optionValue;
+
     public function __construct()
     {
         // 自动生成 UUID

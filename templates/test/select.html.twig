@@ -93,8 +93,8 @@
 {% block body %}
 <div class="demo-container">
   <div class="demo-header">
-    <h1 class="demo-title">Select 选择器组件</h1>
-    <p class="demo-desc">下拉选择器。支持 <strong>标准直角样式</strong> 和 <strong>专用圆角样式</strong>。</p>
+    <h1 class="demo-title">Select 选择器组件 (Choice Fields)</h1>
+    <p class="demo-desc">下拉选择器。涵盖 Symfony 的 <strong>ChoiceType, EnumType, EntityType, CountryType, LanguageType, LocaleType, TimezoneType, CurrencyType</strong>。支持 <strong>标准直角样式</strong> 和 <strong>专用圆角样式</strong>。</p>
   </div>
 
   <div class="demo-section">
@@ -282,6 +282,26 @@
             </div>
         </div>
       </div>
+    </div>
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">Symfony Choice Fields (衍生类型)</h2>
+      <p class="demo-section-desc">以下 Symfony 表单类型均继承自 <code>ChoiceType</code>，已由 <code>ef_ui_form_theme.html.twig</code> 中的 <code>choice_widget_collapsed</code> 统一接管，无需重复编写前端样式。它们与上述基础选择器表现完全一致：</p>
+    </div>
+    <div style="padding: 24px;">
+      <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 12px;">
+        <li style="background: #f3f4f6; padding: 8px 16px; border-radius: 6px; font-family: monospace; font-size: 14px; color: #374151; border: 1px solid #e5e7eb;">ChoiceType</li>
+        <li style="background: #f3f4f6; padding: 8px 16px; border-radius: 6px; font-family: monospace; font-size: 14px; color: #374151; border: 1px solid #e5e7eb;">EnumType</li>
+        <li style="background: #f3f4f6; padding: 8px 16px; border-radius: 6px; font-family: monospace; font-size: 14px; color: #374151; border: 1px solid #e5e7eb;">EntityType</li>
+        <li style="background: #f3f4f6; padding: 8px 16px; border-radius: 6px; font-family: monospace; font-size: 14px; color: #374151; border: 1px solid #e5e7eb;">CountryType</li>
+        <li style="background: #f3f4f6; padding: 8px 16px; border-radius: 6px; font-family: monospace; font-size: 14px; color: #374151; border: 1px solid #e5e7eb;">LanguageType</li>
+        <li style="background: #f3f4f6; padding: 8px 16px; border-radius: 6px; font-family: monospace; font-size: 14px; color: #374151; border: 1px solid #e5e7eb;">LocaleType</li>
+        <li style="background: #f3f4f6; padding: 8px 16px; border-radius: 6px; font-family: monospace; font-size: 14px; color: #374151; border: 1px solid #e5e7eb;">TimezoneType</li>
+        <li style="background: #f3f4f6; padding: 8px 16px; border-radius: 6px; font-family: monospace; font-size: 14px; color: #374151; border: 1px solid #e5e7eb;">CurrencyType</li>
+      </ul>
+      <p style="margin-top: 16px; font-size: 14px; color: #6b7280; line-height: 1.6;">
+        无论在表单中直接使用上述哪种 Type，系统都会自动将其渲染为带有搜索功能、下拉动画及标准样式的 <code>ef-select</code> 组件。
+      </p>
     </div>
   </div>
 </div>

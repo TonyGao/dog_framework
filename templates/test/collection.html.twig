@@ -1,0 +1,75 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="test-container" style="padding: 24px;">
+    <h2>Collection 集合 (CollectionType)</h2>
+    
+    <div class="ef-card" style="padding: 24px; margin-top: 24px; max-width: 600px;">
+        <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+            <div class="ef-col ef-col-8 ef-form-item-label-col">
+                <label class="ef-form-item-label">联系方式</label>
+            </div>
+            <div class="ef-col ef-col-16 ef-form-item-wrapper-col">
+                <div class="ef-collection-container" style="width: 100%;">
+                    <div id="collection-items">
+                        <div class="ef-space ef-space-horizontal ef-space-align-center ef-collection-item" style="margin-bottom: 12px; width: 100%; display: flex;">
+                            <span class="ef-input-wrapper" style="flex: 1;">
+                                <input type="text" class="ef-input ef-input-size-medium text" value="13800138000" style="width: 100%;" />
+                            </span>
+                            <span class="ef-collection-remove" style="cursor: pointer; color: #999; padding: 4px 8px; transition: color 0.2s; margin-left: 4px;" title="删除" onmouseover="this.style.color='#ff4d4f'" onmouseout="this.style.color='#999'">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </span>
+                        </div>
+                        <div class="ef-space ef-space-horizontal ef-space-align-center ef-collection-item" style="margin-bottom: 12px; width: 100%; display: flex;">
+                            <span class="ef-input-wrapper" style="flex: 1;">
+                                <input type="text" class="ef-input ef-input-size-medium text" value="tony@example.com" style="width: 100%;" />
+                            </span>
+                            <span class="ef-collection-remove" style="cursor: pointer; color: #999; padding: 4px 8px; transition: color 0.2s; margin-left: 4px;" title="删除" onmouseover="this.style.color='#ff4d4f'" onmouseout="this.style.color='#999'">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <button type="button" id="add-item-btn" class="btn outline medium" style="width: 100%; border-style: dashed; border-color: #d9d9d9; color: #666; background: #fafafa; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-plus"></i> 添加一项
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('collection-items');
+    const addBtn = document.getElementById('add-item-btn');
+
+    // Handle remove
+    container.addEventListener('click', function(e) {
+        const removeBtn = e.target.closest('.ef-collection-remove');
+        if (removeBtn) {
+            const item = removeBtn.closest('.ef-collection-item');
+            if (item) {
+                item.remove();
+            }
+        }
+    });
+
+    // Handle add
+    addBtn.addEventListener('click', function() {
+        const itemHtml = `
+            <div class="ef-space ef-space-horizontal ef-space-align-center ef-collection-item" style="margin-bottom: 12px; width: 100%; display: flex;">
+                <span class="ef-input-wrapper" style="flex: 1;">
+                    <input type="text" class="ef-input ef-input-size-medium text" placeholder="请输入新项..." style="width: 100%;" />
+                </span>
+                <span class="ef-collection-remove" style="cursor: pointer; color: #999; padding: 4px 8px; transition: color 0.2s; margin-left: 4px;" title="删除" onmouseover="this.style.color='#ff4d4f'" onmouseout="this.style.color='#999'">
+                    <i class="fa-solid fa-trash-can"></i>
+                </span>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', itemHtml);
+    });
+});
+</script>
+{% endblock %}

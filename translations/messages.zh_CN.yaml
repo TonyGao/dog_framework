@@ -1,6 +1,7 @@
 action:
   cancel: 取消
   confirm: 确认
+  save: 保存
 employee:
   list:
     title: 员工花名册
@@ -42,14 +43,32 @@ employee:
     birth_date: 出生日期
     id_card: 身份证号
     english_name: 英文名
+    company: 公司
+    manager: 直接上级
+  edit_drawer:
+    account_details: 账户详情
+    profile_picture: 头像
+    upload_image: 上传图片
+    remove: 移除
+    profile_picture_format: '仅支持 PNG、JPEG、JPG 格式（500KB 以下）'
+    send_verification_mail: 发送验证邮件
+    user_account_status: 用户账户状态
+    user_account_status_desc: 启用或停用用户账户状态
+    save_changes: 保存更改
+  avatar:
+    edit:
+      title: 编辑头像
+    drop_hint: 点击或拖拽图片到这里
   status:
     active: 在职
     inactive: 离职
     vacation: 休假
+    probation: 试用期
   status_value:
     active: 在职
     inactive: 离职
     vacation: 休假
+    probation: 试用期
   gender:
     male: 男
     female: 女
@@ -63,6 +82,8 @@ employee:
       employee: 员工
       detail: 员工详情
     action:
+      edit: 编辑
+      edit_success: 员工信息已更新
       deactivate: 停用
       clear_passkey: 清除Passkey
       clear_passkey_confirm: 确定要清除该用户的所有Passkey吗？此操作无法撤销。
@@ -203,9 +224,20 @@ admin_email:
   tabs:
     config: '发件服务器'
     templates: '邮件模版'
+    bindings: '功能邮件绑定'
+  config:
+    title: '发送服务器'
+    desc: '配置用于发送邮件的服务器信息'
+    add_server: '添加服务器'
+    empty: '暂无发送服务器配置'
+    unnamed: '未命名服务器'
+    default: '默认'
+    delete_confirm: '确定要删除此服务器配置吗？'
   templates:
     title: '邮件模版'
     desc: '管理各个业务场景的邮件内容'
+    empty: '暂无邮件模板'
+    delete_confirm: '确定要删除此模板吗？'
     preset:
       select_label: '选择模版'
       select_placeholder: '请选择预置模版'
@@ -228,11 +260,71 @@ admin_email:
   btn:
     save_config: '保存配置'
     send_test: '发送测试邮件'
-    add_template: '添加模版'
+    add_template: '保存模板'
+  bindings:
+    title: '功能邮件绑定'
+    desc: '将系统核心业务功能绑定到指定的邮件服务器和模板'
+    empty: '暂无功能绑定数据'
+  drawer:
+    add_title: '添加服务器配置'
+    edit_title: '编辑服务器配置'
+    add_template: '添加邮件模板'
+    edit_template: '编辑邮件模板'
+    basic_info: '基础信息'
+    name: '配置名称'
+    name_placeholder: '例如: 营销邮件服务器'
+    is_default: '设为默认服务器'
+    conn_settings: '连接设置'
+    host: '主机地址'
+    host_placeholder: '例如: smtp.exmail.qq.com'
+    port: '端口'
+    protocol: '协议'
+    protocol_select: '请选择协议'
+    encryption: '加密方式'
+    encryption_select: '请选择加密方式'
+    auth: '身份验证'
+    username: '用户名'
+    username_placeholder: '请输入邮箱用户名'
+    password: '密码/授权码'
+    password_hint: '留空表示不修改'
+    sender_info: '发件人信息'
+    sender_name: '发件人名称'
+    sender_name_placeholder: '例如: 系统通知'
+    sender_address: '发件人地址'
+    sender_address_placeholder: 'noreply@example.com'
+    test_conn: '测试连接'
+    test_email_label: '测试接收邮箱'
+    test_email_placeholder: '请输入测试邮箱'
+    test_modal_title: '测试服务器连接'
+  flash:
+    config_saved: '邮件配置已成功保存。'
+    config_deleted: '邮件配置已成功删除。'
+    template_saved: '邮件模板已成功保存。'
+    template_deleted: '邮件模板已成功删除。'
+    binding_saved: '邮件绑定已成功保存。'
+    test_success: '连接成功，测试邮件已发送'
+    test_failed: '测试连接失败'
+    test_email_required: '请输入测试邮箱地址'
+    invalid_email: '请输入有效的邮箱地址'
+    testing: '正在测试...'
+    sending: '正在发送...'
+    send_success: '测试邮件发送成功'
+    send_failed: '测试邮件发送失败'
+    ajax_error: '请求失败，请稍后重试'
+    success: '成功'
+    error: '错误'
   side_card:
     config:
       title: '配置说明'
       text: '请填写您的 SMTP 服务器信息以启用邮件发送功能。支持常用变量，如密码重置时可用 <code>{{ code }}</code>。'
+  form:
+    name: '模板名称'
+    name_placeholder: '请输入模板名称'
+    subject: '邮件主题'
+    subject_placeholder: '请输入邮件主题'
+    server: '发送服务器'
+    server_select: '请选择发送服务器'
+    default_server: '使用系统默认'
 
   editor:
     title: '邮件模版编辑器'
@@ -271,10 +363,13 @@ admin_email:
       event_reminder:
         desc: '即将开始的线上/线下活动提醒。'
     form:
-      name: '模版名称/标识 *'
-      subject: '邮件主题 *'
+      name: '模板名称'
+      name_placeholder: '请输入模板名称'
+      subject: '邮件主题'
+      subject_placeholder: '请输入邮件主题'
       server: '发送服务器'
-      default_server: '使用默认服务器'
+      server_select: '请选择发送服务器'
+      default_server: '使用系统默认'
 
   preview:
     enterprise: '企业管理'
@@ -353,3 +448,37 @@ login:
       passkey_invalid: '无效的通行密钥'
       passkey_generic_error: '通行密钥验证失败'
       passkey_login_failed: '登录失败：'
+
+security:
+  reset_password:
+    page_title: '重置密码'
+    select_method: '请选择验证方式以重置密码：'
+    send_email_link: '发送重置邮件到邮箱'
+    send_sms_code: '发送验证码到手机'
+    answer_question: '回答安全问题'
+    use_passkey: '使用通行密钥验证'
+    next_step: '下一步'
+    back_to_login: '返回登录'
+    email_sent: '验证码已发送到 %email% (模拟: %code%)'
+    email_sent_real: '验证码已发送，请查收邮件。'
+    sms_sent: '短信验证码已发送到 %mobile% (模拟: %code%)'
+    sms_sent_real: '短信验证码已发送，请查收短信。'
+    link_sent: '重置链接已发送到 %email%'
+    link_sent_mock: '重置链接已生成 (模拟发送到 %email%，令牌: %token%)'
+    check_email: '检查您的邮箱'
+    link_sent_message: '我们已向您的邮箱发送了一封包含重置密码链接的邮件。'
+    check_inbox: '请点击邮件中的链接来重置您的密码'
+    link_expire_note: '链接将在 1 小时后过期'
+    resend_link: '重新发送链接'
+
+function_binding:
+  security:
+    reset_password: '密码重置验证'
+  employee:
+    verification: '员工邮箱验证'
+  function_code: '业务代号'
+  server: '发送服务器'
+  template: '渲染模板'
+  save_binding: '保存绑定'
+  system_default: '系统默认'
+  select_template: '请选择模板'

@@ -10,7 +10,9 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_ADMIN')]
 class ViewEditorApiController extends AbstractController
 {
     /**
@@ -32,7 +34,6 @@ class ViewEditorApiController extends AbstractController
     ): ApiResponse {
         // 获取请求参数
         $payload = $request->toArray();
-        dump($payload);
         $viewId = $payload['viewId'] ?? null;
         $canvasHtml = $payload['canvasHtml'] ?? null;
         

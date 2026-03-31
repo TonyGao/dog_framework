@@ -203,8 +203,8 @@
         <div class="email-title">{{ 'admin_email.editor.title'|trans }}</div>
         
         <form action="{{ path('admin_email_template_save') }}" method="post" id="editorForm" style="display: flex; flex-direction: column; height: 100%;">
-            <input type="hidden" name="id" id="templateId">
-            <input type="hidden" name="subject" id="editorSubjectHidden">
+            <input type="hidden" name="id" id="templateId" value="{{ editingTemplate.id|default('') }}">
+            <input type="hidden" name="subject" id="editorSubjectHidden" value="{{ editingTemplate.subject|default('') }}">
 
             <div class="ef-space ef-space-horizontal ef-space-align-center" style="margin-bottom: 24px; justify-content: flex-start;">
                 <div class="page-title" style="margin-bottom: 0; margin-right: 32px; white-space: nowrap;">
@@ -213,14 +213,14 @@
                 
                 <div class="top-form-fields" style="margin-bottom: 0; width: 600px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div class="form-group" style="margin-bottom: 0;">
-                        {{ ui.input('editorTemplateName', 'text', 'admin_email.editor.form.name'|trans, '', 'ef-input-rounded', 'ef-input-size-medium', {'name': 'name', 'required': 'required', 'style': 'width: 100%;'}) }}
+                        {{ ui.input('editorTemplateName', 'text', 'admin_email.editor.form.name'|trans, editingTemplate.name|default(''), 'ef-input-rounded', 'ef-input-size-medium', {'name': 'name', 'required': 'required', 'style': 'width: 100%;'}) }}
                     </div>
                     <div class="form-group" style="margin-bottom: 0;">
                         {% set server_options = [{'label': 'admin_email.editor.form.default_server'|trans, 'value': ''}] %}
                         {% for config in configs %}
                             {% set server_options = server_options|merge([{'label': config.name ?: config.host, 'value': config.id}]) %}
                         {% endfor %}
-                        {{ ui.select(server_options, 'admin_email.editor.form.server'|trans, '292px', 'ef-input-rounded', 'emailConfigId', 'editorEmailConfig', '') }}
+                        {{ ui.select(server_options, 'admin_email.editor.form.server'|trans, '292px', 'ef-input-rounded', 'emailConfigId', 'editorEmailConfig', editingTemplate.emailConfig.id|default('')) }}
                     </div>
                 </div>
             </div>
@@ -399,8 +399,8 @@
                     <div id="editorToolbar" class="editor-toolbar"></div>
                     <div id="editorContainer"></div>
                 </div>
-                <input type="hidden" name="bodyHtml" id="editorBodyHtml">
-                <input type="hidden" name="description" id="editorDescription">
+                <input type="hidden" name="bodyHtml" id="editorBodyHtml" value="{{ editingTemplate.bodyHtml|default('') }}">
+                <input type="hidden" name="description" id="editorDescription" value="{{ editingTemplate.description|default('') }}">
                 <div class="ef-space ef-space-horizontal ef-space-align-center" style="margin-top: 24px; justify-content: flex-end;">
                     <button class="btn outline medium" type="button" onclick="previewEmail()">预览</button>
                     <button class="btn outline medium" type="button" onclick="testTemplateEmail()">发送测试邮件</button>
@@ -416,7 +416,7 @@
     {% set subjectModalBody %}
         <div class="form-group" style="margin-bottom: 0;">
             <label class="form-label required">{{ 'admin_email.editor.form.subject'|trans }}</label>
-            {{ ui.input('templateSubjectInput', 'text', '如: 您的验证码是 {{ \'{{ code }}\' }}', '', 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'required': 'required', 'style': 'width: 100%;'}) }}
+            {{ ui.input('templateSubjectInput', 'text', '如: 您的验证码是 {{ \'{{ code }}\' }}', editingTemplate.subject|default(''), 'ef-input-wrapper-full-width ef-input-rounded', 'ef-input-size-medium', {'required': 'required', 'style': 'width: 100%;'}) }}
         </div>
     {% endset %}
 
@@ -726,7 +726,7 @@
         const innerTemplates = {
             verification_code: '<p style="text-align: center;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIzMiIgZmlsbD0iI2UwZTdmZiIvPjxwYXRoIGQ9Ik0xNiAyMkwzMiAzNEw0OCAyMk0xNiA0Mkg0OFYyMkgxNlY0MloiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzRmNDZlNSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" width="64" height="64" alt="icon"></p><h2 style="text-align: center;">验证您的邮箱</h2><p style="text-align: center;"><span style="color: rgb(75, 85, 99);">感谢您注册！请使用以下一次性验证码完成邮箱验证。</span></p><p style="text-align: center;"><span style="font-family: monospace; font-size: 32px; color: rgb(31, 41, 55); background-color: rgb(243, 244, 246);"><strong> &nbsp;{{ code }}&nbsp; </strong></span></p><p style="text-align: center;"><span style="font-size: 13px; color: rgb(107, 114, 128);">安全提示：此验证码在 15 分钟内有效，请勿将验证码透露给他人。</span></p>',
             welcome: '<p style="text-align: center;"><img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" width="100%" alt="Welcome"></p><h2>欢迎加入我们，{{ username }}！</h2><p>我们很高兴能有您的加入。为了让您有一个良好的开始，我们准备了一些入门指引，请点击下方链接进入您的专属工作区。</p><p style="text-align: center;"><a href="{{ login_url }}" target="_blank"><span style="font-size: 18px; color: rgb(37, 99, 235);"><strong>立即开始使用 &gt;</strong></span></a></p><p><span style="font-size: 14px; color: rgb(107, 114, 128);">如果您在登录过程中遇到任何问题，请随时联系我们的 IT 支持团队或 HR 部门。</span></p>',
-            password_reset: '<p style="text-align: center;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIzMiIgZmlsbD0iI2ZlZTJlMiIvPjxyZWN0IHg9IjIwIiB5PSIzMCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjE2IiByeD0iMiIgcnk9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2VmNDQ0NCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMjQgMzBWMjRhOCA4IDAgMCAxIDE2IDB2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlLXN0cm9rZT0iI2VmNDQ0NCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" width="64" height="64" alt="icon"></p><h2 style="text-align: center;">重置您的密码</h2><p style="text-align: center;"><span style="color: rgb(75, 85, 99);">我们收到了重置您账户密码的请求。如果您确实发起了此请求，请点击下方链接重置密码。</span></p><p style="text-align: center;"><a href="{{ reset_url }}" target="_blank"><span style="font-size: 18px; color: rgb(239, 68, 68);"><strong>重置密码 &gt;</strong></span></a></p><p style="text-align: center;"><span style="font-size: 13px; color: rgb(107, 114, 128);">如果您没有请求重置密码，您可以安全地忽略此邮件，您的密码不会被更改。</span></p>',
+            password_reset: '<p style="text-align: center;"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDY0IDY0Ij48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIzMiIgZmlsbD0iI2ZlZTJlMiIvPjxyZWN0IHg9IjIwIiB5PSIzMCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjE2IiByeD0iMiIgcnk9IjIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2VmNDQ0NCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMjQgMzBWMjRhOCA4IDAgMCAxIDE2IDB2NiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZWY0NDQ0IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==" width="64" height="64" alt="icon"></p><h2 style="text-align: center;">重置您的密码</h2><p style="text-align: center;"><span style="color: rgb(75, 85, 99);">我们收到了重置您账户密码的请求。如果您确实发起了此请求，请点击下方链接重置密码。</span></p><p style="text-align: center;"><a href="{{ reset_url }}" target="_blank"><span style="font-size: 18px; color: rgb(239, 68, 68);"><strong>重置密码 &gt;</strong></span></a></p><p style="text-align: center;"><span style="font-size: 13px; color: rgb(107, 114, 128);">如果您没有请求重置密码，您可以安全地忽略此邮件，您的密码不会被更改。</span></p>',
             announcement: '<p style="text-align: center;"><img src="https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" width="100%" alt="Announcement"></p><h2><span style="color: rgb(37, 99, 235);">{{ announcement_title }}</span></h2><p><span style="color: rgb(55, 65, 81);">{{ announcement_body }}</span></p><hr/><p><span style="color: rgb(107, 114, 128);">此致，<br>团队敬上</span></p>',
             meeting_invite: '<h2>邀请：{{ meeting_topic }}</h2><p>您好 {{ username }}，</p><p>您已被邀请参加以下会议。请在下方查看详情：</p><p><strong>时间：</strong>{{ meeting_time }}<br><strong>地点/链接：</strong><a href="{{ meeting_link }}" target="_blank">{{ meeting_link }}</a></p><p>期待您的参与！</p>',
             newsletter: '<p style="text-align: center;"><img src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" width="100%" alt="Newsletter"></p><h2>本月动态回顾</h2><p>您好 {{ username }}，</p><p>这是我们为您准备的本月最新资讯和产品更新。我们推出了几项新功能，希望能帮助您更好地完成工作。</p><ul><li><strong>新功能 A：</strong>提升效率的利器</li><li><strong>新功能 B：</strong>更完善的数据分析</li></ul><p style="text-align: center;"><a href="{{ update_url }}" target="_blank"><span style="font-size: 16px; color: rgb(37, 99, 235);">阅读完整内容 &gt;</span></a></p>',
@@ -767,7 +767,7 @@
 
             editor = createEditor({
                 selector: '#editorContainer',
-                html: '',
+                html: document.getElementById('editorBodyHtml').value || '',
                 config: {
                     placeholder: '请输入内容...',
                     onChange(editorInst) {

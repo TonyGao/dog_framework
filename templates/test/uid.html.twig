@@ -1,0 +1,31 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<div class="test-container" style="padding: 24px;">
+    <h2>UID 字段 (UuidType & UlidType)</h2>
+    
+    <div class="ef-card" style="padding: 24px; margin-top: 24px; max-width: 600px;">
+        <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+            <div class="ef-col ef-col-8 ef-form-item-label-col">
+                <label class="ef-form-item-label">UUID</label>
+            </div>
+            <div class="ef-col ef-col-16 ef-form-item-wrapper-col">
+                <span class="ef-input-wrapper" style="width: 100%;">
+                    <input type="text" class="ef-input ef-input-size-medium text" value="123e4567-e89b-12d3-a456-426614174000" readonly style="width: 100%;" />
+                </span>
+            </div>
+        </div>
+
+        <div class="ef-row ef-row-align-start ef-row-justify-start ef-form-item ef-form-item-layout-horizontal">
+            <div class="ef-col ef-col-8 ef-form-item-label-col">
+                <label class="ef-form-item-label">ULID</label>
+            </div>
+            <div class="ef-col ef-col-16 ef-form-item-wrapper-col">
+                <span class="ef-input-wrapper" style="width: 100%;">
+                    <input type="text" class="ef-input ef-input-size-medium text" value="01ARZ3NDEKTSV4RRFFQ69G5FAV" readonly style="width: 100%;" />
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

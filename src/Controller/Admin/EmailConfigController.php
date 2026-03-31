@@ -4,27 +4,65 @@ namespace App\Controller\Admin;
 
 use App\Entity\System\EmailConfig;
 use App\Entity\System\EmailTemplate;
+use App\Entity\System\EmailFunctionBinding;
 use App\Repository\System\EmailConfigRepository;
 use App\Repository\System\EmailTemplateRepository;
+use App\Repository\System\EmailFunctionBindingRepository;
+use App\Service\Security\EmailHtmlSanitizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/admin/email')]
+#[IsGranted('ROLE_ADMIN')]
 class EmailConfigController extends AbstractController
 {
+    public function __construct(
+        private readonly EmailHtmlSanitizer $emailHtmlSanitizer,
+        private readonly TranslatorInterface $translator
+    ) {
+    }
+
+    public const SYSTEM_EMAIL_FUNCTIONS = [
+        'security.reset_password' => '重置密码验证邮件',
+        'employee.verification' => '员工邮箱验证邮件',
+    ];
+
     #[Route('/', name: 'admin_email_index')]
-    public function index(EmailConfigRepository $configRepository, EmailTemplateRepository $templateRepository): Response
+    public function index(EmailConfigRepository $configRepository, EmailTemplateRepository $templateRepository, EmailFunctionBindingRepository $bindingRepository, EntityManagerInterface $em): Response
     {
         $configs = $configRepository->findAll();
-
         $templates = $templateRepository->findBy([], ['createdAt' => 'DESC']);
+
+        // Auto-initialize missing bindings
+        $flushNeeded = false;
+        foreach (self::SYSTEM_EMAIL_FUNCTIONS as $code => $name) {
+            $binding = $bindingRepository->findOneBy(['functionCode' => $code]);
+            if (!$binding) {
+                $binding = new EmailFunctionBinding();
+                $binding->setFunctionCode($code);
+                $binding->setFunctionName($name);
+                $em->persist($binding);
+                $flushNeeded = true;
+            } else if ($binding->getFunctionName() !== $name) {
+                $binding->setFunctionName($name);
+                $flushNeeded = true;
+            }
+        }
+        if ($flushNeeded) {
+            $em->flush();
+        }
+
+        $bindings = $bindingRepository->findAll();
 
         return $this->render('admin/email/index.html.twig', [
             'configs' => $configs,
             'templates' => $templates,
+            'bindings' => $bindings,
         ]);
     }
 
@@ -96,7 +134,7 @@ class EmailConfigController extends AbstractController
             }
 
             // Wrap the body with standard email layout only if it doesn't already have it
-            $emailLayout = $renderedBody ?: '<p>Empty Body</p>';
+            $emailLayout = $this->emailHtmlSanitizer->sanitize($renderedBody) ?: '<p>Empty Body</p>';
             if (strpos($emailLayout, 'id="ef-email-wrapper"') === false) {
                 $emailWrapperStart = '<div id="ef-email-wrapper" style="background-color: #f4f5f7; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif, \'Apple Color Emoji\', \'Segoe UI Emoji\', \'Segoe UI Symbol\'; color: #333333;"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" align="center" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow: hidden;"><tr><td style="height: 6px; background: linear-gradient(90deg, #2563eb 0%, #4f46e5 100%);"></td></tr><tr><td style="padding: 40px;">';
                 $emailWrapperEnd = '</td></tr><tr><td style="padding: 30px 40px; background-color: #f9f9f9; text-align: center; font-size: 12px; color: #999999; border-top: 1px solid #eeeeee;"><p style="margin: 0 0 10px 0;">© 2025 Your Company Name. All rights reserved.</p><p style="margin: 0;">此邮件为系统自动发送，请勿直接回复。</p></td></tr></table></div>';
@@ -113,7 +151,7 @@ class EmailConfigController extends AbstractController
 
             return \App\Controller\Api\ApiResponse::success(json_encode([]), 200, '测试邮件发送成功，已发送至 ' . $testEmail);
         } catch (\Exception $e) {
-            return \App\Controller\Api\ApiResponse::error(json_encode([]), 500, '发送失败: ' . $e->getMessage());
+            return \App\Controller\Api\ApiResponse::error(json_encode([]), 500, '发送失败，请检查邮件服务器配置和模板内容。');
         }
     }
 
@@ -167,7 +205,7 @@ class EmailConfigController extends AbstractController
 
         $em->flush();
 
-        $this->addFlash('success', 'Email configuration saved successfully.');
+        $this->addFlash('success', $this->translator->trans('admin_email.flash.config_saved'));
 
         return $this->redirectToRoute('admin_email_index');
     }
@@ -178,9 +216,42 @@ class EmailConfigController extends AbstractController
         $em->remove($config);
         $em->flush();
 
-        $this->addFlash('success', 'Email configuration deleted successfully.');
+        $this->addFlash('success', $this->translator->trans('admin_email.flash.config_deleted'));
 
         return $this->redirectToRoute('admin_email_index');
+    }
+
+    #[Route('/binding/save', name: 'admin_email_binding_save', methods: ['POST'])]
+    public function saveBinding(Request $request, EntityManagerInterface $em, EmailFunctionBindingRepository $bindingRepository, EmailConfigRepository $configRepository, EmailTemplateRepository $templateRepository): Response
+    {
+        $id = $request->request->get('id');
+        $binding = $bindingRepository->find($id);
+        
+        if (!$binding) {
+            throw $this->createNotFoundException('Binding not found');
+        }
+
+        $configId = $request->request->get('emailConfigId');
+        if ($configId) {
+            $config = $configRepository->find($configId);
+            $binding->setEmailConfig($config);
+        } else {
+            $binding->setEmailConfig(null);
+        }
+
+        $templateId = $request->request->get('emailTemplateId');
+        if ($templateId) {
+            $template = $templateRepository->find($templateId);
+            $binding->setEmailTemplate($template);
+        } else {
+            $binding->setEmailTemplate(null);
+        }
+
+        $em->flush();
+        
+        $this->addFlash('success', $this->translator->trans('admin_email.flash.binding_saved'));
+
+        return $this->redirectToRoute('admin_email_index', ['tab' => 'bindings']);
     }
 
     #[Route('/template/save', name: 'admin_email_template_save', methods: ['POST'])]
@@ -210,10 +281,12 @@ class EmailConfigController extends AbstractController
             return $this->redirectToRoute('admin_email_index');
         }
 
+        $bodyHtml = $this->emailHtmlSanitizer->sanitize((string) $request->request->get('bodyHtml'));
+
         $template->setCode($name);
         $template->setName($name);
         $template->setSubject($request->request->get('subject'));
-        $template->setBodyHtml($request->request->get('bodyHtml'));
+        $template->setBodyHtml($bodyHtml);
         $template->setDescription($request->request->get('description'));
 
         $configId = $request->request->get('emailConfigId');
@@ -226,9 +299,9 @@ class EmailConfigController extends AbstractController
 
         $em->flush();
 
-        $this->addFlash('success', 'Email template saved successfully.');
+        $this->addFlash('success', $this->translator->trans('admin_email.flash.template_saved'));
 
-        return $this->redirectToRoute('admin_email_index');
+        return $this->redirectToRoute('admin_email_index', ['tab' => 'templates']);
     }
 
     #[Route('/template/delete/{id}', name: 'admin_email_template_delete', methods: ['POST'])]
@@ -237,15 +310,15 @@ class EmailConfigController extends AbstractController
         $em->remove($template);
         $em->flush();
 
-        $this->addFlash('success', 'Email template deleted successfully.');
+        $this->addFlash('success', $this->translator->trans('admin_email.flash.template_deleted'));
 
-        return $this->redirectToRoute('admin_email_index');
+        return $this->redirectToRoute('admin_email_index', ['tab' => 'templates']);
     }
 
     #[Route('/template/preview', name: 'admin_email_template_preview', methods: ['POST'])]
     public function previewTemplate(Request $request): Response
     {
-        $html = $request->request->get('html');
+        $html = $this->emailHtmlSanitizer->sanitize($request->request->get('html'));
         $subject = $request->request->get('subject', 'No Subject');
         
         return $this->render('admin/email/preview.html.twig', [
@@ -304,7 +377,7 @@ class EmailConfigController extends AbstractController
 
             return \App\Controller\Api\ApiResponse::success(json_encode([]), 200, '连接成功，测试邮件已发送至 ' . $testEmail);
         } catch (\Exception $e) {
-            return \App\Controller\Api\ApiResponse::error(json_encode([]), 500, '连接失败: ' . $e->getMessage());
+            return \App\Controller\Api\ApiResponse::error(json_encode([]), 500, '连接失败，请检查邮件服务器配置。');
         }
     }
 }

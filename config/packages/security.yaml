@@ -22,6 +22,9 @@ security:
     main:
       lazy: true
       provider: all_users_provider
+      login_throttling:
+        max_attempts: 5
+        interval: '15 minutes'
       custom_authenticator: App\Security\AppCustomAuthenticator
       webauthn:
         success_handler: App\Security\WebauthnSuccessHandler
@@ -50,12 +53,21 @@ security:
       # https://symfony.com/doc/current/security/impersonating_user.html
       # switch_user: true
 
+  role_hierarchy:
+    ROLE_ADMIN: ROLE_USER
+    ROLE_SYS_ADMIN: ROLE_ADMIN
+
   # Easy way to control access for large sections of your site
   # Note: Only the *first* access control that matches will be used
   access_control:
     - { path: ^/login, roles: PUBLIC_ACCESS }
-    # - { path: ^/admin, roles: ROLE_ADMIN }
-    # - { path: ^/profile, roles: ROLE_USER }
+    - { path: ^/reset-password, roles: PUBLIC_ACCESS }
+    - { path: ^/test, roles: PUBLIC_ACCESS }
+    - { path: ^/api/admin, roles: ROLE_ADMIN }
+    - { path: ^/admin, roles: ROLE_ADMIN }
+    - { path: ^/api/storage, roles: ROLE_USER }
+    - { path: '^/api/employee/[^/]+/avatar', roles: ROLE_USER }
+    - { path: ^/, roles: ROLE_USER }
 
 when@test:
   security:

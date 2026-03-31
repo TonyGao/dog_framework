@@ -1,4 +1,3 @@
-
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -26,14 +25,14 @@
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
 
-###> 忽略 node_modules
+###> 忽略 node_modules ###
 node_modules/
 node_modules/**/*
-###< 忽略 node_modules
+###< 忽略 node_modules ###
 
-###> 忽略字体文件，要支持所有字体格式
+###> 忽略字体文件，要支持所有字体格式 ###
 *.woff2 *.ttf *.eot *.svg *.otf filter=lfs diff=lfs merge=lfs -text
-###< 忽略字体文件
+###< 忽略字体文件 ###
 
 temp.md
 .env
@@ -42,6 +41,7 @@ temp.md
 .idea/
 .vscode/
 .DS_Store
+.trae/
 ###< IDE & OS Files ###
 
 ###> Uploads & Backups ###
@@ -60,4 +60,27 @@ backups/
 test_*.php
 test_*.html
 tests/test*.html
+test_collection.php
+test_db.php
+test_employee_form.php
+test_json.php
+test_render.php
+test_submit.php
+test_twig.php
+test_twig_select.php
+test_click.html
+test_hidden.html
+test_post.html
+test_we.html
 ###< Test Scratch Files ###
+
+###> Binary & Empty Dirs ###
+frankenphp
+formFactory/
+vuse/
+###< Binary & Empty Dirs ###
+
+###> Cache Files ###
+.twig-cs-fixer.cache
+.php-cs-fixer.cache
+###< Cache Files ###

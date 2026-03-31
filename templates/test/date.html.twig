@@ -1,0 +1,303 @@
+{% extends "base.html.twig" %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <style>
+    .demo-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .demo-header {
+      margin-bottom: 40px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 24px;
+    }
+    .demo-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 12px;
+    }
+    .demo-desc {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .demo-section {
+      margin-bottom: 48px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .demo-section-header {
+      background: #f9fafb;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .demo-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #374151;
+      margin: 0;
+    }
+    .demo-section-desc {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      padding: 24px;
+    }
+    .demo-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .demo-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #4b5563;
+    }
+    .code-tag {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      color: #0f172a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    .time-picker-only .calendar-table {
+        display: none !important;
+    }
+  </style>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script>
+    $(document).ready(function() {
+      // 1. Date Picker
+      $('.date-picker').daterangepicker({
+        ...EFDate.getDefaultOptions('YYYY-MM-DD'),
+        singleDatePicker: true,
+        showDropdowns: true,
+        autoUpdateInput: false
+      }).on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD'));
+      }).on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+      });
+
+      // 2. DateTime Picker
+      $('.datetime-picker').daterangepicker({
+        ...EFDate.getDefaultOptions('YYYY-MM-DD HH:mm'),
+        singleDatePicker: true,
+        timePicker: true,
+        timePicker24Hour: true,
+        showDropdowns: true,
+        autoUpdateInput: false
+      }).on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm'));
+      }).on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+      });
+
+      // 3. Time Picker (Hack using daterangepicker)
+      $('.time-picker').daterangepicker({
+        ...EFDate.getDefaultOptions('HH:mm'),
+        singleDatePicker: true,
+        timePicker: true,
+        timePicker24Hour: true,
+        autoUpdateInput: false
+      }).on('show.daterangepicker', function (ev, picker) {
+          picker.container.addClass('time-picker-only');
+      }).on('hide.daterangepicker', function (ev, picker) {
+          picker.container.removeClass('time-picker-only');
+      }).on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('HH:mm'));
+      }).on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+      });
+
+      // 4. DateTimeRange Picker
+      $('.datetimerange-picker').daterangepicker({
+        ...EFDate.getDefaultOptions('YYYY-MM-DD HH:mm'),
+        timePicker: true,
+        timePicker24Hour: true,
+        autoUpdateInput: false
+      }).on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('YYYY-MM-DD HH:mm') + ' - ' + picker.endDate.format('YYYY-MM-DD HH:mm'));
+      }).on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+      });
+
+      // Wrapper click forwards to input to trigger datepickers
+      $('.ef-input-wrapper').on('click', function(e) {
+        if ($(e.target).is('input') || $(e.target).closest('.ef-input-clear-btn').length) return; // prevent infinite loop or clear btn interference
+        var $input = $(this).find('input');
+        if ($input.length > 0) {
+            $input[0].click(); // use native click to ensure daterangepicker and native pickers open reliably
+            $input.focus();
+        }
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block body %}
+<div class="demo-container">
+  <div class="demo-header">
+    <h1 class="demo-title">{{ 'test.date.title'|trans }}</h1>
+    <p class="demo-desc">{{ 'test.date.desc'|trans|raw }}</p>
+  </div>
+
+  <!-- 1. Date (Symfony Date Constraint) -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">{{ 'test.date.section.date.title'|trans }}</h2>
+      <p class="demo-section-desc">{{ 'test.date.section.date.desc'|trans|raw }}</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.rounded'|trans }}</span>
+        <span class="ef-input-wrapper ef-input-rounded">
+          <input class="ef-input ef-input-size-medium text date-picker" type="text" placeholder="{{ 'test.date.placeholder.date'|trans }}" autocomplete="off">
+        </span>
+      </div>
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.square'|trans }}</span>
+        <span class="ef-input-wrapper">
+          <input class="ef-input ef-input-size-medium text date-picker" type="text" placeholder="{{ 'test.date.placeholder.date'|trans }}" autocomplete="off">
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. DateTime (Symfony DateTime Constraint) -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">{{ 'test.date.section.datetime.title'|trans }}</h2>
+      <p class="demo-section-desc">{{ 'test.date.section.datetime.desc'|trans|raw }}</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.rounded'|trans }}</span>
+        <span class="ef-input-wrapper ef-input-rounded">
+          <input class="ef-input ef-input-size-medium text datetime-picker" type="text" placeholder="{{ 'test.date.placeholder.datetime'|trans }}" autocomplete="off">
+        </span>
+      </div>
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.square'|trans }}</span>
+        <span class="ef-input-wrapper">
+          <input class="ef-input ef-input-size-medium text datetime-picker" type="text" placeholder="{{ 'test.date.placeholder.datetime'|trans }}" autocomplete="off">
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Time (Symfony Time Constraint) -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">{{ 'test.date.section.time.title'|trans }}</h2>
+      <p class="demo-section-desc">{{ 'test.date.section.time.desc'|trans|raw }}</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.rounded'|trans }}</span>
+        <span class="ef-input-wrapper ef-input-rounded">
+          <input class="ef-input ef-input-size-medium text time-picker" type="text" placeholder="{{ 'test.date.placeholder.time'|trans }}" autocomplete="off">
+        </span>
+      </div>
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.square'|trans }}</span>
+        <span class="ef-input-wrapper">
+          <input class="ef-input ef-input-size-medium text time-picker" type="text" placeholder="{{ 'test.date.placeholder.time'|trans }}" autocomplete="off">
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Timezone (Symfony Timezone Constraint) -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">{{ 'test.date.section.timezone.title'|trans }}</h2>
+      <p class="demo-section-desc">{{ 'test.date.section.timezone.desc'|trans|raw }}</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.rounded'|trans }}</span>
+        <span class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium ef-input-rounded" style="height: 36px; line-height: 36px;">
+          <select class="ef-input" style="border:none; width: 100%; height: 100%; outline: none; background: transparent; padding: 0 12px;">
+            <option value="Asia/Shanghai">Asia/Shanghai (GMT+08:00)</option>
+            <option value="UTC">UTC (GMT+00:00)</option>
+            <option value="America/New_York">America/New_York (GMT-05:00)</option>
+          </select>
+        </span>
+      </div>
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.square'|trans }}</span>
+        <span class="ef-select-view-single ef-select ef-select-view ef-select-view-size-medium" style="height: 36px; line-height: 36px;">
+          <select class="ef-input" style="border:none; width: 100%; height: 100%; outline: none; background: transparent; padding: 0 12px;">
+            <option value="Asia/Shanghai">Asia/Shanghai (GMT+08:00)</option>
+            <option value="UTC">UTC (GMT+00:00)</option>
+            <option value="America/New_York">America/New_York (GMT-05:00)</option>
+          </select>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Week (Symfony Week Constraint) -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">{{ 'test.date.section.week.title'|trans }}</h2>
+      <p class="demo-section-desc">{{ 'test.date.section.week.desc'|trans|raw }}</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.rounded'|trans }}</span>
+        <span class="ef-input-wrapper ef-input-rounded">
+          <input class="ef-input ef-input-size-medium text" type="week">
+        </span>
+      </div>
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.square'|trans }}</span>
+        <span class="ef-input-wrapper">
+          <input class="ef-input ef-input-size-medium text" type="week">
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. DateTimeRange (Custom Type) -->
+  <div class="demo-section">
+    <div class="demo-section-header">
+      <h2 class="demo-section-title">{{ 'test.date.section.datetimerange.title'|trans }}</h2>
+      <p class="demo-section-desc">{{ 'test.date.section.datetimerange.desc'|trans|raw }}</p>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.rounded'|trans }}</span>
+        <span class="ef-input-wrapper ef-input-rounded" style="width: 100%; min-width: 380px;">
+          <input class="ef-input ef-input-size-medium text datetimerange-picker" type="text" placeholder="{{ 'test.date.placeholder.datetimerange'|trans }}" autocomplete="off" style="width: 100%; cursor: pointer;">
+        </span>
+      </div>
+      <div class="demo-item">
+        <span class="demo-label">{{ 'test.date.label.square'|trans }}</span>
+        <span class="ef-input-wrapper" style="width: 100%; min-width: 380px;">
+          <input class="ef-input ef-input-size-medium text datetimerange-picker" type="text" placeholder="{{ 'test.date.placeholder.datetimerange'|trans }}" autocomplete="off" style="width: 100%; cursor: pointer;">
+        </span>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

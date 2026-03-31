@@ -4,6 +4,7 @@ namespace App\Entity\Storage;
 
 use App\Repository\Storage\FileRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
 #[ORM\Table(name: 'storage_files')]
@@ -47,7 +48,7 @@ class File
 
     public function __construct()
     {
-        $this->id = uuid_create();
+        $this->id = Uuid::v4()->toRfc4122();
         $this->createdAt = new \DateTimeImmutable();
     }
 
