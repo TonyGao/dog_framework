@@ -133,10 +133,16 @@ class ResetPasswordController extends AbstractController
             ]);
             $this->addFlash('success', $translator->trans('security.reset_password.link_sent', ['%email%' => $user->getEmail()], 'messages'));
         } catch (\DomainException $e) {
+            // Handle cases where mail service is intentionally mocked or disabled
             $this->addFlash('info', $translator->trans('security.reset_password.link_sent_mock', [
                 '%email%' => $user->getEmail(),
                 '%token%' => substr($token, 0, 8) . '...'
             ], 'messages'));
+        } catch (\Exception $e) {
+            // Log the error but don't crash the application
+            // In a development environment, showing the link helps the developer continue
+            $this->addFlash('error', '邮件发送失败: ' . $e->getMessage());
+            $this->addFlash('info', '由于邮件发送失败，您可以在此直接使用重置链接（仅供开发测试）：' . $resetUrl);
         }
 
         return $this->redirectToRoute('app_reset_password_check_email', ['id' => $id]);

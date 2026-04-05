@@ -17,6 +17,33 @@ class AiSearchController extends AbstractController
         private LoggerInterface $logger
     ) {}
 
+    #[Route('/parse-policy', name: 'api_admin_ai_parse_policy', methods: ['POST'])]
+    public function parsePolicy(Request $request): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+            $text = $data['text'] ?? '';
+
+            if (empty($text)) {
+                return new JsonResponse(['error' => 'Missing text instruction'], 400);
+            }
+
+            $agent = $this->agentManager->getPasswordPolicyAgent();
+            $result = $agent->parsePolicyInstruction($text);
+
+            if (isset($result['error'])) {
+                return new JsonResponse($result, 500);
+            }
+
+            return new JsonResponse([
+                'expression' => $result
+            ]);
+        } catch (\Exception $e) {
+            $this->logger->error('AI Parse Policy Error: ' . $e->getMessage());
+            return new JsonResponse(['error' => $e->getMessage()], 500);
+        }
+    }
+
     #[Route('/parse-query', name: 'api_admin_ai_parse_query', methods: ['POST'])]
     public function parseQuery(Request $request): JsonResponse
     {

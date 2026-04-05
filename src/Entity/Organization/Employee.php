@@ -162,14 +162,24 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     private $terminationDate;
 
     /**
-     * 员工状态（在职/离职/试用期等）
+     * 在职状态（在职/离职）
      * @Ef(
      *     group="employee_job_info",
      *     isBF=true
      * )
      */
     #[ORM\Column(type: 'string', length: 20)]
-    private $status = 'active';
+    private $employmentStatus = 'active';
+
+    /**
+     * 工作状态（工作/休假/出差/外出/会议中）
+     * @Ef(
+     *     group="employee_job_info",
+     *     isBF=true
+     * )
+     */
+    #[ORM\Column(type: 'string', length: 20)]
+    private $workStatus = 'working';
 
     /**
      * 所属公司
@@ -226,6 +236,12 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column(type: 'json')]
     private $roles = [];
+
+    /**
+     * 是否为系统账号 (不属于正常员工，不在花名册展示)
+     */
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private $isSystem = false;
 
     /**
      * 最后登录时间
@@ -341,12 +357,20 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $address;
 
+    /**
+     * Managed Departments
+     */
+    #[ORM\ManyToMany(targetEntity: Department::class, inversedBy: 'manager')]
+    #[ORM\JoinTable(name: 'org_department_managers')]
+    private $managedDepartments;
+
     public function __construct()
     {
         // 自动生成 UUID
         $this->id = Uuid::v4();
         $this->subordinates = new ArrayCollection();
         $this->passkeys = new ArrayCollection();
+        $this->managedDepartments = new ArrayCollection();
     }
 
     /**
@@ -667,23 +691,66 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Get 员工状态（在职/离职/试用期等）
+     * Get 在职状态
      */
-    public function getStatus()
+    public function getEmploymentStatus()
     {
-        return $this->status;
+        return $this->employmentStatus;
     }
 
     /**
-     * Set 员工状态（在职/离职/试用期等）
+     * Set 在职状态
      *
      * @return  self
      */
-    public function setStatus($status)
+    public function setEmploymentStatus($employmentStatus)
     {
-        $this->status = $status;
+        $this->employmentStatus = $employmentStatus;
+
+        // 离职自动停用账户，在职自动启用账户
+        if ($employmentStatus === 'inactive') {
+            $this->isActive = false;
+        } elseif ($employmentStatus === 'active') {
+            $this->isActive = true;
+        }
 
         return $this;
+    }
+
+    /**
+     * Get 工作状态
+     */
+    public function getWorkStatus()
+    {
+        return $this->workStatus;
+    }
+
+    /**
+     * Set 工作状态
+     *
+     * @return  self
+     */
+    public function setWorkStatus($workStatus)
+    {
+        $this->workStatus = $workStatus;
+
+        return $this;
+    }
+
+    /**
+     * 兼容旧代码，获取状态（返回在职状态）
+     */
+    public function getStatus()
+    {
+        return $this->employmentStatus;
+    }
+
+    /**
+     * 兼容旧代码，设置状态（设置在职状态）
+     */
+    public function setStatus($status)
+    {
+        return $this->setEmploymentStatus($status);
     }
 
     /**
@@ -820,6 +887,24 @@ class Employee implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastLoginAt($lastLoginAt)
     {
         $this->lastLoginAt = $lastLoginAt;
+
+        return $this;
+    }
+
+    /**
+     * Get 是否为系统账号
+     */
+    public function getIsSystem(): bool
+    {
+        return $this->isSystem;
+    }
+
+    /**
+     * Set 是否为系统账号
+     */
+    public function setIsSystem(bool $isSystem): self
+    {
+        $this->isSystem = $isSystem;
 
         return $this;
     }

@@ -51,12 +51,14 @@ class UserSetupListener
             // But we can check route name or path
         ];
 
-        // Check path info for WebAuthn routes
+        // Check path info for WebAuthn routes and API presence
         $pathInfo = $event->getRequest()->getPathInfo();
-        if (str_starts_with($pathInfo, '/user/webauthn') || str_starts_with($pathInfo, '/login')) {
+        if (str_starts_with($pathInfo, '/user/webauthn') || str_starts_with($pathInfo, '/login') || str_starts_with($pathInfo, '/api/presence') || str_starts_with($pathInfo, '/api/mercure')) {
             return;
         }
 
+        // If it's an AJAX request, we might want to return 403 instead of a redirect,
+        // but for now, just ignoring presence APIs is enough to fix the EventSource error.
         if (in_array($currentRoute, $allowedRoutes)) {
             return;
         }

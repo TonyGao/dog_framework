@@ -131,29 +131,69 @@
 
 {% block app_content_container %}
 <div class="edit-container">
-    <div class="edit-header">
-        <div class="edit-title" data-ef-sync="employee:{{ employee.id }}">
-            {% if employee.avatar %}
-                <img src="{{ employee.avatar }}" class="edit-avatar" id="edit-avatar-img-{{ employee.id }}" alt="Avatar">
-                <div class="edit-avatar-fallback" id="edit-avatar-fallback-{{ employee.id }}" style="display: none;"></div>
-            {% else %}
-                <img src="{{ employee.avatar }}" class="edit-avatar" id="edit-avatar-img-{{ employee.id }}" alt="Avatar" style="display: none;">
-                <div class="edit-avatar-fallback" id="edit-avatar-fallback-{{ employee.id }}">
-                    {{ employee.name|slice(-2) }}
-                </div>
-            {% endif %}
+    <div class="edit-header" style="flex-direction: column; align-items: flex-start; gap: 24px; border-bottom: none; margin-bottom: 0;">
+        <div class="edit-title" style="font-size: 24px;">
             {{ 'employee.detail.action.edit'|trans }} - {{ employee.name }}
+        </div>
+        
+        <div class="profile-summary" style="display: flex; gap: 24px; align-items: center; background: #f8fafc; padding: 20px; border-radius: 12px; width: 100%; border: 1px solid #e2e8f0;">
+            <div id="edit-avatar-img-{{ employee.id }}" data-ef-sync="employee:{{ employee.id }}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; cursor: pointer; display: flex; align-items: center; justify-content: center; background: #3b82f6; color: #fff; font-size: 28px; font-weight: 600; flex-shrink: 0;" onclick="openAvatarModal('{{ employee.id }}')">
+                {% if employee.avatar %}
+                    <img src="{{ employee.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                {% else %}
+                    {{ employee.name|slice(-2) }}
+                {% endif %}
+            </div>
+            <div style="flex: 1;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <div style="font-size: 20px; font-weight: 600; color: #0f172a; margin-bottom: 4px;">{{ employee.name }}</div>
+                        <div style="font-size: 14px; color: #64748b;">{{ employee.englishName|default('') }}</div>
+                    </div>
+                    {% set status_class = {
+                        'active': 'ef-badge-success',
+                        'inactive': 'ef-badge-danger'
+                    }[employee.employmentStatus] | default('ef-badge-secondary') %}
+                    <span class="ef-badge {{ status_class }}" style="padding: 6px 12px; font-size: 13px;">{{ ('employee.employment_status.' ~ employee.employmentStatus)|trans }}</span>
+                </div>
+                <div style="margin-top: 12px; display: flex; gap: 20px; font-size: 14px; color: #475569;">
+                    <span><i class="fa-solid fa-briefcase" style="margin-right: 8px; color: #94a3b8;"></i>{{ employee.position ? employee.position.name : ('employee.field.no_position'|trans|default('No Position')) }}</span>
+                    <span style="display: flex; align-items: center; gap: 4px;">
+                        {% set work_icon = {
+                            'working': 'fa-briefcase',
+                            'vacation': 'fa-umbrella-beach',
+                            'business_trip': 'fa-plane',
+                            'out_of_office': 'fa-person-walking-arrow-right',
+                            'in_meeting': 'fa-users'
+                        }[employee.workStatus] | default('fa-circle') %}
+                        <i class="fa-solid {{ work_icon }}" style="color: #94a3b8;"></i>
+                        {{ ('employee.work_status.' ~ employee.workStatus)|trans }}
+                    </span>
+                    <span><i class="fa-solid fa-envelope" style="margin-right: 8px; color: #94a3b8;"></i>{{ employee.email }}</span>
+                </div>
+            </div>
         </div>
     </div>
 
     {% for message in app.flashes('success') %}
-        <div style="background: #dcfce7; color: #166534; padding: 12px 16px; border-radius: 6px; margin-bottom: 24px; font-size: 14px;">
+        <div style="background: #dcfce7; color: #166534; padding: 12px 16px; border-radius: 6px; margin: 24px 0; font-size: 14px;">
             <i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i> {{ message|trans }}
         </div>
     {% endfor %}
 
-    {{ form_start(form, {'attr': {'class': 'edit-form'}}) }}
-        <div class="form-grid">
+    <div style="margin-top: 24px;">
+        {{ form_start(form, {'attr': {'class': 'edit-form'}}) }}
+            <div class="form-grid">
+            <div class="form-group">
+                {{ form_label(form.name, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.name) }}
+                {{ form_errors(form.name) }}
+            </div>
+            <div class="form-group">
+                {{ form_label(form.englishName, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.englishName) }}
+                {{ form_errors(form.englishName) }}
+            </div>
             <div class="form-group">
                 {{ form_label(form.employeeNo, null, {'label_attr': {'class': 'form-label'}}) }}
                 {{ form_widget(form.employeeNo) }}
@@ -161,15 +201,33 @@
             </div>
             
             <div class="form-group">
-                {{ form_label(form.status, null, {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_widget(form.status) }}
-                {{ form_errors(form.status) }}
+                {{ form_label(form.employmentStatus, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.employmentStatus) }}
+                {{ form_errors(form.employmentStatus) }}
+            </div>
+            
+            <div class="form-group">
+                {{ form_label(form.workStatus, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.workStatus) }}
+                {{ form_errors(form.workStatus) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.isActive, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.isActive) }}
+                {{ form_errors(form.isActive) }}
             </div>
 
             <div class="form-group">
                 {{ form_label(form.hireDate, null, {'label_attr': {'class': 'form-label'}}) }}
                 {{ form_widget(form.hireDate) }}
                 {{ form_errors(form.hireDate) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.position, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.position) }}
+                {{ form_errors(form.position) }}
             </div>
 
             <div class="form-group">
@@ -230,6 +288,24 @@
         // The ef-mercure.js library is already loaded in base.html.twig
         // Data-ef-sync attribute will trigger automatic updates
         $(document).ready(function() {
+            // 状态联动：在职状态 -> 账号状态
+            (function() {
+                const employmentStatusSelect = document.getElementById('employee_employmentStatus');
+                const accountStatusSelect = document.getElementById('employee_isActive');
+
+                if (employmentStatusSelect && accountStatusSelect) {
+                    employmentStatusSelect.addEventListener('change', function() {
+                        const val = this.value;
+                        if (val === 'inactive') {
+                            accountStatusSelect.value = '0';
+                        } else if (val === 'active') {
+                            accountStatusSelect.value = '1';
+                        }
+                        $(accountStatusSelect).trigger('change');
+                    });
+                }
+            })();
+
             // Listen for sync events on the avatar container
             $('.edit-title').on('ef:sync', function(e, data) {
                 if (data && data.entity === 'Employee' && data.id === '{{ employee.id }}') {

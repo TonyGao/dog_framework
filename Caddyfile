@@ -19,7 +19,7 @@ http://localhost:8000 {
 			}
 			publisher_jwt !ChangeThisMercureHubJWTSecretKey!
 			subscriber_jwt !ChangeThisMercureHubJWTSecretKey!
-			cors_origins *
+			cors_origins http://localhost:8000
 			publish_origins *
 			anonymous
 		}

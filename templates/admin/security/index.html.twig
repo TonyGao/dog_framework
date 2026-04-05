@@ -124,12 +124,22 @@
         <div class="security-title">{{ 'admin_security.title'|trans }}</div>
         
         <div class="security-tabs">
-            <div class="security-tab active">{{ 'admin_security.tabs.2fa_settings'|trans }}</div>
+            <a href="{{ path('admin_security_index') }}" class="security-tab active" style="text-decoration: none;">{{ 'admin_security.tabs.2fa_settings'|trans }}</a>
+            <a href="{{ path('admin_security_password_policy') }}" class="security-tab" style="text-decoration: none;">{{ 'admin_security.tabs.password_policy'|trans }}</a>
         </div>
 
         <div class="ef-row ef-row-align-start ef-row-justify-start">
             <div class="ef-col-16" style="padding-right: 60px;">
                 
+                {% for message in app.flashes('success') %}
+                    <div role="alert" class="ef-alert ef-alert-success" style="margin-bottom: 32px; border-radius: 12px; padding: 20px; background-color: #f0fdf4; color: #166534;">
+                        <div class="ef-alert-icon" style="color: #16a34a;"><i class="fa-solid fa-circle-check" style="font-size: 18px;"></i></div>
+                        <div class="ef-alert-body">
+                            <div class="ef-alert-content" style="font-size: 14px;">{{ message }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+
                 <div role="alert" class="ef-alert ef-alert-info" style="margin-bottom: 32px; background-color: #f0f4f8; border: none; border-radius: 12px; padding: 20px;">
                     <div class="ef-alert-icon" style="color: #0066cc; align-self: flex-start; margin-top: 2px;">
                         <i class="fa-solid fa-circle-info" style="font-size: 18px;"></i>

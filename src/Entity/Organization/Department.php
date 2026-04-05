@@ -97,7 +97,7 @@ class Department implements GedmoNode
 	 *     isBF=true
 	 * )
 	 */
-	#[ORM\ManyToMany(targetEntity: 'App\Entity\OrgUser', mappedBy: 'managedDepartments')]
+	#[ORM\ManyToMany(targetEntity: Employee::class, mappedBy: 'managedDepartments')]
 	private $manager;
 
 	/**

@@ -123,11 +123,20 @@ class EmailConfigController extends AbstractController
             $transport = \Symfony\Component\Mailer\Transport::fromDsn($dsn);
             $mailer = new \Symfony\Component\Mailer\Mailer($transport);
 
+            // Unmangle Twig tags
+            $unmangle = function($text) {
+                return preg_replace_callback('/\{\{(.*?)\}\}/', function($matches) {
+                    return '{{' . urldecode($matches[1]) . '}}';
+                }, $text ?: '');
+            };
+            $subject = $unmangle($subject);
+            $bodyHtml = $unmangle($bodyHtml);
+
             // Render twig if it contains variables (dummy data for testing)
             try {
                 $renderedSubject = $twig->createTemplate($subject ?: '')->render(['code' => '123456', 'user.email' => 'test@example.com']);
                 $renderedBody = $twig->createTemplate($bodyHtml ?: '')->render(['code' => '123456', 'user.email' => 'test@example.com', 'username' => 'john.doe', 'login_url' => 'https://example.com/login', 'reset_url' => 'https://example.com/reset', 'announcement_title' => '系统通知', 'announcement_body' => '系统将于今晚升级']);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // If twig rendering fails (e.g. syntax error in template), fallback to original
                 $renderedSubject = $subject;
                 $renderedBody = $bodyHtml;
@@ -281,11 +290,20 @@ class EmailConfigController extends AbstractController
             return $this->redirectToRoute('admin_email_index');
         }
 
-        $bodyHtml = $this->emailHtmlSanitizer->sanitize((string) $request->request->get('bodyHtml'));
+        $bodyHtmlRaw = (string) $request->request->get('bodyHtml');
+        $bodyHtml = $this->emailHtmlSanitizer->sanitize($bodyHtmlRaw);
+
+        // Unmangle Twig tags that might have been URL-encoded by DOMDocument in sanitizer (e.g. {{%20var%20}})
+        $unmangle = function($text) {
+            return preg_replace_callback('/\{\{(.*?)\}\}/', function($matches) {
+                return '{{' . urldecode($matches[1]) . '}}';
+            }, $text ?: '');
+        };
+        $bodyHtml = $unmangle($bodyHtml);
 
         $template->setCode($name);
         $template->setName($name);
-        $template->setSubject($request->request->get('subject'));
+        $template->setSubject($unmangle($request->request->get('subject')));
         $template->setBodyHtml($bodyHtml);
         $template->setDescription($request->request->get('description'));
 
@@ -319,6 +337,12 @@ class EmailConfigController extends AbstractController
     public function previewTemplate(Request $request): Response
     {
         $html = $this->emailHtmlSanitizer->sanitize($request->request->get('html'));
+        
+        // Unmangle Twig tags
+        $html = preg_replace_callback('/\{\{(.*?)\}\}/', function($matches) {
+            return '{{' . urldecode($matches[1]) . '}}';
+        }, $html ?: '');
+
         $subject = $request->request->get('subject', 'No Subject');
         
         return $this->render('admin/email/preview.html.twig', [

@@ -2,8 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\System\SystemUser;
-use App\Repository\System\SystemUserRepository;
+use App\Entity\Organization\Employee;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -20,8 +19,7 @@ class InitOfficersCommand extends Command
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private UserPasswordHasherInterface $passwordHasher,
-        private SystemUserRepository $userRepository
+        private UserPasswordHasherInterface $passwordHasher
     ) {
         parent::__construct();
     }
@@ -36,19 +34,26 @@ class InitOfficersCommand extends Command
             'auditor'   => ['role' => 'ROLE_AUDITOR', 'name' => 'Security Auditor'],
         ];
 
+        $employeeRepo = $this->entityManager->getRepository(Employee::class);
+
         foreach ($officers as $username => $data) {
-            $user = $this->userRepository->findOneBy(['username' => $username]);
+            $user = $employeeRepo->findOneBy(['username' => $username]);
             
             if (!$user) {
-                $user = new SystemUser();
+                $user = new Employee();
                 $user->setUsername($username);
+                $user->setEmail($username . '@system.local');
+                $user->setName($data['name']);
+                $user->setEmployeeNo('SYS_' . strtoupper($username));
+                $user->setEmploymentStatus('active');
+                $user->setWorkStatus('working');
                 $io->note(sprintf('Creating user "%s"...', $username));
             } else {
                 $io->note(sprintf('Updating user "%s"...', $username));
             }
 
             $user->setRoles([$data['role']]);
-            $user->setIsActive(true);
+            $user->setIsSystem(true);
             
             // Default password
             $password = 'Officer@123'; 

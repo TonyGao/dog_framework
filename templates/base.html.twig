@@ -23,6 +23,7 @@
     <meta name="view-editor-undo-steps" content="{{ app.request.server.get('VIEW_EDITOR_UNDO_STEPS', 50) }}">
     <meta name="view-editor-version" content="1.0">
     <meta name="mercure-hub-url" content="{{ mercure_public_url() }}">
+    <meta name="mercure-heartbeat-mode" content="{{ app.environment == 'dev' ? 'sse' : 'ajax' }}">
 		<title>
 			{% block title %}Welcome!{% endblock %}
 		</title>
@@ -78,6 +79,7 @@
 			<script src="{{ asset('lib/ef/base/ef-mercure.js') }}"></script>
 			<script src="{{ asset('lib/pinyin/browser.js') }}"></script>
 			<script src="{{ asset('lib/leader-line/leader-line.min.js') }}"></script>
+			<script src="{{ asset('lib/sortablejs/Sortable.min.js') }}"></script>
 			<script src="{{ asset('alert.js', 'ui') }}"></script>
 			<script src="{{ asset('input.js', 'ui') }}"></script>
 			<script src="{{ asset('toolbar.js', 'ui') }}"></script>
@@ -96,18 +98,20 @@
 			<script src="{{ asset('datagrid.js', 'ui') }}"></script>
 			<script src="{{ asset('modal.js', 'ui') }}"></script>
 			<script src="{{ asset('tip.js', 'ui') }}"></script>
-                        <script src="{{ asset('lib/daterangepicker/moment.min.js', 'static') }}"></script>
-                        <script src="{{ asset('lib/daterangepicker/daterangepicker.js', 'static') }}"></script>
-                        <script src="{{ asset('date.js', 'ui') }}"></script>
+      <script src="{{ asset('lib/daterangepicker/moment.min.js', 'static') }}"></script>
+      <script src="{{ asset('lib/daterangepicker/daterangepicker.js', 'static') }}"></script>
+      <script src="{{ asset('date.js', 'ui') }}"></script>
 			<script src="{{ asset('sunui/admin/platform/undo_redo_manager.js') }}"></script>
 			<script>
 				$(document).ready(function() {
-					// 初始化 Mercure 实时通信
+					// 初始化 Mercure 实时通信 (仅限已登录用户)
+					{% if app.user %}
 					if (window.EF && window.EF.Mercure) {
 						window.EF.Mercure.init();
 						// 开启在线心跳
 						window.EF.Mercure.startHeartbeat();
 					}
+					{% endif %}
 				});
 			</script>
 			<script src="{{ asset('lib/echarts/echarts.min.js') }}"></script>

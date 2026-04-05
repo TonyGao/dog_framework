@@ -425,10 +425,6 @@
                     {{ 'login.form.button.login'|trans }}
                 </button>
                 
-                <div class="signup-link">
-                    {{ 'login.form.text.signup_prompt'|trans }} <a href="#">{{ 'login.form.link.signup'|trans }}</a>
-                </div>
-                
                 <div class="divider">
                     <span>{{ 'login.form.divider.or'|trans }}</span>
                 </div>
@@ -444,6 +440,25 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const languageSelect = document.getElementById('language-select');
+        const loginForm = document.querySelector('form');
+        const usernameInput = document.getElementById('inputEmail');
+        const passwordInput = document.getElementById('inputPassword');
+        const rememberMeCheckbox = document.getElementById('_remember_me');
+
+        // Load remembered credentials
+        const rememberedUsername = localStorage.getItem('remembered_username');
+        const rememberedPassword = localStorage.getItem('remembered_password');
+        
+        if (rememberedUsername) {
+            usernameInput.value = rememberedUsername;
+            rememberMeCheckbox.checked = true;
+        }
+        if (rememberedPassword) {
+            try {
+                passwordInput.value = atob(rememberedPassword);
+            } catch(e) {}
+        }
+
         if (languageSelect) {
             languageSelect.addEventListener('change', (e) => {
                 const url = new URL(window.location.href);
@@ -452,8 +467,19 @@
             });
         }
 
+        if (loginForm) {
+            loginForm.addEventListener('submit', () => {
+                if (rememberMeCheckbox.checked) {
+                    localStorage.setItem('remembered_username', usernameInput.value);
+                    localStorage.setItem('remembered_password', btoa(passwordInput.value));
+                } else {
+                    localStorage.removeItem('remembered_username');
+                    localStorage.removeItem('remembered_password');
+                }
+            });
+        }
+
         const passkeyBtn = document.getElementById('passkey-login');
-        const usernameInput = document.getElementById('inputEmail');
         const forgotPasswordLink = document.getElementById('forgot-password-link');
 
         if (forgotPasswordLink) {

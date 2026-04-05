@@ -17,7 +17,7 @@ class UserPreferenceApiController extends AbstractController
     public function save(Request $request, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
-        if (!$user instanceof Employee) {
+        if (!$user) {
             return ApiResponse::error(json_encode(['message' => 'User not logged in']), 401, 'Unauthorized');
         }
 
@@ -29,12 +29,19 @@ class UserPreferenceApiController extends AbstractController
             return ApiResponse::error(json_encode(['message' => 'Invalid data']), 400, 'Bad Request');
         }
 
+        $userId = $user->getUserIdentifier();
+        if ($user instanceof \App\Entity\Organization\Employee) {
+            $userId = (string)$user->getId();
+        } else {
+            $userId = (string)$userId;
+        }
+
         $repo = $em->getRepository(UserPreference::class);
-        $pref = $repo->findOneBy(['user' => $user, 'prefKey' => $key]);
+        $pref = $repo->findOneBy(['userId' => $userId, 'prefKey' => $key]);
 
         if (!$pref) {
             $pref = new UserPreference();
-            $pref->setUser($user);
+            $pref->setUserId($userId);
             $pref->setPrefKey($key);
         }
 
@@ -49,7 +56,7 @@ class UserPreferenceApiController extends AbstractController
     public function get(Request $request, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
-        if (!$user instanceof Employee) {
+        if (!$user) {
             return ApiResponse::error(json_encode(['message' => 'User not logged in']), 401, 'Unauthorized');
         }
 
@@ -58,13 +65,16 @@ class UserPreferenceApiController extends AbstractController
             return ApiResponse::error(json_encode(['message' => 'Key is required']), 400, 'Bad Request');
         }
 
-        $repo = $em->getRepository(UserPreference::class);
-        $pref = $repo->findOneBy(['user' => $user, 'prefKey' => $key]);
-
-        if (!$pref) {
-            return ApiResponse::success(json_encode(['value' => null]), 200, 'Success');
+        $userId = $user->getUserIdentifier();
+        if ($user instanceof \App\Entity\Organization\Employee) {
+            $userId = (string)$user->getId();
+        } else {
+            $userId = (string)$userId;
         }
 
-        return ApiResponse::success(json_encode(['value' => $pref->getPrefValue()]), 200, 'Success');
+        $repo = $em->getRepository(UserPreference::class);
+        $pref = $repo->findOneBy(['userId' => $userId, 'prefKey' => $key]);
+
+        return ApiResponse::success(json_encode(['value' => $pref ? $pref->getPrefValue() : null]), 200, 'Success');
     }
 }

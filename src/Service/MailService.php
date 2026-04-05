@@ -85,12 +85,35 @@ class MailService
             }
 
             // Render subject and body using Twig
-            $twigTemplateSubject = $this->twig->createTemplate($template->getSubject());
-            $subject = $twigTemplateSubject->render($context);
+            $subjectRaw = $template->getSubject() ?: '';
+            $bodyRaw = $template->getBodyHtml() ?: '';
+
+            // Unmangle Twig tags that might have been URL-encoded by HTML sanitizers (e.g. {{%20var%20}})
+            $unmangle = function($text) {
+                return preg_replace_callback('/\{\{(.*?)\}\}/', function($matches) {
+                    return '{{' . urldecode($matches[1]) . '}}';
+                }, $text);
+            };
+
+            $subjectRaw = $unmangle($subjectRaw);
+            $bodyRaw = $unmangle($bodyRaw);
+
+            try {
+                $twigTemplateSubject = $this->twig->createTemplate($subjectRaw);
+                $subject = $twigTemplateSubject->render($context);
+            } catch (\Throwable $e) {
+                // Fallback to raw subject if Twig rendering fails
+                $subject = $subjectRaw;
+            }
             $log->setSubject($subject);
 
-            $twigTemplateBody = $this->twig->createTemplate($template->getBodyHtml());
-            $bodyHtml = $twigTemplateBody->render($context);
+            try {
+                $twigTemplateBody = $this->twig->createTemplate($bodyRaw);
+                $bodyHtml = $twigTemplateBody->render($context);
+            } catch (\Throwable $e) {
+                // Fallback to raw body if Twig rendering fails
+                $bodyHtml = $bodyRaw;
+            }
 
             // Build DSN
             $protocol = $config->getProtocol() ?: 'smtp';

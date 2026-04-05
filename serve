@@ -28,30 +28,76 @@ show_help() {
 }
 
 PID_FILE="$PROJECT_ROOT/var/frankenphp.pid"
+WORKER_PID_FILE="$PROJECT_ROOT/var/messenger_worker.pid"
 STATE_FILE="$PROJECT_ROOT/var/frankenphp.state"
 
 stop_server() {
+    echo "Stopping FrankenPHP and Messenger Worker..."
+    
+    # 1. 尝试通过 PID 文件停止 FrankenPHP
     if [ -f "$PID_FILE" ]; then
         PID=$(cat "$PID_FILE")
-        if kill -0 "$PID" 2>/dev/null; then
-            echo "Stopping FrankenPHP (PID: $PID)..."
+        if [ -n "$PID" ] && kill -0 "$PID" 2>/dev/null; then
+            echo "Stopping FrankenPHP PID $PID..."
             kill "$PID" 2>/dev/null || true
-            rm -f "$PID_FILE"
-            echo "Server stopped."
-        else
-            echo "Server not running (stale PID file)."
-            rm -f "$PID_FILE"
+            sleep 1
+            # 如果还没死，强制杀掉
+            if kill -0 "$PID" 2>/dev/null; then
+                echo "FrankenPHP PID $PID still running, forcing kill..."
+                kill -9 "$PID" 2>/dev/null || true
+            fi
         fi
-    else
-        echo "Stopping FrankenPHP via CLI..."
-        ./frankenphp stop 2>/dev/null || echo "No running server found."
+        rm -f "$PID_FILE"
     fi
+
+    # 1.5 尝试通过 PID 文件停止 Messenger Worker
+    if [ -f "$WORKER_PID_FILE" ]; then
+        WPID=$(cat "$WORKER_PID_FILE")
+        if [ -n "$WPID" ] && kill -0 "$WPID" 2>/dev/null; then
+            echo "Stopping Messenger Worker PID $WPID..."
+            kill "$WPID" 2>/dev/null || true
+            sleep 1
+            if kill -0 "$WPID" 2>/dev/null; then
+                kill -9 "$WPID" 2>/dev/null || true
+            fi
+        fi
+        rm -f "$WORKER_PID_FILE"
+    fi
+
+    # 2. 兜底：查找所有名为 frankenphp 的进程并杀掉（防止由于 PID 文件失效导致的僵死进程）
+    REMAINING_PIDS=$(ps aux | grep "[f]rankenphp" | awk '{print $2}')
+    if [ -n "$REMAINING_PIDS" ]; then
+        echo "Cleaning up remaining frankenphp processes..."
+        for RPID in $REMAINING_PIDS; do
+            kill -9 "$RPID" 2>/dev/null || true
+        done
+    fi
+
+    # 3. 尝试通过内置 stop 命令清理（可选）
+    ./frankenphp stop 2>/dev/null || true
+    
+    # 4. 兜底清理 symfony messenger worker
+    MESSENGER_PIDS=$(ps aux | grep "[p]hp bin/console messenger:consume async" | awk '{print $2}')
+    if [ -n "$MESSENGER_PIDS" ]; then
+        echo "Cleaning up remaining messenger worker processes..."
+        for MPID in $MESSENGER_PIDS; do
+            kill -9 "$MPID" 2>/dev/null || true
+        done
+    fi
+
     rm -f "$STATE_FILE"
+    echo "Server stopped."
 }
 
 start_dev() {
     echo "Starting FrankenPHP in DEV mode (hot reload enabled)..."
     echo "dev" > "$STATE_FILE"
+    
+    # Start Messenger Worker
+    php bin/console messenger:consume async -vv > "$PROJECT_ROOT/var/log/messenger_worker.log" 2>&1 &
+    echo $! > "$WORKER_PID_FILE"
+    echo "Messenger Worker started in background (PID: $(cat "$WORKER_PID_FILE"))."
+    
     ./frankenphp run --config Caddyfile --watch &
     echo $! > "$PID_FILE"
     echo "Server started in background (PID: $(cat "$PID_FILE"))."
@@ -62,6 +108,12 @@ start_dev() {
 start_prod() {
     echo "Starting FrankenPHP in PROD mode..."
     echo "prod" > "$STATE_FILE"
+    
+    # Start Messenger Worker
+    php bin/console messenger:consume async > "$PROJECT_ROOT/var/log/messenger_worker.log" 2>&1 &
+    echo $! > "$WORKER_PID_FILE"
+    echo "Messenger Worker started in background (PID: $(cat "$WORKER_PID_FILE"))."
+    
     ./frankenphp run --config Caddyfile &
     echo $! > "$PID_FILE"
     echo "Server started in background (PID: $(cat "$PID_FILE"))."

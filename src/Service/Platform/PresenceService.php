@@ -49,4 +49,12 @@ class PresenceService
         }
         return $item->get();
     }
+
+    /**
+     * 手动标记用户离线
+     */
+    public function markOffline(string $userId): void
+    {
+        $this->cache->deleteItem(self::CACHE_PREFIX . $userId);
+    }
 }

@@ -19,9 +19,8 @@ class UserPreference
     #[ORM\Column(type: "uuid", unique: true)]
     private $id;
 
-    #[ORM\ManyToOne(targetEntity: Employee::class)]
-    #[ORM\JoinColumn(nullable: false)]
-    private $user;
+    #[ORM\Column(type: 'string', length: 50)]
+    private $userId;
 
     #[ORM\Column(type: 'string', length: 100)]
     private $prefKey;
@@ -39,14 +38,14 @@ class UserPreference
         return $this->id;
     }
 
-    public function getUser(): ?Employee
+    public function getUserId(): ?string
     {
-        return $this->user;
+        return $this->userId;
     }
 
-    public function setUser(?Employee $user): self
+    public function setUserId(string $userId): self
     {
-        $this->user = $user;
+        $this->userId = $userId;
         return $this;
     }
 

@@ -8,6 +8,39 @@
     {{ parent() }}
     <link rel="stylesheet" type="text/css" href="{{ asset('platform/treeLayout.css', 'admin') }}"/>
     <style>
+        /* Draggable Column Styles */
+        .column-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: default;
+            transition: all 0.2s;
+        }
+        .column-item:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+        .column-drag-handle {
+            cursor: grab;
+            color: #94a3b8;
+            padding: 4px;
+        }
+        .column-drag-handle:active {
+            cursor: grabbing;
+        }
+        .column-item.sortable-ghost {
+            opacity: 0.4;
+            background: #eff6ff;
+            border: 1px dashed #3b82f6;
+        }
+        .column-item.sortable-chosen {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
         .custom-toolbar-box {
             background: #fff;
             padding: 15px 20px;
@@ -677,9 +710,10 @@
                             </div>
                             
                             <div class="filter-tabs">
-                                <button class="filter-tab active">{{ 'employee.filter.all'|trans }}</button>
-                                <button class="filter-tab"><i class="fa-regular fa-circle-check" style="margin-right: 4px;"></i> {{ 'employee.filter.active'|trans }}</button>
-                                <button class="filter-tab"><i class="fa-solid fa-user-clock" style="margin-right: 4px;"></i> {{ 'employee.filter.pending'|trans }}</button>
+                                {% set current_status = app.request.query.get('employment_status', 'active') %}
+                                <button class="filter-tab {% if current_status == 'active' %}active{% endif %}" onclick="filterEmploymentStatus('active')"><i class="fa-regular fa-circle-check" style="margin-right: 4px;"></i> {{ 'employee.employment_status.active'|trans }}</button>
+                                <button class="filter-tab {% if current_status == 'inactive' %}active{% endif %}" onclick="filterEmploymentStatus('inactive')"><i class="fa-solid fa-user-xmark" style="margin-right: 4px;"></i> {{ 'employee.employment_status.inactive'|trans }}</button>
+                                <button class="filter-tab {% if current_status == 'all' %}active{% endif %}" onclick="filterEmploymentStatus('all')">{{ 'employee.filter.all'|trans }}</button>
                             </div>
                             
                             <button class="btn outline medium mini round icon" style="color: #64748b; border-color: #e2e8f0; margin-left: 10px;" onclick="openColumnModal()">
@@ -701,11 +735,11 @@
                                 </button>
                             </div>
 
-                            <button class="btn outline medium mini round icon" style="color: #64748b; border-color: #e2e8f0;">
-                                <i class="fa-solid fa-file-export"></i>
+                            <button class="btn outline medium mini round" style="color: #64748b; border-color: #e2e8f0; display: inline-flex; align-items: center; gap: 6px;" onclick="exportEmployees()">
+                                <i class="fa-solid fa-file-export"></i> {{ 'employee.action.export'|trans({}, 'messages')|default('导出') }}
                             </button>
-                             <button class="btn outline medium mini round icon" style="color: #64748b; border-color: #e2e8f0;">
-                                <i class="fa-solid fa-file-import"></i>
+                            <button class="btn outline medium mini round" style="color: #64748b; border-color: #e2e8f0; display: inline-flex; align-items: center; gap: 6px;" onclick="openImportModal()">
+                                <i class="fa-solid fa-file-import"></i> {{ 'employee.action.import'|trans({}, 'messages')|default('导入') }}
                             </button>
                             <a href="{{ path('test_employee_onboarding') }}" class="btn primary medium mini round icon" style="background-color: #f97316; border-color: #f97316;">
                                 <i class="fa-solid fa-plus"></i>
@@ -733,11 +767,11 @@
                                 <tr>
                                     <th style="width: 40px;"><input type="checkbox" class="custom-checkbox" id="selectAll"></th>
                                     {% for key, config in columns %}
-                                        {% set sortIcon = 'fa-sort' %}
-                                        {% if currentSort == key %}
-                                            {% set sortIcon = currentOrder == 'asc' ? 'fa-sort-up' : 'fa-sort-down' %}
-                                        {% endif %}
                                         <th>
+                                            {% set sortIcon = 'fa-sort' %}
+                                            {% if currentSort == key %}
+                                                {% set sortIcon = currentOrder == 'asc' ? 'fa-sort-up' : 'fa-sort-down' %}
+                                            {% endif %}
                                             <a href="{{ path('employee_list', app.request.query.all|merge({'sort': key, 'order': currentSort == key and currentOrder == 'desc' ? 'asc' : 'desc'})) }}" style="color: inherit; text-decoration: none; display: flex; align-items: center;">
                                                 {{ config.label|trans }} <i class="fa-solid {{ sortIcon }}" style="margin-left: 6px;"></i>
                                             </a>
@@ -755,7 +789,7 @@
                                             <td>
                                                 <div class="user-info">
                                                     <div id="list-avatar-img-{{ item.id }}" class="custom-avatar" data-ef-sync="employee:{{ item.id }}" data-name="{{ item.name }}">{% if item.avatar %}<img src="{{ item.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% else %}{{ item.name|slice(-2, 2) }}{% endif %}</div>
-                                                    <span class="user-name sync-val-name" onclick="openEmployeeDrawer('{{ item.id }}')" style="cursor: pointer;">{{ item.name }}</span>
+                                                    <span class="user-name sync-val-name" onclick="openEmployeeDrawer('{{ item.id }}')" style="cursor: pointer; {% if item.employmentStatus == 'inactive' %}text-decoration: underline; text-decoration-color: #ef4444; text-underline-offset: 4px;{% endif %}">{{ item.name }}</span>
                                                 </div>
                                             </td>
                                         {% elseif key == 'employeeNo' %}
@@ -767,15 +801,28 @@
                                             </td>
                                         {% elseif key == 'position' %}
                                             <td class="sync-val-position">{{ item.position ? item.position.name : '' }}</td>
-                                        {% elseif key == 'status' %}
+                                        {% elseif key == 'employmentStatus' %}
                                             <td class="sync-val-status">
-                                                {% if item.status == 'active' %}
-                                                    <span class="status-pill status-active"><i class="fa-solid fa-check" style="margin-right:4px;"></i> {{ 'employee.status.active'|trans }}</span>
-                                                {% elseif item.status == 'inactive' %}
-                                                    <span class="status-pill status-inactive"><i class="fa-solid fa-xmark" style="margin-right:4px;"></i> {{ 'employee.status.inactive'|trans }}</span>
-                                                {% else %}
-                                                    <span class="status-pill status-vacation"><i class="fa-solid fa-umbrella-beach" style="margin-right:4px;"></i> {{ 'employee.status.vacation'|trans }}</span>
-                                                {% endif %}
+                                                <div style="font-size: 14px; color: #334155; display: flex; align-items: center; gap: 6px;">
+                                                    {% set status_icon = item.employmentStatus == 'active' ? 'fa-circle-check' : 'fa-user-xmark' %}
+                                                    {% set status_color = item.employmentStatus == 'active' ? '#22c55e' : '#ef4444' %}
+                                                    <i class="fa-solid {{ status_icon }}" style="color: {{ status_color }};"></i>
+                                                    {{ ('employee.employment_status.' ~ item.employmentStatus)|trans }}
+                                                </div>
+                                            </td>
+                                        {% elseif key == 'workStatus' %}
+                                            <td>
+                                                <div style="font-size: 14px; color: #334155; display: flex; align-items: center; gap: 6px;">
+                                                    {% set work_icon = {
+                                                        'working': 'fa-briefcase',
+                                                        'vacation': 'fa-umbrella-beach',
+                                                        'business_trip': 'fa-plane',
+                                                        'out_of_office': 'fa-person-walking-arrow-right',
+                                                        'in_meeting': 'fa-users'
+                                                    }[item.workStatus] | default('fa-circle') %}
+                                                    <i class="fa-solid {{ work_icon }}" style="color: #64748b;"></i>
+                                                    {{ ('employee.work_status.' ~ item.workStatus)|trans }}
+                                                </div>
                                             </td>
                                         {% elseif key == 'hireDate' %}
                                             <td class="sync-val-hireDate">{{ item.hireDate ? item.hireDate|date('Y-m-d') : '' }}</td>
@@ -813,19 +860,17 @@
                             <div class="card-header">
                                 <div class="card-avatar-wrapper">
                                     <div id="card-avatar-img-{{ item.id }}" class="card-custom-avatar" data-ef-sync="employee:{{ item.id }}" data-name="{{ item.name }}">{% if item.avatar %}<img src="{{ item.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% else %}{{ item.name|slice(-2, 2) }}{% endif %}</div>
-                                    {% if item.status == 'active' %}
-                                        <span class="status-indicator indicator-active"></span>
-                                    {% elseif item.status == 'inactive' %}
-                                        <span class="status-indicator indicator-inactive"></span>
+                                    {% if item.employmentStatus == 'active' %}
+                                        <span class="status-indicator indicator-active" title="{{ 'employee.employment_status.active'|trans }}"></span>
                                     {% else %}
-                                        <span class="status-indicator indicator-vacation"></span>
+                                        <span class="status-indicator indicator-inactive" title="{{ 'employee.employment_status.inactive'|trans }}"></span>
                                     {% endif %}
                                 </div>
                                 <button class="action-btn"><i class="fa-solid fa-ellipsis"></i></button>
                             </div>
 
                             <div class="card-main-info">
-                                <span class="card-name sync-val-name" onclick="openEmployeeDrawer('{{ item.id }}')" style="cursor: pointer;">{{ item.name }}</span>
+                                <span class="card-name sync-val-name" onclick="openEmployeeDrawer('{{ item.id }}')" style="cursor: pointer; {% if item.employmentStatus == 'inactive' %}text-decoration: underline; text-decoration-color: #ef4444; text-underline-offset: 4px;{% endif %}">{{ item.name }}</span>
                                 <span class="card-role sync-val-position">{{ item.position ? item.position.name : '' }}</span>
                             </div>
 
@@ -898,27 +943,290 @@
 </div>
 
 <div id="columnModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
-    <div style="background: #fff; width: 400px; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-        <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 18px; font-weight: 600; color: #0f172a;">{{ 'employee.list.customize_columns'|trans({}, 'messages')|default('Customize Columns') }}</h3>
-        <div id="columnList" style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+    <div style="background: #fff; width: 420px; border-radius: 12px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+        <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600; color: #0f172a; border-bottom: 1px solid #f1f5f9; padding-bottom: 12px;">{{ 'employee.list.customize_columns'|trans({}, 'messages')|default('Customize Columns') }}</h3>
+        <div id="columnList" style="max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;">
+            {# 1. Render active columns in their saved order #}
+            {% for key, config in columns %}
+                <div class="column-item" data-id="{{ key }}">
+                     <div class="column-drag-handle">
+                         <i class="fa-solid fa-grip-vertical"></i>
+                     </div>
+                     <input type="checkbox" class="column-checkbox custom-checkbox" value="{{ key }}" checked>
+                     <span style="font-size: 14px; color: #334155; font-weight: 500;">{{ config.label|trans }}</span>
+                </div>
+            {% endfor %}
+
+            {# 2. Render inactive columns #}
             {% for key, config in allColumns %}
-            <div style="display: flex; align-items: center; gap: 10px;">
-                 <input type="checkbox" class="column-checkbox custom-checkbox" value="{{ key }}" {% if columns[key] is defined %}checked{% endif %}>
-                 <span>{{ config.label|trans }}</span>
-            </div>
+                {% if columns[key] is not defined %}
+                <div class="column-item" data-id="{{ key }}">
+                     <div class="column-drag-handle">
+                         <i class="fa-solid fa-grip-vertical"></i>
+                     </div>
+                     <input type="checkbox" class="column-checkbox custom-checkbox" value="{{ key }}">
+                     <span style="font-size: 14px; color: #334155; font-weight: 500;">{{ config.label|trans }}</span>
+                </div>
+                {% endif %}
             {% endfor %}
         </div>
-        <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
-            <button onclick="closeColumnModal()" class="btn outline medium" style="border: 1px solid #e2e8f0; color: #64748b;">{{ 'action.cancel'|trans({}, 'messages')|default('Cancel') }}</button>
-            <button onclick="saveColumns()" class="btn primary medium" style="background: #3b82f6; color: #fff; border-color: #3b82f6;">{{ 'action.save'|trans({}, 'messages')|default('Save') }}</button>
+        <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
+            <button onclick="closeColumnModal()" class="btn outline medium" style="border: 1px solid #e2e8f0; color: #64748b; padding: 0 16px; border-radius: 8px; font-weight: 500; height: 36px; display: inline-flex; align-items: center; justify-content: center;">{{ 'action.cancel'|trans({}, 'messages')|default('Cancel') }}</button>
+            <button onclick="saveColumns()" class="btn primary medium" style="background: #3b82f6; color: #fff; border: none; padding: 0 24px; border-radius: 8px; font-weight: 600; cursor: pointer; height: 36px; display: inline-flex; align-items: center; justify-content: center;">{{ 'action.save'|trans({}, 'messages')|default('Save') }}</button>
         </div>
     </div>
 </div>
 
+{% set importModalBody %}
+    <div style="margin-bottom: 20px; font-size: 14px; color: #475569;">
+        请先 <a href="{{ path('employee_import_template') }}" style="color: #3b82f6; text-decoration: none; font-weight: 500;"><i class="fa-solid fa-download"></i> 下载导入模板</a>，按照模板格式填写后上传。
+    </div>
+
+    <div id="uploadArea" style="border: 2px dashed #cbd5e1; border-radius: 8px; padding: 40px 20px; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.3s;"
+            ondragover="event.preventDefault(); this.style.borderColor='#3b82f6'; this.style.background='#eff6ff';"
+            ondragleave="event.preventDefault(); this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';"
+            ondrop="handleDrop(event)"
+            onclick="document.getElementById('fileInput').click()">
+        
+        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 36px; color: #94a3b8; margin-bottom: 12px;"></i>
+        <div style="font-size: 15px; color: #334155; font-weight: 500; margin-bottom: 4px;">点击或拖拽文件到此处上传</div>
+        <div style="font-size: 13px; color: #94a3b8;">支持 .xlsx, .xls 格式</div>
+        <input type="file" id="fileInput" style="display: none;" accept=".xlsx, .xls" onchange="handleFileSelect(this)">
+    </div>
+
+    <div id="uploadProgress" style="display: none; margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+            <span style="color: #334155; font-weight: 500;" id="progressText">正在导入...</span>
+            <span style="color: #3b82f6; font-weight: 600;" id="progressPercentage">0%</span>
+        </div>
+        <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+            <div id="progressBar" style="height: 100%; width: 0%; background: #3b82f6; transition: width 0.3s;"></div>
+        </div>
+    </div>
+    
+    <div id="importResult" style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: #f0fdf4; border: 1px solid #bbf7d0;">
+        <div style="display: flex; align-items: center; gap: 10px; color: #166534; font-weight: 500;">
+            <i class="fa-solid fa-circle-check" style="font-size: 18px; color: #22c55e;"></i>
+            <span>导入完成！共成功导入 <span id="successCount">0</span> 条数据。</span>
+        </div>
+    </div>
+    
+    <div id="importError" style="display: none; margin-top: 20px; padding: 15px; border-radius: 8px; background: #fef2f2; border: 1px solid #fecaca;">
+        <div style="display: flex; align-items: center; gap: 10px; color: #991b1b; font-weight: 500;">
+            <i class="fa-solid fa-circle-xmark" style="font-size: 18px; color: #ef4444;"></i>
+            <span id="errorMsg">导入失败</span>
+        </div>
+    </div>
+{% endset %}
+
+{% set importModalFooter %}
+    <button class="btn outline medium" type="button" onclick="closeImportModalLogic()">关闭</button>
+{% endset %}
+
+{{ ui.modal('importModal', '导入员工'|trans({}, 'messages'), importModalBody, importModalFooter, {
+    'width': '500px',
+    'onClose': 'closeImportModalLogic()'
+}) }}
+
 <script>
+    window.exportEmployees = function() {
+        const url = new URL('{{ path('employee_export') }}', window.location.origin);
+        
+        // Pass current filters to export
+        const currentUrl = new URL(window.location.href);
+        const searchParams = currentUrl.searchParams;
+        
+        if (searchParams.get('q')) url.searchParams.set('q', searchParams.get('q'));
+        if (searchParams.get('employment_status')) url.searchParams.set('employment_status', searchParams.get('employment_status'));
+        if (searchParams.get('department_id')) url.searchParams.set('department_id', searchParams.get('department_id'));
+        if (searchParams.get('company_id')) url.searchParams.set('company_id', searchParams.get('company_id'));
+        if (searchParams.get('include_sub')) url.searchParams.set('include_sub', searchParams.get('include_sub'));
+        
+        // 使用 AJAX 触发后台异步导出任务
+        $.ajax({
+            url: url.toString(),
+            type: 'GET',
+            success: function(res) {
+                if (window.$.alert) {
+                    window.$.alert.success(res.message || '导出任务已提交，系统将在后台处理。生成完毕后会自动发送通知。', {
+                        title: '提示',
+                        closable: true
+                    });
+                } else {
+                    alert(res.message || '导出任务已提交，系统将在后台处理。生成完毕后会自动发送通知。');
+                }
+            },
+            error: function(err) {
+                if (window.$.alert) {
+                    window.$.alert.error('导出任务提交失败，请重试');
+                } else {
+                    alert('导出任务提交失败，请重试');
+                }
+            }
+        });
+    }
+
+    window.openImportModal = function() {
+        resetImportUI();
+        
+        // 使用框架提供的 openModal 方法打开预先定义的静态模态框
+        openModal('importModal');
+    }
+
+    function closeImportModalLogic() {
+        if (window.importEventSource) {
+            window.importEventSource.close();
+            window.importEventSource = null;
+        }
+        
+        // 关闭模态框
+        closeModal('importModal');
+
+        // Reload list if successful
+        const modalResult = document.getElementById('importResult');
+        if (modalResult && modalResult.style.display === 'block') {
+            loadContent(window.location.href);
+        }
+    }
+
+    window.handleDrop = function(e) {
+        e.preventDefault();
+        const modalBody = document.querySelector('.ef-modal-body');
+        if(!modalBody) return;
+        
+        const uploadArea = modalBody.querySelector('#uploadArea');
+        if(uploadArea) {
+            uploadArea.style.borderColor = '#cbd5e1';
+            uploadArea.style.background = '#f8fafc';
+        }
+        
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            processImportFile(e.dataTransfer.files[0]);
+        }
+    }
+
+    window.handleFileSelect = function(input) {
+        if (input.files && input.files.length > 0) {
+            processImportFile(input.files[0]);
+        }
+        input.value = ''; // Reset input
+    }
+
+    window.importEventSource = null;
+
+    function resetImportUI() {
+        const modal = document.getElementById('importModal');
+        if(!modal) return;
+        
+        modal.querySelector('#uploadArea').style.display = 'block';
+        modal.querySelector('#uploadProgress').style.display = 'none';
+        modal.querySelector('#importResult').style.display = 'none';
+        modal.querySelector('#importError').style.display = 'none';
+        modal.querySelector('#progressBar').style.width = '0%';
+        modal.querySelector('#progressPercentage').innerText = '0%';
+    }
+
+    function processImportFile(file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (ext !== 'xlsx' && ext !== 'xls') {
+            showImportError('仅支持 .xlsx 或 .xls 格式的 Excel 文件');
+            return;
+        }
+
+        const modalBody = document.querySelector('.ef-modal-body');
+        if(!modalBody) return;
+
+        modalBody.querySelector('#uploadArea').style.display = 'none';
+        modalBody.querySelector('#uploadProgress').style.display = 'block';
+        modalBody.querySelector('#importError').style.display = 'none';
+        modalBody.querySelector('#progressText').innerText = '正在上传文件...';
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        $.ajax({
+            url: '{{ path('employee_import_upload') }}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(res) {
+                if (res.taskId) {
+                    startImportProgress(res.taskId);
+                } else {
+                    showImportError('上传失败：未返回任务ID');
+                }
+            },
+            error: function(err) {
+                showImportError('上传失败：' + (err.responseJSON?.error || err.statusText));
+            }
+        });
+    }
+
+    function startImportProgress(taskId) {
+        const modalBody = document.querySelector('.ef-modal-body');
+        if(!modalBody) return;
+
+        modalBody.querySelector('#progressText').innerText = '正在处理数据...';
+        
+        window.importEventSource = new EventSource('{{ path('employee_import_process') }}?taskId=' + taskId);
+        
+        window.importEventSource.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            
+            if (data.error) {
+                window.importEventSource.close();
+                showImportError(data.error);
+                return;
+            }
+
+            if (data.progress !== undefined) {
+                modalBody.querySelector('#progressBar').style.width = data.progress + '%';
+                modalBody.querySelector('#progressPercentage').innerText = data.progress + '%';
+            }
+
+            if (data.complete) {
+                window.importEventSource.close();
+                modalBody.querySelector('#uploadProgress').style.display = 'none';
+                modalBody.querySelector('#importResult').style.display = 'block';
+                modalBody.querySelector('#successCount').innerText = data.processed || 0;
+            }
+        };
+
+        window.importEventSource.onerror = function() {
+            window.importEventSource.close();
+            showImportError('与服务器的连接中断');
+        };
+    }
+
+    function showImportError(msg) {
+        const modalBody = document.querySelector('.ef-modal-body');
+        if(!modalBody) return;
+
+        modalBody.querySelector('#uploadProgress').style.display = 'none';
+        modalBody.querySelector('#importError').style.display = 'block';
+        modalBody.querySelector('#errorMsg').innerText = msg;
+        modalBody.querySelector('#uploadArea').style.display = 'block'; // Allow retry
+    }
+
     // Column Customization Logic
+    let columnSortable = null;
+
     window.openColumnModal = function() {
         document.getElementById('columnModal').style.display = 'flex';
+        
+        if (!columnSortable) {
+            const el = document.getElementById('columnList');
+            columnSortable = new Sortable(el, {
+                animation: 150,
+                handle: '.column-drag-handle',
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                onEnd: function() {
+                    console.log('Column order changed');
+                }
+            });
+        }
     }
 
     window.closeColumnModal = function() {
@@ -928,9 +1236,10 @@
     window.saveColumns = function() {
         const newColumns = {};
         
-        // Iterate all checkboxes to preserve original order
-        const allCheckboxes = document.querySelectorAll('.column-checkbox');
-        allCheckboxes.forEach(cb => {
+        // Use the actual DOM order from Sortable
+        const columnItems = document.querySelectorAll('#columnList .column-item');
+        columnItems.forEach(item => {
+            const cb = item.querySelector('.column-checkbox');
             if (cb.checked) {
                 newColumns[cb.value] = { sortable: true }; 
             }
@@ -948,15 +1257,27 @@
             }
         };
         
+        const saveBtn = document.querySelector('#columnModal button[onclick="saveColumns()"]');
+        const originalText = saveBtn.innerText;
+        saveBtn.innerText = '{{ "action.saving"|trans|default("Saving...") }}';
+        saveBtn.disabled = true;
+        
         fetch('/api/user/preference/save', {
             method: 'POST',
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
         }).then(res => {
             if(res.ok) {
-                location.reload();
+                closeColumnModal();
+                loadContent(window.location.href);
             } else {
                 alert('Failed to save preferences');
             }
+        }).finally(() => {
+            saveBtn.innerText = originalText;
+            saveBtn.disabled = false;
         });
     }
 
@@ -1095,6 +1416,17 @@
          url.searchParams.set('limit', limit);
          url.searchParams.set('page', 1); // Reset to page 1
          loadContent(url.toString());
+    }
+
+    window.filterEmploymentStatus = function(status) {
+        const url = new URL(window.location.href);
+        if (status) {
+            url.searchParams.set('employment_status', status);
+        } else {
+            url.searchParams.delete('employment_status');
+        }
+        url.searchParams.set('page', 1);
+        loadContent(url.toString());
     }
 
     // PJAX Loading Function
@@ -1245,17 +1577,26 @@
             const id = $this.attr('id');
             
             let newUrl = window.location.pathname;
-            const params = new URLSearchParams();
+            const params = new URLSearchParams(window.location.search);
 
+            // Update department or company
             if (type === 'department' && id) {
                 params.set('department_id', id);
+                params.delete('company_id');
             } else if (type === 'company' && id) {
                 params.set('company_id', id);
+                params.delete('department_id');
+            } else {
+                params.delete('department_id');
+                params.delete('company_id');
             }
             
             // Include sub-departments toggle state
             const includeSub = $('#includeSubToggle').is(':checked');
             params.set('include_sub', includeSub ? '1' : '0');
+            
+            // Reset to page 1
+            params.set('page', 1);
 
             if (params.toString()) {
                 newUrl += '?' + params.toString();
@@ -1358,7 +1699,22 @@
             
             // 2. 如果是整行数据更新 (tr 或 .employee-card)
             if (($el.is('tr') || $el.hasClass('employee-card')) && data.name) {
-                $el.find('.sync-val-name').text(data.name);
+                const $nameSpan = $el.find('.sync-val-name');
+                $nameSpan.text(data.name);
+                
+                // 离职红线逻辑
+                if (data.employmentStatus === 'inactive') {
+                    $nameSpan.css({
+                        'text-decoration': 'underline',
+                        'text-decoration-color': '#ef4444',
+                        'text-underline-offset': '4px'
+                    });
+                } else {
+                    $nameSpan.css({
+                        'text-decoration': 'none'
+                    });
+                }
+
                 $el.find('.sync-val-employeeNo').text(data.employeeNo);
                 
                 // 部门和职位
@@ -1372,31 +1728,54 @@
                 $el.find('.sync-val-position').text(data.position);
                 $el.find('.sync-val-hireDate').text(data.hireDate);
                 
-                // 状态 - HTML 重构
-                if (data.status && data.statusTrans) {
+                // 状态 - HTML 重构 (仅显示工作状态)
+                if (data.workStatus) {
                     const $statusTd = $el.find('.sync-val-status');
                     if ($statusTd.length) {
-                        let icon = 'fa-check';
-                        let pillClass = 'status-active';
-                        if (data.status === 'inactive') {
-                            icon = 'fa-xmark';
-                            pillClass = 'status-inactive';
-                        } else if (data.status === 'vacation') {
-                            icon = 'fa-umbrella-beach';
-                            pillClass = 'status-vacation';
-                        }
-                        $statusTd.html(`<span class="status-pill ${pillClass}"><i class="fa-solid ${icon}" style="margin-right:4px;"></i> ${data.statusTrans}</span>`);
+                        let workIcon = 'fa-circle';
+                        if (data.workStatus === 'working') workIcon = 'fa-briefcase';
+                        else if (data.workStatus === 'vacation') workIcon = 'fa-umbrella-beach';
+                        else if (data.workStatus === 'business_trip') workIcon = 'fa-plane';
+                        else if (data.workStatus === 'out_of_office') workIcon = 'fa-person-walking-arrow-right';
+                        else if (data.workStatus === 'in_meeting') workIcon = 'fa-users';
+
+                        $statusTd.html(`
+                            <div style="font-size: 14px; color: #334155; display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid ${workIcon}" style="color: #64748b;"></i>
+                                ${data.workStatusTrans || data.workStatus}
+                            </div>
+                        `);
                     }
                     
                     // 卡片视图的状态点
                     const $cardStatus = $el.find('.status-indicator');
                     if ($cardStatus.length) {
                         $cardStatus.removeClass('indicator-active indicator-inactive indicator-vacation');
-                        $cardStatus.addClass('indicator-' + data.status);
+                        $cardStatus.addClass('indicator-' + data.employmentStatus);
                     }
                 }
             }
         });
+        
+        // 监听 Mercure 异步导出完成事件
+        if (window.EF && window.EF.Mercure) {
+            const userId = '{{ app.user.id ?? app.user.userIdentifier }}';
+            const topic = 'https://enterprise.local/user/' + userId + '/export';
+            window.EF.Mercure.subscribe(topic);
+            
+            window.EF.Mercure.on('export_complete', function(data) {
+                    if (window.$.alert) {
+                        window.$.alert.success(data.message + ' <br><br><a href="' + data.download_url + '" class="btn primary small round" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;" target="_blank"><i class="fa-solid fa-download"></i> 立即下载</a>', {
+                            percent: '320px', 
+                            title: data.title || '处理完成', 
+                            closable: true
+                        });
+                    } else {
+                        // 降级处理，以防 Alert 组件未加载
+                        alert(data.message + '\n请访问此链接下载: ' + data.download_url);
+                    }
+                });
+        }
     });
 </script>
 {% endblock %}

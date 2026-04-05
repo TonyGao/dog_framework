@@ -7,7 +7,7 @@ use App\Entity\Organization\Department;
 use App\Entity\Organization\Company;
 use App\Form\BaseFormType;
 use App\Repository\Organization\CompanyRepository;
-use App\Repository\Organization\UserRepository;
+use App\Repository\Organization\EmployeeRepository;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Form\Common\DepartmentTypeTransfer;
@@ -17,7 +17,7 @@ class OrgDepartmentType extends BaseFormType
   public function __construct(
     private FormFieldBuilderService $formFieldBuilder,
     private CompanyRepository $companyRepo,
-    private UserRepository $userRepo,
+    private EmployeeRepository $empRepo,
     private DepartmentTypeTransfer $departmentTypeTransfer
   ) {
   }

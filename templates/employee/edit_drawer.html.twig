@@ -191,14 +191,46 @@
                 <div class="profile-drawer-title">{{ 'employee.edit_drawer.account_details'|trans }}</div>
 
                 <div class="profile-section">
-                    <div id="edit-avatar-img-{{ employee.id }}" data-ef-sync="employee:{{ employee.id }}" class="profile-avatar" style="cursor: pointer;display:flex;align-items:center;justify-content:center;background-color:#3b82f6;color:#ffffff;font-weight:600;font-size:24px;" onclick="openAvatarModal('{{ employee.id }}')">{% if employee.avatar %}<img src="{{ employee.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">{% else %}{{ employee.name|slice(-2, 2) }}{% endif %}</div>
-                    <div class="profile-info">
-                        <div class="profile-info-title">{{ 'employee.edit_drawer.profile_picture'|trans }}</div>
-                        <div class="profile-actions">
+                    <div id="edit-avatar-img-{{ employee.id }}" data-ef-sync="employee:{{ employee.id }}" class="profile-avatar" style="cursor: pointer;display:flex;align-items:center;justify-content:center;background-color:#3b82f6;color:#ffffff;font-weight:600;font-size:24px;flex-shrink:0;" onclick="openAvatarModal('{{ employee.id }}')">
+                        {% if employee.avatar %}
+                            <img src="{{ employee.avatar }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+                        {% else %}
+                            {{ employee.name|slice(-2, 2) }}
+                        {% endif %}
+                    </div>
+                    <div class="profile-info" style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div class="profile-info-title" style="font-size: 18px; margin-bottom: 2px;">{{ employee.name }}</div>
+                                <div style="font-size: 13px; color: #64748b;">{{ employee.englishName|default('') }}</div>
+                            </div>
+                            {% set status_class = {
+                                'active': 'ef-badge-success',
+                                'inactive': 'ef-badge-danger'
+                            }[employee.employmentStatus] | default('ef-badge-secondary') %}
+                            <span class="ef-badge {{ status_class }}">{{ ('employee.employment_status.' ~ employee.employmentStatus)|trans }}</span>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 13px; color: #475569; display: flex; gap: 12px; align-items: center;">
+                            <span>
+                                <i class="fa-solid fa-briefcase" style="margin-right: 6px; color: #94a3b8;"></i>
+                                {{ employee.position ? employee.position.name : ('employee.field.no_position'|trans|default('No Position')) }}
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 4px;">
+                                {% set work_icon = {
+                                    'working': 'fa-briefcase',
+                                    'vacation': 'fa-umbrella-beach',
+                                    'business_trip': 'fa-plane',
+                                    'out_of_office': 'fa-person-walking-arrow-right',
+                                    'in_meeting': 'fa-users'
+                                }[employee.workStatus] | default('fa-circle') %}
+                                <i class="fa-solid {{ work_icon }}" style="color: #94a3b8;"></i>
+                                {{ ('employee.work_status.' ~ employee.workStatus)|trans }}
+                            </span>
+                        </div>
+                        <div class="profile-actions" style="margin-top: 12px;">
                             <button type="button" class="btn-upload" onclick="openAvatarModal('{{ employee.id }}')"><i class="fa-solid fa-arrow-up-from-bracket"></i> {{ 'employee.edit_drawer.upload_image'|trans }}</button>
                             <button type="button" class="btn-remove" onclick="removeAvatar('{{ employee.id }}', this)"><i class="fa-regular fa-trash-can"></i> {{ 'employee.edit_drawer.remove'|trans }}</button>
                         </div>
-                        <div class="profile-hint">{{ 'employee.edit_drawer.profile_picture_format'|trans }}</div>
                     </div>
                 </div>
 
@@ -206,15 +238,49 @@
                 {{ form_start(form, {'attr': {'id': 'employee-edit-form-' ~ employee.id, 'class': 'edit-form'}}) }}
                     <div class="modern-form-grid">
                         <div class="modern-form-group">
+                            {{ form_label(form.name, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.name) }}
+                            {{ form_errors(form.name) }}
+                        </div>
+                        <div class="modern-form-group">
+                            {{ form_label(form.englishName, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.englishName) }}
+                            {{ form_errors(form.englishName) }}
+                        </div>
+                        <div class="modern-form-group">
                             {{ form_label(form.employeeNo, null, {'label_attr': {'class': 'modern-label'}}) }}
                             {{ form_widget(form.employeeNo) }}
                             {{ form_errors(form.employeeNo) }}
                         </div>
                         
                         <div class="modern-form-group">
+                            {{ form_label(form.employmentStatus, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.employmentStatus) }}
+                            {{ form_errors(form.employmentStatus) }}
+                        </div>
+
+                        <div class="modern-form-group">
+                            {{ form_label(form.workStatus, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.workStatus) }}
+                            {{ form_errors(form.workStatus) }}
+                        </div>
+
+                        <div class="modern-form-group">
+                            {{ form_label(form.isActive, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.isActive) }}
+                            {{ form_errors(form.isActive) }}
+                        </div>
+
+                        <div class="modern-form-group">
                             {{ form_label(form.hireDate, null, {'label_attr': {'class': 'modern-label'}}) }}
                             {{ form_widget(form.hireDate) }}
                             {{ form_errors(form.hireDate) }}
+                        </div>
+
+                        <div class="modern-form-group">
+                            {{ form_label(form.position, null, {'label_attr': {'class': 'modern-label'}}) }}
+                            {{ form_widget(form.position) }}
+                            {{ form_errors(form.position) }}
                         </div>
 
                         <div class="modern-form-group full-width">
@@ -257,19 +323,6 @@
                         </div>
                     </div>
 
-                    <div class="modern-divider"></div>
-
-                    <div class="toggle-row">
-                        <div class="toggle-info">
-                            <div class="toggle-title">{{ 'employee.edit_drawer.user_account_status'|trans }}</div>
-                            <div class="toggle-desc">{{ 'employee.edit_drawer.user_account_status_desc'|trans }}</div>
-                        </div>
-                        <div style="width: 160px;">
-                            {{ form_widget(form.status) }}
-                            {{ form_errors(form.status) }}
-                        </div>
-                    </div>
-
                     <button class="btn-full-save" type="submit">{{ 'employee.edit_drawer.save_changes'|trans }}</button>
                 {{ form_end(form) }}
             </div>
@@ -301,9 +354,27 @@
         }
     });
 
-    if (window.EF && window.EF.Mercure) {
-        window.EF.Mercure.subscribe('/entity/employee/{{ employee.id }}');
-    }
+    // 状态联动：在职状态 -> 账号状态
+    (function() {
+        const employmentStatusSelect = document.getElementById('employee_employmentStatus');
+        const accountStatusSelect = document.getElementById('employee_isActive');
+
+        if (employmentStatusSelect && accountStatusSelect) {
+            employmentStatusSelect.addEventListener('change', function() {
+                const val = this.value;
+                if (val === 'inactive') {
+                    // 离职 -> 停用
+                    accountStatusSelect.value = '0';
+                } else if (val === 'active') {
+                    // 在职 -> 可用
+                    accountStatusSelect.value = '1';
+                }
+                
+                // 触发 change 事件以更新可能的自定义 UI 组件 (如 select.js)
+                $(accountStatusSelect).trigger('change');
+            });
+        }
+    })();
 
     // Initialize date pickers in the drawer if needed
     if (typeof $.fn.daterangepicker !== 'undefined' && typeof window.EFDate !== 'undefined') {
@@ -323,6 +394,7 @@
         });
     }
 
+    // Form Submission Logic
     document.getElementById('employee-edit-form-{{ employee.id }}').addEventListener('submit', function(e) {
         e.preventDefault();
         

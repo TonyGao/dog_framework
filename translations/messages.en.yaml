@@ -23,7 +23,7 @@ employee:
     save_changes: Save Changes
   list:
     customize_columns: Customize Columns
-    title: Employee Roster
+    title: Employee List
     search_department: Search Department
     header: Employee List
     search_placeholder: Search...
@@ -58,11 +58,27 @@ employee:
     manager: Manager
     position: Role
     status: Status
+    employment_status: Employment Status
+    work_status: Work Status
+    account_status: Account Status
     entry_date: Joining Date
     gender: Gender
     birth_date: Date of Birth
     id_card: ID Card
     english_name: English Name
+    no_position: No Position
+  employment_status:
+    active: Active
+    inactive: Inactive
+  work_status:
+    working: Working
+    vacation: Vacation
+    business_trip: Business Trip
+    out_of_office: Out of Office
+    in_meeting: In Meeting
+  account_status:
+    enabled: Enabled
+    disabled: Disabled
   status:
     active: Active
     inactive: Inactive
@@ -166,6 +182,34 @@ pagination:
   info: Showing {start} to {end} of {total} entries
   per_page: Per page
 
+security:
+  reset_password:
+    title: Reset your password
+    new_password_label: Password
+    confirm_password_label: Confirm password
+    min_length_hint: Must be at least 8 characters
+    match_hint: Both passwords must match
+    reset_button: Reset
+    cancel_button: Cancel
+    page_title: 'Reset Password'
+    select_method: 'Please select a verification method to reset your password:'
+    send_email_link: 'Send Reset Email to Email'
+    send_sms_code: 'Send Verification Code to Phone'
+    answer_question: 'Answer Security Question'
+    use_passkey: 'Verify with Passkey'
+    next_step: 'Next'
+    back_to_login: 'Back to Login'
+    email_sent: 'Verification code sent to %email% (Mock: %code%)'
+    sms_sent: 'SMS Verification code sent to %mobile% (Mock: %code%)'
+    email_sent_real: 'Verification code sent. Please check your inbox.'
+    sms_sent_real: 'SMS Verification code sent. Please check your messages.'
+    link_sent: 'Reset link sent to %email%'
+    link_sent_mock: 'Reset link generated (Mock sent to %email%, token: %token%)'
+    check_email: 'Check Your Email'
+    link_sent_message: 'We have sent a password reset link to your email address.'
+    check_inbox: 'Click the link in the email to reset your password'
+    link_expire_note: 'The link will expire in 1 hour'
+    resend_link: 'Resend Link'
 admin_security:
   page_title: 'Security Configuration'
   title: 'Security'
@@ -492,25 +536,3 @@ function_binding:
   function_code: 'Function Code'
   system_default: 'System Default'
   select_template: 'Please select a template'
-
-security:
-  reset_password:
-    page_title: 'Reset Password'
-    select_method: 'Please select a verification method to reset your password:'
-    send_email_link: 'Send Reset Email to Email'
-    send_sms_code: 'Send Verification Code to Phone'
-    answer_question: 'Answer Security Question'
-    use_passkey: 'Verify with Passkey'
-    next_step: 'Next'
-    back_to_login: 'Back to Login'
-    email_sent: 'Verification code sent to %email% (Mock: %code%)'
-    sms_sent: 'SMS Verification code sent to %mobile% (Mock: %code%)'
-    email_sent_real: 'Verification code sent. Please check your inbox.'
-    sms_sent_real: 'SMS Verification code sent. Please check your messages.'
-    link_sent: 'Reset link sent to %email%'
-    link_sent_mock: 'Reset link generated (Mock sent to %email%, token: %token%)'
-    check_email: 'Check Your Email'
-    link_sent_message: 'We have sent a password reset link to your email address.'
-    check_inbox: 'Click the link in the email to reset your password'
-    link_expire_note: 'The link will expire in 1 hour'
-    resend_link: 'Resend Link'

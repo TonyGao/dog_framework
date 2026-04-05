@@ -2,7 +2,7 @@
 
 namespace App\Entity\Traits;
 
-use App\Entity\OrgUser;
+use App\Entity\Organization\Employee;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Organization\Company;
 use App\Entity\Organization\Corporation;
@@ -55,8 +55,8 @@ trait OrganizationTrait
         if ($this->ownerCompany === null) {
             $user = $this->getCurrentUser();
             
-            if ($user instanceof OrgUser) {
-                $this->ownerCompany = $user->getOwnerCompany();
+            if ($user instanceof Employee) {
+                $this->ownerCompany = $user->getCompany();
             } else {
                 $this->ownerCompany = null; // 处理未登录用户的情况
             }

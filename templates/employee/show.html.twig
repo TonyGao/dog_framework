@@ -565,15 +565,23 @@
                                     <img src="" class="profile-avatar" id="avatar-preview-{{ employee.id }}" alt="Avatar" style="display: none;">
                                 {% endif %}
                             </div>
-                            <div class="profile-name">
+                            <div class="profile-name" style="{% if employee.employmentStatus|default('active') == 'inactive' %}text-decoration: underline; text-decoration-color: #ef4444; text-underline-offset: 4px;{% endif %}">
                                 {{ employee.name }}
                             </div>
                             {% if employee.englishName is defined and employee.englishName %}
                             <div class="english-name">{{ employee.englishName }}</div>
                             {% endif %}
                             <div class="profile-role">{{ employee.position }}</div>
-                            <div class="status-badge">
-                                <span class="status-dot"></span> {{ ('employee.status_value.' ~ employee.status|default('active')|lower)|trans({}, 'messages')|default('Active') }}
+                            <div class="status-badge" style="background: #f1f5f9; color: #475569;">
+                                {% set work_icon = {
+                                    'working': 'fa-briefcase',
+                                    'vacation': 'fa-umbrella-beach',
+                                    'business_trip': 'fa-plane',
+                                    'out_of_office': 'fa-person-walking-arrow-right',
+                                    'in_meeting': 'fa-users'
+                                }[employee.workStatus|default('working')] | default('fa-circle') %}
+                                <i class="fa-solid {{ work_icon }}" style="margin-right: 6px; color: #94a3b8;"></i>
+                                {{ ('employee.work_status.' ~ employee.workStatus|default('working'))|trans({}, 'messages') }}
                             </div>
                         </div>
 

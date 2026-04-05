@@ -7,6 +7,7 @@ action:
   reselect: 重新选择
 employee:
   list:
+    customize_columns: 自定义列
     title: 员工花名册
     search_department: 搜索部门
     header: 员工列表
@@ -21,15 +22,57 @@ employee:
     increase_last_month: 较上月增长
     decrease_yesterday: 较昨日减少
     increase_last_year: 较去年增长
+  onboarding:
+    title: 员工入职
+    steps:
+      basic_info: 基本信息
+      job_info: 职位信息
+      account_info: 账户信息
+      complete: 完成
+    basic_info:
+      title: 基本信息
+      english_name: 英文名
+      id_type: 证件类型
+      id_number: 证件号码
+    job_info:
+      title: 职位信息
+      employee_no: 员工工号
+      status: 状态
+      hire_date: 入职日期
+      company: 公司
+      department: 部门
+      position: 职位
+      manager: 直接上级
+    account_info:
+      title: 账户信息
+      username: 用户名
+      password: 密码
+      roles: 角色
+      is_active: 是否启用
+    complete_step:
+      success: 员工入职流程已完成，相关信息已成功保存。
+      view_profile: 查看员工档案
+      onboard_another: 继续入职下一个员工
+    action:
+      cancel: 取消
+      prev: 上一步
+      next: 下一步
+      submit: 提交
+    placeholder:
+      input: 请输入 %label%
+      select: 请选择 %label%
   filter:
-    all: 全部员工
+    all: 全部人员
     active: 在职
+    inactive: 离职
     pending: 待验证
     include_sub: 包含子部门
   action:
     cancel: 取消
     confirm: 确认
     filter: 筛选
+    export: 导出
+    import: 导入
   view:
     list: 列表视图
     card: 卡片视图
@@ -41,6 +84,9 @@ employee:
     department: 部门
     position: 职位
     status: 状态
+    employment_status: 在职状态
+    work_status: 工作状态
+    account_status: 账号状态
     entry_date: 入职日期
     gender: 性别
     birth_date: 出生日期
@@ -48,6 +94,7 @@ employee:
     english_name: 英文名
     company: 公司
     manager: 直接上级
+    no_position: 暂无职位
   edit_drawer:
     account_details: 账户详情
     profile_picture: 头像
@@ -62,6 +109,18 @@ employee:
     edit:
       title: 编辑头像
     drop_hint: 点击或拖拽图片到这里
+  employment_status:
+    active: 在职
+    inactive: 离职
+  work_status:
+    working: 工作
+    vacation: 休假
+    business_trip: 出差
+    out_of_office: 外出
+    in_meeting: 会议中
+  account_status:
+    enabled: 可用
+    disabled: 停用
   status:
     active: 在职
     inactive: 离职
@@ -151,6 +210,11 @@ employee:
       time: 时间
       ip: IP地址
       browser: 浏览器
+
+pagination:
+  info: 显示第 %start% 到 %end% 条，共 %total% 条
+  per_page: 每页显示
+
 layout:
   user:
     settings: 个人设置
@@ -183,16 +247,42 @@ setup:
     password_mismatch: 两次输入的密码不一致。
     password_length: 密码长度至少为8个字符。
     password_updated: 密码更新成功。接下来请设置通行密钥。
-pagination:
-  info: 显示第 {start} 到 {end} 条，共 {total} 条
-  per_page: 每页显示
 
+security:
+  reset_password:
+    title: 重置您的密码
+    new_password_label: 密码
+    confirm_password_label: 确认密码
+    min_length_hint: 至少 8 个字符
+    match_hint: 两次输入的密码必须一致
+    reset_button: 重置
+    cancel_button: 取消
+    page_title: '重置密码'
+    select_method: '请选择验证方式以重置密码：'
+    send_email_link: '发送重置邮件到邮箱'
+    send_sms_code: '发送验证码到手机'
+    answer_question: '回答安全问题'
+    use_passkey: '使用通行密钥验证'
+    next_step: '下一步'
+    back_to_login: '返回登录'
+    email_sent: '验证码已发送到 %email% (模拟: %code%)'
+    email_sent_real: '验证码已发送，请查收邮件。'
+    sms_sent: '短信验证码已发送到 %mobile% (模拟: %code%)'
+    sms_sent_real: '短信验证码已发送，请查收短信。'
+    link_sent: '重置链接已发送到 %email%'
+    link_sent_mock: '重置链接已生成 (模拟发送到 %email%，令牌: %token%)'
+    check_email: '检查您的邮箱'
+    link_sent_message: '我们已向您的邮箱发送了一封包含重置密码链接的邮件。'
+    check_inbox: '请点击邮件中的链接来重置您的密码'
+    link_expire_note: '链接将在 1 小时后过期'
+    resend_link: '重新发送链接'
 admin_security:
   page_title: '安全配置管理'
   title: '安全配置'
   tabs:
     email_password: '邮箱与密码'
     2fa_settings: '二次验证设置'
+    password_policy: '密码强度配置'
   alert:
     title: '添加强大的备用方法以增加更多保护'
     content: '拥有一个强大的方法很好，但拥有两个方法可以更好地保护您的帐户。如果您失去了对主要方法的访问权限，您可以使用另一个方法作为备用。'
@@ -451,28 +541,6 @@ login:
       passkey_invalid: '无效的通行密钥'
       passkey_generic_error: '通行密钥验证失败'
       passkey_login_failed: '登录失败：'
-
-security:
-  reset_password:
-    page_title: '重置密码'
-    select_method: '请选择验证方式以重置密码：'
-    send_email_link: '发送重置邮件到邮箱'
-    send_sms_code: '发送验证码到手机'
-    answer_question: '回答安全问题'
-    use_passkey: '使用通行密钥验证'
-    next_step: '下一步'
-    back_to_login: '返回登录'
-    email_sent: '验证码已发送到 %email% (模拟: %code%)'
-    email_sent_real: '验证码已发送，请查收邮件。'
-    sms_sent: '短信验证码已发送到 %mobile% (模拟: %code%)'
-    sms_sent_real: '短信验证码已发送，请查收短信。'
-    link_sent: '重置链接已发送到 %email%'
-    link_sent_mock: '重置链接已生成 (模拟发送到 %email%，令牌: %token%)'
-    check_email: '检查您的邮箱'
-    link_sent_message: '我们已向您的邮箱发送了一封包含重置密码链接的邮件。'
-    check_inbox: '请点击邮件中的链接来重置您的密码'
-    link_expire_note: '链接将在 1 小时后过期'
-    resend_link: '重新发送链接'
 
 function_binding:
   security:

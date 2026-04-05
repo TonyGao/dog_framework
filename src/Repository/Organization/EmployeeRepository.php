@@ -106,8 +106,10 @@ class EmployeeRepository extends ServiceEntityRepository implements PasswordUpgr
     public function findActiveEmployees()
     {
         return $this->createQueryBuilder('e')
-            ->andWhere('e.status = :status')
+            ->andWhere('e.employmentStatus = :status')
+            ->andWhere('e.isSystem = :isSystem OR e.isSystem IS NULL')
             ->setParameter('status', 'active')
+            ->setParameter('isSystem', false)
             ->orderBy('e.name', 'ASC')
             ->getQuery()
             ->getResult();
@@ -120,7 +122,9 @@ class EmployeeRepository extends ServiceEntityRepository implements PasswordUpgr
     {
         return $this->createQueryBuilder('e')
             ->andWhere('e.department = :departmentId')
+            ->andWhere('e.isSystem = :isSystem OR e.isSystem IS NULL')
             ->setParameter('departmentId', $departmentId)
+            ->setParameter('isSystem', false)
             ->orderBy('e.name', 'ASC')
             ->getQuery()
             ->getResult();
@@ -133,7 +137,9 @@ class EmployeeRepository extends ServiceEntityRepository implements PasswordUpgr
     {
         return $this->createQueryBuilder('e')
             ->andWhere('e.position = :positionId')
+            ->andWhere('e.isSystem = :isSystem OR e.isSystem IS NULL')
             ->setParameter('positionId', $positionId)
+            ->setParameter('isSystem', false)
             ->orderBy('e.name', 'ASC')
             ->getQuery()
             ->getResult();
@@ -146,7 +152,9 @@ class EmployeeRepository extends ServiceEntityRepository implements PasswordUpgr
     {
         return $this->createQueryBuilder('e')
             ->andWhere('e.manager = :managerId')
+            ->andWhere('e.isSystem = :isSystem OR e.isSystem IS NULL')
             ->setParameter('managerId', $managerId)
+            ->setParameter('isSystem', false)
             ->orderBy('e.name', 'ASC')
             ->getQuery()
             ->getResult();

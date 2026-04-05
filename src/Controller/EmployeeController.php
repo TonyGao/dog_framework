@@ -19,6 +19,15 @@ use App\Entity\Traits\OrganizationTrait;
 
 use App\Entity\Security\WebauthnCredential;
 use App\Form\Organization\EmployeeType;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+
+use Symfony\Component\Messenger\MessageBusInterface;
+use App\Message\ExportEmployeeMessage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 #[IsGranted('ROLE_USER')]
 class EmployeeController extends AbstractController
@@ -41,10 +50,9 @@ class EmployeeController extends AbstractController
             $this->addFlash('success', 'action.edit_success');
             
             $statusTransKey = [
-                'active' => 'employee.status.active',
-                'inactive' => 'employee.status.inactive',
-                'vacation' => 'employee.status.vacation'
-            ][$employee->getStatus()] ?? 'employee.status.active';
+                'active' => 'employee.employment_status.active',
+                'inactive' => 'employee.employment_status.inactive'
+            ][$employee->getEmploymentStatus()] ?? 'employee.employment_status.active';
 
             // Broadcast the updated info via Mercure SSE
             $update = new Update(
@@ -57,8 +65,10 @@ class EmployeeController extends AbstractController
                     'employeeNo' => $employee->getEmployeeNo(),
                     'department' => $employee->getDepartment() ? $employee->getDepartment()->getName() : '',
                     'position' => $employee->getPosition() ? $employee->getPosition()->getName() : '',
-                    'status' => $employee->getStatus(),
+                    'employmentStatus' => $employee->getEmploymentStatus(),
+                    'workStatus' => $employee->getWorkStatus(),
                     'statusTrans' => $translator->trans($statusTransKey, [], 'messages'),
+                    'workStatusTrans' => $translator->trans('employee.work_status.' . $employee->getWorkStatus(), [], 'messages'),
                     'hireDate' => $employee->getHireDate() ? $employee->getHireDate()->format('Y-m-d') : ''
                 ])
             );
@@ -86,6 +96,195 @@ class EmployeeController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    #[Route('/employee/export', name: 'employee_export')]
+    public function export(Request $request, MessageBusInterface $bus): Response
+    {
+        $filters = [
+            'search' => $request->query->get('q'),
+            'employmentStatus' => $request->query->get('employment_status', 'active'),
+            'departmentId' => $request->query->get('department_id'),
+            'companyId' => $request->query->get('company_id'),
+            'includeSub' => $request->query->getBoolean('include_sub', true),
+        ];
+
+        $user = $this->getUser();
+        $userId = method_exists($user, 'getId') ? (string)$user->getId() : $user->getUserIdentifier();
+
+        // Dispatch async message to RabbitMQ/Redis
+        $bus->dispatch(new ExportEmployeeMessage($userId, $filters));
+
+        // Since the previous implementation was a direct download via `window.location.href`,
+        // and we are switching to async, we return a JSON response or redirect back with a flash message.
+        // Assuming the frontend might still be doing a direct window.open or location.href,
+        // we can return an HTML snippet that closes the window or redirects back.
+        // If it's an AJAX call, we return JSON. Let's handle both.
+        if ($request->isXmlHttpRequest()) {
+            return $this->json([
+                'code' => 200,
+                'message' => '导出任务已提交，系统将在后台处理。生成完毕后会自动发送通知。'
+            ]);
+        }
+
+        $this->addFlash('success', '导出任务已提交，系统将在后台处理。生成完毕后会自动发送通知。');
+        return $this->redirectToRoute('employee_list');
+    }
+
+    #[Route('/employee/export/download/{filename}', name: 'employee_export_download')]
+    public function downloadExport(string $filename, #[Autowire('%kernel.project_dir%')] string $projectDir): Response
+    {
+        $exportDir = $projectDir . '/var/exports';
+        $filePath = $exportDir . '/' . basename($filename);
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('导出的文件不存在或已过期');
+        }
+
+        $response = new BinaryFileResponse($filePath);
+        
+        $timezone = new \DateTimeZone('Asia/Shanghai');
+        $now = new \DateTime('now', $timezone);
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            '花名册导出_' . $now->format('Ymd_His') . '.xlsx'
+        );
+
+        // Optional: Delete file after download to save space
+        $response->deleteFileAfterSend(true);
+
+        return $response;
+    }
+
+    #[Route('/employee/import/template', name: 'employee_import_template')]
+    public function importTemplate(): Response
+    {
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        $headers = ['工号', '姓名', '英文名', '邮箱', '手机号', '性别(男/女)'];
+        $column = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($column . '1', $header);
+            $column++;
+        }
+        
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $fileName = '导入模板.xlsx';
+        $temp_file = tempnam(sys_get_temp_dir(), $fileName);
+        $writer->save($temp_file);
+
+        return $this->file($temp_file, $fileName)->deleteFileAfterSend(true);
+    }
+
+    #[Route('/employee/import/upload', name: 'employee_import_upload', methods: ['POST'])]
+    public function importUpload(Request $request): Response
+    {
+        $file = $request->files->get('file');
+        if (!$file) {
+            return $this->json(['error' => 'No file uploaded'], 400);
+        }
+
+        $taskId = uniqid('import_');
+        $uploadDir = sys_get_temp_dir();
+        $fileName = $taskId . '.' . $file->getClientOriginalExtension();
+        $file->move($uploadDir, $fileName);
+
+        return $this->json(['taskId' => $taskId]);
+    }
+
+    #[Route('/employee/import/process', name: 'employee_import_process')]
+    public function importProcess(Request $request, EntityManagerInterface $em): Response
+    {
+        $taskId = $request->query->get('taskId');
+        if (!$taskId) {
+            throw $this->createNotFoundException();
+        }
+
+        $filePath = sys_get_temp_dir() . '/' . $taskId . '.xlsx';
+        if (!file_exists($filePath)) {
+            $filePath = sys_get_temp_dir() . '/' . $taskId . '.xls';
+            if (!file_exists($filePath)) {
+                $filePath = sys_get_temp_dir() . '/' . $taskId . '.csv';
+            }
+        }
+
+        if ($request->hasSession()) {
+            $request->getSession()->save();
+        }
+
+        $response = new \Symfony\Component\HttpFoundation\StreamedResponse(function () use ($filePath, $em) {
+            set_time_limit(0);
+            
+            if (!file_exists($filePath)) {
+                echo "data: " . json_encode(['error' => 'File not found']) . "\n\n";
+                if (ob_get_level() > 0) ob_flush(); flush();
+                return;
+            }
+
+            try {
+                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($filePath);
+                $sheet = $spreadsheet->getActiveSheet();
+                $highestRow = $sheet->getHighestRow();
+                
+                if ($highestRow <= 1) {
+                    echo "data: " . json_encode(['error' => 'Empty file']) . "\n\n";
+                    if (ob_get_level() > 0) ob_flush(); flush();
+                    return;
+                }
+
+                $total = $highestRow - 1;
+                $processed = 0;
+
+                for ($row = 2; $row <= $highestRow; $row++) {
+                    $employeeNo = $sheet->getCell('A' . $row)->getValue();
+                    $name = $sheet->getCell('B' . $row)->getValue();
+                    
+                    if (!$name) continue;
+
+                    $employee = new Employee();
+                    $employee->setName((string)$name);
+                    $employee->setEmployeeNo((string)$employeeNo);
+                    $employee->setEnglishName((string)$sheet->getCell('C' . $row)->getValue());
+                    $employee->setEmail((string)$sheet->getCell('D' . $row)->getValue());
+                    $employee->setMobile((string)$sheet->getCell('E' . $row)->getValue());
+                    
+                    $gender = $sheet->getCell('F' . $row)->getValue();
+                    if ($gender == '男') $employee->setGender('male');
+                    elseif ($gender == '女') $employee->setGender('female');
+                    
+                    $em->persist($employee);
+                    $processed++;
+                    
+                    if ($processed % 10 === 0) {
+                        $em->flush();
+                        $em->clear();
+                        
+                        $progress = floor(($processed / $total) * 100);
+                        echo "data: " . json_encode(['progress' => $progress, 'processed' => $processed, 'total' => $total]) . "\n\n";
+                        if (ob_get_level() > 0) ob_flush(); flush();
+                    }
+                }
+                
+                $em->flush();
+                
+                echo "data: " . json_encode(['progress' => 100, 'processed' => $processed, 'total' => $total, 'complete' => true]) . "\n\n";
+                if (ob_get_level() > 0) ob_flush(); flush();
+                
+                @unlink($filePath);
+                
+            } catch (\Exception $e) {
+                echo "data: " . json_encode(['error' => $e->getMessage()]) . "\n\n";
+                if (ob_get_level() > 0) ob_flush(); flush();
+            }
+        });
+
+        $response->headers->set('Content-Type', 'text/event-stream');
+        $response->headers->set('Cache-Control', 'no-cache');
+        $response->headers->set('Connection', 'keep-alive');
+        $response->headers->set('X-Accel-Buffering', 'no');
+
+        return $response;
+    }
+
     #[Route('/employee/list', name: 'employee_list')]
     public function list(Request $request, EntityManagerInterface $em): Response
     {
@@ -179,8 +378,9 @@ class EmployeeController extends AbstractController
         $user = $this->getUser();
         $prefRepo = $em->getRepository(UserPreference::class);
         $userPref = null;
-        if ($user instanceof Employee) {
-            $userPref = $prefRepo->findOneBy(['user' => $user, 'prefKey' => 'employee_list_columns']);
+        if ($user) {
+            $userId = method_exists($user, 'getId') ? (string)$user->getId() : $user->getUserIdentifier();
+            $userPref = $prefRepo->findOneBy(['userId' => $userId, 'prefKey' => 'employee_list_columns']);
         }
 
         $allColumns = [
@@ -188,7 +388,8 @@ class EmployeeController extends AbstractController
             'employeeNo' => ['label' => 'employee.field.employee_no', 'sortable' => true],
             'department' => ['label' => 'employee.field.department', 'sortable' => true],
             'position' => ['label' => 'employee.field.position', 'sortable' => true],
-            'status' => ['label' => 'employee.field.status', 'sortable' => true],
+            'employmentStatus' => ['label' => 'employee.field.employment_status', 'sortable' => true],
+            'workStatus' => ['label' => 'employee.field.work_status', 'sortable' => true],
             'hireDate' => ['label' => 'employee.field.entry_date', 'sortable' => true],
             'email' => ['label' => 'employee.field.email', 'sortable' => true],
             'mobile' => ['label' => 'employee.field.mobile', 'sortable' => true],
@@ -199,16 +400,30 @@ class EmployeeController extends AbstractController
         ];
 
         $columns = [];
-        if ($userPref && isset($userPref->getPrefValue()['columns'])) {
-            // Merge stored columns with definition to ensure they are valid and have labels
-            foreach ($userPref->getPrefValue()['columns'] as $key => $config) {
-                if (isset($allColumns[$key])) {
-                    $columns[$key] = $allColumns[$key];
+        if ($userPref) {
+            $prefVal = $userPref->getPrefValue();
+            if (is_string($prefVal)) {
+                $prefVal = json_decode($prefVal, true);
+            }
+            
+            if (is_array($prefVal) && isset($prefVal['columns'])) {
+                // Merge stored columns with definition to ensure they are valid and have labels
+                foreach ($prefVal['columns'] as $key => $config) {
+                    // Compatibility for old 'status' key
+                    if ($key === 'status') {
+                        $key = 'employmentStatus';
+                    }
+                    
+                    if (isset($allColumns[$key])) {
+                        $columns[$key] = $allColumns[$key];
+                    }
                 }
             }
-        } else {
+        }
+        
+        if (empty($columns)) {
             // Default columns
-            $defaultKeys = ['name', 'employeeNo', 'department', 'position', 'status', 'hireDate'];
+            $defaultKeys = ['name', 'employeeNo', 'department', 'position', 'employmentStatus', 'hireDate'];
             foreach ($defaultKeys as $key) {
                 if (isset($allColumns[$key])) {
                     $columns[$key] = $allColumns[$key];
@@ -218,10 +433,22 @@ class EmployeeController extends AbstractController
 
         // 如果 URL 参数中没有指定排序，尝试使用用户偏好，否则使用默认值
         if (!$sort) {
-            if ($userPref && isset($userPref->getPrefValue()['sort'])) {
-                $sort = $userPref->getPrefValue()['sort'];
-                $order = $userPref->getPrefValue()['order'] ?? 'desc';
-            } else {
+            if ($userPref) {
+                $prefVal = $userPref->getPrefValue();
+                if (is_string($prefVal)) {
+                    $prefVal = json_decode($prefVal, true);
+                }
+                if (is_array($prefVal) && isset($prefVal['sort'])) {
+                    $sort = $prefVal['sort'];
+                    // Compatibility for old 'status' key in sort
+                    if ($sort === 'status') {
+                        $sort = 'employmentStatus';
+                    }
+                    $order = $prefVal['order'] ?? 'desc';
+                }
+            }
+            
+            if (!$sort) {
                 $sort = 'hireDate';
                 $order = 'desc';
             }
@@ -238,7 +465,9 @@ class EmployeeController extends AbstractController
         $empRepo = $em->getRepository(Employee::class);
         $qb = $empRepo->createQueryBuilder('e')
             ->leftJoin('e.department', 'd')
-            ->leftJoin('e.position', 'p');
+            ->leftJoin('e.position', 'p')
+            ->where('e.isSystem = :isSystem OR e.isSystem IS NULL')
+            ->setParameter('isSystem', false);
 
         // 应用排序
         if ($sort === 'department') {
@@ -254,6 +483,13 @@ class EmployeeController extends AbstractController
         if ($search) {
             $qb->andWhere('e.name LIKE :search OR e.employeeNo LIKE :search')
                ->setParameter('search', '%' . $search . '%');
+        }
+
+        // 在职状态筛选
+        $employmentStatus = $request->query->get('employment_status', 'active'); // 默认为 active
+        if ($employmentStatus && $employmentStatus !== 'all') {
+            $qb->andWhere('e.employmentStatus = :employmentStatus')
+               ->setParameter('employmentStatus', $employmentStatus);
         }
 
         // 树状结构筛选
@@ -314,7 +550,14 @@ class EmployeeController extends AbstractController
             ->getResult();
 
         // 3. 统计数据 (从数据库获取真实数据)
-        $activeCount = $empRepo->count(['status' => 'active']);
+        $activeCountQb = $empRepo->createQueryBuilder('e')
+            ->select('count(e.id)')
+            ->where('e.employmentStatus = :status')
+            ->andWhere('e.isSystem = :isSystem OR e.isSystem IS NULL')
+            ->setParameter('status', 'active')
+            ->setParameter('isSystem', false);
+        $activeCount = $activeCountQb->getQuery()->getSingleScalarResult();
+        
         $deptCount = $deptRepo->count(['type' => 'department']);
 
         // 简单的统计数据结构
@@ -364,7 +607,8 @@ class EmployeeController extends AbstractController
             'avatar' => $employee->getAvatar(),
             'position' => $employee->getPosition() ? $employee->getPosition()->getName() : '',
             'employeeNo' => $employee->getEmployeeNo(),
-            'status' => $employee->getStatus(), // active, inactive, etc.
+            'employmentStatus' => $employee->getEmploymentStatus(), // active, inactive, etc.
+            'workStatus' => $employee->getWorkStatus(),
             'hireDate' => $employee->getHireDate() ? $employee->getHireDate()->format('Y-m-d') : '-',
             'email' => $employee->getEmail(),
             'mobile' => $employee->getMobile(),

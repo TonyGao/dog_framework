@@ -117,19 +117,21 @@
                                 <tbody>
                                     {% for employee in employees %}
                                         <tr class="ef-table-tr">
-                                            <td class="ef-table-td">{{ employee.name }}</td>
+                                            <td class="ef-table-td" style="{% if employee.employmentStatus == 'inactive' %}text-decoration: underline; text-decoration-color: #ef4444; text-underline-offset: 4px;{% endif %}">{{ employee.name }}</td>
                                             <td class="ef-table-td">{{ employee.employeeNo }}</td>
                                             <td class="ef-table-td">{{ employee.hireDate ? employee.hireDate|date('Y-m-d') : '未设置' }}</td>
                                             <td class="ef-table-td">
-                                                {% if employee.status == 'active' %}
-                                                    <span class="ef-badge ef-badge-success">在职</span>
-                                                {% elseif employee.status == 'probation' %}
-                                                    <span class="ef-badge ef-badge-warning">试用期</span>
-                                                {% elseif employee.status == 'terminated' %}
-                                                    <span class="ef-badge ef-badge-danger">离职</span>
-                                                {% else %}
-                                                    <span class="ef-badge ef-badge-default">{{ employee.status }}</span>
-                                                {% endif %}
+                                                {% set work_icon = {
+                                                    'working': 'fa-briefcase',
+                                                    'vacation': 'fa-umbrella-beach',
+                                                    'business_trip': 'fa-plane',
+                                                    'out_of_office': 'fa-person-walking-arrow-right',
+                                                    'in_meeting': 'fa-users'
+                                                }[employee.workStatus|default('working')] | default('fa-circle') %}
+                                                <span class="ef-badge ef-badge-default" style="display: inline-flex; align-items: center; gap: 4px;">
+                                                    <i class="fa-solid {{ work_icon }}" style="font-size: 11px;"></i>
+                                                    {{ ('employee.work_status.' ~ employee.workStatus|default('working'))|trans }}
+                                                </span>
                                             </td>
                                             <td class="ef-table-td">
                                                 <a href="#" class="ef-button ef-button-text">查看</a>
